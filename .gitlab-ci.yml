@@ -9,8 +9,8 @@ variables:
 
 before_script:
   # Node.js 및 npm 설치
-  - apt-get update -y
-  - apt-get install -y nodejs npm
+  - apt update -y
+  - apt install -y nodejs npm
 
 docker-build:
   stage: docker-build
