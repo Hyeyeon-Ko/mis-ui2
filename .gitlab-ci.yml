@@ -6,7 +6,8 @@ stages:
 
 variables:
   # Docker 이미지 이름
-  DOCKER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+  DOCKER_IMAGE: frontend
+  FRONTEND_IMAGE: $CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$DOCKER_IMAGE:$CI_COMMIT_REF_NAME
   DEPLOY_USER: root  # 배포할 사용자 이름
   DEPLOY_SERVER: 101.10.1.87  # 배포할 서버 IP 주소
 
@@ -30,7 +31,7 @@ docker-build:
   script:
     - echo "Docker build start!!"
     # Dockerfile로 Docker 이미지 빌드
-    - docker build -t $DOCKER_IMAGE .
+    - docker build -t $FRONTEND_IMAGE .
   tags:
     - mis-runner
   dependencies:
@@ -43,7 +44,7 @@ docker-push:
     - echo "Docker push start!!"
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     # Docker 이미지 푸시
-    - docker push $DOCKER_IMAGE
+    - docker push $FRONTEND_IMAGE
   tags:
     - mis-runner
   dependencies:
@@ -59,13 +60,16 @@ deploy:
     - chmod 600 ~/.ssh/id_rsa
     - ssh-keyscan $DEPLOY_SERVER >> ~/.ssh/known_hosts
   script:
-    # 필요 시 배포 스크립트 작성
-    - echo "Deploy step!!"
-    # - ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $DEPLOY_USER@$DEPLOY_SERVER "docker-compose down && docker-compose pull && docker-compose up -d"
-    - ssh user@101.10.1.87 "
-        docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD 101.10.1.100:5000 && 
-        docker pull 101.10.1.100:5000/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:$CI_COMMIT_REF_NAME && 
-        docker run -d --name my_container 101.10.1.100:5000/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
+    - ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $DEPLOY_USER@$DEPLOY_SERVER "
+        echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY &&
+        cd / &&
+        export CI_REGISTRY=$CI_REGISTRY &&
+        export CI_PROJECT_NAMESPACE=$CI_PROJECT_NAMESPACE &&
+        export CI_PROJECT_NAME=$CI_PROJECT_NAME &&
+        export CI_COMMIT_REF_NAME=$CI_COMMIT_REF_NAME &&
+        export DOCKER_IMAGE=$DOCKER_IMAGE &&
+        docker-compose pull &&
+        docker-compose up -d
       "
   tags:
     - mis-runner
