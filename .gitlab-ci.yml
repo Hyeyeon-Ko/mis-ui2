@@ -68,8 +68,8 @@ deploy:
         export CI_PROJECT_NAMESPACE=$CI_PROJECT_NAMESPACE &&
         export CI_PROJECT_NAME=$CI_PROJECT_NAME &&
         export CI_COMMIT_REF_NAME=$CI_COMMIT_REF_NAME &&
-        docker-compose pull &&
-        docker-compose up -d
+        docker-compose pull frontend &&
+        docker-compose up -d frontend
       "
   tags:
     - mis-runner
