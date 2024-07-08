@@ -5,20 +5,11 @@ stages:
 
 variables:
   # Docker 이미지 이름 변수
-  DOCKER_IMAGE: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:main
-
-# Docker 이미지 빌드 및 푸시 전에 필요한 서비스
-services:
-  - docker:dind
-
-# Cache dependencies to speed up builds
-cache:
-  paths:
-    - node_modules/
+  DOCKER_IMAGE: $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$DOCKER_IMAGE:$CI_COMMIT_REF_NAME .
 
 before_script:
   # GitLab Runner에 Docker 로그인
-  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
   # Node.js 및 npm 설치
   - apt-get update -y
   - apt-get install -y nodejs npm
