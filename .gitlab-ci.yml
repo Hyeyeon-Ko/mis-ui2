@@ -31,7 +31,7 @@ docker-build:
   script:
     - echo "Docker build start!!"
     # Dockerfile로 Docker 이미지 빌드
-    - docker build -t $FRONTEND_IMAGE .
+    - docker build -t $CI_REGISTRY/$FRONTEND_IMAGE .
   tags:
     - mis-runner
   dependencies:
@@ -44,7 +44,7 @@ docker-push:
     - echo "Docker push start!!"
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     # Docker 이미지 푸시
-    - docker push $FRONTEND_IMAGE
+    - docker push $CI_REGISTRY/$FRONTEND_IMAGE
   tags:
     - mis-runner
   dependencies:
