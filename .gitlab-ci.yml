@@ -60,6 +60,7 @@ deploy:
     - chmod 600 ~/.ssh/id_rsa
     - ssh-keyscan $DEPLOY_SERVER >> ~/.ssh/known_hosts
   script:
+    - echo "Docker Deploy!!"
     - ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $DEPLOY_USER@$DEPLOY_SERVER "
         echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY &&
         cd / &&
