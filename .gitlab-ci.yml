@@ -1,6 +1,6 @@
 stages:
-  - build
   - docker-build
+  - docker-push
   - deploy
 
 variables:
@@ -8,31 +8,42 @@ variables:
   DOCKER_IMAGE: $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$DOCKER_IMAGE:$CI_COMMIT_REF_NAME .
 
 before_script:
-  # GitLab Runner에 Docker 로그인
-  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
   # Node.js 및 npm 설치
   - apt-get update -y
   - apt-get install -y nodejs npm
 
-build:
-  stage: build
-  script:
-    - npm install
-    - npm run build
-  artifacts:
-    paths:
-      - build/
-
 docker-build:
   stage: docker-build
   script:
+    - echo "Docker build start!!"
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     # Dockerfile로 Docker 이미지 빌드
     - docker build -t $DOCKER_IMAGE .
     # Docker 이미지 푸시
     - docker push $DOCKER_IMAGE
+  tags:
+    - mis-runner
+
+docker-push:
+  stage: docker-push
+  script:
+    - echo "Docker build start!!"
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    # Dockerfile로 Docker 이미지 빌드
+    - docker build -t $DOCKER_IMAGE .
+    # Docker 이미지 푸시
+    - docker push $DOCKER_IMAGE
+  tags:
+    - mis-runner
+  dependencies:
+    - docker-build
 
 deploy:
   stage: deploy
   script:
     # 필요 시 배포 스크립트 작성
     - echo "Deploy step"
+  tags:
+    - mis-runner
+  dependencies:
+    - docker-push
