@@ -1,4 +1,5 @@
 stages:
+  - build
   - docker-build
   - docker-push
   - deploy
@@ -8,24 +9,35 @@ variables:
   DOCKER_IMAGE: $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$DOCKER_IMAGE:$CI_COMMIT_REF_NAME .
 
 before_script:
-  # Node.js 및 npm 설치
-  - apt update
-  - apt install nodejs npm
+  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+  
+build:
+  stage: build
+  image: node:alpine
+  script:
+    # Node.js 및 npm 설치
+    - apt update
+    - apt install nodejs npm
+  tags:
+    - mis-runner
 
 docker-build:
   stage: docker-build
+  image: docker:stable
   script:
     - echo "Docker build start!!"
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     # Dockerfile로 Docker 이미지 빌드
     - docker build -t $DOCKER_IMAGE .
     # Docker 이미지 푸시
     - docker push $DOCKER_IMAGE
   tags:
     - mis-runner
+  dependencies:
+    - build
 
 docker-push:
   stage: docker-push
+  image: docker:stable
   script:
     - echo "Docker build start!!"
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
