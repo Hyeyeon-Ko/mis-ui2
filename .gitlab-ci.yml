@@ -5,8 +5,7 @@ stages:
   - deploy
 
 variables:
-  # Docker 이미지 이름 변수
-  # DOCKER_IMAGE: $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$DOCKER_IMAGE:$CI_COMMIT_REF_NAME
+  # Docker 이미지 이름
   DOCKER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
 
 before_script:
@@ -40,6 +39,7 @@ docker-push:
   image: docker:stable
   script:
     - echo "Docker push start!!"
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     # Docker 이미지 푸시
     - docker push $DOCKER_IMAGE
   tags:
