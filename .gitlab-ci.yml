@@ -51,7 +51,7 @@ deploy:
   stage: deploy
   script:
     # 필요 시 배포 스크립트 작성
-    - echo "Deploy step"
+    - echo "Deploy step!!"
   tags:
     - mis-runner
   dependencies:
