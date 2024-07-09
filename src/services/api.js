@@ -17,7 +17,7 @@ const postData = async () => {
   };
 
   try {
-    const response = await axios.post('/sample/sample', dataToSend);
+    const response = await apiClient.post('/sample/sample', dataToSend);
     console.log('POST 요청 성공:', response.data);
     return response.data; // 성공적으로 데이터를 받은 경우 데이터 반환
   } catch (error) {
