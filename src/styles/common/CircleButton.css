@@ -1,0 +1,40 @@
+.circle-button {
+  background-color: #F1F4F7;
+  border-radius: 50%;
+  width: 380px; 
+  height: 380px; 
+  letter-spacing: 1px;
+  display: flex;
+  flex-direction: column; 
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, font-size 0.3s ease;
+  color: inherit;
+  text-decoration: none;
+}
+
+.circle-button .label {
+  font-size: 40px; 
+  margin-bottom: 10px; 
+}
+
+.circle-button .sub-label {
+  font-size: 18px;
+  text-align: center;
+  color: #888; 
+}
+
+.circle-button:hover {
+  background-color: #2789FE;
+  color: white;
+}
+
+.circle-button:hover .label {
+  color: white; 
+  font-weight: bold;
+}
+
+.circle-button:hover .sub-label {
+  color: white; 
+}

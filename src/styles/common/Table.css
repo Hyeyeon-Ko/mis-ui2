@@ -1,0 +1,85 @@
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 18px;
+  border-left: none;
+  border-right: none; 
+}
+
+.custom-table th, .custom-table td {
+  border: none;
+  padding: 13px 10px;
+  font-size: 19px;
+  text-align: center;
+}
+
+.custom-table th {
+  background-color: #F1F4F7;
+  text-align: center; 
+  border-top: 1px solid #D7D2D2;
+  border-bottom: 1px solid #D7D2D2; 
+}
+
+.custom-table td {
+  border-bottom: 0.1px solid #ebebeb; 
+}
+
+.button-cell {
+  padding: 5px; 
+}
+
+.email-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.email-text {
+  text-align: center;
+  flex-grow: 1;
+}
+
+.delete-button {
+  background-color: white;
+  color: black;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+  position: absolute;
+  right: 0;
+}
+
+.delete-button:hover {
+  background-color: #E84646;
+  color: white;
+}
+
+.modify-button, .cancel-button {
+  width: 70px;
+  height: 35px;
+  background-color: #BDC6CF;
+  color: black;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0 5px;
+}
+
+.cancel-button {
+  background-color: #2789FE;
+  color: white;
+}
+
+.modify-button:hover {
+  background-color: #A9A9A9;
+}
+
+.cancel-button:hover {
+  background-color: #1C6CC1;
+}

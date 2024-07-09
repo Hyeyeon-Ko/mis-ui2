@@ -1,0 +1,45 @@
+.button {
+    border-radius: 10px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .modify-button {
+    width: 70px;
+    height: 35px;
+    background-color: #BDC6CF;
+    color: black;
+    border: none;
+  }
+  
+  .modify-button:hover {
+    background-color: #BDC6CF;
+  }
+  
+  .cancel-button {
+    width: 70px;
+    height: 35px;
+    background-color: #2789FE;
+    color: white;
+    border: none;
+  }
+  
+  .cancel-button:hover {
+    background-color: #2789FE;
+  }
+  
+  .delete-button {
+    background: transparent;
+    border: none;
+    color: black;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .delete-button:hover {
+    background-color: #2789FE;
+    color: white;
+  }
+  

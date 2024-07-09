@@ -1,0 +1,27 @@
+.header {
+    background-color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    border-bottom: 1px solid #e7e7e7;
+  }
+  
+  .header-content {
+    display: flex;
+    align-items: center;
+  }
+  
+  /* 임시헤더 -> 현재 텍스트 입력 상태*/
+  .user-info {
+    font-size: 18px;
+    margin-right: 10px;
+  }
+  
+  /* 로그아웃 */
+  .user-info a {
+    color: #2789FE;
+    text-decoration: none;
+    margin-left: 5px;
+  }
+  

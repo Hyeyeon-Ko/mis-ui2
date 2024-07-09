@@ -1,0 +1,40 @@
+.admin-list {
+  padding: 10px 20px;
+}
+
+.admin-list h2 {
+  font-size: 35px;
+  margin-bottom: 15px;
+}
+
+.email-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.email-text {
+  text-align: center;
+  flex-grow: 1;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.buttons-container {
+  display: flex;
+  gap: 10px;
+}
+
+.authority-add-button {
+  background-color: #2789FE;
+}
+
+.authority-add-button:hover {
+  background-color: #1e6fc1;
+}

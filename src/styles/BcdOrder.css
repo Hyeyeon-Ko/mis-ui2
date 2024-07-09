@@ -1,0 +1,47 @@
+.order {
+  padding: 10px 20px;
+}
+
+.order h2 {
+  font-size: 35px;
+  margin-bottom: 15px;
+}
+
+.order-table tbody tr.selected {
+  background-color: #e6f7ff;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.buttons-container {
+  display: flex;
+  gap: 10px;
+}
+
+.center-header {
+  position: relative;
+  display: inline-block;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.center-select {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.arrow {
+  margin-left: 5px;
+}

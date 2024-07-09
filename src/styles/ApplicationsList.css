@@ -1,0 +1,80 @@
+.all-applications, .order {
+  padding: 10px 20px;
+}
+
+.all-applications h2, .order h2 {
+  font-size: 35px;
+  margin-bottom: 5px;
+}
+
+.link {
+  color: black;
+  cursor: pointer;
+}
+
+.link:hover {
+  color: #2789FE; 
+  text-decoration: none; 
+}
+
+.status-filters {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px; 
+  margin: 10px 0;
+}
+
+.status-filters label {
+  margin-right: 10px;
+  font-size: 18px;
+  font-weight: normal;
+}
+
+.status-filters input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.status {
+  cursor: default;
+}
+
+.status-pending {
+  color: #2789FE;
+  cursor: pointer;
+  border-bottom: 1px solid #2789FE;
+}
+
+.center-header {
+  position: relative;
+  display: inline-block;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.center-select {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.arrow {
+  margin-left: 5px;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.buttons-container {
+  display: flex;
+  gap: 10px;
+}

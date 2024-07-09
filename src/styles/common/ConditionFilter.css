@@ -1,0 +1,54 @@
+.all-application-filter-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  padding: 13px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: white;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.all-application-filter {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.all-application-filter span {
+  margin-right: 10px;
+}
+
+.all-application-filter label {
+  margin-bottom: 5px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.all-application-filter input,
+.all-application-filter select {
+  margin-right: 10px;
+}
+
+/* 기안일자 선택 박스 스타일 수정 */
+.custom-datepicker {
+  width: 150px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 0;
+  background-color: white;
+  font-size: 17px;
+  text-align: center;
+  margin-right: 10px;
+}
+
+/* 문서분류 박스 스타일 수정 */
+.all-application-filter select {
+  width: 150px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 0;  
+  background-color: white;
+  font-size: 17px;
+}
