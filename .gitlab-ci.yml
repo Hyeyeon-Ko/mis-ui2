@@ -12,6 +12,7 @@ variables:
   DEPLOY_SERVER: 101.10.1.87  # 배포할 서버 IP 주소
 
 before_script:
+  - echo "Docker build start!!"
   - apk add --no-cache docker
   - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
   
