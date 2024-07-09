@@ -1,8 +1,12 @@
 import axios from 'axios';
 
+// 환경 변수 API URL
+// API 개발서버
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 // Axios 인스턴스 생성
 const apiClient = axios.create({
-  baseURL: 'http://kmi-mis-backend-1:8080', // API 개발서버
+  baseURL: apiUrl,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json', // 필요에 따라 헤더 설정
