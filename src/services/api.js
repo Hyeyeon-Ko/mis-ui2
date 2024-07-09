@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Axios 기본 설정
-axios.defaults.baseURL = 'http://10.1.10.138:9090'; // api 개발서버
+axios.defaults.baseURL = 'http://101.1.10.87:9090'; // api 개발서버
 axios.defaults.timeout = 10000;
 
 // POST 요청을 보내는 함수
