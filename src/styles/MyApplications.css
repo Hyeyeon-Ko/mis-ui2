@@ -52,7 +52,7 @@
 }
 
 .cancel-button:hover {
-  background-color: #2789FE;
+  background-color: #1e6fc1;
 }
 
 .status-button {
@@ -65,5 +65,5 @@
 }
 
 .status-button:hover {
-  color: #1C6CC1;
+  color: #1e6fc1;
 }

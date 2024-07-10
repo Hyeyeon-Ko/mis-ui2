@@ -1,3 +1,4 @@
+/* AuthorityManagement.css */
 .admin-list {
   padding: 10px 20px;
 }
@@ -5,18 +6,6 @@
 .admin-list h2 {
   font-size: 35px;
   margin-bottom: 15px;
-}
-
-.email-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.email-text {
-  text-align: center;
-  flex-grow: 1;
 }
 
 .header-row {
@@ -33,8 +22,36 @@
 
 .authority-add-button {
   background-color: #2789FE;
+  color: white;
 }
 
 .authority-add-button:hover {
   background-color: #1e6fc1;
+}
+
+.email-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.email-text {
+  margin-right: 10px;
+}
+
+.icon-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+}
+
+.action-icon {
+  cursor: pointer;
+  width: 24px;
+  height: 26px;
+}
+
+.action-icon:hover {
+  opacity: 0.7;
 }

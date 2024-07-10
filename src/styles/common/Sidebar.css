@@ -28,7 +28,7 @@
 
 /* 나의신청내역 & 권한관리 */
 .sidebar-section h2 {
-  font-size: 25px;
+  font-size: 24px;
   margin-bottom: 40px;
   margin-left: 25px;
   cursor: pointer;
@@ -76,7 +76,7 @@
 
 /* 신청하기 & 신청목록관리 */
 .sidebar-section h3 {
-  font-size: 25px;
+  font-size: 24px;
   margin-bottom: 20px;
   cursor: pointer;
   display: flex;

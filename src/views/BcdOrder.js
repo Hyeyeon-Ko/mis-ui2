@@ -13,7 +13,18 @@ function BcdOrder() {
   const [selectedCenter, setSelectedCenter] = useState('전체'); 
 
   useEffect(() => {
-    
+    const mockApplications = [
+      {
+        id: 1,
+        center: '재단본부',
+        title: '명함신청서(고혜연)',
+        draftDate: '2023-06-01',
+        drafter: '최민성',
+        approvalDate: '2023-06-03',
+        quantity: 2
+      },
+    ];
+    setApplications(mockApplications);
   }, []);
 
   const handleSelectAll = (event) => {

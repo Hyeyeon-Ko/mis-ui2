@@ -11,6 +11,17 @@ function PendingApprovalList() {
   const [selectedCenter, setSelectedCenter] = useState('전체');
 
   useEffect(() => {
+    const mockApplications = [
+      {
+        id: 1,
+        center: '재단본부',
+        title: '명함신청서(윤성아)',
+        draftDate: '2023-06-05',
+        drafter: '최민성',
+        status: '승인대기',
+      },
+    ];
+    setApplications(mockApplications);
   }, []);
 
   const handleCenterChange = (event) => {

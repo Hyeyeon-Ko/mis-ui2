@@ -20,6 +20,19 @@ function ApplicationsList() {
   const [selectedCenter, setSelectedCenter] = useState('전체');
 
   useEffect(() => {
+    const mockApplications = [
+      {
+        id: 1,
+        center: '재단본부',
+        title: '명함신청서(고혜연)',
+        draftDate: '2023-06-01',
+        drafter: '최민성',
+        approvalDate: '2023-06-03',
+        orderDate: '2023-06-03',
+        status: '발주완료',
+      },
+    ];
+    setApplications(mockApplications);
   }, []);
 
   const handleFilterChange = (e) => {

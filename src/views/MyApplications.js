@@ -20,7 +20,39 @@ function MyApplications() {
   const navigate = useNavigate(); 
 
   useEffect(() => {
-    
+    const mockApplications = [
+      {
+        id: 1,
+        title: '[재단본부]명함신청서(고혜연)',
+        draftDate: '2023-06-01 10:00',
+        drafter: '최민성',
+        approvalDate: '2023-06-02',
+        manager: '이진채',
+        status: '발주완료',
+      },
+      {
+        id: 2,
+        title: '[재단본부]명함신청서(윤성아)',
+        draftDate: '2023-06-05 10:00',
+        drafter: '최민성',
+        approvalDate: '',
+        manager: '',
+        status: '승인대기',
+      },
+    ];
+    setApplications(mockApplications);
+
+    const mockPendingApplications = [
+      {
+        id: 1,
+        title: '[재단본부]명함신청서(윤성아)',
+        draftDate: '2023-06-05 10:00',
+        drafter: '최민성',
+        modifyDate: '',
+        modifier: '',
+      },
+    ];
+    setPendingApplications(mockPendingApplications);
   }, []);
 
   const handleButtonClick = (application) => {
@@ -52,7 +84,7 @@ function MyApplications() {
     { header: '제목', accessor: 'title', width: '32%' },
     { header: '기안일시', accessor: 'draftDate', width: '14%' },
     { header: '기안자', accessor: 'drafter', width: '9%' },
-    { header: '승인/반려일시', accessor: 'approvalDate', width: '16%' },
+    { header: '승인/반려일시', accessor: 'approvalDate', width: '14%' },
     { header: '담당자', accessor: 'manager', width: '9%' },
     {
       header: '신청상태',
@@ -74,7 +106,7 @@ function MyApplications() {
     { header: '제목', accessor: 'title', width: '33%' },
     { header: '기안일시', accessor: 'draftDate', width: '14%' },
     { header: '기안자', accessor: 'drafter', width: '9%' },
-    { header: '수정일시', accessor: 'modifyDate', width: '16%' },
+    { header: '수정일시', accessor: 'modifyDate', width: '14%' },
     { header: '수정자', accessor: 'modifier', width: '9%' },
     {
       header: '수정',
