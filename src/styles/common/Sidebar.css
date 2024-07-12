@@ -11,8 +11,10 @@
 
 /* 로고 */
 .logo {
-  height: 200px;
-  margin-bottom: 10px;
+  width: 210px;
+  height: 90px;
+  margin-top: 40px;
+  margin-bottom: 40px;
 }
 
 .sidebar-section {

@@ -3,35 +3,61 @@ import Breadcrumb from '../components/common/Breadcrumb';
 import Table from '../components/common/Table';
 import '../styles/ApplicationsList.css';
 import '../styles/common/Page.css';
+import axios from 'axios';
 
 /* 승인 대기 목록 페이지 */
 function PendingApprovalList() {
+  
+  // 신청 내역, 센터 목록, 선택된 센터 상태 관리
   const [applications, setApplications] = useState([]);
   const [centers, setCenters] = useState(['전체', '재단본부', '기타']); 
   const [selectedCenter, setSelectedCenter] = useState('전체');
 
+  // Timestamp Parsing: "YYYY-MM-DD"
+  const parseDraftDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+  };
+
+  // 승인 대기 목록 데이터 가져오기
+  const fetchPendingList = async () => {
+    try {
+      const response = await axios.get('/api/pendingList');
+      console.log('Response data: ', response.data);
+
+      // API 응답 데이터 구조에 맞게 데이터 추출
+      const data = response.data.bcdPendingResponses || [];
+      
+      const transformedData = data.map(item => ({
+        id: item.draftId,
+        center: item.instNm,
+        title: item.title,
+        draftDate: parseDraftDate(item.draftDate),
+        drafter: item.drafter,
+        status: item.applyStatus,
+      }));
+      console.log('Transformed data: ', transformedData);
+      setApplications(transformedData);
+    } catch (error) {
+      console.error('Error fetching pending list: ', error);
+    }
+  };
+
   useEffect(() => {
-    const mockApplications = [
-      {
-        id: 1,
-        center: '재단본부',
-        title: '명함신청서(윤성아)',
-        draftDate: '2023-06-05',
-        drafter: '최민성',
-        status: '승인대기',
-      },
-    ];
-    setApplications(mockApplications);
+    fetchPendingList();
   }, []);
 
+  // 센터 선택 핸들러
   const handleCenterChange = (event) => {
     setSelectedCenter(event.target.value);
   };
 
+  // 선택된 센터에 따라 신청 내역 필터링
   const filteredApplications = selectedCenter === '전체'
     ? applications
     : applications.filter(app => app.center === selectedCenter);
 
+  // 테이블 컬럼 정의
   const columns = [
     {
       header: (

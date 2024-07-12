@@ -13,11 +13,10 @@
 
 .confirm-modal-container {
   background: #fff;
-  padding: 30px 20px;
+  padding: 35px 30px;
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 300px;
 }
 
 .confirm-modal-container h3 {

@@ -7,6 +7,7 @@ import Button from '../components/common/Button';
 import ConfirmModal from '../components/common/ConfirmModal'; 
 import '../styles/MyApplications.css';
 import '../styles/common/Page.css';
+import axios from 'axios';
 
 /* 나의 신청내역 페이지 */
 function MyApplications() {
@@ -20,39 +21,7 @@ function MyApplications() {
   const navigate = useNavigate(); 
 
   useEffect(() => {
-    const mockApplications = [
-      {
-        id: 1,
-        title: '[재단본부]명함신청서(고혜연)',
-        draftDate: '2023-06-01 10:00',
-        drafter: '최민성',
-        approvalDate: '2023-06-02',
-        manager: '이진채',
-        status: '발주완료',
-      },
-      {
-        id: 2,
-        title: '[재단본부]명함신청서(윤성아)',
-        draftDate: '2023-06-05 10:00',
-        drafter: '최민성',
-        approvalDate: '',
-        manager: '',
-        status: '승인대기',
-      },
-    ];
-    setApplications(mockApplications);
 
-    const mockPendingApplications = [
-      {
-        id: 1,
-        title: '[재단본부]명함신청서(윤성아)',
-        draftDate: '2023-06-05 10:00',
-        drafter: '최민성',
-        modifyDate: '',
-        modifier: '',
-      },
-    ];
-    setPendingApplications(mockPendingApplications);
   }, []);
 
   const handleButtonClick = (application) => {

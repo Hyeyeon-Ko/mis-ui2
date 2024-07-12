@@ -7,6 +7,8 @@ import '../styles/common/Page.css';
 
 /* 전체 신청 내역 페이지 */
 function ApplicationsList() {
+
+  // 신청 내역, 시작 날짜, 종료 날짜, 필터, 센터, 선택된 센터 상태 관리
   const [applications, setApplications] = useState([]);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -19,22 +21,7 @@ function ApplicationsList() {
   const [centers, setCenters] = useState(['전체', '재단본부', '기타']);
   const [selectedCenter, setSelectedCenter] = useState('전체');
 
-  useEffect(() => {
-    const mockApplications = [
-      {
-        id: 1,
-        center: '재단본부',
-        title: '명함신청서(고혜연)',
-        draftDate: '2023-06-01',
-        drafter: '최민성',
-        approvalDate: '2023-06-03',
-        orderDate: '2023-06-03',
-        status: '발주완료',
-      },
-    ];
-    setApplications(mockApplications);
-  }, []);
-
+  // 조건 필터 변경 핸들러
   const handleFilterChange = (e) => {
     const { name, checked } = e.target;
     setFilters((prevFilters) => ({
@@ -43,12 +30,15 @@ function ApplicationsList() {
     }));
   };
 
+  // 센터 변경 핸들러
   const handleCenterChange = (event) => {
     setSelectedCenter(event.target.value);
   };
 
+  // 활성화된 필터 여부 확인
   const isAnyFilterActive = Object.values(filters).some((value) => value);
 
+  // 필터링된 신청 내역
   const filteredApplications = applications.filter((application) => {
     if (selectedCenter !== '전체' && application.center !== selectedCenter) return false;
     if (isAnyFilterActive) {
@@ -61,6 +51,7 @@ function ApplicationsList() {
     return true;
   });
 
+  // 테이블 컬럼 정의
   const columns = [
     {
       header: (

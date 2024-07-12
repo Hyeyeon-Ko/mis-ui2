@@ -2,13 +2,18 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import '../styles/RejectReasonModal.css';
 
+/* 반려 사유 모달 */
 const RejectReasonModal = ({ show, onClose }) => {
+
+  // 반려 사유를 저장하는 상태 관리
   const [reason, setReason] = useState('');
 
+  // 텍스트 영역의 변경 핸들러
   const handleTextareaChange = (event) => {
     setReason(event.target.value);
   };
 
+  // 모달이 표시되지 않으면 null 반환
   if (!show) return null;
 
   return (
@@ -29,9 +34,10 @@ const RejectReasonModal = ({ show, onClose }) => {
   );
 };
 
+// 컴포넌트의 props 타입 정의
 RejectReasonModal.propTypes = {
-  show: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
+  show: PropTypes.bool.isRequired, // 모달 표시 여부
+  onClose: PropTypes.func.isRequired, // 모달 닫기 핸들러
 };
 
 export default RejectReasonModal;

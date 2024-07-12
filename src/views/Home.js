@@ -2,6 +2,7 @@ import React from 'react';
 import CircleButton from '../components/CircleButton';
 import '../styles/Home.css';
 
+/* 메인페이지 */
 function Home() {
   return (
     <div className="main-content">

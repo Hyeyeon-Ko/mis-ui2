@@ -19,8 +19,8 @@ function Sidebar() {
   ];
 
   const manageItems = [
-    { label: '전체 신청 목록', url: '/api/bsc/applyList' },
-    { label: '승인 대기 목록', url: '/api/bsc/pendingList' },
+    { label: '전체 신청 목록', url: '/api/applyList' },
+    { label: '승인 대기 목록', url: '/api/pendingList' },
     { label: '명함 발주', url: '/api/bsc/orderList' },
   ];
 
@@ -32,7 +32,7 @@ function Sidebar() {
       <SidebarSection title="신청하기" items={applyItems} isActive={isActive} />
       <div className="sidebar-section">
         <h2>
-          <Link to="/api/bsc/myApplyList" className={isActive('/api/bsc/myApplyList')}>나의 신청내역</Link>
+          <Link to="/api/myApplyList" className={isActive('/api/myApplyList')}>나의 신청내역</Link>
         </h2>
       </div>
       <SidebarSection title="신청 목록 관리" items={manageItems} isActive={isActive} />

@@ -13,7 +13,7 @@ function BcdApplyFirst() {
             <Breadcrumb items={['신청하기', '명함신청']} />
             <div className="apply-button-container">
                 <CircleButton to="/api/bsc/own" label="본인" />
-                <CircleButton to="/api/bsc/other" label="타인" subLabel="단, 팀원의 명함만 대리 신청 가능" />
+                <CircleButton to="/api/bsc/other" label="타인" />
             </div>
         </div>
     </div>

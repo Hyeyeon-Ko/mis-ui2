@@ -12,16 +12,29 @@
     align-items: center;
   }
   
-  /* 임시헤더 -> 현재 텍스트 입력 상태*/
   .user-info {
     font-size: 18px;
     margin-right: 10px;
   }
+
+  .header-content .user-info span {
+    margin-right: 5px;
+  }
   
-  /* 로그아웃 */
+  /* 로그인 */
   .user-info a {
-    color: #2789FE;
+    color: black;
     text-decoration: none;
     margin-left: 5px;
   }
-  
+
+  /* 로그아웃 */
+  .logout-button {
+    font-size: 18px;
+    margin-right: 10px;
+    margin-left: -3px;
+    color: #2789FE;
+    text-decoration: none;
+    border: none;
+    background-color: white;
+  }
