@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { AuthContext } from '../../components/common/AuthContext';
+import { AuthContext } from '../../components/AuthContext';
 import '../../styles/common/Header.css';
 
 /* 헤더 component */

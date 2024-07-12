@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../components/common/Breadcrumb';
 import Table from '../components/common/Table';
-import CustomButton from '../components/CustomButton'; 
+import CustomButton from '../components/CustomButton';
 import '../styles/BcdOrder.css';
 import '../styles/common/Page.css';
 import axios from 'axios';
+import fileDownload from 'js-file-download'; // 파일 다운로드를 위한 라이브러리
 
 /* 발주 페이지 */
 function BcdOrder() {
@@ -85,8 +86,22 @@ function BcdOrder() {
     ? applications
     : applications.filter(app => app.center === selectedCenter);
 
-  // TODO : 엑셀변환 & 발주요청
-  //        => 정확한 프로세스 결정되면 백엔드 구현 후에 추가.
+  // 엑셀 변환 버튼 클릭 핸들러
+  const handleExcelDownload = async () => {
+    if (selectedApplications.length === 0) {
+      alert('선택된 신청 내역이 없습니다.');
+      return;
+    }
+
+    try {
+      const response = await axios.post('/api/bsc/order/excel', selectedApplications, {
+        responseType: 'blob', // 서버로부터 바이너리 데이터를 받을 때 설정
+      });
+      fileDownload(response.data, 'order_details.xlsx');
+    } catch (error) {
+      console.error('Error downloading excel: ', error);
+    }
+  };
 
   // 테이블 컬럼 정의
   const columns = [
@@ -130,7 +145,7 @@ function BcdOrder() {
         <div className="header-row">
           <Breadcrumb items={['신청 목록 관리', '명함 발주']} />
           <div className="buttons-container">
-            <CustomButton className="excel-button">엑셀변환</CustomButton>
+            <CustomButton className="excel-button" onClick={handleExcelDownload}>엑셀변환</CustomButton>
             <CustomButton className="order-request-button">발주요청</CustomButton>
           </div>
         </div>
