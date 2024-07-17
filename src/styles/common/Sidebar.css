@@ -19,19 +19,12 @@
 
 .sidebar-section {
   width: 100%;
-  margin-bottom: 20px;
   margin-left: 90px;
-}
-
-.sidebar-section h1 {
-  margin-bottom: 10px;
-  cursor: pointer;
 }
 
 /* 나의신청내역 & 권한관리 */
 .sidebar-section h2 {
   font-size: 24px;
-  margin-bottom: 40px;
   margin-left: 25px;
   cursor: pointer;
 }
@@ -41,7 +34,6 @@
   text-decoration: none; 
 }
 
-/* 마우스 호버 시 파란색 */
 .sidebar-section h2 a:hover {
   color: #2789FE;
   font-weight: bold;
@@ -65,7 +57,6 @@
   text-decoration: none; 
 }
 
-/* 마우스 호버 시 색변환 */
 .sidebar-section li:hover {
   color: #2789FE;
   font-weight: bold;

@@ -11,7 +11,7 @@
 
 .content {
   flex: 1;
-  padding: 40px;
+  padding: 20px 50px;
   overflow-y: auto;
 }
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../components/common/Breadcrumb';
 import Table from '../components/common/Table';
 import CustomButton from '../components/CustomButton';
+import EmailModal from '../views/EmailModal';
 import '../styles/BcdOrder.css';
 import '../styles/common/Page.css';
 import axios from 'axios';
@@ -14,16 +15,17 @@ function BcdOrder() {
   const [applications, setApplications] = useState([]);
   const [selectedApplications, setSelectedApplications] = useState([]);
   const [centers, setCenters] = useState(['전체', '재단본부', '기타']); 
-  const [selectedCenter, setSelectedCenter] = useState('전체'); 
+  const [selectedCenter, setSelectedCenter] = useState('전체');
+  const [showEmailModal, setShowEmailModal] = useState(false);
 
   // Timestamp Parsing: "YYYY-MM-DD"
-  const parseDraftDate = (dateString) => {
+  const parseDate = (dateString) => {
     const date = new Date(dateString);
     return date.toISOString().split('T')[0];
   };
 
   // Timestamp Parsing: "YYYY-MM-DD HH:MM"
-  const parseRespondDate = (dateString) => {
+  const parseDateTime = (dateString) => {
     const date = new Date(dateString);
     const datePart = date.toISOString().split('T')[0];
     const timePart = date.toTimeString().split(' ')[0].substring(0, 5);
@@ -41,9 +43,9 @@ function BcdOrder() {
         id: item.draftId,
         center: item.instNm,
         title: item.title,
-        draftDate: parseDraftDate(item.draftDate), 
+        draftDate: parseDate(item.draftDate), 
         drafter: item.drafter, 
-        respondDate: parseRespondDate(item.respondDate), 
+        respondDate: parseDateTime(item.respondDate), 
         quantity: item.quantity,
       }));
       console.log('Transformed data: ', transformedData);
@@ -103,6 +105,33 @@ function BcdOrder() {
     }
   };
 
+  // 발주 요청 버튼 클릭 핸들러
+  const handleOrderRequest = () => {
+    if (selectedApplications.length === 0) {
+      alert('선택된 신청 내역이 없습니다.');
+      return;
+    }
+    setShowEmailModal(true); // 이메일 작성 모달 표시
+  };
+
+  // 이메일 전송 핸들러
+  const handleSendEmail = async (subject, body, fileName) => {
+    try {
+        await axios.post('/api/bsc/order', {
+            draftIds: selectedApplications,
+            emailSubject: subject,
+            emailBody: body,
+            fileName: fileName, // fileName 추가
+        });
+        alert('발주 요청이 완료되었습니다.');
+        fetchBcdOrderList(); // 발주 요청 후 리스트 갱신
+        setShowEmailModal(false); // 이메일 작성 모달 닫기
+    } catch (error) {
+        console.error('Error sending order request: ', error);
+        alert('발주 요청 중 오류가 발생했습니다.');
+    }
+};
+
   // 테이블 컬럼 정의
   const columns = [
     {
@@ -146,11 +175,12 @@ function BcdOrder() {
           <Breadcrumb items={['신청 목록 관리', '명함 발주']} />
           <div className="buttons-container">
             <CustomButton className="excel-button" onClick={handleExcelDownload}>엑셀변환</CustomButton>
-            <CustomButton className="order-request-button">발주요청</CustomButton>
+            <CustomButton className="order-request-button" onClick={handleOrderRequest}>발주요청</CustomButton>
           </div>
         </div>
         <Table columns={columns} data={filteredApplications} />
       </div>
+      <EmailModal show={showEmailModal} onClose={() => setShowEmailModal(false)} onSend={handleSendEmail} />
     </div>
   );
 }

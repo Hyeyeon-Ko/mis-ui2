@@ -1,0 +1,21 @@
+.user-applications {
+  padding: 10px 20px;
+}
+
+.user-applications h2 {
+  font-size: 35px;
+  margin-bottom: 5px;
+}
+
+.status-button {
+  background: none;
+  color: #2789FE;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  text-decoration: underline;
+}
+
+.status-button:hover {
+  color: #1e6fc1;
+}

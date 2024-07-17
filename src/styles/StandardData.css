@@ -1,0 +1,43 @@
+.standard-data-list {
+    padding: 10px 20px;
+  }
+  
+  .standard-data-list h2 {
+    font-size: 35px;
+    margin-bottom: 15px;
+  }
+  
+  .data-add-button {
+    border-radius: 7px;
+    padding: 11px 7px 11px 22px;
+    cursor: pointer;
+    font-size: 17px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    color: white;
+    border: none;
+    background-color: #2789FE;
+    letter-spacing: 1em; 
+  }
+  
+  .data-add-button:hover {
+    background-color: #1e6fc1;
+  }
+  
+  .data-delete-button {
+    border-radius: 7px;
+    padding: 11px 7px 11px 22px;
+    cursor: pointer;
+    font-size: 17px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    color: black;
+    border: none;
+    background-color: #BDC6CF;
+    letter-spacing: 1em; 
+  }
+  
+  .data-delete-button:hover {
+    background-color: #a1a9b2;
+  }
+  

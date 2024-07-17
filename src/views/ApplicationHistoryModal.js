@@ -59,8 +59,8 @@ const ApplicationHistoryModal = ({ show, onClose }) => {
 
 // 컴포넌트의 props 타입 정의
 ApplicationHistoryModal.propTypes = {
-  show: PropTypes.bool.isRequired, // 모달 표시 여부
-  onClose: PropTypes.func.isRequired // 모달 닫기 핸들러
+  show: PropTypes.bool.isRequired, 
+  onClose: PropTypes.func.isRequired 
 };
 
 export default ApplicationHistoryModal;

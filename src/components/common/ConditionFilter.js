@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import PropTypes from 'prop-types';
@@ -6,10 +6,25 @@ import Button from '../common/Button';
 import '../../styles/common/ConditionFilter.css';
 import resetIcon from '../../assets/images/reset.png';
 
-const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, onSearch }) => {
+const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documentType, setDocumentType, onSearch, onReset }) => {
+  useEffect(() => {
+    const defaultStartDate = new Date();
+    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
+    setStartDate(defaultStartDate);
+    setEndDate(new Date());
+  }, [setStartDate, setEndDate]);
+
+  const handleDocumentTypeChange = (event) => {
+    setDocumentType(event.target.value === '전체' ? '' : event.target.value);
+  };
+
   const handleReset = () => {
-    setStartDate(null);
-    setEndDate(null);
+    const defaultStartDate = new Date();
+    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
+    setStartDate(defaultStartDate);
+    setEndDate(new Date());
+    setDocumentType('');
+    onReset();
   };
 
   return (
@@ -37,8 +52,12 @@ const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, onSearc
           className="custom-datepicker"
         />
         <label>문서분류</label>
-        <select>
-          <option value="all">전체</option>
+        <select value={documentType} onChange={handleDocumentTypeChange}>
+          <option value="전체">전체</option>
+          <option value="명함신청">명함신청</option>
+          <option value="법인서류">법인서류</option>
+          <option value="인장관리">인장관리</option>
+          <option value="문서수발신">문서수발신</option>
         </select>
         <button className="reset-button" onClick={handleReset}>
           <img src={resetIcon} alt="Reset" className="reset-icon" />
@@ -55,7 +74,10 @@ ConditionFilter.propTypes = {
   setStartDate: PropTypes.func.isRequired,
   endDate: PropTypes.instanceOf(Date),
   setEndDate: PropTypes.func.isRequired,
+  documentType: PropTypes.string.isRequired,
+  setDocumentType: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
+  onReset: PropTypes.func.isRequired,
 };
 
 export default ConditionFilter;

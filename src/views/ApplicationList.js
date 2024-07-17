@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../components/common/Breadcrumb';
-import DateFilter from '../components/common/ConditionFilter';
+import ConditionFilter from '../components/common/ConditionFilter';
 import Table from '../components/common/Table';
 import '../styles/ApplicationsList.css';
 import '../styles/common/Page.css';
+import axios from 'axios';
 
 /* 전체 신청 내역 페이지 */
 function ApplicationsList() {
 
-  // 신청 내역, 시작 날짜, 종료 날짜, 필터, 센터, 선택된 센터 상태 관리
   const [applications, setApplications] = useState([]);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [documentType, setDocumentType] = useState('');
   const [filters, setFilters] = useState({
     statusApproved: false,
     statusRejected: false,
@@ -20,38 +21,133 @@ function ApplicationsList() {
   });
   const [centers, setCenters] = useState(['전체', '재단본부', '기타']);
   const [selectedCenter, setSelectedCenter] = useState('전체');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // 조건 필터 변경 핸들러
+  // Timestamp Parsing: "YYYY-MM-DD"
+  const parseDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+  };
+
+  // Timestamp Parsing: "YYYY-MM-DD HH:MM"
+  const parseDateTime = (dateString) => {
+    const date = new Date(dateString);
+    const datePart = date.toISOString().split('T')[0];
+    const timePart = date.toTimeString().split(' ')[0].substring(0, 5);
+    return `${datePart} ${timePart}`;
+  };
+
+  // applyStatus 매핑
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'A':
+        return '승인대기';
+      case 'B':
+        return '승인완료';
+      case 'C':
+        return '반려';
+      case 'D':
+        return '발주완료';
+      case 'E':
+        return '완료';
+      case 'F':
+        return '신청취소';
+      default:
+        return status;
+    }
+  };
+
+  useEffect(() => {
+    fetchApplications();
+  }, []);
+
+  const fetchApplications = async (filterParams = {}) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get('/api/applyList', {
+        params: {
+          documentType: filterParams.documentType || null,
+          startDate: filterParams.startDate || '',
+          endDate: filterParams.endDate || '',
+        },
+      });
+
+      console.log('Response data:', response.data);
+
+      const data = Array.isArray(response.data.data.bcdMasterResponses) ? response.data.data.bcdMasterResponses : [];
+
+      const transformedData = data.map(application => ({
+        ...application,
+        center: application.instCd, 
+        title: application.title, 
+        draftDate: application.draftDate ? parseDate(application.draftDate) : '',
+        drafter: application.drafter, 
+        approvalDate: application.respondDate ? parseDate(application.respondDate) : '', 
+        orderDate: application.orderDate ? parseDateTime(application.orderDate) : '',
+        status: getStatusText(application.applyStatus),
+      }));
+
+      console.log('Transformed data:', transformedData);
+
+      setApplications(transformedData);
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+      setError('데이터를 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleFilterChange = (e) => {
-    const { name, checked } = e.target;
+    const { name } = e.target;
     setFilters((prevFilters) => ({
       ...prevFilters,
-      [name]: checked,
+      [name]: !prevFilters[name],
     }));
   };
 
-  // 센터 변경 핸들러
   const handleCenterChange = (event) => {
     setSelectedCenter(event.target.value);
   };
 
-  // 활성화된 필터 여부 확인
+  const handleSearch = () => {
+    fetchApplications({
+      documentType,
+      startDate: startDate ? startDate.toISOString().split('T')[0] : '',
+      endDate: endDate ? endDate.toISOString().split('T')[0] : '',
+    });
+  };
+
+  const handleReset = () => {
+    setStartDate(null);
+    setEndDate(null);
+    setDocumentType('');
+    setFilters({
+      statusApproved: false,
+      statusRejected: false,
+      statusOrdered: false,
+      statusClosed: false,
+    });
+    fetchApplications();
+  };
+
   const isAnyFilterActive = Object.values(filters).some((value) => value);
 
-  // 필터링된 신청 내역
   const filteredApplications = applications.filter((application) => {
+    if (application.status === '승인대기') return false; // 승인대기 상태 제외
     if (selectedCenter !== '전체' && application.center !== selectedCenter) return false;
     if (isAnyFilterActive) {
       if (filters.statusApproved && application.status === '승인완료') return true;
       if (filters.statusRejected && application.status === '반려') return true;
       if (filters.statusOrdered && application.status === '발주완료') return true;
-      if (filters.statusClosed && application.status === '종결') return true;
+      if (filters.statusClosed && application.status === '완료') return true;
       return false;
     }
     return true;
   });
 
-  // 테이블 컬럼 정의
   const columns = [
     {
       header: (
@@ -88,11 +184,15 @@ function ApplicationsList() {
       <div className="all-applications">
         <h2>전체 신청 목록</h2>
         <Breadcrumb items={['신청 목록 관리', '전체 신청 목록']} />
-        <DateFilter 
+        <ConditionFilter 
           startDate={startDate} 
           setStartDate={setStartDate} 
           endDate={endDate} 
           setEndDate={setEndDate} 
+          documentType={documentType} 
+          setDocumentType={setDocumentType} 
+          onSearch={handleSearch} 
+          onReset={handleReset}
         />
         <div className="status-filters">
           <label>
@@ -129,10 +229,18 @@ function ApplicationsList() {
               checked={filters.statusClosed}
               onChange={handleFilterChange}
             />
-            종결
+            완료
           </label>
         </div>
-        <Table columns={columns} data={filteredApplications} />
+        {loading ? (
+          <p>로딩 중...</p>
+        ) : error ? (
+          <p>{error}</p>
+        ) : (
+          <>
+            <Table columns={columns} data={filteredApplications} />
+          </>
+        )}
       </div>
     </div>
   );

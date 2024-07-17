@@ -18,6 +18,11 @@ function Sidebar() {
     { label: '문서수발신', url: '/api/doc' },
   ];
 
+  const myApplyItems = [
+    { label: '전체 신청 목록', url: '/api/myApplyList' },
+    { label: '승인 대기 목록', url: '/api/myPendingList' },
+  ];
+
   const manageItems = [
     { label: '전체 신청 목록', url: '/api/applyList' },
     { label: '승인 대기 목록', url: '/api/pendingList' },
@@ -29,24 +34,25 @@ function Sidebar() {
       <Link to="/">
         <img src={logo} alt="KMI Logo" className="logo" />
       </Link>
-      <SidebarSection title="신청하기" items={applyItems} isActive={isActive} />
-      <div className="sidebar-section">
-        <h2>
-          <Link to="/api/myApplyList" className={isActive('/api/myApplyList')}>나의 신청내역</Link>
-        </h2>
-      </div>
-      <SidebarSection title="신청 목록 관리" items={manageItems} isActive={isActive} />
+      <SidebarSection title="신청하기" items={applyItems} isActive={isActive} defaultOpen={false} />
+      <SidebarSection title="나의 신청내역" items={myApplyItems} isActive={isActive} defaultOpen={false} />
+      <SidebarSection title="신청 목록 관리" items={manageItems} isActive={isActive} defaultOpen={false} />
       <div className="sidebar-section">
         <h2>
           <Link to="/api/auth" className={isActive('/api/auth')}>권한 관리</Link>
+        </h2>
+      </div>
+      <div className="sidebar-section">
+        <h2>
+          <Link to="/api/standard" className={isActive('/api/standard')}>기준자료 관리</Link>
         </h2>
       </div>
     </div>
   );
 }
 
-function SidebarSection({ title, items, isActive }) {
-  const [isOpen, setIsOpen] = useState(false);
+function SidebarSection({ title, items, isActive, defaultOpen }) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
 
   const toggleOpen = () => {
     setIsOpen(!isOpen);

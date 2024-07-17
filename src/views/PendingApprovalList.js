@@ -7,39 +7,46 @@ import axios from 'axios';
 
 /* 승인 대기 목록 페이지 */
 function PendingApprovalList() {
-  
-  // 신청 내역, 센터 목록, 선택된 센터 상태 관리
+
   const [applications, setApplications] = useState([]);
-  const [centers, setCenters] = useState(['전체', '재단본부', '기타']); 
+  const [centers, setCenters] = useState(['전체', '재단본부', '기타']);
   const [selectedCenter, setSelectedCenter] = useState('전체');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Timestamp Parsing: "YYYY-MM-DD"
-  const parseDraftDate = (dateString) => {
+  const parseDate = (dateString) => {
     const date = new Date(dateString);
     return date.toISOString().split('T')[0];
   };
 
   // 승인 대기 목록 데이터 가져오기
   const fetchPendingList = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const response = await axios.get('/api/pendingList');
       console.log('Response data: ', response.data);
 
-      // API 응답 데이터 구조에 맞게 데이터 추출
-      const data = response.data.bcdPendingResponses || [];
-      
+      const data = Array.isArray(response.data.data.bcdPendingResponses) ? response.data.data.bcdPendingResponses : [];
+
       const transformedData = data.map(item => ({
-        id: item.draftId,
-        center: item.instNm,
+        ...item,
+        center: item.instCd,
         title: item.title,
-        draftDate: parseDraftDate(item.draftDate),
+        draftDate: item.draftDate ? parseDate(item.draftDate) : '',
         drafter: item.drafter,
-        status: item.applyStatus,
+        status: '승인대기', // 상태를 '승인대기'로 설정
       }));
-      console.log('Transformed data: ', transformedData);
+
+      console.log('Transformed data:', transformedData);
+
       setApplications(transformedData);
     } catch (error) {
-      console.error('Error fetching pending list: ', error);
+      console.error('Error fetching pending list:', error);
+      setError('데이터를 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -47,17 +54,14 @@ function PendingApprovalList() {
     fetchPendingList();
   }, []);
 
-  // 센터 선택 핸들러
   const handleCenterChange = (event) => {
     setSelectedCenter(event.target.value);
   };
 
-  // 선택된 센터에 따라 신청 내역 필터링
   const filteredApplications = selectedCenter === '전체'
     ? applications
     : applications.filter(app => app.center === selectedCenter);
 
-  // 테이블 컬럼 정의
   const columns = [
     {
       header: (
@@ -91,7 +95,13 @@ function PendingApprovalList() {
       <div className="order">
         <h2>승인 대기 목록</h2>
         <Breadcrumb items={['신청 목록 관리', '승인 대기 목록']} />
-        <Table columns={columns} data={filteredApplications} />
+        {loading ? (
+          <p>로딩 중...</p>
+        ) : error ? (
+          <p>{error}</p>
+        ) : (
+          <Table columns={columns} data={filteredApplications} />
+        )}
       </div>
     </div>
   );

@@ -5,15 +5,18 @@ import Sidebar from './components/common/Sidebar';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Home from './views/Home';
 import Login from './views/Login';
-import MyApplications from './views/MyApplications';
+import MyApplyList from './views/MyApplyList';
+import MyPendingList from './views/MyPendingList';
 import ApplicationsList from './views/ApplicationList';
 import BcdOrder from './views/BcdOrder';
 import AuthorityManagement from './views/AuthorityManagement';
 import BcdApplyFirst from './views/BcdApplyFirst';
+import BcdApplySecond from './views/BcdApplySecond';
 import DetailInfo from './views/DetailInfo';
 import PendingApprovalList from './views/PendingApprovalList';
 import { AuthProvider } from './components/AuthContext';
 import RequireAuth from './components/RequireAuth';
+import StandardData from './views/StandardData';
 
 function MainLayout({ children }) {
   const location = useLocation();
@@ -39,46 +42,18 @@ function App() {
           <Route path="*" element={
             <MainLayout>
               <Routes>
-                <Route path="/" element={
-                  <RequireAuth>
-                    <Home />
-                  </RequireAuth>
-                } />
-                <Route path="/api/myApplyList" element={
-                  <RequireAuth>
-                    <MyApplications />
-                  </RequireAuth>
-                } />
-                <Route path="/api/applyList" element={
-                  <RequireAuth>
-                    <ApplicationsList />
-                  </RequireAuth>
-                } />
-                <Route path="/api/bsc/orderList" element={
-                  <RequireAuth>
-                    <BcdOrder />
-                  </RequireAuth>
-                } />
-                <Route path="/api/auth" element={
-                  <RequireAuth>
-                    <AuthorityManagement />
-                  </RequireAuth>
-                } />
-                <Route path="/api/bsc" element={
-                  <RequireAuth>
-                    <BcdApplyFirst />
-                  </RequireAuth>
-                } />
-                <Route path="/detailInfo" element={
-                  <RequireAuth>
-                    <DetailInfo />
-                  </RequireAuth>
-                } />
-                <Route path="/api/pendingList" element={
-                  <RequireAuth>
-                    <PendingApprovalList />
-                  </RequireAuth>
-                } />
+                <Route path="/" element={<Home />} />
+                <Route path="/api/myApplyList" element={<RequireAuth><MyApplyList /></RequireAuth>} />
+                <Route path="/api/myPendingList" element={<RequireAuth><MyPendingList /></RequireAuth>} />
+                <Route path="/api/applyList" element={<RequireAuth><ApplicationsList /></RequireAuth>} />
+                <Route path="/api/bsc/orderList" element={<RequireAuth><BcdOrder /></RequireAuth>} />
+                <Route path="/api/auth" element={<RequireAuth><AuthorityManagement /></RequireAuth>} />
+                <Route path="/api/bsc" element={<RequireAuth><BcdApplyFirst /></RequireAuth>} />
+                <Route path="/api/bsc/own" element={<RequireAuth><BcdApplySecond /></RequireAuth>} />
+                <Route path="/api/bsc/other" element={<RequireAuth><BcdApplySecond /></RequireAuth>} />
+                <Route path="/detailInfo" element={<RequireAuth><DetailInfo /></RequireAuth>} />
+                <Route path="/api/pendingList" element={<RequireAuth><PendingApprovalList /></RequireAuth>} />
+                <Route path="/api/standard" element={<RequireAuth><StandardData /></RequireAuth>} />
               </Routes>
             </MainLayout>
           } />

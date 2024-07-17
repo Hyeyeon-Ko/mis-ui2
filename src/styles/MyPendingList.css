@@ -1,0 +1,43 @@
+.pending-applications {
+   padding: 10px 20px;
+  }
+  
+  .pending-applications h2 {
+    font-size: 35px;
+    margin-bottom: 5px;
+    }
+  
+  .modify-button {
+    border-radius: 10px;
+    width: 70px;
+    height: 35px;
+    background-color: #BDC6CF;
+    color: black;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .modify-button:hover {
+    background-color: #BDC6CF;
+  }
+  
+  .cancel-button {
+    border-radius: 10px;
+    width: 70px;
+    height: 35px;
+    background-color: #2789FE;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .cancel-button:hover {
+    background-color: #1e6fc1;
+  }
+  
