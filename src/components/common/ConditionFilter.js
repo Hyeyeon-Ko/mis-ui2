@@ -27,6 +27,16 @@ const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documen
     onReset();
   };
 
+  const handleSearch = () => {
+    const adjustedEndDate = new Date(endDate);
+    adjustedEndDate.setDate(adjustedEndDate.getDate() + 1);
+    onSearch({
+      documentType,
+      startDate: startDate ? startDate.toISOString().split('T')[0] : '',
+      endDate: adjustedEndDate.toISOString().split('T')[0],
+    });
+  };
+
   return (
     <div className="all-application-filter-container">
       <div className="all-application-filter">
@@ -63,7 +73,7 @@ const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documen
           <img src={resetIcon} alt="Reset" className="reset-icon" />
           <span className="reset-text">초기화</span>
         </button>
-        <Button onClick={onSearch} className="search-button">조회</Button>
+        <Button onClick={handleSearch} className="search-button">조회</Button>
       </div>
     </div>
   );

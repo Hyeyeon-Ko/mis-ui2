@@ -60,8 +60,10 @@ function MyApplyList() {
         },
       });
 
-      if (response.data && response.data.data) {
-        const data = Array.isArray(response.data.data.bcdMasterResponses) ? response.data.data.bcdMasterResponses : [];
+      console.log('Responses data:', response.data); // 로그 추가
+
+      if (response.data && response.data.data && response.data.data.myApplyResponses) {
+        const data = Array.isArray(response.data.data.myApplyResponses) ? response.data.data.myApplyResponses : [];
 
         const uniqueData = data.reduce((acc, current) => {
           const x = acc.find(item => item.draftId === current.draftId);
@@ -72,6 +74,7 @@ function MyApplyList() {
           }
         }, []);
 
+
         const transformedData = uniqueData
           .map(application => ({
             ...application,
@@ -81,6 +84,8 @@ function MyApplyList() {
             applyStatus: getStatusText(application.applyStatus), 
           }))
           .filter(application => application.applyStatus !== '승인대기');
+
+        console.log('Transformed Data:', transformedData); // 로그 추가
 
         setApplications(transformedData);
       } else {
@@ -99,6 +104,23 @@ function MyApplyList() {
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedApplication(null);
+  };
+
+  const handleConfirmModal = async () => {
+    if (selectedApplication) {
+      try {
+        await axios.put('/api/bcd/completeApply', null, {
+          params: { draftId: selectedApplication.draftId }
+        });
+        alert('명함 수령이 확인되었습니다.');
+        fetchApplications(); // Refresh the application list
+      } catch (error) {
+        console.error('Error completing application:', error.response ? error.response.data : error.message);
+      } finally {
+        setShowModal(false);
+        setSelectedApplication(null);
+      }
+    }
   };
 
   const handleSearch = () => {
@@ -158,7 +180,7 @@ function MyApplyList() {
       {showModal && (
         <ConfirmModal
           message="명함을 수령하셨습니까?"
-          onConfirm={handleCloseModal}
+          onConfirm={handleConfirmModal}
           onCancel={handleCloseModal}
         />
       )}

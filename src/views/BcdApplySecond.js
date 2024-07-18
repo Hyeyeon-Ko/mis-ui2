@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Breadcrumb from '../components/common/Breadcrumb';
@@ -18,7 +18,7 @@ function BcdApplySecond() {
   const isOwn = location.pathname === '/api/bsc/own';
 
   const [formData, setFormData] = useState({
-    name: isOwn ? auth.hngNm : '',
+    name: '',
     firstName: '',
     lastName: '',
     center: '',
@@ -38,11 +38,44 @@ function BcdApplySecond() {
     address: '',
     quantity: 1,
     cardType: 'personal',
-    userId: isOwn ? auth.userId : '',
+    userId: '',
   });
 
   const [userIdInput, setUserIdInput] = useState('');
   const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false);
+
+  useEffect(() => {
+    if (isOwn) {
+      fetchUserInfo(auth.userId);
+    }
+  }, [isOwn, auth.userId]);
+
+  const fetchUserInfo = async (userId) => {
+    try {
+      const response = await axios.get(`/api/info/${userId}`);
+      console.log('Lookup User Response:', response.data);
+      if (response.data && response.data.data) {
+        const userData = response.data.data;
+        setFormData({
+          ...formData,
+          name: userData.userName,
+          center: userData.centerNm,
+          team: userData.teamNm,
+          mobile1: userData.telNum.split('-')[0],
+          mobile2: userData.telNum.split('-')[1],
+          mobile3: userData.telNum.split('-')[2],
+          email: userData.email.split('@')[0],
+          userId: userId,
+        });
+      } else {
+        console.error('No data found for the user');
+        alert('사용자 정보를 불러오는 중 오류가 발생했습니다. 유효한 사번을 입력하세요.');
+      }
+    } catch (error) {
+      console.error('Error fetching user info:', error.response ? error.response.data : error.message);
+      alert('사용자 정보를 불러오는 중 오류가 발생했습니다.');
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
