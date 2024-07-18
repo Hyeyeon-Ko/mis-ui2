@@ -11,11 +11,12 @@ import '../styles/common/Page.css';
 import backImage_eng from '../assets/images/backimage_eng.png';
 import backImage_company from '../assets/images/backimage_company.png';
 
+/* 명함 신청 페이지 (본인/타인 선택에 따라) */
 function BcdApplySecond() {
-  const { auth } = useContext(AuthContext);
-  const location = useLocation();
-  const navigate = useNavigate();
-  const isOwn = location.pathname === '/api/bsc/own';
+  const { auth } = useContext(AuthContext);             // 사용자 인증 정보 사용
+  const location = useLocation();                       // 현재 경로 정보 사용
+  const navigate = useNavigate();                       // 경로 이동을 위한 네비게이트 함수
+  const isOwn = location.pathname === '/api/bsc/own';   // 본인 신청 여부 확인
 
   const [formData, setFormData] = useState({
     name: '',
@@ -39,17 +40,19 @@ function BcdApplySecond() {
     quantity: 1,
     cardType: 'personal',
     userId: '',
-  });
+  }); // 신청 데이터 상태 관리
 
-  const [userIdInput, setUserIdInput] = useState('');
-  const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false);
+  const [userIdInput, setUserIdInput] = useState(''); // 사용자 ID 입력 상태 관리
+  const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false); // 최종 확인 모달 표시 상태 관리
 
+  // 컴포넌트 마운트 시 사용자 정보 가져오기 (본인 신청 시)
   useEffect(() => {
     if (isOwn) {
       fetchUserInfo(auth.userId);
     }
   }, [isOwn, auth.userId]);
 
+  // 사용자 정보 가져오기
   const fetchUserInfo = async (userId) => {
     try {
       const response = await axios.get(`/api/info/${userId}`);
@@ -76,20 +79,52 @@ function BcdApplySecond() {
       alert('사용자 정보를 불러오는 중 오류가 발생했습니다.');
     }
   };
+  
+  // 사용자 조회 버튼 클릭 핸들러
+  const handleLookupUser = async () => {
+    try {
+      const response = await axios.get(`/api/info/${userIdInput}`);
+      console.log('Lookup User Response:', response.data);
+      if (response.data && response.data.data) {
+        const userData = response.data.data;
+        setFormData({
+          ...formData,
+          name: userData.userName,
+          center: userData.centerNm,
+          team: userData.teamNm,
+          mobile1: userData.telNum.split('-')[0],
+          mobile2: userData.telNum.split('-')[1],
+          mobile3: userData.telNum.split('-')[2],
+          email: userData.email.split('@')[0],
+          userId: userIdInput,
+        });
+      } else {
+        console.error('No data found for the user');
+        alert('사용자 정보를 불러오는 중 오류가 발생했습니다. 유효한 사번을 입력하세요.');
+      }
+    } catch (error) {
+      console.error('Error fetching user info:', error.response ? error.response.data : error.message);
+      alert('사용자 정보를 불러오는 중 오류가 발생했습니다.');
+    }
+  };
 
+  // 입력 변경 핸들러
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  // 명함 종류 변경 핸들러
   const handleCardTypeChange = (e) => {
     setFormData({ ...formData, cardType: e.target.value });
   };
 
+  // 사용자 ID 입력 변경 핸들러
   const handleUserIdChange = (e) => {
     setUserIdInput(e.target.value);
   };
 
+  // 폼 입력 검증
   const validateForm = () => {
     const requiredFields = [
       'name', 'firstName', 'lastName', 'center', 'department', 
@@ -105,6 +140,7 @@ function BcdApplySecond() {
     return true;
   };
 
+  // 명함 신청 버튼 클릭 핸들러
   const handleApplyRequest = () => {
     if (!validateForm()) {
       alert('모든 명함 정보를 입력해주세요.');
@@ -113,6 +149,7 @@ function BcdApplySecond() {
     setShowFinalConfirmationModal(true);
   };
 
+  // 최종 확인 모달 확인 버튼 클릭 핸들러
   const handleConfirmRequest = async () => {
     setShowFinalConfirmationModal(false);
 
@@ -147,33 +184,6 @@ function BcdApplySecond() {
     } catch (error) {
       console.error('Error submitting application:', error);
       alert('명함 신청 중 오류가 발생했습니다.');
-    }
-  };
-
-  const handleLookupUser = async () => {
-    try {
-      const response = await axios.get(`/api/info/${userIdInput}`);
-      console.log('Lookup User Response:', response.data);
-      if (response.data && response.data.data) {
-        const userData = response.data.data;
-        setFormData({
-          ...formData,
-          name: userData.userName,
-          center: userData.centerNm,
-          team: userData.teamNm,
-          mobile1: userData.telNum.split('-')[0],
-          mobile2: userData.telNum.split('-')[1],
-          mobile3: userData.telNum.split('-')[2],
-          email: userData.email.split('@')[0],
-          userId: userIdInput,
-        });
-      } else {
-        console.error('No data found for the user');
-        alert('사용자 정보를 불러오는 중 오류가 발생했습니다. 유효한 사번을 입력하세요.');
-      }
-    } catch (error) {
-      console.error('Error fetching user info:', error.response ? error.response.data : error.message);
-      alert('사용자 정보를 불러오는 중 오류가 발생했습니다.');
     }
   };
 

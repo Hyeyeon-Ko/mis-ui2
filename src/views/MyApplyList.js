@@ -10,13 +10,13 @@ import axios from 'axios';
 
 /* 나의 전체 신청 목록 페이지 */
 function MyApplyList() {
-  const [applications, setApplications] = useState([]);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const [documentType, setDocumentType] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [selectedApplication, setSelectedApplication] = useState(null);
-  const navigate = useNavigate();
+  const [applications, setApplications] = useState([]);                   // 신청 내역 상태 관리
+  const [startDate, setStartDate] = useState(null);                       // 시작 날짜 상태 관리
+  const [endDate, setEndDate] = useState(null);                           // 종료 날짜 상태 관리
+  const [documentType, setDocumentType] = useState('');                   // 문서 타입 상태 관리
+  const [showModal, setShowModal] = useState(false);                      // 확인 모달 표시 상태 관리
+  const [selectedApplication, setSelectedApplication] = useState(null);   // 선택된 신청 내역 상태 관리
+  const navigate = useNavigate();                                         // 경로 이동을 위한 네비게이트 함수
 
   useEffect(() => {
     fetchApplications();
@@ -50,6 +50,7 @@ function MyApplyList() {
     }
   };
 
+  // 신청 내역 가져오기
   const fetchApplications = async (filterParams = {}) => {
     try {
       const response = await axios.get('/api/myApplyList', {
@@ -60,7 +61,7 @@ function MyApplyList() {
         },
       });
 
-      console.log('Responses data:', response.data); // 로그 추가
+      console.log('Responses data:', response.data); 
 
       if (response.data && response.data.data && response.data.data.myApplyResponses) {
         const data = Array.isArray(response.data.data.myApplyResponses) ? response.data.data.myApplyResponses : [];
@@ -85,7 +86,7 @@ function MyApplyList() {
           }))
           .filter(application => application.applyStatus !== '승인대기');
 
-        console.log('Transformed Data:', transformedData); // 로그 추가
+        console.log('Transformed Data:', transformedData);
 
         setApplications(transformedData);
       } else {
@@ -96,16 +97,19 @@ function MyApplyList() {
     }
   };
 
+  // 상태 버튼 클릭 핸들러
   const handleButtonClick = (application) => {
     setSelectedApplication(application);
     setShowModal(true);
   };
 
+  // 확인 모달 닫기 핸들러
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedApplication(null);
   };
 
+  // 확인 모달 확인 버튼 클릭 핸들러
   const handleConfirmModal = async () => {
     if (selectedApplication) {
       try {
@@ -113,7 +117,7 @@ function MyApplyList() {
           params: { draftId: selectedApplication.draftId }
         });
         alert('명함 수령이 확인되었습니다.');
-        fetchApplications(); // Refresh the application list
+        fetchApplications(); 
       } catch (error) {
         console.error('Error completing application:', error.response ? error.response.data : error.message);
       } finally {
@@ -123,6 +127,7 @@ function MyApplyList() {
     }
   };
 
+  // 검색 버튼 클릭 핸들러
   const handleSearch = () => {
     fetchApplications({
       documentType: documentType || null,
@@ -131,6 +136,7 @@ function MyApplyList() {
     });
   };
 
+  // 초기화 버튼 클릭 핸들러
   const handleReset = () => {
     setStartDate(null);
     setEndDate(null);

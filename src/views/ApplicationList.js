@@ -8,21 +8,20 @@ import axios from 'axios';
 
 /* 전체 신청 내역 페이지 */
 function ApplicationsList() {
-
-  const [applications, setApplications] = useState([]);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const [documentType, setDocumentType] = useState('');
+  const [applications, setApplications] = useState([]);                 // 신청 내역 상태 관리
+  const [startDate, setStartDate] = useState(null);                     // 시작 날짜 상태 관리
+  const [endDate, setEndDate] = useState(null);                         // 종료 날짜 상태 관리
+  const [documentType, setDocumentType] = useState('');                 // 문서 타입 상태 관리
   const [filters, setFilters] = useState({
     statusApproved: false,
     statusRejected: false,
     statusOrdered: false,
     statusClosed: false,
-  });
-  const [centers, setCenters] = useState(['전체', '재단본부', '기타']);
-  const [selectedCenter, setSelectedCenter] = useState('전체');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  }); // 상태 필터 상태 관리
+  const [centers, setCenters] = useState(['전체', '재단본부', '기타']);  // 센터 목록 상태 관리
+  const [selectedCenter, setSelectedCenter] = useState('전체');         // 선택된 센터 상태 관리
+  const [loading, setLoading] = useState(false);                        // 로딩 상태 관리
+  const [error, setError] = useState(null);                             // 에러 상태 관리
 
   // Timestamp Parsing: "YYYY-MM-DD"
   const parseDate = (dateString) => {
@@ -62,6 +61,7 @@ function ApplicationsList() {
     fetchApplications();
   }, []);
 
+  // 신청 내역 가져오기
   const fetchApplications = async (filterParams = {}) => {
     setLoading(true);
     setError(null);
@@ -100,6 +100,7 @@ function ApplicationsList() {
     }
   };
 
+  // 필터 변경 핸들러
   const handleFilterChange = (e) => {
     const { name } = e.target;
     setFilters((prevFilters) => ({
@@ -108,10 +109,12 @@ function ApplicationsList() {
     }));
   };
 
+  // 센터 선택 핸들러
   const handleCenterChange = (event) => {
     setSelectedCenter(event.target.value);
   };
 
+  // 검색 버튼 클릭 핸들러
   const handleSearch = () => {
     fetchApplications({
       documentType,
@@ -120,6 +123,7 @@ function ApplicationsList() {
     });
   };
 
+  // 초기화 버튼 클릭 핸들러
   const handleReset = () => {
     setStartDate(null);
     setEndDate(null);
@@ -133,8 +137,10 @@ function ApplicationsList() {
     fetchApplications();
   };
 
+  // 활성화된 필터 여부 확인
   const isAnyFilterActive = Object.values(filters).some((value) => value);
 
+  // 필터링된 신청 내역
   const filteredApplications = applications.filter((application) => {
     if (application.status === '승인대기') return false; // 승인대기 상태 제외
     if (selectedCenter !== '전체' && application.center !== selectedCenter) return false;

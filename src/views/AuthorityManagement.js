@@ -10,13 +10,15 @@ import editIcon from '../assets/images/edit.png';
 import deleteIcon from '../assets/images/delete.png';
 import axios from 'axios';
 
+/* 권한 관리 페이지 */
 function AuthorityManagement() {
-  const [applications, setApplications] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [selectedAdmin, setSelectedAdmin] = useState(null);
-  const [isEditMode, setIsEditMode] = useState(false);
+  const [applications, setApplications] = useState([]);                // 신청 내역 상태 관리
+  const [showModal, setShowModal] = useState(false);                   // 권한 추가/수정 모달 표시 상태 관리
+  const [showConfirmModal, setShowConfirmModal] = useState(false);     // 확인 모달 표시 상태 관리
+  const [selectedAdmin, setSelectedAdmin] = useState(null);            // 선택된 관리자 상태 관리
+  const [isEditMode, setIsEditMode] = useState(false);                 // 수정 모드 상태 관리
 
+  // 권한 목록 가져오기
   const fetchAuthorityList = async () => {
     try {
       const response = await axios.get('/api/auth');
@@ -44,12 +46,14 @@ function AuthorityManagement() {
     fetchAuthorityList();
   }, []);
 
+  // 수정 핸들러
   const handleEdit = (admin) => {
     setSelectedAdmin(admin);
     setIsEditMode(true);
     setShowModal(true);
   };
 
+  // 권한 삭제 확인 핸들러
   const handleConfirmDelete = async () => {
     try {
       await axios.delete(`/api/auth/admin/${selectedAdmin.authId}`, {
@@ -65,12 +69,14 @@ function AuthorityManagement() {
     }
   };
 
+  // 저장 핸들러
   const handleSave = () => {
     fetchAuthorityList();
     setShowModal(false);
     setSelectedAdmin(null);
   };
 
+  // 삭제 핸들러
   const handleDelete = (admin) => {
     setSelectedAdmin(admin);
     setShowConfirmModal(true);

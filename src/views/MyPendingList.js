@@ -10,10 +10,10 @@ import axios from 'axios';
 
 /* 승인 대기 목록 페이지 */
 function MyPendingList() {
-  const [pendingApplications, setPendingApplications] = useState([]);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [selectedApplication, setSelectedApplication] = useState(null);
-  const navigate = useNavigate();
+  const [pendingApplications, setPendingApplications] = useState([]);     // 승인 대기 목록 상태 관리
+  const [showConfirmModal, setShowConfirmModal] = useState(false);        // 확인 모달 표시 상태 관리
+  const [selectedApplication, setSelectedApplication] = useState(null);   // 선택된 신청 내역 상태 관리
+  const navigate = useNavigate();                                         // 경로 이동을 위한 네비게이트 함수
 
   useEffect(() => {
     fetchPendingApplications();
@@ -27,6 +27,7 @@ function MyPendingList() {
     return `${datePart} ${timePart}`;
   };
 
+  // 승인 대기 목록 가져오기
   const fetchPendingApplications = async () => {
     try {
       const response = await axios.get('/api/myPendingList');
@@ -34,7 +35,7 @@ function MyPendingList() {
       if (response.data && response.data.data) {
         const data = Array.isArray(response.data.data.bcdPendingResponses) ? response.data.data.bcdPendingResponses : [];
         const transformedData = data.map(application => ({
-          draftId: application.draftId, // Ensure draftId is included
+          draftId: application.draftId,
           title: application.title,
           draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
           drafter: application.drafter,
@@ -50,11 +51,13 @@ function MyPendingList() {
     }
   };
 
+  // 취소 버튼 클릭 핸들러
   const handleCancelClick = (application) => {
     setSelectedApplication(application);
     setShowConfirmModal(true);
   };
 
+  // 확인 모달 확인 버튼 클릭 핸들러
   const handleConfirmCancel = async () => {
     try {
       await axios.put(`/api/bcd/${selectedApplication.draftId}`);
@@ -69,6 +72,7 @@ function MyPendingList() {
     }
   };
 
+  // 확인 모달 닫기 핸들러
   const handleCloseConfirmModal = () => {
     setShowConfirmModal(false);
     setSelectedApplication(null);
