@@ -32,7 +32,7 @@ function MyPendingList() {
     try {
       const response = await axios.get('/api/myPendingList');
       console.log('Pending List Response:', response.data);
-      if (response.data && response.data.data) {
+      if (response.data && response.data.data && response.data.data.bcdPendingResponses) {
         const data = Array.isArray(response.data.data.bcdPendingResponses) ? response.data.data.bcdPendingResponses : [];
         const transformedData = data.map(application => ({
           draftId: application.draftId,
@@ -89,7 +89,7 @@ function MyPendingList() {
       accessor: 'modify',
       width: '6%',
       Cell: ({ row }) => (
-        <Button className="modify-button" onClick={() => navigate('/detailInfo')}>수정</Button>
+        <Button className="modify-button" onClick={() => navigate(`/api/bcd/${row.draftId}`)}>수정</Button>
       ),
     },
     {

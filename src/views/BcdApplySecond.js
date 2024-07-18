@@ -16,7 +16,7 @@ function BcdApplySecond() {
   const { auth } = useContext(AuthContext);             // 사용자 인증 정보 사용
   const location = useLocation();                       // 현재 경로 정보 사용
   const navigate = useNavigate();                       // 경로 이동을 위한 네비게이트 함수
-  const isOwn = location.pathname === '/api/bsc/own';   // 본인 신청 여부 확인
+  const isOwn = location.pathname === '/api/bcd/own';   // 본인 신청 여부 확인
 
   const [formData, setFormData] = useState({
     name: '',
@@ -79,7 +79,7 @@ function BcdApplySecond() {
       alert('사용자 정보를 불러오는 중 오류가 발생했습니다.');
     }
   };
-  
+
   // 사용자 조회 버튼 클릭 핸들러
   const handleLookupUser = async () => {
     try {
@@ -190,7 +190,7 @@ function BcdApplySecond() {
   return (
     <div className="content">
       <div className="apply-content">
-        <h2>명함 신청하기</h2>
+        <h2>명함신청</h2>
         <Breadcrumb items={['신청하기', '명함신청']} />
         <div className="form-wrapper">
           <form className="business-card-form">

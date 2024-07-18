@@ -4,6 +4,7 @@ import Breadcrumb from '../components/common/Breadcrumb';
 import DateFilter from '../components/common/ConditionFilter';
 import Table from '../components/common/Table';
 import ConfirmModal from '../components/common/ConfirmModal';
+import RejectReasonModal from '../views/RejectReasonModal'; 
 import '../styles/MyApplyList.css';
 import '../styles/common/Page.css';
 import axios from 'axios';
@@ -16,6 +17,8 @@ function MyApplyList() {
   const [documentType, setDocumentType] = useState('');                   // 문서 타입 상태 관리
   const [showModal, setShowModal] = useState(false);                      // 확인 모달 표시 상태 관리
   const [selectedApplication, setSelectedApplication] = useState(null);   // 선택된 신청 내역 상태 관리
+  const [showRejectionModal, setShowRejectionModal] = useState(false);    // 반려 모달 표시 상태 관리
+  const [rejectionReason, setRejectionReason] = useState('');             // 반려 이유 상태 관리
   const navigate = useNavigate();                                         // 경로 이동을 위한 네비게이트 함수
 
   useEffect(() => {
@@ -100,12 +103,23 @@ function MyApplyList() {
   // 상태 버튼 클릭 핸들러
   const handleButtonClick = (application) => {
     setSelectedApplication(application);
-    setShowModal(true);
+    if (application.applyStatus === '반려') {
+      setRejectionReason('사내메일을 입력하세요.'); 
+      setShowRejectionModal(true);
+    } else {
+      setShowModal(true);
+    }
   };
 
   // 확인 모달 닫기 핸들러
   const handleCloseModal = () => {
     setShowModal(false);
+    setSelectedApplication(null);
+  };
+
+  // 반려 모달 닫기 핸들러
+  const handleCloseRejectionModal = () => {
+    setShowRejectionModal(false);
     setSelectedApplication(null);
   };
 
@@ -155,9 +169,13 @@ function MyApplyList() {
       accessor: 'applyStatus',
       width: '12%',
       Cell: ({ row }) => (
-        row.applyStatus === '발주완료' ? (
-          <button className="status-button" onClick={() => handleButtonClick(row)}>
-            발주완료
+        row.applyStatus === '발주완료' || row.applyStatus === '반려' ? (
+          <button 
+            className="status-button" 
+            style={row.applyStatus === '반려' ? { color: "#2789FE", textDecoration: 'underline' } : {}}
+            onClick={() => handleButtonClick(row)}
+          >
+            {row.applyStatus}
           </button>
         ) : (
           row.applyStatus
@@ -188,6 +206,15 @@ function MyApplyList() {
           message="명함을 수령하셨습니까?"
           onConfirm={handleConfirmModal}
           onCancel={handleCloseModal}
+        />
+      )}
+      {showRejectionModal && (
+        <RejectReasonModal
+          show={showRejectionModal}
+          onClose={handleCloseRejectionModal}
+          onConfirm={() => {}} // No action needed for viewing reasons
+          reason={rejectionReason}
+          isViewOnly={true}
         />
       )}
     </div>

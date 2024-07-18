@@ -18,7 +18,7 @@ function ApplicationsList() {
     statusOrdered: false,
     statusClosed: false,
   }); // 상태 필터 상태 관리
-  const [centers, setCenters] = useState(['전체', '재단본부', '기타']);  // 센터 목록 상태 관리
+  const [centers, setCenters] = useState(['전체', '재단본부', '광화문', '여의도센터', '강남센터', '수원센터', '대구센터', '부산센터', '광주센터', '제주센터', '협력사']);
   const [selectedCenter, setSelectedCenter] = useState('전체');         // 선택된 센터 상태 관리
   const [loading, setLoading] = useState(false);                        // 로딩 상태 관리
   const [error, setError] = useState(null);                             // 에러 상태 관리
@@ -82,7 +82,7 @@ function ApplicationsList() {
         ...application,
         center: application.instCd, 
         title: application.title, 
-        draftDate: application.draftDate ? parseDate(application.draftDate) : '',
+        draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
         drafter: application.drafter, 
         approvalDate: application.respondDate ? parseDate(application.respondDate) : '', 
         orderDate: application.orderDate ? parseDateTime(application.orderDate) : '',

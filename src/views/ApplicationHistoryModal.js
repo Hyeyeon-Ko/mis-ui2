@@ -7,7 +7,7 @@ import '../styles/ApplicationHistoryModal.css';
 /* 신청이력 모달 */
 const ApplicationHistoryModal = ({ show, onClose }) => {
   
-  // 시작 날짜와 종료 날짜 상태를 관리하는 useState 훅
+  // 시작 날짜와 종료 날짜 상태 관리
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 

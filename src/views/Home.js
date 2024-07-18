@@ -7,7 +7,7 @@ function Home() {
   return (
     <div className="main-content">
       <div className="button-container">
-        <CircleButton to="/api/bsc" label="명함신청" />
+        <CircleButton to="/api/bcd" label="명함신청" />
         <CircleButton to="/api/corpdoc" label="법인서류" />
       </div>
       <div className="button-container">

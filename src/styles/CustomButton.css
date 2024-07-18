@@ -58,3 +58,37 @@
 .preview-button:hover { 
   background-color: #d4d9df;
 }
+
+.approve-button {
+  background-color: #2789FE;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 12px 8px 12px 25px;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 20px;
+  margin-right: 20px;
+  cursor: pointer;
+}
+
+.approve-button:hover {
+  background-color: #1e6fc1;
+}
+
+.reject-button {
+  background-color: #FF4C4C;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 12px 8px 12px 25px;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 20px;
+  margin-left: 20px;
+  cursor: pointer;
+}
+
+.reject-button:hover {
+  background-color: #E84646;
+}

@@ -171,6 +171,13 @@
     font-size: 24px;
 }
 
+.quantity-display {
+    font-weight: 550;
+    font-size: 24px;
+    margin-top: 50px;
+    margin-bottom: 20px;
+}
+
 .card-preview {
     max-width: 100%;
     margin-left: 80px;

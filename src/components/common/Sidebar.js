@@ -12,7 +12,7 @@ function Sidebar() {
   };
 
   const applyItems = [
-    { label: '명함신청', url: '/api/bsc' },
+    { label: '명함신청', url: '/api/bcd' },
     { label: '법인서류', url: '/api/legalDoc' },
     { label: '인장관리', url: '/api/seal' },
     { label: '문서수발신', url: '/api/doc' },
@@ -26,7 +26,7 @@ function Sidebar() {
   const manageItems = [
     { label: '전체 신청 목록', url: '/api/applyList' },
     { label: '승인 대기 목록', url: '/api/pendingList' },
-    { label: '명함 발주', url: '/api/bsc/orderList' },
+    { label: '명함 발주', url: '/api/bcd/orderList' },
   ];
 
   return (
