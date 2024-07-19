@@ -64,8 +64,8 @@ function DetailApplication() {
   });
 
   useEffect(() => {
-    fetchApplicationDetail(draftId);
     fetchBcdStd();
+    fetchApplicationDetail(draftId);
   }, [draftId]);
 
   const fetchApplicationDetail = async (draftId) => {
@@ -82,10 +82,10 @@ function DetailApplication() {
           name: data.korNm,
           firstName: data.engNm.split(' ')[1],
           lastName: data.engNm.split(' ')[0],
-          center: data.instNm,
-          department: data.deptNm,
-          team: data.teamNm,
-          position: data.gradeNm,
+          center: data.instCd,
+          department: data.deptCd,
+          team: data.teamCd,
+          position: data.gradeCd,
           phone1, phone2, phone3,
           fax1, fax2, fax3,
           mobile1, mobile2, mobile3,
@@ -115,10 +115,10 @@ function DetailApplication() {
         const teamMap = {};
         const gradeMap = {};
 
-        data.instInfo.forEach(inst => instMap[inst.detailNm] = inst.detailCd);
-        data.deptInfo.forEach(dept => deptMap[dept.detailNm] = dept.detailCd);
-        data.teamInfo.forEach(team => teamMap[team.detailNm] = team.detailCd);
-        data.gradeInfo.forEach(grade => gradeMap[grade.detailNm] = grade.detailCd);
+        data.instInfo.forEach(inst => instMap[inst.detailCd] = inst.detailNm);
+        data.deptInfo.forEach(dept => deptMap[dept.detailCd] = dept.detailNm);
+        data.teamInfo.forEach(team => teamMap[team.detailCd] = team.detailNm);
+        data.gradeInfo.forEach(grade => gradeMap[grade.detailCd] = grade.detailNm);
 
         setMappings({ instMap, deptMap, teamMap, gradeMap });
         setBcdData(data);
@@ -173,10 +173,10 @@ function DetailApplication() {
       userId: formData.userId,
       korNm: formData.name,
       engNm: `${formData.lastName} ${formData.firstName}`,
-      instCd: mappings.instMap[formData.center],
-      deptCd: mappings.deptMap[formData.department],
-      teamCd: mappings.teamMap[formData.team],
-      gradeCd: mappings.gradeMap[formData.position],
+      instCd: formData.center,
+      deptCd: formData.department,
+      teamCd: formData.team,
+      gradeCd: formData.position,
       extTel: `${formData.phone1}-${formData.phone2}-${formData.phone3}`,
       faxTel: `${formData.fax1}-${formData.fax2}-${formData.fax3}`,
       phoneTel: `${formData.mobile1}-${formData.mobile2}-${formData.mobile3}`,
@@ -357,7 +357,7 @@ function DetailApplication() {
                 <select name="center" value={formData.center} onChange={handleCenterChange} required={!isReadOnly} disabled={isReadOnly}>
                   <option value="">선택하세요</option>
                   {bcdData.instInfo.map((center) => (
-                    <option key={center.detailCd} value={center.detailNm}>{center.detailNm}</option>
+                    <option key={center.detailCd} value={center.detailCd}>{center.detailNm}</option>
                   ))}
                 </select>
               </div>
@@ -366,9 +366,9 @@ function DetailApplication() {
                 <select name="department" value={formData.department} onChange={handleDepartmentChange} required={!isReadOnly} disabled={isReadOnly}>
                   <option value="">선택하세요</option>
                   {bcdData.deptInfo
-                    .filter((dept) => dept.etcItem1 === mappings.instMap[formData.center])
+                    .filter((dept) => dept.etcItem1 === formData.center)
                     .map((department) => (
-                      <option key={department.detailCd} value={department.detailNm}>{department.detailNm}</option>
+                      <option key={department.detailCd} value={department.detailCd}>{department.detailNm}</option>
                     ))}
                 </select>
               </div>
@@ -377,9 +377,9 @@ function DetailApplication() {
                 <select name="team" value={formData.team} onChange={handleChange} required={!isReadOnly} disabled={isReadOnly}>
                   <option value="">선택하세요</option>
                   {bcdData.teamInfo
-                    .filter((team) => team.etcItem1 === mappings.deptMap[formData.department])
+                    .filter((team) => team.etcItem1 === formData.department)
                     .map((team) => (
-                      <option key={team.detailCd} value={team.detailNm}>{team.detailNm}</option>
+                      <option key={team.detailCd} value={team.detailCd}>{team.detailNm}</option>
                     ))}
                 </select>
               </div>
@@ -388,7 +388,7 @@ function DetailApplication() {
                 <select name="position" value={formData.position} onChange={handleChange} required={!isReadOnly} disabled={isReadOnly}>
                   <option value="">선택하세요</option>
                   {bcdData.gradeInfo.map((position) => (
-                    <option key={position.detailCd} value={position.detailNm}>{position.detailNm}</option>
+                    <option key={position.detailCd} value={position.detailCd}>{position.detailNm}</option>
                   ))}
                 </select>
               </div>

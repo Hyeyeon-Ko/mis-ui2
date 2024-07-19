@@ -78,7 +78,6 @@ function MyApplyList() {
           }
         }, []);
 
-
         const transformedData = uniqueData
           .map(application => ({
             ...application,
@@ -86,8 +85,9 @@ function MyApplyList() {
             approvalDate: application.respondDate ? parseDateTime(application.respondDate) : '',
             drafter: application.drafter,
             applyStatus: getStatusText(application.applyStatus), 
-          }))
-          .filter(application => application.applyStatus !== '승인대기');
+            rejectionReason: application.rejectReason,
+            manager: application.approver || application.disapprover || '',  // 매핑된 담당자 값 추가
+          }));
 
         console.log('Transformed Data:', transformedData);
 
@@ -104,7 +104,7 @@ function MyApplyList() {
   const handleButtonClick = (application) => {
     setSelectedApplication(application);
     if (application.applyStatus === '반려') {
-      setRejectionReason('사내메일을 입력하세요.'); 
+      setRejectionReason(application.rejectionReason || '사내메일을 입력하세요.'); 
       setShowRejectionModal(true);
     } else {
       setShowModal(true);
@@ -163,7 +163,7 @@ function MyApplyList() {
     { header: '기안일시', accessor: 'draftDate', width: '14%' },
     { header: '기안자', accessor: 'drafter', width: '9%' },
     { header: '승인/반려일시', accessor: 'approvalDate', width: '14%' },
-    { header: '담당자', accessor: 'manager', width: '9%' },
+    { header: '담당자', accessor: 'manager', width: '9%' },  // manager 컬럼 추가
     {
       header: '신청상태',
       accessor: 'applyStatus',

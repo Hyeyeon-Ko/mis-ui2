@@ -25,6 +25,7 @@ function BcdApplySecond() {
     center: '',
     department: '',
     team: '',
+    teamNm: '', // teamNm 추가
     position: '',
     phone1: '',
     phone2: '',
@@ -78,6 +79,7 @@ function BcdApplySecond() {
           name: userData.userName,
           center: userData.centerNm,
           team: userData.teamNm,
+          teamNm: userData.teamNm, // teamNm 추가
           mobile1: userData.telNum.split('-')[0],
           mobile2: userData.telNum.split('-')[1],
           mobile3: userData.telNum.split('-')[2],
@@ -135,6 +137,7 @@ function BcdApplySecond() {
           name: userData.userName,
           center: userData.centerNm,
           team: userData.teamNm,
+          teamNm: userData.teamNm, // teamNm 추가
           mobile1: userData.telNum.split('-')[0],
           mobile2: userData.telNum.split('-')[1],
           mobile3: userData.telNum.split('-')[2],
@@ -205,6 +208,7 @@ function BcdApplySecond() {
       instCd: mappings.instMap[formData.center],
       deptCd: mappings.deptMap[formData.department],
       teamCd: mappings.teamMap[formData.team],
+      teamNm: formData.team,
       gradeCd: mappings.gradeMap[formData.position],
       extTel: `${formData.phone1}-${formData.phone2}-${formData.phone3}`,
       faxTel: `${formData.fax1}-${formData.fax2}-${formData.fax3}`,
@@ -220,7 +224,7 @@ function BcdApplySecond() {
       console.log('Confirm Request Response:', response.data);
       if (response.data.code === 200) {
         alert('명함 신청이 완료되었습니다.');
-        navigate('/');
+        navigate('/api/myApplyList');
       } else {
         alert('명함 신청 중 오류가 발생했습니다.');
       }
@@ -231,7 +235,11 @@ function BcdApplySecond() {
   };
 
   const handleCenterChange = (e) => {
-    setFormData({ ...formData, center: e.target.value, department: '', team: '' });
+    const selectedCenter = e.target.value;
+    const selectedInstInfo = bcdData.instInfo.find(inst => inst.detailNm === selectedCenter);
+    const address = selectedInstInfo ? selectedInstInfo.etcItem3 : ''; // Using etcItem3 for address
+
+    setFormData({ ...formData, center: selectedCenter, address, department: '', team: '' });
   };
 
   const handleDepartmentChange = (e) => {

@@ -80,7 +80,7 @@ function ApplicationsList() {
 
       const transformedData = data.map(application => ({
         ...application,
-        center: application.instCd, 
+        center: application.instNm, 
         title: application.title, 
         draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
         drafter: application.drafter, 
@@ -142,7 +142,6 @@ function ApplicationsList() {
 
   // 필터링된 신청 내역
   const filteredApplications = applications.filter((application) => {
-    if (application.status === '승인대기') return false; // 승인대기 상태 제외
     if (selectedCenter !== '전체' && application.center !== selectedCenter) return false;
     if (isAnyFilterActive) {
       if (filters.statusApproved && application.status === '승인완료') return true;

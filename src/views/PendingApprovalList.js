@@ -32,7 +32,7 @@ function PendingApprovalList() {
 
       const transformedData = data.map(item => ({
         ...item,
-        center: item.instCd,
+        center: item.instNm,
         title: item.title,
         draftDate: item.draftDate ? parseDate(item.draftDate) : '',
         drafter: item.drafter,
