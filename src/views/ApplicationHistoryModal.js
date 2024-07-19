@@ -10,6 +10,7 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
 
   useEffect(() => {
     if (draftId) {
@@ -20,9 +21,33 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   const fetchHistory = async (draftId) => {
     try {
       const response = await axios.get(`/api/bcd/applyList/history/${draftId}`);
-      setData(response.data.data);
+      const transformedData = response.data.data.map(item => ({
+        ...item,
+        applyStatus: getStatusText(item.applyStatus),
+      }));
+      setData(transformedData);
+      setFilteredData(transformedData);
     } catch (error) {
       console.error('Error fetching application history:', error);
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'A':
+        return '승인대기';
+      case 'B':
+        return '승인완료';
+      case 'C':
+        return '반려';
+      case 'D':
+        return '발주완료';
+      case 'E':
+        return '완료';
+      case 'F':
+        return '신청취소';
+      default:
+        return status;
     }
   };
 
@@ -32,39 +57,48 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
     { header: '문서상태', accessor: 'applyStatus', width: '20%' }
   ];
 
-  const filteredData = data.filter(item => {
-    const itemDate = new Date(item.draftDate);
-    return (
-      (!startDate || itemDate >= startDate) &&
-      (!endDate || itemDate <= endDate)
-    );
-  });
+  const handleSearch = () => {
+    const newData = data.filter(item => {
+      const itemDate = new Date(item.draftDate);
+      return (
+        (!startDate || itemDate >= startDate) &&
+        (!endDate || itemDate <= endDate)
+      );
+    });
+    setFilteredData(newData);
+  };
+
+  const handleReset = () => {
+    setStartDate(null);
+    setEndDate(null);
+    setFilteredData(data); // Reset to original data
+  };
 
   if (!show) return null;
 
   return (
     <div className="history-modal-overlay">
       <div className="history-modal-container">
-        <h3>신청이력</h3>
-        <button className="history-modal-close" onClick={onClose}>×</button>
+        <div className="modal-header">
+          <h3>신청이력</h3>
+          <button className="history-modal-close" onClick={onClose}>×</button>
+        </div>
         <ConditionFilter
           startDate={startDate}
           setStartDate={setStartDate}
           endDate={endDate}
           setEndDate={setEndDate}
+          onSearch={handleSearch}
+          onReset={handleReset}
         />
-        {startDate && endDate ? (
-          <Table columns={columns} data={filteredData} />
-        ) : (
-          <Table columns={columns} data={data} />
-        )}
+        <Table columns={columns} data={filteredData} />
       </div>
     </div>
   );
 };
 
 ApplicationHistoryModal.propTypes = {
-  show: PropTypes.bool.isRequired, 
+  show: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   draftId: PropTypes.string.isRequired,
 };

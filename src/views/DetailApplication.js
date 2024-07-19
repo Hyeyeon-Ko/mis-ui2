@@ -49,8 +49,23 @@ function DetailApplication() {
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const isReadOnly = new URLSearchParams(location.search).get('readonly') === 'true';
 
+  const [bcdData, setBcdData] = useState({
+    instInfo: [],
+    deptInfo: [],
+    teamInfo: [],
+    gradeInfo: [],
+  });
+
+  const [mappings, setMappings] = useState({
+    instMap: {},
+    deptMap: {},
+    teamMap: {},
+    gradeMap: {}
+  });
+
   useEffect(() => {
     fetchApplicationDetail(draftId);
+    fetchBcdStd();
   }, [draftId]);
 
   const fetchApplicationDetail = async (draftId) => {
@@ -85,6 +100,35 @@ function DetailApplication() {
       }
     } catch (error) {
       alert('신청 정보를 불러오는 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 기준자료 불러오기
+  const fetchBcdStd = async () => {
+    try {
+      const response = await axios.get('/api/std/bcd');
+      console.log('BCD Standard Data:', response.data);
+      if (response.data && response.data.data) {
+        const data = response.data.data;
+        const instMap = {};
+        const deptMap = {};
+        const teamMap = {};
+        const gradeMap = {};
+
+        data.instInfo.forEach(inst => instMap[inst.detailNm] = inst.detailCd);
+        data.deptInfo.forEach(dept => deptMap[dept.detailNm] = dept.detailCd);
+        data.teamInfo.forEach(team => teamMap[team.detailNm] = team.detailCd);
+        data.gradeInfo.forEach(grade => gradeMap[grade.detailNm] = grade.detailCd);
+
+        setMappings({ instMap, deptMap, teamMap, gradeMap });
+        setBcdData(data);
+      } else {
+        console.error('No standard data found');
+        alert('기준자료를 불러오는 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('Error fetching BCD standard data:', error.response ? error.response.data : error.message);
+      alert('기준자료를 불러오는 중 오류가 발생했습니다.');
     }
   };
 
@@ -129,10 +173,10 @@ function DetailApplication() {
       userId: formData.userId,
       korNm: formData.name,
       engNm: `${formData.lastName} ${formData.firstName}`,
-      instCd: formData.center,
-      deptCd: formData.department,
-      teamCd: formData.team,
-      gradeCd: formData.position,
+      instCd: mappings.instMap[formData.center],
+      deptCd: mappings.deptMap[formData.department],
+      teamCd: mappings.teamMap[formData.team],
+      gradeCd: mappings.gradeMap[formData.position],
       extTel: `${formData.phone1}-${formData.phone2}-${formData.phone3}`,
       faxTel: `${formData.fax1}-${formData.fax2}-${formData.fax3}`,
       phoneTel: `${formData.mobile1}-${formData.mobile2}-${formData.mobile3}`,
@@ -201,6 +245,14 @@ function DetailApplication() {
 
   const handleHistoryClose = () => {
     setShowHistoryModal(false);
+  };
+
+  const handleCenterChange = (e) => {
+    setFormData({ ...formData, center: e.target.value, department: '', team: '' });
+  };
+
+  const handleDepartmentChange = (e) => {
+    setFormData({ ...formData, department: e.target.value, team: '' });
   };
 
   return (
@@ -302,19 +354,43 @@ function DetailApplication() {
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">센터</label>
-                <input type="text" name="center" value={formData.center} onChange={handleChange} required={!isReadOnly} readOnly={isReadOnly} />
+                <select name="center" value={formData.center} onChange={handleCenterChange} required={!isReadOnly} disabled={isReadOnly}>
+                  <option value="">선택하세요</option>
+                  {bcdData.instInfo.map((center) => (
+                    <option key={center.detailCd} value={center.detailNm}>{center.detailNm}</option>
+                  ))}
+                </select>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">부서</label>
-                <input type="text" name="department" value={formData.department} onChange={handleChange} required={!isReadOnly} readOnly={isReadOnly} />
+                <select name="department" value={formData.department} onChange={handleDepartmentChange} required={!isReadOnly} disabled={isReadOnly}>
+                  <option value="">선택하세요</option>
+                  {bcdData.deptInfo
+                    .filter((dept) => dept.etcItem1 === mappings.instMap[formData.center])
+                    .map((department) => (
+                      <option key={department.detailCd} value={department.detailNm}>{department.detailNm}</option>
+                    ))}
+                </select>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">팀 명</label>
-                <input type="text" name="team" value={formData.team} onChange={handleChange} required={!isReadOnly} readOnly={isReadOnly} />
+                <select name="team" value={formData.team} onChange={handleChange} required={!isReadOnly} disabled={isReadOnly}>
+                  <option value="">선택하세요</option>
+                  {bcdData.teamInfo
+                    .filter((team) => team.etcItem1 === mappings.deptMap[formData.department])
+                    .map((team) => (
+                      <option key={team.detailCd} value={team.detailNm}>{team.detailNm}</option>
+                    ))}
+                </select>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">직위 / 직책</label>
-                <input type="text" name="position" value={formData.position} onChange={handleChange} required={!isReadOnly} readOnly={isReadOnly} />
+                <select name="position" value={formData.position} onChange={handleChange} required={!isReadOnly} disabled={isReadOnly}>
+                  <option value="">선택하세요</option>
+                  {bcdData.gradeInfo.map((position) => (
+                    <option key={position.detailCd} value={position.detailNm}>{position.detailNm}</option>
+                  ))}
+                </select>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">내선 번호</label>
