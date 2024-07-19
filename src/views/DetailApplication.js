@@ -5,6 +5,7 @@ import Breadcrumb from '../components/common/Breadcrumb';
 import CustomButton from '../components/CustomButton';
 import FinalConfirmationModal from '../views/FinalConfirmationModal';
 import RejectReasonModal from '../views/RejectReasonModal';
+import ApplicationHistoryModal from '../views/ApplicationHistoryModal';
 import { AuthContext } from '../components/AuthContext';
 import '../styles/BcdApplySecond.css';
 import '../styles/common/Page.css';
@@ -45,6 +46,7 @@ function DetailApplication() {
 
   const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
   const isReadOnly = new URLSearchParams(location.search).get('readonly') === 'true';
 
   useEffect(() => {
@@ -65,10 +67,10 @@ function DetailApplication() {
           name: data.korNm,
           firstName: data.engNm.split(' ')[1],
           lastName: data.engNm.split(' ')[0],
-          center: data.instCd,
-          department: data.deptCd,
-          team: data.teamCd,
-          position: data.gradeCd,
+          center: data.instNm,
+          department: data.deptNm,
+          team: data.teamNm,
+          position: data.gradeNm,
           phone1, phone2, phone3,
           fax1, fax2, fax3,
           mobile1, mobile2, mobile3,
@@ -193,6 +195,14 @@ function DetailApplication() {
     }
   };
 
+  const handleHistoryClick = () => {
+    setShowHistoryModal(true);
+  };
+
+  const handleHistoryClose = () => {
+    setShowHistoryModal(false);
+  };
+
   return (
     <div className="content">
       <div className="apply-content">
@@ -203,7 +213,14 @@ function DetailApplication() {
             <div className="form-left">
               <div className="form-group">
                 <label className="bold-label">명함 대상자 선택</label>
-                <input type="text" value={`${formData.name} (${formData.userId})`} readOnly />
+                <div className="form-horizontal">
+                  <input type="text" value={`${formData.name} (${formData.userId})`} readOnly />
+                  {isReadOnly && (
+                    <button type="button" className="history-button" onClick={handleHistoryClick}>
+                      신청이력
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="form-group">
                 <label className="bold-label">명함 종류</label>
@@ -358,6 +375,7 @@ function DetailApplication() {
         onConfirm={handleConfirmRequest}
       />
       <RejectReasonModal show={showRejectModal} onClose={handleRejectClose} onConfirm={handleRejectConfirm} />
+      <ApplicationHistoryModal show={showHistoryModal} onClose={handleHistoryClose} draftId={draftId} /> {/* 신청이력 모달 추가 */}
     </div>
   );
 }

@@ -1,30 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 import ConditionFilter from '../components/common/ConditionFilter';
 import Table from '../components/common/Table';
 import '../styles/ApplicationHistoryModal.css';
 
 /* 신청이력 모달 */
-const ApplicationHistoryModal = ({ show, onClose }) => {
-  
-  // 시작 날짜와 종료 날짜 상태 관리
+const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [data, setData] = useState([]);
 
-  // 테이블 컬럼 정의
+  useEffect(() => {
+    if (draftId) {
+      fetchHistory(draftId);
+    }
+  }, [draftId]);
+
+  const fetchHistory = async (draftId) => {
+    try {
+      const response = await axios.get(`/api/bcd/applyList/history/${draftId}`);
+      setData(response.data.data);
+    } catch (error) {
+      console.error('Error fetching application history:', error);
+    }
+  };
+
   const columns = [
     { header: '제목', accessor: 'title', width: '40%' },
     { header: '기안일시', accessor: 'draftDate', width: '20%' },
-    { header: '문서상태', accessor: 'status', width: '20%' }
+    { header: '문서상태', accessor: 'applyStatus', width: '20%' }
   ];
 
-  // 샘플 데이터 정의
-  const data = [
-    { title: '문서1', draftDate: '2023-07-01', status: '승인' },
-    { title: '문서2', draftDate: '2023-07-02', status: '반려' }
-  ];
-
-  // 날짜 필터링 로직
   const filteredData = data.filter(item => {
     const itemDate = new Date(item.draftDate);
     return (
@@ -33,7 +40,6 @@ const ApplicationHistoryModal = ({ show, onClose }) => {
     );
   });
 
-  // 모달이 표시되지 않으면 null 반환
   if (!show) return null;
 
   return (
@@ -50,17 +56,17 @@ const ApplicationHistoryModal = ({ show, onClose }) => {
         {startDate && endDate ? (
           <Table columns={columns} data={filteredData} />
         ) : (
-          <p className="no-data-message">조회하고자 하는 기안 일자를 설정하세요.</p>
+          <Table columns={columns} data={data} />
         )}
       </div>
     </div>
   );
 };
 
-// 컴포넌트의 props 타입 정의
 ApplicationHistoryModal.propTypes = {
   show: PropTypes.bool.isRequired, 
-  onClose: PropTypes.func.isRequired 
+  onClose: PropTypes.func.isRequired,
+  draftId: PropTypes.string.isRequired,
 };
 
 export default ApplicationHistoryModal;

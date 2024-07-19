@@ -3,13 +3,12 @@
   background-color: #EDF1F5;
   color: black;
   padding: 20px;
-  min-height: 100vh;
+  height: 125vh; 
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* 로고 */
 .logo {
   width: 210px;
   height: 90px;
@@ -22,7 +21,6 @@
   margin-left: 90px;
 }
 
-/* 나의신청내역 & 권한관리 */
 .sidebar-section h2 {
   font-size: 24px;
   margin-left: 25px;
@@ -44,7 +42,6 @@
   padding: 0;
 }
 
-/* section 내의 메뉴들 */
 .sidebar-section li {
   font-size: 20px;
   margin-bottom: 13px;
@@ -67,7 +64,6 @@
   margin-bottom: 0px;
 }
 
-/* 신청하기 & 신청목록관리 */
 .sidebar-section h3 {
   font-size: 24px;
   margin-bottom: 20px;
@@ -86,7 +82,6 @@
   margin-bottom: 6px;
 }
 
-/* active 클래스 추가 */
 .sidebar-section .active {
   color: #2789FE;
   font-weight: bold;

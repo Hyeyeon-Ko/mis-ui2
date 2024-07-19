@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import '../../styles/common/Sidebar.css';
 import logo from '../../assets/images/logo.png';
 
-/* 사이드바 component */
+/* Sidebar component */
 function Sidebar() {
   const location = useLocation();
 

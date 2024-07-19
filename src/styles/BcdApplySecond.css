@@ -34,7 +34,7 @@
 
 .form-right {
     right: 0;
-    padding-left: 20px;
+    padding-left: 60px;
 }
 
 .form-group {
@@ -237,4 +237,21 @@ input[type="text2"] {
   
   .lookup-button:hover {
     background-color: #d4d9df;
+}
+
+.history-button {
+    padding: 10px 20px;
+    background-color: #e2e5e9;
+    color: rgb(126, 125, 125);
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.history-button:hover {
+    background-color: #d4d9df;
+    color: rgb(100, 100, 100);
 }

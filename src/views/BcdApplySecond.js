@@ -44,33 +44,26 @@ function BcdApplySecond() {
 
   const [userIdInput, setUserIdInput] = useState(''); // 사용자 ID 입력 상태 관리
   const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false); // 최종 확인 모달 표시 상태 관리
+  const [bcdData, setBcdData] = useState({
+    instInfo: [],
+    deptInfo: [],
+    teamInfo: [],
+    gradeInfo: [],
+  });
 
-  const centers = {
-    '재단본부': [
-      '감사', '기획조정실', '법무실', '재무실', '경영지원실', '디지털혁신실', '커뮤니케이션실', '연구위원회', 'ESG운영총괄단', '안전보건관리단'
-    ],
-  };
+  const [mappings, setMappings] = useState({
+    instMap: {},
+    deptMap: {},
+    teamMap: {},
+    gradeMap: {}
+  });
 
-  const departments = {
-    '감사': ['감사팀'],
-    '기획조정실': ['인사팀', '노사상생팀', '인재개발팀', '전략기획팀', '미래전략팀', '국제사업팀', '검진사업기획팀', '온라인사업팀'],
-    '법무실': ['준법경영팀', '법무팀'],
-    '재무실': ['회계팀', '자금팀'],
-    '경영지원실': ['총무팀', '구매팀'],
-    '디지털혁신실': ['정보전략팀', '스마트인프라팀', '디지털헬스케어팀', '스마트워크팀'],
-    '커뮤니케이션실': ['브랜드홍보팀', '커뮤니케이션팀'],
-    '연구위원회': ['연구위원회'],
-    'ESG운영총괄단': ['ESG운영팀', '연구지원팀'],
-    '안전보건관리단': ['안전보건팀'],
-  };
-
-  const positions = ['팀장', '파트장', '선임', '사원'];
-
-  // 컴포넌트 마운트 시 사용자 정보 가져오기 (본인 신청 시)
+  // 컴포넌트 마운트 시 사용자 정보 가져오기 (본인 신청 시) 및 기준자료 불러오기
   useEffect(() => {
     if (isOwn) {
       fetchUserInfo(auth.userId);
     }
+    fetchBcdStd();
   }, [isOwn, auth.userId]);
 
   // 사용자 정보 가져오기
@@ -80,8 +73,8 @@ function BcdApplySecond() {
       console.log('Lookup User Response:', response.data);
       if (response.data && response.data.data) {
         const userData = response.data.data;
-        setFormData({
-          ...formData,
+        setFormData((prevFormData) => ({
+          ...prevFormData,
           name: userData.userName,
           center: userData.centerNm,
           team: userData.teamNm,
@@ -90,7 +83,7 @@ function BcdApplySecond() {
           mobile3: userData.telNum.split('-')[2],
           email: userData.email.split('@')[0],
           userId: userId,
-        });
+        }));
       } else {
         console.error('No data found for the user');
         alert('사용자 정보를 불러오는 중 오류가 발생했습니다. 유효한 사번을 입력하세요.');
@@ -101,6 +94,35 @@ function BcdApplySecond() {
     }
   };
 
+  // 기준자료 불러오기
+  const fetchBcdStd = async () => {
+    try {
+      const response = await axios.get('/api/std/bcd');
+      console.log('BCD Standard Data:', response.data);
+      if (response.data && response.data.data) {
+        const data = response.data.data;
+        const instMap = {};
+        const deptMap = {};
+        const teamMap = {};
+        const gradeMap = {};
+
+        data.instInfo.forEach(inst => instMap[inst.detailNm] = inst.detailCd);
+        data.deptInfo.forEach(dept => deptMap[dept.detailNm] = dept.detailCd);
+        data.teamInfo.forEach(team => teamMap[team.detailNm] = team.detailCd);
+        data.gradeInfo.forEach(grade => gradeMap[grade.detailNm] = grade.detailCd);
+
+        setMappings({ instMap, deptMap, teamMap, gradeMap });
+        setBcdData(data);
+      } else {
+        console.error('No standard data found');
+        alert('기준자료를 불러오는 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('Error fetching BCD standard data:', error.response ? error.response.data : error.message);
+      alert('기준자료를 불러오는 중 오류가 발생했습니다.');
+    }
+  };
+
   // 사용자 조회 버튼 클릭 핸들러
   const handleLookupUser = async () => {
     try {
@@ -108,8 +130,8 @@ function BcdApplySecond() {
       console.log('Lookup User Response:', response.data);
       if (response.data && response.data.data) {
         const userData = response.data.data;
-        setFormData({
-          ...formData,
+        setFormData((prevFormData) => ({
+          ...prevFormData,
           name: userData.userName,
           center: userData.centerNm,
           team: userData.teamNm,
@@ -118,7 +140,7 @@ function BcdApplySecond() {
           mobile3: userData.telNum.split('-')[2],
           email: userData.email.split('@')[0],
           userId: userIdInput,
-        });
+        }));
       } else {
         console.error('No data found for the user');
         alert('사용자 정보를 불러오는 중 오류가 발생했습니다. 유효한 사번을 입력하세요.');
@@ -132,12 +154,12 @@ function BcdApplySecond() {
   // 입력 변경 핸들러
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   };
 
   // 명함 종류 변경 핸들러
   const handleCardTypeChange = (e) => {
-    setFormData({ ...formData, cardType: e.target.value });
+    setFormData((prevFormData) => ({ ...prevFormData, cardType: e.target.value }));
   };
 
   // 사용자 ID 입력 변경 핸들러
@@ -148,8 +170,8 @@ function BcdApplySecond() {
   // 폼 입력 검증
   const validateForm = () => {
     const requiredFields = [
-      'name', 'firstName', 'lastName', 'center', 'department', 
-      'team', 'position', 'phone1', 'phone2', 'phone3', 'fax1', 
+      'name', 'firstName', 'lastName', 'center', 'department',
+      'team', 'position', 'phone1', 'phone2', 'phone3', 'fax1',
       'fax2', 'fax3', 'mobile1', 'mobile2', 'mobile3', 'email', 'address'
     ];
 
@@ -180,10 +202,10 @@ function BcdApplySecond() {
       userId: formData.userId,
       korNm: formData.name,
       engNm: `${formData.lastName} ${formData.firstName}`,
-      instCd: formData.center,
-      deptCd: formData.department,
-      teamCd: formData.team,
-      gradeCd: formData.position,
+      instCd: mappings.instMap[formData.center],
+      deptCd: mappings.deptMap[formData.department],
+      teamCd: mappings.teamMap[formData.team],
+      gradeCd: mappings.gradeMap[formData.position],
       extTel: `${formData.phone1}-${formData.phone2}-${formData.phone3}`,
       faxTel: `${formData.fax1}-${formData.fax2}-${formData.fax3}`,
       phoneTel: `${formData.mobile1}-${formData.mobile2}-${formData.mobile3}`,
@@ -291,49 +313,53 @@ function BcdApplySecond() {
                 <CustomButton className="preview-button">명함시안미리보기</CustomButton>
               </div>
               <div className="form-group-horizontal">
-                <label className="form-label">이름</label>
+                <label className="form-label">이 름</label>
                 <input type="text" name="name" value={formData.name} onChange={handleChange} required />
               </div>
               <div className="form-group-horizontal">
-                <label className="form-label">영문이름</label>
+                <label className="form-label">영문 이름</label>
                 <div className="name-inputs">
                   <input type="text" name="firstName" placeholder="First name" value={formData.firstName} onChange={handleChange} required className="english-name" />
                   <input type="text" name="lastName" placeholder="Last name" value={formData.lastName} onChange={handleChange} required className="english-name" />
                 </div>
               </div>
               <div className="form-group-horizontal">
-                <label className="form-label">센터</label>
+                <label className="form-label">센 터</label>
                 <select name="center" value={formData.center} onChange={handleCenterChange} required>
                   <option value="">선택하세요</option>
-                  {Object.keys(centers).map(center => (
-                    <option key={center} value={center}>{center}</option>
+                  {bcdData.instInfo.map((center) => (
+                    <option key={center.detailCd} value={center.detailNm}>{center.detailNm}</option>
                   ))}
                 </select>
               </div>
               <div className="form-group-horizontal">
-                <label className="form-label">부서</label>
+                <label className="form-label">부 서</label>
                 <select name="department" value={formData.department} onChange={handleDepartmentChange} required>
                   <option value="">선택하세요</option>
-                  {centers[formData.center] && centers[formData.center].map(department => (
-                    <option key={department} value={department}>{department}</option>
-                  ))}
+                  {bcdData.deptInfo
+                    .filter((dept) => dept.etcItem1 === mappings.instMap[formData.center])
+                    .map((department) => (
+                      <option key={department.detailCd} value={department.detailNm}>{department.detailNm}</option>
+                    ))}
                 </select>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">팀 명</label>
                 <select name="team" value={formData.team} onChange={handleChange} required>
                   <option value="">선택하세요</option>
-                  {departments[formData.department] && departments[formData.department].map(team => (
-                    <option key={team} value={team}>{team}</option>
-                  ))}
+                  {bcdData.teamInfo
+                    .filter((team) => team.etcItem1 === mappings.deptMap[formData.department])
+                    .map((team) => (
+                      <option key={team.detailCd} value={team.detailNm}>{team.detailNm}</option>
+                    ))}
                 </select>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">직위 / 직책</label>
                 <select name="position" value={formData.position} onChange={handleChange} required>
                   <option value="">선택하세요</option>
-                  {positions.map(position => (
-                    <option key={position} value={position}>{position}</option>
+                  {bcdData.gradeInfo.map((position) => (
+                    <option key={position.detailCd} value={position.detailNm}>{position.detailNm}</option>
                   ))}
                 </select>
               </div>
