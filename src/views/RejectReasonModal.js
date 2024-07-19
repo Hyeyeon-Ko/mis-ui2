@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import '../styles/RejectReasonModal.css';
 
 /* 반려 사유 모달 */
-const RejectReasonModal = ({ show, onClose, onConfirm, reason, isViewOnly }) => {
-  const [inputReason, setInputReason] = useState(reason || '');
+const RejectReasonModal = ({ show, onClose, onConfirm, reason = '', isViewOnly = false }) => {
+  const [inputReason, setInputReason] = useState(reason);
 
   useEffect(() => {
     setInputReason(reason);
@@ -31,7 +31,8 @@ const RejectReasonModal = ({ show, onClose, onConfirm, reason, isViewOnly }) => 
           </div>
         ) : (
           <textarea
-            placeholder="반려 사유를 작성해주세요.\n해당 내용은 명함 신청자에게 전달됩니다."
+            placeholder={`반려 사유를 작성해주세요.
+해당 내용은 명함 신청자에게 전달됩니다.`}
             value={inputReason}
             onChange={handleTextareaChange}
           />
@@ -53,11 +54,6 @@ RejectReasonModal.propTypes = {
   onConfirm: PropTypes.func.isRequired,
   reason: PropTypes.string,
   isViewOnly: PropTypes.bool,
-};
-
-RejectReasonModal.defaultProps = {
-  reason: '',
-  isViewOnly: false,
 };
 
 export default RejectReasonModal;

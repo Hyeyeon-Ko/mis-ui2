@@ -45,6 +45,27 @@ function BcdApplySecond() {
   const [userIdInput, setUserIdInput] = useState(''); // 사용자 ID 입력 상태 관리
   const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false); // 최종 확인 모달 표시 상태 관리
 
+  const centers = {
+    '재단본부': [
+      '감사', '기획조정실', '법무실', '재무실', '경영지원실', '디지털혁신실', '커뮤니케이션실', '연구위원회', 'ESG운영총괄단', '안전보건관리단'
+    ],
+  };
+
+  const departments = {
+    '감사': ['감사팀'],
+    '기획조정실': ['인사팀', '노사상생팀', '인재개발팀', '전략기획팀', '미래전략팀', '국제사업팀', '검진사업기획팀', '온라인사업팀'],
+    '법무실': ['준법경영팀', '법무팀'],
+    '재무실': ['회계팀', '자금팀'],
+    '경영지원실': ['총무팀', '구매팀'],
+    '디지털혁신실': ['정보전략팀', '스마트인프라팀', '디지털헬스케어팀', '스마트워크팀'],
+    '커뮤니케이션실': ['브랜드홍보팀', '커뮤니케이션팀'],
+    '연구위원회': ['연구위원회'],
+    'ESG운영총괄단': ['ESG운영팀', '연구지원팀'],
+    '안전보건관리단': ['안전보건팀'],
+  };
+
+  const positions = ['팀장', '파트장', '선임', '사원'];
+
   // 컴포넌트 마운트 시 사용자 정보 가져오기 (본인 신청 시)
   useEffect(() => {
     if (isOwn) {
@@ -187,6 +208,14 @@ function BcdApplySecond() {
     }
   };
 
+  const handleCenterChange = (e) => {
+    setFormData({ ...formData, center: e.target.value, department: '', team: '' });
+  };
+
+  const handleDepartmentChange = (e) => {
+    setFormData({ ...formData, department: e.target.value, team: '' });
+  };
+
   return (
     <div className="content">
       <div className="apply-content">
@@ -274,19 +303,39 @@ function BcdApplySecond() {
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">센터</label>
-                <input type="text" name="center" value={formData.center} onChange={handleChange} required />
+                <select name="center" value={formData.center} onChange={handleCenterChange} required>
+                  <option value="">선택하세요</option>
+                  {Object.keys(centers).map(center => (
+                    <option key={center} value={center}>{center}</option>
+                  ))}
+                </select>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">부서</label>
-                <input type="text" name="department" value={formData.department} onChange={handleChange} required />
+                <select name="department" value={formData.department} onChange={handleDepartmentChange} required>
+                  <option value="">선택하세요</option>
+                  {centers[formData.center] && centers[formData.center].map(department => (
+                    <option key={department} value={department}>{department}</option>
+                  ))}
+                </select>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">팀 명</label>
-                <input type="text" name="team" value={formData.team} onChange={handleChange} required />
+                <select name="team" value={formData.team} onChange={handleChange} required>
+                  <option value="">선택하세요</option>
+                  {departments[formData.department] && departments[formData.department].map(team => (
+                    <option key={team} value={team}>{team}</option>
+                  ))}
+                </select>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">직위 / 직책</label>
-                <input type="text" name="position" value={formData.position} onChange={handleChange} required />
+                <select name="position" value={formData.position} onChange={handleChange} required>
+                  <option value="">선택하세요</option>
+                  {positions.map(position => (
+                    <option key={position} value={position}>{position}</option>
+                  ))}
+                </select>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">내선 번호</label>

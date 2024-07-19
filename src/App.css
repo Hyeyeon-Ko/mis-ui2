@@ -1,28 +1,44 @@
 .app {
-    display: flex;
-    min-height: 100vh; /* 최소 높이를 설정하여 내용이 충분하지 않으면 최소 높이만큼 공간을 차지하도록 설정 */  }
-  
-  .sidebar {
-    width: 260px;
-    background-color: #EDF1F5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-  }
-  
-  .main-layout {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-  }
-  
-  /* 헤더 높이 조정 */
-  .main-layout .header {
-    flex: 0 0 50px; 
-  }
-  
-  .main-layout .main-content {
-    flex: 1;
-  }
-  
+  display: flex;
+  min-height: 100vh; 
+  flex-direction: row;
+}
+
+.sidebar {
+  width: 260px;
+  background-color: #EDF1F5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  flex-shrink: 0; 
+}
+
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.header {
+  flex: 0 0 50px;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: auto; 
+}
+
+.content {
+  flex: 1;
+  padding: 20px 50px;
+  overflow-y: auto;
+}
+
+.section-separator {
+  margin-top: 40px;
+  border-top: 1px solid #ddd;
+  margin-bottom: 20px;
+}

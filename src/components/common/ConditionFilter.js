@@ -1,6 +1,4 @@
 import React, { useEffect } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import PropTypes from 'prop-types';
 import Button from '../common/Button'; 
 import '../../styles/common/ConditionFilter.css';
@@ -33,32 +31,33 @@ const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documen
     onSearch({
       documentType,
       startDate: startDate ? startDate.toISOString().split('T')[0] : '',
-      endDate: adjustedEndDate.toISOString().split('T')[0],
+      endDate: endDate ? adjustedEndDate.toISOString().split('T')[0] : '',
     });
+  };
+
+  const handleStartDateChange = (event) => {
+    setStartDate(event.target.value ? new Date(event.target.value) : null);
+  };
+
+  const handleEndDateChange = (event) => {
+    setEndDate(event.target.value ? new Date(event.target.value) : null);
   };
 
   return (
     <div className="all-application-filter-container">
       <div className="all-application-filter">
         <label>기안일자</label>
-        <DatePicker
-          selected={startDate ? new Date(startDate) : null}
-          onChange={(date) => setStartDate(date)}
-          selectsStart
-          startDate={startDate ? new Date(startDate) : null}
-          endDate={endDate ? new Date(endDate) : null}
-          dateFormat="yyyy-MM-dd"
+        <input
+          type="date"
+          value={startDate ? startDate.toISOString().split('T')[0] : ''}
+          onChange={handleStartDateChange}
           className="custom-datepicker"
         />
         <span> ~ </span>
-        <DatePicker
-          selected={endDate ? new Date(endDate) : null}
-          onChange={(date) => setEndDate(date)}
-          selectsEnd
-          startDate={startDate ? new Date(startDate) : null}
-          endDate={endDate ? new Date(endDate) : null}
-          minDate={startDate ? new Date(startDate) : null}
-          dateFormat="yyyy-MM-dd"
+        <input
+          type="date"
+          value={endDate ? endDate.toISOString().split('T')[0] : ''}
+          onChange={handleEndDateChange}
           className="custom-datepicker"
         />
         <label>문서분류</label>

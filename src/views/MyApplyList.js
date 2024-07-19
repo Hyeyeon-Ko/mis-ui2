@@ -212,7 +212,7 @@ function MyApplyList() {
         <RejectReasonModal
           show={showRejectionModal}
           onClose={handleCloseRejectionModal}
-          onConfirm={() => {}} // No action needed for viewing reasons
+          onConfirm={() => {}} 
           reason={rejectionReason}
           isViewOnly={true}
         />
