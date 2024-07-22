@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { AuthContext } from '../../components/AuthContext';
 import '../../styles/common/Sidebar.css';
 import logo from '../../assets/images/logo.png';
 
 /* Sidebar component */
 function Sidebar() {
   const location = useLocation();
+  const { auth } = useContext(AuthContext); // Get user role from AuthContext
 
   const isActive = (url) => {
     return location.pathname === url ? 'active' : '';
@@ -34,19 +36,29 @@ function Sidebar() {
       <Link to="/">
         <img src={logo} alt="KMI Logo" className="logo" />
       </Link>
-      <SidebarSection title="신청하기" items={applyItems} isActive={isActive} location={location} defaultOpen={false} />
-      <SidebarSection title="나의 신청내역" items={myApplyItems} isActive={isActive} location={location} defaultOpen={false} />
-      <SidebarSection title="신청 내역 관리" items={manageItems} isActive={isActive} location={location} defaultOpen={false} />
-      <div className="sidebar-section">
-        <h2>
-          <Link to="/api/auth" className={isActive('/api/auth')}>권한 관리</Link>
-        </h2>
-      </div>
-      <div className="sidebar-section">
-        <h2>
-          <Link to="/api/standard" className={isActive('/api/standard')}>기준자료 관리</Link>
-        </h2>
-      </div>
+      {(auth.role === 'USER' || auth.role === 'MASTER' || auth.role === 'ADMIN') && (
+        <SidebarSection title="신청하기" items={applyItems} isActive={isActive} location={location} defaultOpen={false} />
+      )}
+      {(auth.role === 'MASTER' || auth.role === 'ADMIN') && (
+        <SidebarSection title="나의 신청내역" items={myApplyItems} isActive={isActive} location={location} defaultOpen={false} />
+      )}
+      {(auth.role === 'MASTER' || auth.role === 'ADMIN') && (
+        <SidebarSection title="신청 내역 관리" items={manageItems} isActive={isActive} location={location} defaultOpen={false} />
+      )}
+      {auth.role === 'MASTER' && (
+        <div className="sidebar-section">
+          <h2>
+            <Link to="/api/auth" className={isActive('/api/auth')}>권한 관리</Link>
+          </h2>
+        </div>
+      )}
+      {auth.role === 'MASTER' && (
+        <div className="sidebar-section">
+          <h2>
+            <Link to="/api/standard" className={isActive('/api/standard')}>기준자료 관리</Link>
+          </h2>
+        </div>
+      )}
     </div>
   );
 }

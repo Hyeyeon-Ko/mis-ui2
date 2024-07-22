@@ -22,6 +22,7 @@ function AuthorityManagement() {
   const fetchAuthorityList = async () => {
     try {
       const response = await axios.get('/api/auth');
+      console.log('Fetch Authority List Response:', response.data);
       const data = response.data.data || response.data;
       const transformedData = data.map(item => ({
         id: item.userId,
@@ -47,15 +48,30 @@ function AuthorityManagement() {
   }, []);
 
   // 수정 핸들러
-  const handleEdit = (admin) => {
-    setSelectedAdmin(admin);
-    setIsEditMode(true);
-    setShowModal(true);
+  const handleEdit = async (admin) => {
+    try {
+      const response = await axios.get(`/api/auth/admin/${admin.authId}`);
+      console.log('Fetch Admin Data Response:', response.data);
+      const adminData = response.data.data;
+
+      setSelectedAdmin({
+        ...admin,
+        role: adminData.userRole,
+        permissions: {
+          standardDataManagement: adminData.canHandleStd === "Y"
+        },
+      });
+      setIsEditMode(true);
+      setShowModal(true);
+    } catch (error) {
+      console.error('Error fetching admin data:', error);
+    }
   };
 
   // 권한 삭제 확인 핸들러
   const handleConfirmDelete = async () => {
     try {
+      console.log('Deleting Admin:', selectedAdmin);
       await axios.delete(`/api/auth/admin/${selectedAdmin.authId}`, {
         params: {
           detailCd: selectedAdmin.detailCd 
@@ -74,6 +90,9 @@ function AuthorityManagement() {
     fetchAuthorityList();
     setShowModal(false);
     setSelectedAdmin(null);
+    if (isEditMode) {
+      alert('수정이 완료되었습니다.');
+    }
   };
 
   // 삭제 핸들러

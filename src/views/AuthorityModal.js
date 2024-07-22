@@ -18,26 +18,34 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
   useEffect(() => {
     if (show) {
       if (adminData) {
-        setRole(adminData.role);
-        setUserId(adminData.userId || '');
-        setUserName(adminData.name || '');
-        setIsStandardChecked(adminData.permissions?.standardDataManagement || false);
-        setInitialRole(adminData.role);
-        setInitialStandardChecked(adminData.permissions?.standardDataManagement || false);
-        setInitialData({
-          userRole: adminData.role,
-          detailRole: adminData.permissions?.standardDataManagement ? 'Y' : 'N',
-        });
-        setQueryResult([
-          {
-            id: adminData.authId,
-            role: adminData.role,
-            name: adminData.name,
-            permissions: {
-              standardDataManagement: adminData.permissions?.standardDataManagement || false,
-            },
-          },
-        ]);
+        // Fetch detailed admin data using authId
+        axios.get(`/api/auth/admin/${adminData.authId}`)
+          .then(response => {
+            const data = response.data.data;
+            setRole(data.userRole);
+            setUserId(data.userId || '');
+            setUserName(data.userName || '');
+            setIsStandardChecked(data.detailRole === 'Y');
+            setInitialRole(data.userRole);
+            setInitialStandardChecked(data.detailRole === 'Y');
+            setInitialData({
+              userRole: data.userRole,
+              detailRole: data.detailRole,
+            });
+            setQueryResult([
+              {
+                id: adminData.authId,
+                role: data.userRole,
+                name: `${data.userName}(${data.userId})`,
+                permissions: {
+                  standardDataManagement: data.detailRole === 'Y',
+                },
+              },
+            ]);
+          })
+          .catch(error => {
+            console.error('Error fetching admin data:', error);
+          });
       } else {
         setRole('');
         setUserId('');
