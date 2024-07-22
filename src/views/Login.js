@@ -38,13 +38,22 @@ const Login = () => {
           navigate('/');
         } else {
           console.error('Login response data is null or undefined');
+          alert('로그인 정보가 올바르지 않습니다.');
+          setUserId('');
+          setUserPw('');
         }
       } else {
         const errorData = await response.json();
         console.error('Login failed:', errorData);
+        alert('로그인에 실패했습니다. 다시 시도해주세요.');
+        setUserId('');
+        setUserPw('');
       }
     } catch (error) {
       console.error('Error:', error);
+      alert('서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.');
+      setUserId('');
+      setUserPw('');
     }
   };
 

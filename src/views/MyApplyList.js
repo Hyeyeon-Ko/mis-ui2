@@ -9,7 +9,7 @@ import '../styles/MyApplyList.css';
 import '../styles/common/Page.css';
 import axios from 'axios';
 
-/* 나의 전체 신청 목록 페이지 */
+/* 나의 전체 신청 내역 페이지 */
 function MyApplyList() {
   const [applications, setApplications] = useState([]);                   // 신청 내역 상태 관리
   const [startDate, setStartDate] = useState(null);                       // 시작 날짜 상태 관리
@@ -187,8 +187,8 @@ function MyApplyList() {
   return (
     <div className="content">
       <div className="user-applications">
-        <h2>전체 신청 목록</h2>
-        <Breadcrumb items={['나의 신청내역', '전체 신청 목록']} />
+        <h2>전체 신청 내역</h2>
+        <Breadcrumb items={['나의 신청내역', '전체 신청 내역']} />
         <DateFilter 
           startDate={startDate} 
           setStartDate={setStartDate} 

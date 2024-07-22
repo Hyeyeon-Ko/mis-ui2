@@ -13,7 +13,7 @@
 
 .add-modal-container {
   background: #fff;
-  padding: 80px 55px 60px 55px;
+  padding: 70px 55px 60px 55px;
   border-radius: 10px;
   text-align: left;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -156,7 +156,7 @@
   background-color: #1e6fc1;
 }
 
-.close-button {
+.authority-close-button {
   background: none;
   border: none;
   font-size: 20px;

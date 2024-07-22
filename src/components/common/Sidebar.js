@@ -19,13 +19,13 @@ function Sidebar() {
   ];
 
   const myApplyItems = [
-    { label: '전체 신청 목록', url: '/api/myApplyList' },
-    { label: '승인 대기 목록', url: '/api/myPendingList' },
+    { label: '전체 신청 내역', url: '/api/myApplyList' },
+    { label: '승인 대기 내역', url: '/api/myPendingList' },
   ];
 
   const manageItems = [
-    { label: '전체 신청 목록', url: '/api/applyList' },
-    { label: '승인 대기 목록', url: '/api/pendingList' },
+    { label: '전체 신청 내역', url: '/api/applyList' },
+    { label: '승인 대기 내역', url: '/api/pendingList' },
     { label: '명함 발주', url: '/api/bcd/orderList' },
   ];
 
@@ -34,9 +34,9 @@ function Sidebar() {
       <Link to="/">
         <img src={logo} alt="KMI Logo" className="logo" />
       </Link>
-      <SidebarSection title="신청하기" items={applyItems} isActive={isActive} defaultOpen={false} />
-      <SidebarSection title="나의 신청내역" items={myApplyItems} isActive={isActive} defaultOpen={false} />
-      <SidebarSection title="신청 목록 관리" items={manageItems} isActive={isActive} defaultOpen={false} />
+      <SidebarSection title="신청하기" items={applyItems} isActive={isActive} location={location} defaultOpen={false} />
+      <SidebarSection title="나의 신청내역" items={myApplyItems} isActive={isActive} location={location} defaultOpen={false} />
+      <SidebarSection title="신청 내역 관리" items={manageItems} isActive={isActive} location={location} defaultOpen={false} />
       <div className="sidebar-section">
         <h2>
           <Link to="/api/auth" className={isActive('/api/auth')}>권한 관리</Link>
@@ -51,16 +51,18 @@ function Sidebar() {
   );
 }
 
-function SidebarSection({ title, items, isActive, defaultOpen }) {
+function SidebarSection({ title, items, isActive, location, defaultOpen }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   const toggleOpen = () => {
     setIsOpen(!isOpen);
   };
 
+  const anyItemActive = items.some(item => location.pathname === item.url);
+
   return (
     <div className="sidebar-section">
-      <h3 onClick={toggleOpen} className="toggle-header">
+      <h3 onClick={toggleOpen} className={`toggle-header ${!isOpen && anyItemActive ? 'active-toggle' : ''}`}>
         <span className="toggle-icon">{isOpen ? '∨' : '>'}</span> {title}
       </h3>
       {isOpen && (

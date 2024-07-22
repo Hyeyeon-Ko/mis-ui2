@@ -69,6 +69,12 @@
     margin-bottom: 20px;
 }
 
+.sub-label2 {
+    font-size: 15px;
+    margin-top: -25px;
+  }
+  
+
 .form-label {
     width: 100px;
     text-align: left;
@@ -88,6 +94,17 @@ input[type="text2"] {
     background-color: #fff;
 }
 
+.floor-input {
+    width: 30px;
+    padding: 8px;
+    border: 1px solid #c8c5c5;
+    border-radius: 5px;
+    font-size: 18px;
+    background-color: #fff;
+    text-align: center;
+}
+
+
 .apply-content select {
     width: 317px;
     height: 48px;
@@ -96,7 +113,7 @@ input[type="text2"] {
     border-radius: 5px;
     font-size: 18px;
     background-color: #fff;
-
+    margin-right: -25px;
 }
 
 .apply-content input[type="text"].english-name {
@@ -112,6 +129,22 @@ input[type="text2"] {
     font-size: 18px;
 }
 
+.apply-content input[type="text3"] {
+    width: 35px;
+    height: 30px;
+    display: inline-block;
+    font-size: 18px;
+    margin-left: 0x;
+    margin-right: -30px;
+}
+
+.apply-content input[type="text4"] {
+    width: 50px;
+    height: 30px;
+    display: inline-block;
+    font-size: 18px;
+}
+
 .name-inputs {
     display: flex;
     gap: 10px;
@@ -121,6 +154,11 @@ input[type="text2"] {
     margin-top: 10px;
     display: flex;
     gap: 20px;
+}
+
+.card-type label:hover {
+    color: #007bff;
+    cursor: pointer;
 }
 
 .apply-content input[type="tel"].phone-number {

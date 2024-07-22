@@ -5,7 +5,7 @@ import '../styles/ApplicationsList.css';
 import '../styles/common/Page.css';
 import axios from 'axios';
 
-/* 승인 대기 목록 페이지 */
+/* 승인 대기 내역 페이지 */
 function PendingApprovalList() {
   const [applications, setApplications] = useState([]);
   const [centers, setCenters] = useState(['전체', '재단본부', '광화문', '여의도센터', '강남센터', '수원센터', '대구센터', '부산센터', '광주센터', '제주센터', '협력사']);
@@ -14,13 +14,15 @@ function PendingApprovalList() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Timestamp Parsing: "YYYY-MM-DD"
-  const parseDate = (dateString) => {
+  // Timestamp Parsing: "YYYY-MM-DD HH:MM"
+  const parseDateTime = (dateString) => {
     const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
+    const datePart = date.toISOString().split('T')[0];
+    const timePart = date.toTimeString().split(' ')[0].substring(0, 5);
+    return `${datePart} ${timePart}`;
   };
 
-  // 승인 대기 목록 데이터 가져오기
+  // 승인 대기 내역 데이터 가져오기
   const fetchPendingList = async () => {
     setLoading(true);
     setError(null);
@@ -34,11 +36,14 @@ function PendingApprovalList() {
         ...item,
         center: item.instNm,
         title: item.title,
-        draftDate: item.draftDate ? parseDate(item.draftDate) : '',
+        draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
         drafter: item.drafter,
         status: '승인대기', // 상태를 '승인대기'로 설정
         draftId: item.draftId 
       }));
+
+      // 기안일자를 기준으로 내림차순 정렬
+      transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
 
       console.log('Transformed data:', transformedData);
 
@@ -84,7 +89,7 @@ function PendingApprovalList() {
     },
     { header: '제목', accessor: 'title', width: '28%' },
     { header: '기안일자', accessor: 'draftDate', width: '12%' },
-    { header: '기안자', accessor: 'drafter', width: '10%' },
+    { header: '기안자', accessor: 'drafter', width: '8%' },
     { 
       header: '문서상태', 
       accessor: 'status', 
@@ -98,8 +103,8 @@ function PendingApprovalList() {
   return (
     <div className="content">
       <div className="order">
-        <h2>승인 대기 목록</h2>
-        <Breadcrumb items={['신청 목록 관리', '승인 대기 목록']} />
+        <h2>승인 대기 내역</h2>
+        <Breadcrumb items={['신청 내역 관리', '승인 대기 내역']} />
         {loading ? (
           <p>로딩 중...</p>
         ) : error ? (

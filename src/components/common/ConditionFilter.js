@@ -6,22 +6,27 @@ import resetIcon from '../../assets/images/reset.png';
 
 const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documentType, setDocumentType, onSearch, onReset }) => {
   useEffect(() => {
+    resetFilters();
+  }, [setStartDate, setEndDate]);
+
+  const formatDate = (date) => {
+    return date.toISOString().split('T')[0];
+  };
+
+  const resetFilters = () => {
     const defaultStartDate = new Date();
     defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
     setStartDate(defaultStartDate);
     setEndDate(new Date());
-  }, [setStartDate, setEndDate]);
+    setDocumentType('');
+  };
 
   const handleDocumentTypeChange = (event) => {
     setDocumentType(event.target.value === '전체' ? '' : event.target.value);
   };
 
   const handleReset = () => {
-    const defaultStartDate = new Date();
-    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
-    setStartDate(defaultStartDate);
-    setEndDate(new Date());
-    setDocumentType('');
+    resetFilters();
     onReset();
   };
 
@@ -30,8 +35,8 @@ const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documen
     adjustedEndDate.setDate(adjustedEndDate.getDate() + 1);
     onSearch({
       documentType,
-      startDate: startDate ? startDate.toISOString().split('T')[0] : '',
-      endDate: endDate ? adjustedEndDate.toISOString().split('T')[0] : '',
+      startDate: startDate ? formatDate(startDate) : '',
+      endDate: endDate ? formatDate(adjustedEndDate) : '',
     });
   };
 
@@ -49,14 +54,14 @@ const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documen
         <label>기안일자</label>
         <input
           type="date"
-          value={startDate ? startDate.toISOString().split('T')[0] : ''}
+          value={startDate ? formatDate(startDate) : ''}
           onChange={handleStartDateChange}
           className="custom-datepicker"
         />
         <span> ~ </span>
         <input
           type="date"
-          value={endDate ? endDate.toISOString().split('T')[0] : ''}
+          value={endDate ? formatDate(endDate) : ''}
           onChange={handleEndDateChange}
           className="custom-datepicker"
         />

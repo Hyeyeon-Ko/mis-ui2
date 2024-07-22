@@ -3,10 +3,11 @@
   background-color: #EDF1F5;
   color: black;
   padding: 20px;
-  height: 125vh; 
+  height: 100vh; 
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow-y: auto; /* Enable scrolling */
 }
 
 .logo {
@@ -83,6 +84,11 @@
 }
 
 .sidebar-section .active {
+  color: #2789FE;
+  font-weight: bold;
+}
+
+.sidebar-section .active-toggle {
   color: #2789FE;
   font-weight: bold;
 }

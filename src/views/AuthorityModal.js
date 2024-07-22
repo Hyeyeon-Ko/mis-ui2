@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import { AuthContext } from '../components/AuthContext';
 import '../styles/AuthorityModal.css';
 
-const AuthorityModal = ({ show, onClose, onSave, adminData }) => {
+const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) => {
   const [role, setRole] = useState('');
   const [userId, setUserId] = useState('');
   const [userName, setUserName] = useState('');
@@ -12,6 +13,7 @@ const AuthorityModal = ({ show, onClose, onSave, adminData }) => {
   const [initialStandardChecked, setInitialStandardChecked] = useState(false);
   const [queryResult, setQueryResult] = useState([]);
   const [initialData, setInitialData] = useState({ userRole: '', detailRole: '' });
+  const { auth } = useContext(AuthContext);
 
   useEffect(() => {
     if (show) {
@@ -69,8 +71,15 @@ const AuthorityModal = ({ show, onClose, onSave, adminData }) => {
         alert('사번을 입력하세요');
         return;
       }
-      if (userId === '12345') { // TODO: Replace '12345' with the current user's ID
-        alert('본인은 추가할 수 없습니다');
+
+      const existingAdmin = existingAdmins.find(admin => admin.userId === userId);
+      if (existingAdmin) {
+        alert('이미 존재하는 관리자입니다');
+        setRole('');
+        setUserId('');
+        setUserName('');
+        setIsStandardChecked(false);
+        setQueryResult([]);
         return;
       }
 
@@ -94,9 +103,16 @@ const AuthorityModal = ({ show, onClose, onSave, adminData }) => {
         detailRole: role === 'MASTER' ? 'Y' : 'N',
       });
     } catch (error) {
-      console.error('Error fetching user name:', error);
-      if (error.response && error.response.status === 409) {
-        alert('이미 존재하는 관리자입니다');
+      if (error.response && error.response.data && error.response.data.message) {
+        alert('본인은 조회할 수 없습니다.');
+        // 폼 초기화
+        setRole('');
+        setUserId('');
+        setUserName('');
+        setIsStandardChecked(false);
+        setQueryResult([]);
+      } else {
+        console.error('Error fetching user name:', error);
       }
     }
   };
@@ -136,7 +152,17 @@ const AuthorityModal = ({ show, onClose, onSave, adminData }) => {
       onSave();
       onClose();
     } catch (error) {
-      console.error('Error saving admin:', error);
+      if (error.response && error.response.data && error.response.data.message) {
+        alert('이미 존재하는 관리자입니다.');
+        // 폼 초기화
+        setRole('');
+        setUserId('');
+        setUserName('');
+        setIsStandardChecked(false);
+        setQueryResult([]);
+      } else {
+        console.error('Error saving admin:', error);
+      }
     }
   };
 
@@ -147,7 +173,7 @@ const AuthorityModal = ({ show, onClose, onSave, adminData }) => {
       <div className="add-modal-container">
         <div className="modal-header">
           <h3>{adminData ? '권한 수정' : '권한 추가'}</h3>
-          <button className="close-button" onClick={onClose}>X</button>
+          <button className="authority-close-button" onClick={onClose}>X</button>
         </div>
         {!adminData && (
           <p>권한을 부여할 사람을 선택하세요</p>
@@ -211,6 +237,7 @@ AuthorityModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   adminData: PropTypes.object,
+  existingAdmins: PropTypes.array.isRequired, 
 };
 
 export default AuthorityModal;

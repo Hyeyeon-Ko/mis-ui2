@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import ConditionFilter from '../components/common/ConditionFilter';
 import Table from '../components/common/Table';
@@ -22,6 +23,7 @@ function ApplicationsList() {
   const [selectedCenter, setSelectedCenter] = useState('전체');         // 선택된 센터 상태 관리
   const [loading, setLoading] = useState(false);                        // 로딩 상태 관리
   const [error, setError] = useState(null);                             // 에러 상태 관리
+  const navigate = useNavigate();
 
   // Timestamp Parsing: "YYYY-MM-DD"
   const parseDate = (dateString) => {
@@ -62,43 +64,48 @@ function ApplicationsList() {
   }, []);
 
   // 신청 내역 가져오기
-  const fetchApplications = async (filterParams = {}) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axios.get('/api/applyList', {
-        params: {
-          documentType: filterParams.documentType || null,
-          startDate: filterParams.startDate || '',
-          endDate: filterParams.endDate || '',
-        },
-      });
+// 신청 내역 가져오기
+const fetchApplications = async (filterParams = {}) => {
+  setLoading(true);
+  setError(null);
+  try {
+    const response = await axios.get('/api/applyList', {
+      params: {
+        documentType: filterParams.documentType || null,
+        startDate: filterParams.startDate || '',
+        endDate: filterParams.endDate || '',
+      },
+    });
 
-      console.log('Response data:', response.data);
+    console.log('Response data:', response.data);
 
-      const data = Array.isArray(response.data.data.bcdMasterResponses) ? response.data.data.bcdMasterResponses : [];
+    const data = Array.isArray(response.data.data.bcdMasterResponses) ? response.data.data.bcdMasterResponses : [];
 
-      const transformedData = data.map(application => ({
-        ...application,
-        center: application.instNm, 
-        title: application.title, 
-        draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
-        drafter: application.drafter, 
-        approvalDate: application.respondDate ? parseDate(application.respondDate) : '', 
-        orderDate: application.orderDate ? parseDateTime(application.orderDate) : '',
-        status: getStatusText(application.applyStatus),
-      }));
+    const transformedData = data.map(application => ({
+      ...application,
+      center: application.instNm, 
+      title: application.title, 
+      draftDate: application.draftDate ? parseDate(application.draftDate) : '',
+      drafter: application.drafter, 
+      approvalDate: application.respondDate ? parseDate(application.respondDate) : '', 
+      orderDate: application.orderDate ? parseDateTime(application.orderDate) : '',
+      status: getStatusText(application.applyStatus),
+      draftId: application.draftId, // 추가된 필드
+    }));
 
-      console.log('Transformed data:', transformedData);
+    // 기안일자 기준으로 내림차순 정렬
+    transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
 
-      setApplications(transformedData);
-    } catch (error) {
-      console.error('Error fetching applications:', error);
-      setError('데이터를 불러오는 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    console.log('Transformed data:', transformedData);
+
+    setApplications(transformedData);
+  } catch (error) {
+    console.error('Error fetching applications:', error);
+    setError('데이터를 불러오는 중 오류가 발생했습니다.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   // 필터 변경 핸들러
   const handleFilterChange = (e) => {
@@ -181,14 +188,26 @@ function ApplicationsList() {
       header: '문서상태', 
       accessor: 'status', 
       width: '10%',
+      Cell: ({ row }) => (
+        <span
+          className={row.status === '승인대기' ? 'status-pending clickable' : ''}
+          onClick={() => {
+            if (row.status === '승인대기') {
+              navigate(`/api/bcd/applyList/${row.draftId}?readonly=true`);
+            }
+          }}
+        >
+          {row.status}
+        </span>
+      ),
     },
   ];
 
   return (
     <div className="content">
       <div className="all-applications">
-        <h2>전체 신청 목록</h2>
-        <Breadcrumb items={['신청 목록 관리', '전체 신청 목록']} />
+        <h2>전체 신청 내역</h2>
+        <Breadcrumb items={['신청 내역 관리', '전체 신청 내역']} />
         <ConditionFilter 
           startDate={startDate} 
           setStartDate={setStartDate} 

@@ -13,7 +13,7 @@
 
 .history-modal-container {
   background: #fff;
-  padding: 50px 60px 50px 60px;
+  padding: 80px 70px 0px 70px;
   border-radius: 10px;
   text-align: left;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -39,8 +39,10 @@
 .history-modal-close {
   background: none;
   border: none;
-  font-size: 25px;
+  font-size: 30px;
   cursor: pointer;
+  align-self: flex-start;
+  margin-top: 10px;
 }
 
 .history-modal-container .no-data-message {

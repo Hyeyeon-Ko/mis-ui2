@@ -11,7 +11,7 @@ import fileDownload from 'js-file-download'; // 파일 다운로드를 위한 �
 /* 발주 페이지 */
 function BcdOrder() {
 
-  // 신청 내역, 선택된 신청 내역, 센터 목록, 선택된 센터 상태 관리
+  // 신청 내역, 선택된 신청 내역, 센터 내역, 선택된 센터 상태 관리
   const [applications, setApplications] = useState([]);
   const [selectedApplications, setSelectedApplications] = useState([]);
   const [centers, setCenters] = useState(['전체', '재단본부', '광화문', '여의도센터', '강남센터', '수원센터', '대구센터', '부산센터', '광주센터', '제주센터', '협력사']);
@@ -91,7 +91,7 @@ function BcdOrder() {
   // 엑셀 변환 버튼 클릭 핸들러
   const handleExcelDownload = async () => {
     if (selectedApplications.length === 0) {
-      alert('선택된 신청 내역이 없습니다.');
+      alert('엑셀변환 할 명함 신청 목록을 선택하세요.');
       return;
     }
 
@@ -108,7 +108,7 @@ function BcdOrder() {
   // 발주 요청 버튼 클릭 핸들러
   const handleOrderRequest = () => {
     if (selectedApplications.length === 0) {
-      alert('선택된 신청 내역이 없습니다.');
+      alert('발주요청 할 명함 신청 목록을 선택하세요.');
       return;
     }
     setShowEmailModal(true); // 이메일 작성 모달 표시
@@ -130,7 +130,7 @@ function BcdOrder() {
         console.error('Error sending order request: ', error);
         alert('발주 요청 중 오류가 발생했습니다.');
     }
-};
+  };
 
   // 테이블 컬럼 정의
   const columns = [
@@ -172,7 +172,7 @@ function BcdOrder() {
       <div className="order">
         <h2>명함 발주</h2>
         <div className="header-row">
-          <Breadcrumb items={['신청 목록 관리', '명함 발주']} />
+          <Breadcrumb items={['신청 내역 관리', '명함 발주']} />
           <div className="buttons-container">
             <CustomButton className="excel-button" onClick={handleExcelDownload}>엑셀변환</CustomButton>
             <CustomButton className="order-request-button" onClick={handleOrderRequest}>발주요청</CustomButton>

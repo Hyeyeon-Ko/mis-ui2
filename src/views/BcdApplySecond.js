@@ -4,6 +4,7 @@ import axios from 'axios';
 import Breadcrumb from '../components/common/Breadcrumb';
 import CustomButton from '../components/CustomButton';
 import FinalConfirmationModal from '../views/FinalConfirmationModal';
+import PreviewModal from '../views/PreviewModal'; 
 import { AuthContext } from '../components/AuthContext';
 import '../styles/BcdApplySecond.css';
 import '../styles/common/Page.css';
@@ -11,12 +12,11 @@ import '../styles/common/Page.css';
 import backImage_eng from '../assets/images/backimage_eng.png';
 import backImage_company from '../assets/images/backimage_company.png';
 
-/* 명함 신청 페이지 (본인/타인 선택에 따라) */
 function BcdApplySecond() {
-  const { auth } = useContext(AuthContext);             // 사용자 인증 정보 사용
-  const location = useLocation();                       // 현재 경로 정보 사용
-  const navigate = useNavigate();                       // 경로 이동을 위한 네비게이트 함수
-  const isOwn = location.pathname === '/api/bcd/own';   // 본인 신청 여부 확인
+  const { auth } = useContext(AuthContext);             
+  const location = useLocation();                       
+  const navigate = useNavigate();                       
+  const isOwn = location.pathname === '/api/bcd/own';   
 
   const [formData, setFormData] = useState({
     name: '',
@@ -25,7 +25,7 @@ function BcdApplySecond() {
     center: '',
     department: '',
     team: '',
-    teamNm: '', // teamNm 추가
+    teamNm: '', 
     position: '',
     phone1: '',
     phone2: '',
@@ -41,10 +41,14 @@ function BcdApplySecond() {
     quantity: 1,
     cardType: 'personal',
     userId: '',
-  }); // 신청 데이터 상태 관리
+    engAddress: '',
+    engPosition: '',
+    engTeam: '',
+  });
 
-  const [userIdInput, setUserIdInput] = useState(''); // 사용자 ID 입력 상태 관리
-  const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false); // 최종 확인 모달 표시 상태 관리
+  const [userIdInput, setUserIdInput] = useState(''); 
+  const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false); 
+  const [previewVisible, setPreviewVisible] = useState(false); 
   const [bcdData, setBcdData] = useState({
     instInfo: [],
     deptInfo: [],
@@ -59,7 +63,9 @@ function BcdApplySecond() {
     gradeMap: {}
   });
 
-  // 컴포넌트 마운트 시 사용자 정보 가져오기 (본인 신청 시) 및 기준자료 불러오기
+  const [addressOptions, setAddressOptions] = useState([]); 
+  const [floor, setFloor] = useState(''); 
+
   useEffect(() => {
     if (isOwn) {
       fetchUserInfo(auth.userId);
@@ -67,7 +73,6 @@ function BcdApplySecond() {
     fetchBcdStd();
   }, [isOwn, auth.userId]);
 
-  // 사용자 정보 가져오기
   const fetchUserInfo = async (userId) => {
     try {
       const response = await axios.get(`/api/info/${userId}`);
@@ -79,7 +84,7 @@ function BcdApplySecond() {
           name: userData.userName,
           center: userData.centerNm,
           team: userData.teamNm,
-          teamNm: userData.teamNm, // teamNm 추가
+          teamNm: userData.teamNm,
           mobile1: userData.telNum.split('-')[0],
           mobile2: userData.telNum.split('-')[1],
           mobile3: userData.telNum.split('-')[2],
@@ -96,7 +101,6 @@ function BcdApplySecond() {
     }
   };
 
-  // 기준자료 불러오기
   const fetchBcdStd = async () => {
     try {
       const response = await axios.get('/api/std/bcd');
@@ -125,7 +129,14 @@ function BcdApplySecond() {
     }
   };
 
-  // 사용자 조회 버튼 클릭 핸들러
+  const handleInputClick = (e) => {
+    if (!formData.userId) {
+      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+      e.preventDefault();
+    }
+  };
+  
+
   const handleLookupUser = async () => {
     try {
       const response = await axios.get(`/api/info/${userIdInput}`);
@@ -137,7 +148,7 @@ function BcdApplySecond() {
           name: userData.userName,
           center: userData.centerNm,
           team: userData.teamNm,
-          teamNm: userData.teamNm, // teamNm 추가
+          teamNm: userData.teamNm, 
           mobile1: userData.telNum.split('-')[0],
           mobile2: userData.telNum.split('-')[1],
           mobile3: userData.telNum.split('-')[2],
@@ -154,23 +165,30 @@ function BcdApplySecond() {
     }
   };
 
-  // 입력 변경 핸들러
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (['phone1', 'phone2', 'phone3', 'fax1', 'fax2', 'fax3', 'mobile1', 'mobile2', 'mobile3'].includes(name)) {
+      if (isNaN(value) || value.length > 4) return;
+    }
+    if (!formData.userId) {
+      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+      return;
+    }
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   };
 
-  // 명함 종류 변경 핸들러
   const handleCardTypeChange = (e) => {
+    if (!formData.userId) {
+      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+      return;
+    }
     setFormData((prevFormData) => ({ ...prevFormData, cardType: e.target.value }));
   };
 
-  // 사용자 ID 입력 변경 핸들러
   const handleUserIdChange = (e) => {
     setUserIdInput(e.target.value);
   };
 
-  // 폼 입력 검증
   const validateForm = () => {
     const requiredFields = [
       'name', 'firstName', 'lastName', 'center', 'department',
@@ -186,8 +204,11 @@ function BcdApplySecond() {
     return true;
   };
 
-  // 명함 신청 버튼 클릭 핸들러
   const handleApplyRequest = () => {
+    if (!formData.name) {
+      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+      return;
+    }
     if (!validateForm()) {
       alert('모든 명함 정보를 입력해주세요.');
       return;
@@ -195,7 +216,6 @@ function BcdApplySecond() {
     setShowFinalConfirmationModal(true);
   };
 
-  // 최종 확인 모달 확인 버튼 클릭 핸들러
   const handleConfirmRequest = async () => {
     setShowFinalConfirmationModal(false);
 
@@ -215,6 +235,7 @@ function BcdApplySecond() {
       phoneTel: `${formData.mobile1}-${formData.mobile2}-${formData.mobile3}`,
       email: `${formData.email}@kmi.or.kr`,
       address: formData.address,
+      engAddress: formData.engAddress,
       division: formData.cardType === 'personal' ? 'B' : 'A',
       quantity: formData.quantity,
     };
@@ -235,17 +256,101 @@ function BcdApplySecond() {
   };
 
   const handleCenterChange = (e) => {
+    if (!formData.userId) {
+      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+      return;
+    }
     const selectedCenter = e.target.value;
     const selectedInstInfo = bcdData.instInfo.find(inst => inst.detailNm === selectedCenter);
-    const address = selectedInstInfo ? selectedInstInfo.etcItem3 : ''; // Using etcItem3 for address
-
-    setFormData({ ...formData, center: selectedCenter, address, department: '', team: '' });
+  
+    const addressOptions = [];
+    let engAddress = '';
+    if (selectedInstInfo) {
+      if (selectedInstInfo.etcItem1) {
+        addressOptions.push(selectedInstInfo.etcItem1);
+        engAddress = selectedInstInfo.etcItem2; 
+      }
+      if (selectedInstInfo.etcItem3) {
+        addressOptions.push(selectedInstInfo.etcItem3);
+        engAddress = selectedInstInfo.etcItem4; 
+      }
+      if (selectedInstInfo.etcItem5) {
+        addressOptions.push(selectedInstInfo.etcItem5);
+        engAddress = selectedInstInfo.etcItem6; 
+      }
+    }
+  
+    setAddressOptions(addressOptions);
+    setFormData({ ...formData, center: selectedCenter, address: addressOptions[0] || '', engAddress, department: '', team: '' });
+  };
+    
+  const handleTeamChange = (e) => {
+    if (!formData.userId) {
+      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+      return;
+    }
+    const selectedTeam = e.target.value;
+    const selectedTeamInfo = bcdData.teamInfo.find(team => team.detailNm === selectedTeam);
+    const engTeam = selectedTeamInfo ? selectedTeamInfo.etcItem1 : '';
+  
+    setFormData({ ...formData, team: selectedTeam, engTeam });
+  };
+  
+  const handlePositionChange = (e) => {
+    if (!formData.userId) {
+      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+      return;
+    }
+    const selectedPosition = e.target.value;
+    const selectedPositionInfo = bcdData.gradeInfo.find(position => position.detailNm === selectedPosition);
+    const engPosition = selectedPositionInfo ? selectedPositionInfo.etcItem1 : '';
+  
+    setFormData({ ...formData, position: selectedPosition, engPosition });
   };
 
   const handleDepartmentChange = (e) => {
+    if (!formData.userId) {
+      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+      return;
+    }
     setFormData({ ...formData, department: e.target.value, team: '' });
   };
 
+  const handlePreview = (e) => {
+    e.preventDefault();
+    if (!formData.userId) {
+      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+      return;
+    }
+    setPreviewVisible(true);
+  };
+
+  const handleAddressChange = (e) => {
+    if (!formData.userId) {
+      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+      return;
+    }
+    const updatedAddress = e.target.value + (floor ? `, ${floor}` : '');
+    setFormData({ ...formData, address: updatedAddress });
+  };
+
+  const handleFloorChange = (e) => {
+    if (!formData.userId) {
+      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+      return;
+    }
+    const updatedFloor = e.target.value;
+    setFloor(updatedFloor);
+  
+    const baseAddress = formData.address.split(',')[0];
+    const updatedAddress = `${baseAddress}${updatedFloor ? `, ${updatedFloor}` : ''}`;
+  
+    const originalEngAddress = bcdData.instInfo.find(inst => inst.detailNm === formData.center)?.etcItem2 || '';
+    const updatedEngAddress = updatedFloor ? `${updatedFloor}F, ${originalEngAddress}` : originalEngAddress;
+  
+    setFormData({ ...formData, address: updatedAddress, engAddress: updatedEngAddress });
+  };
+                  
   return (
     <div className="content">
       <div className="apply-content">
@@ -275,6 +380,7 @@ function BcdApplySecond() {
                     value="personal"
                     checked={formData.cardType === 'personal'}
                     onChange={handleCardTypeChange}
+                    onClick={handleInputClick}
                   />
                   <label htmlFor="personal">[뒷면] 영문 명함</label>
                   <input
@@ -284,6 +390,7 @@ function BcdApplySecond() {
                     value="company"
                     checked={formData.cardType === 'company'}
                     onChange={handleCardTypeChange}
+                    onClick={handleInputClick}
                   />
                   <label htmlFor="company">[뒷면] 회사 정보</label>
                 </div>
@@ -313,27 +420,28 @@ function BcdApplySecond() {
                     </button>
                   </div>
                 </div>
+                <div className="sub-label2">(수량 단위: 1 * 100매입)</div>
               </div>
             </div>
             <div className="form-right">
               <div className="form-group-horizontal">
                 <label className="bold-label">명함 정보 입력</label>
-                <CustomButton className="preview-button">명함시안미리보기</CustomButton>
+                <CustomButton type="button" className="preview-button" onClick={handlePreview}>명함시안미리보기</CustomButton>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">이 름</label>
-                <input type="text" name="name" value={formData.name} onChange={handleChange} required />
+                <input type="text" name="name" value={formData.name} onChange={handleChange} required readOnly={!isOwn} onClick={handleInputClick} />
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">영문 이름</label>
                 <div className="name-inputs">
-                  <input type="text" name="firstName" placeholder="First name" value={formData.firstName} onChange={handleChange} required className="english-name" />
-                  <input type="text" name="lastName" placeholder="Last name" value={formData.lastName} onChange={handleChange} required className="english-name" />
+                  <input type="text" name="firstName" placeholder="First name" value={formData.firstName} onChange={handleChange} required className="english-name" onClick={handleInputClick} />
+                  <input type="text" name="lastName" placeholder="Last name" value={formData.lastName} onChange={handleChange} required className="english-name" onClick={handleInputClick} />
                 </div>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">센 터</label>
-                <select name="center" value={formData.center} onChange={handleCenterChange} required>
+                <select name="center" value={formData.center} onChange={handleCenterChange} required onClick={handleInputClick}>
                   <option value="">선택하세요</option>
                   {bcdData.instInfo.map((center) => (
                     <option key={center.detailCd} value={center.detailNm}>{center.detailNm}</option>
@@ -342,7 +450,7 @@ function BcdApplySecond() {
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">부 서</label>
-                <select name="department" value={formData.department} onChange={handleDepartmentChange} required>
+                <select name="department" value={formData.department} onChange={handleDepartmentChange} required onClick={handleInputClick}>
                   <option value="">선택하세요</option>
                   {bcdData.deptInfo
                     .filter((dept) => dept.etcItem1 === mappings.instMap[formData.center])
@@ -353,7 +461,7 @@ function BcdApplySecond() {
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">팀 명</label>
-                <select name="team" value={formData.team} onChange={handleChange} required>
+                <select name="team" value={formData.team} onChange={handleTeamChange} required onClick={handleInputClick}>
                   <option value="">선택하세요</option>
                   {bcdData.teamInfo
                     .filter((team) => team.etcItem1 === mappings.deptMap[formData.department])
@@ -364,7 +472,7 @@ function BcdApplySecond() {
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">직위 / 직책</label>
-                <select name="position" value={formData.position} onChange={handleChange} required>
+                <select name="position" value={formData.position} onChange={handlePositionChange} required onClick={handleInputClick}>
                   <option value="">선택하세요</option>
                   {bcdData.gradeInfo.map((position) => (
                     <option key={position.detailCd} value={position.detailNm}>{position.detailNm}</option>
@@ -374,37 +482,42 @@ function BcdApplySecond() {
               <div className="form-group-horizontal">
                 <label className="form-label">내선 번호</label>
                 <div className="phone-inputs">
-                  <input type="tel" name="phone1" value={formData.phone1} onChange={handleChange} required className="phone-number" />
-                  <input type="tel" name="phone2" value={formData.phone2} onChange={handleChange} required className="phone-number" />
-                  <input type="tel" name="phone3" value={formData.phone3} onChange={handleChange} required className="phone-number" />
+                  <input type="tel" name="phone1" value={formData.phone1} onChange={handleChange} required className="phone-number" onClick={handleInputClick} />
+                  <input type="tel" name="phone2" value={formData.phone2} onChange={handleChange} required className="phone-number" onClick={handleInputClick} />
+                  <input type="tel" name="phone3" value={formData.phone3} onChange={handleChange} required className="phone-number" onClick={handleInputClick} />
                 </div>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">팩스 번호</label>
                 <div className="phone-inputs">
-                  <input type="tel" name="fax1" value={formData.fax1} onChange={handleChange} required className="phone-number" />
-                  <input type="tel" name="fax2" value={formData.fax2} onChange={handleChange} required className="phone-number" />
-                  <input type="tel" name="fax3" value={formData.fax3} onChange={handleChange} required className="phone-number" />
+                  <input type="tel" name="fax1" value={formData.fax1} onChange={handleChange} required className="phone-number" onClick={handleInputClick} />
+                  <input type="tel" name="fax2" value={formData.fax2} onChange={handleChange} required className="phone-number" onClick={handleInputClick} />
+                  <input type="tel" name="fax3" value={formData.fax3} onChange={handleChange} required className="phone-number" onClick={handleInputClick} />
                 </div>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">휴대폰 번호</label>
                 <div className="phone-inputs">
-                  <input type="tel" name="mobile1" value={formData.mobile1} onChange={handleChange} required className="phone-number" />
-                  <input type="tel" name="mobile2" value={formData.mobile2} onChange={handleChange} required className="phone-number" />
-                  <input type="tel" name="mobile3" value={formData.mobile3} onChange={handleChange} required className="phone-number" />
+                  <input type="tel" name="mobile1" value={formData.mobile1} onChange={handleChange} required className="phone-number" onClick={handleInputClick} />
+                  <input type="tel" name="mobile2" value={formData.mobile2} onChange={handleChange} required className="phone-number" onClick={handleInputClick} />
+                  <input type="tel" name="mobile3" value={formData.mobile3} onChange={handleChange} required className="phone-number" onClick={handleInputClick} />
                 </div>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">메일 주소</label>
                 <div className="email-input">
-                  <input type="text2" name="email" value={formData.email} onChange={handleChange} required className="email-full" />
+                  <input type="text2" name="email" value={formData.email} onChange={handleChange} required className="email-full" onClick={handleInputClick} />
                   <span>@ kmi.or.kr</span>
                 </div>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">주소</label>
-                <input type="text" name="address" value={formData.address} onChange={handleChange} required />
+                <select name="address" value={formData.address.split(',')[0]} onChange={handleAddressChange} required className="address-select" onClick={handleInputClick}>
+                  {addressOptions.map((address, index) => (
+                    <option key={index} value={address}>{address}</option>
+                  ))}
+                </select>
+                <input type="text3" value={floor} onChange={handleFloorChange} required className="floor-input" onClick={handleInputClick} />층
               </div>
             </div>
           </form>
@@ -421,6 +534,13 @@ function BcdApplySecond() {
         cardType={formData.cardType === 'personal' ? '[뒷면] 영문 명함' : '[뒷면] 회사 정보'}
         quantity={formData.quantity}
         onConfirm={handleConfirmRequest}
+        title="최종 신청 확인"
+        confirmButtonText="신 청"
+      />
+      <PreviewModal
+        show={previewVisible}
+        onClose={() => setPreviewVisible(false)}
+        formData={formData}
       />
     </div>
   );

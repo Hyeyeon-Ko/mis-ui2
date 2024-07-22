@@ -6,6 +6,7 @@ import CustomButton from '../components/CustomButton';
 import FinalConfirmationModal from '../views/FinalConfirmationModal';
 import RejectReasonModal from '../views/RejectReasonModal';
 import ApplicationHistoryModal from '../views/ApplicationHistoryModal';
+import PreviewModal from '../views/PreviewModal';
 import { AuthContext } from '../components/AuthContext';
 import '../styles/BcdApplySecond.css';
 import '../styles/common/Page.css';
@@ -19,7 +20,6 @@ function DetailApplication() {
   const { draftId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-
   const [formData, setFormData] = useState({
     name: '',
     firstName: '',
@@ -42,11 +42,15 @@ function DetailApplication() {
     quantity: 1,
     cardType: 'personal',
     userId: '',
+    engAddress: '',
   });
 
+  const [addressOptions, setAddressOptions] = useState([]); // 주소 옵션 상태 추가
+  const [floor, setFloor] = useState(''); // 층 상태 추가
   const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [previewVisible, setPreviewVisible] = useState(false); // 시안 미리보기 상태 추가
   const isReadOnly = new URLSearchParams(location.search).get('readonly') === 'true';
 
   const [bcdData, setBcdData] = useState({
@@ -77,7 +81,8 @@ function DetailApplication() {
         const [fax1, fax2, fax3] = data.faxTel.split('-');
         const [mobile1, mobile2, mobile3] = data.phoneTel.split('-');
         const email = data.email.split('@')[0];
-
+        const [baseAddress, floor] = data.address.split(', ');
+  
         setFormData({
           name: data.korNm,
           firstName: data.engNm.split(' ')[1],
@@ -90,11 +95,13 @@ function DetailApplication() {
           fax1, fax2, fax3,
           mobile1, mobile2, mobile3,
           email,
-          address: data.address,
+          address: baseAddress,
           quantity: data.quantity,
           cardType: data.division === 'B' ? 'personal' : 'company',
           userId: data.userId,
+          engAddress: data.engAddress,
         });
+        setFloor(floor || '');
       } else {
         alert('신청 정보를 불러오는 중 오류가 발생했습니다.');
       }
@@ -102,7 +109,7 @@ function DetailApplication() {
       alert('신청 정보를 불러오는 중 오류가 발생했습니다.');
     }
   };
-
+  
   // 기준자료 불러오기
   const fetchBcdStd = async () => {
     try {
@@ -182,6 +189,7 @@ function DetailApplication() {
       phoneTel: `${formData.mobile1}-${formData.mobile2}-${formData.mobile3}`,
       email: `${formData.email}@kmi.or.kr`,
       address: formData.address,
+      engAddress: formData.engAddress,
       division: formData.cardType === 'personal' ? 'B' : 'A',
       quantity: formData.quantity,
     };
@@ -190,7 +198,7 @@ function DetailApplication() {
       const response = await axios.post(`/api/bcd/update?draftId=${draftId}`, requestData);
       if (response.data.code === 200) {
         alert('명함 수정이 완료되었습니다.');
-        navigate('/');
+        navigate('/api/myPendingList');
       } else {
         alert('명함 수정 중 오류가 발생했습니다.');
       }
@@ -248,18 +256,62 @@ function DetailApplication() {
   };
 
   const handleCenterChange = (e) => {
-    setFormData({ ...formData, center: e.target.value, department: '', team: '' });
+    const selectedCenter = e.target.value;
+    const selectedInstInfo = bcdData.instInfo.find(inst => inst.detailCd === selectedCenter);
+
+    const addressOptions = [];
+    let engAddress = '';
+    if (selectedInstInfo) {
+      if (selectedInstInfo.etcItem1) {
+        addressOptions.push(selectedInstInfo.etcItem1);
+        engAddress = selectedInstInfo.etcItem2; 
+      }
+      if (selectedInstInfo.etcItem3) {
+        addressOptions.push(selectedInstInfo.etcItem3);
+        engAddress = selectedInstInfo.etcItem4; 
+      }
+      if (selectedInstInfo.etcItem5) {
+        addressOptions.push(selectedInstInfo.etcItem5);
+        engAddress = selectedInstInfo.etcItem6; 
+      }
+    }
+
+    setAddressOptions(addressOptions);
+    setFormData({ ...formData, center: selectedCenter, address: addressOptions[0] || '', engAddress, department: '', team: '' });
   };
 
   const handleDepartmentChange = (e) => {
     setFormData({ ...formData, department: e.target.value, team: '' });
   };
 
+  const handlePreview = (e) => {
+    e.preventDefault();
+    setPreviewVisible(true);
+  };
+
+  const handleAddressChange = (e) => {
+    const updatedAddress = e.target.value + (floor ? `, ${floor}` : '');
+    setFormData({ ...formData, address: updatedAddress });
+  };
+
+  const handleFloorChange = (e) => {
+    const updatedFloor = e.target.value;
+    setFloor(updatedFloor);
+  
+    const baseAddress = formData.address.split(',')[0];
+    const updatedAddress = `${baseAddress}${updatedFloor ? `, ${updatedFloor}` : ''}`;
+  
+    const originalEngAddress = bcdData.instInfo.find(inst => inst.detailCd === formData.center)?.etcItem2 || '';
+    const updatedEngAddress = updatedFloor ? `${updatedFloor}F, ${originalEngAddress}` : originalEngAddress;
+  
+    setFormData({ ...formData, address: updatedAddress, engAddress: updatedEngAddress });
+  };
+
   return (
     <div className="content">
       <div className="apply-content">
         <h2>{isReadOnly ? '명함 상세보기' : '명함수정'}</h2>
-        <Breadcrumb items={['나의 신청내역', '승인 대기 목록', isReadOnly ? '명함 상세보기' : '명함수정']} />
+        <Breadcrumb items={['나의 신청내역', '승인 대기 내역', isReadOnly ? '명함 상세보기' : '명함수정']} />
         <div className="form-wrapper">
           <form className="business-card-form">
             <div className="form-left">
@@ -317,7 +369,6 @@ function DetailApplication() {
                       <button
                         type="button"
                         onClick={() => setFormData({ ...formData, quantity: Math.max(formData.quantity - 1, 1) })}
-                        disabled={isReadOnly}
                       >
                         -
                       </button>
@@ -325,21 +376,19 @@ function DetailApplication() {
                       <button
                         type="button"
                         onClick={() => setFormData({ ...formData, quantity: formData.quantity + 1 })}
-                        disabled={isReadOnly}
                       >
                         +
                       </button>
                     </div>
                   )}
                 </div>
+                <div className="sub-label2">(수량 단위: 1 * 100매입)</div>
               </div>
             </div>
             <div className="form-right">
               <div className="form-group-horizontal">
                 <label className="bold-label">명함 정보 입력</label>
-                {!isReadOnly && (
-                  <CustomButton className="preview-button">명함시안미리보기</CustomButton>
-                )}
+                <CustomButton className="preview-button" onClick={handlePreview}>명함시안미리보기</CustomButton>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">이름</label>
@@ -425,7 +474,21 @@ function DetailApplication() {
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">주소</label>
-                <input type="text" name="address" value={formData.address} onChange={handleChange} required={!isReadOnly} readOnly={isReadOnly} />
+                {isReadOnly ? (
+                  <div className="address-floor-input">
+                    <input type="text" name="address" value={formData.address} readOnly className="address-select" />
+                    <input type="text3" value={floor} readOnly className="floor-input" />층
+                  </div>
+                ) : (
+                  <div className="address-floor-input">
+                    <select name="address" value={formData.address.split(',')[0]} onChange={handleAddressChange} required className="address-select">
+                      {addressOptions.map((address, index) => (
+                        <option key={index} value={address}>{address}</option>
+                      ))}
+                    </select>
+                    <input type="text3" value={floor} onChange={handleFloorChange} required className="floor-input" />층
+                  </div>
+                )}
               </div>
             </div>
           </form>
@@ -449,9 +512,16 @@ function DetailApplication() {
         cardType={formData.cardType === 'personal' ? '[뒷면] 영문 명함' : '[뒷면] 회사 정보'}
         quantity={formData.quantity}
         onConfirm={handleConfirmRequest}
+        title="최종 수정 확인"
+        confirmButtonText="수 정"
       />
       <RejectReasonModal show={showRejectModal} onClose={handleRejectClose} onConfirm={handleRejectConfirm} />
       <ApplicationHistoryModal show={showHistoryModal} onClose={handleHistoryClose} draftId={draftId} /> {/* 신청이력 모달 추가 */}
+      <PreviewModal
+        show={previewVisible}
+        onClose={() => setPreviewVisible(false)}
+        formData={formData}
+      />
     </div>
   );
 }

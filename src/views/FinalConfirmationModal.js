@@ -2,13 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../styles/FinalConfirmationModal.css';
 
-const ConfirmApplyModal = ({ show, onClose, applicant, recipient, cardType, quantity, onConfirm }) => {
+const FinalConfirmationModal = ({ show, onClose, applicant, recipient, cardType, quantity, onConfirm, title, confirmButtonText }) => {
   if (!show) return null;
 
   return (
     <div className="final-modal-overlay">
       <div className="final-modal-container">
-        <h3>최종 신청 확인</h3>
+        <h3>{title}</h3>
         <div className="confirmation-details">
           <div className="detail-row">
             <p className="detail-label"><strong>신 청 자</strong></p>
@@ -29,14 +29,14 @@ const ConfirmApplyModal = ({ show, onClose, applicant, recipient, cardType, quan
         </div>
         <div className="final-modal-buttons">
           <button className="final-modal-button cancel" onClick={onClose}><span>취 소</span></button>
-          <button className="final-modal-button confirm" onClick={onConfirm}><span>신 청</span></button>
+          <button className="final-modal-button confirm" onClick={onConfirm}><span>{confirmButtonText}</span></button>
         </div>
       </div>
     </div>
   );
 };
 
-ConfirmApplyModal.propTypes = {
+FinalConfirmationModal.propTypes = {
   show: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   applicant: PropTypes.shape({
@@ -50,6 +50,8 @@ ConfirmApplyModal.propTypes = {
   cardType: PropTypes.string.isRequired,
   quantity: PropTypes.number.isRequired,
   onConfirm: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+  confirmButtonText: PropTypes.string.isRequired,
 };
 
-export default ConfirmApplyModal;
+export default FinalConfirmationModal;

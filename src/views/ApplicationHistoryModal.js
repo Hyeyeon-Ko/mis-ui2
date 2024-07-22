@@ -71,7 +71,7 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   const handleReset = () => {
     setStartDate(null);
     setEndDate(null);
-    setFilteredData(data); // Reset to original data
+    setFilteredData(data);
   };
 
   if (!show) return null;

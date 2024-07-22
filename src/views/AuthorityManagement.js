@@ -18,7 +18,7 @@ function AuthorityManagement() {
   const [selectedAdmin, setSelectedAdmin] = useState(null);            // 선택된 관리자 상태 관리
   const [isEditMode, setIsEditMode] = useState(false);                 // 수정 모드 상태 관리
 
-  // 권한 목록 가져오기
+  // 권한 내역 가져오기
   const fetchAuthorityList = async () => {
     try {
       const response = await axios.get('/api/auth');
@@ -135,6 +135,7 @@ function AuthorityManagement() {
         onClose={() => setShowModal(false)} 
         onSave={handleSave} 
         adminData={isEditMode ? selectedAdmin : null} 
+        existingAdmins={applications} 
       />
       {showConfirmModal && selectedAdmin && (
         <ConfirmModal 
