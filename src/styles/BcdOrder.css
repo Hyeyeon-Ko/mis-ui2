@@ -11,11 +11,10 @@
   background-color: #e6f7ff;
 }
 
-.header-row {
+.bcdorder-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
 }
 
 .buttons-container {

@@ -79,11 +79,11 @@ function MyPendingList() {
   };
 
   const pendingColumns = [
-    { header: '제목', accessor: 'title', width: '33%' },
+    { header: '제목', accessor: 'title', width: '30%' },
     { header: '기안일시', accessor: 'draftDate', width: '14%' },
     { header: '기안자', accessor: 'drafter', width: '9%' },
     { header: '수정일시', accessor: 'lastUpdateDate', width: '14%' },
-    { header: '최종수정자', accessor: 'lastUpdater', width: '9%' },
+    { header: '최종수정자', accessor: 'lastUpdater', width: '11%' },
     {
       header: '수정',
       accessor: 'modify',
@@ -95,7 +95,7 @@ function MyPendingList() {
     {
       header: '신청취소',
       accessor: 'cancel',
-      width: '6%',
+      width: '9%',
       Cell: ({ row }) => (
         <Button className="cancel-button" onClick={() => handleCancelClick(row)}>
           취소

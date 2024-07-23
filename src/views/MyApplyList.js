@@ -64,39 +64,30 @@ function MyApplyList() {
         },
       });
 
-      console.log('Responses data:', response.data); 
+      const data = response.data?.data?.myApplyResponses || [];
 
-      if (response.data && response.data.data && response.data.data.myApplyResponses) {
-        const data = Array.isArray(response.data.data.myApplyResponses) ? response.data.data.myApplyResponses : [];
+      const uniqueData = data.reduce((acc, current) => {
+        const x = acc.find(item => item.draftId === current.draftId);
+        if (!x) {
+          return acc.concat([current]);
+        } else {
+          return acc;
+        }
+      }, []);
 
-        const uniqueData = data.reduce((acc, current) => {
-          const x = acc.find(item => item.draftId === current.draftId);
-          if (!x) {
-            return acc.concat([current]);
-          } else {
-            return acc;
-          }
-        }, []);
+      const transformedData = uniqueData.map(application => ({
+        ...application,
+        draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
+        approvalDate: application.respondDate ? parseDateTime(application.respondDate) : '',
+        drafter: application.drafter,
+        applyStatus: getStatusText(application.applyStatus),
+        rejectionReason: application.rejectReason,
+        manager: application.approver || application.disapprover || '', 
+      }));
 
-        const transformedData = uniqueData
-          .map(application => ({
-            ...application,
-            draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
-            approvalDate: application.respondDate ? parseDateTime(application.respondDate) : '',
-            drafter: application.drafter,
-            applyStatus: getStatusText(application.applyStatus), 
-            rejectionReason: application.rejectReason,
-            manager: application.approver || application.disapprover || '',  // 매핑된 담당자 값 추가
-          }));
-
-        console.log('Transformed Data:', transformedData);
-
-        setApplications(transformedData);
-      } else {
-        console.error('Unexpected response format:', response.data);
-      }
+      setApplications(transformedData);
     } catch (error) {
-      console.error('Error fetching applications:', error.response ? error.response.data : error.message);
+      console.error('Error fetching applications:', error.response?.data || error.message);
     }
   };
 
@@ -104,7 +95,7 @@ function MyApplyList() {
   const handleButtonClick = (application) => {
     setSelectedApplication(application);
     if (application.applyStatus === '반려') {
-      setRejectionReason(application.rejectionReason || '사내메일을 입력하세요.'); 
+      setRejectionReason(application.rejectionReason || '사내메일을 입력하세요.');
       setShowRejectionModal(true);
     } else {
       setShowModal(true);
@@ -131,9 +122,9 @@ function MyApplyList() {
           params: { draftId: selectedApplication.draftId }
         });
         alert('명함 수령이 확인되었습니다.');
-        fetchApplications(); 
+        fetchApplications();
       } catch (error) {
-        console.error('Error completing application:', error.response ? error.response.data : error.message);
+        console.error('Error completing application:', error.response?.data || error.message);
       } finally {
         setShowModal(false);
         setSelectedApplication(null);
@@ -163,7 +154,7 @@ function MyApplyList() {
     { header: '기안일시', accessor: 'draftDate', width: '14%' },
     { header: '기안자', accessor: 'drafter', width: '9%' },
     { header: '승인/반려일시', accessor: 'approvalDate', width: '14%' },
-    { header: '담당자', accessor: 'manager', width: '9%' },  // manager 컬럼 추가
+    { header: '담당자', accessor: 'manager', width: '9%' }, 
     {
       header: '신청상태',
       accessor: 'applyStatus',

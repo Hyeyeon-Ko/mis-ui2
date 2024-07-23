@@ -51,6 +51,7 @@
 
 .reject-reason-content {
   font-size: 16px;
+  height: 160px;
   background-color: #F9FAFB;
   padding: 12px;
   border: 1px solid #D1D5DB;

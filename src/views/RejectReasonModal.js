@@ -37,9 +37,9 @@ const RejectReasonModal = ({ show, onClose, onConfirm, reason = '', isViewOnly =
           />
         )}
         <div className="reject-modal-buttons">
-          <button className="reject-modal-button cancel" onClick={onClose}><span>취    소</span></button>
+          <button className="reject-modal-button cancel" onClick={onClose}><span>취소</span></button>
           {!isViewOnly && (
-            <button className="reject-modal-button confirm" onClick={handleConfirmClick}><span>반    려</span></button>
+            <button className="reject-modal-button confirm" onClick={handleConfirmClick}><span>반려</span></button>
           )}
         </div>
       </div>

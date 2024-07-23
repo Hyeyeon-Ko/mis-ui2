@@ -4,9 +4,8 @@ import { AuthContext } from '../components/AuthContext';
 import '../styles/Login.css'; 
 import logo from '../assets/images/logo.png';
 
-// 로그인 컴포넌트
+/*로그인 페이지*/
 const Login = () => {
-
   // 사용자 ID와 비밀번호 상태 관리
   const [userId, setUserId] = useState('');
   const [userPw, setUserPw] = useState('');
@@ -31,26 +30,21 @@ const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Login response data:', data);
         if (data && data.data) {
           // 로그인 성공 시 사용자 정보를 AuthContext에 저장 -> 메인 페이지로 이동
-          login(userId, data.data.hngNm, data.data.role, data.data.sidebarPermissions); 
+          login(userId, data.data.hngNm, data.data.role, data.data.sidebarPermissions);
           navigate('/');
         } else {
-          console.error('Login response data is null or undefined');
           alert('로그인 정보가 올바르지 않습니다.');
           setUserId('');
           setUserPw('');
         }
       } else {
-        const errorData = await response.json();
-        console.error('Login failed:', errorData);
         alert('로그인에 실패했습니다. 다시 시도해주세요.');
         setUserId('');
         setUserPw('');
       }
     } catch (error) {
-      console.error('Error:', error);
       alert('서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.');
       setUserId('');
       setUserPw('');

@@ -1,141 +1,143 @@
+/* 기존 CSS 스타일 유지 */
+
 .standard-data-content {
-    padding: 8px 16px;
-  }
-  
-  .standard-data-content h2 {
-    font-size: 28px;
-    margin-bottom: 16px;
-  }
-
-  .category-section {
-    margin-top: 25px;
-    margin-bottom: 25px;
-    font-size: 16px;
-  }
-  
-  .category label {
-    font-weight: bold;
-    margin-right: 30px;
-  }
-
-  .main-content {
-    display: flex;
-  }
-
-  .sub-category-sidebar {
-    width: 200px;
-    border-right: 1px solid #ddd;
-    float: left;
-    padding: 10px;
-    margin-left:10px;
-  }
-
-  .sub-category-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
+  padding: 8px 16px;
 }
 
-  .sub-category-label {
-    font-weight: bold;
-    margin-right: 30px;
-  }
+.standard-data-content h2 {
+  font-size: 28px;
+  margin-bottom: 16px;
+}
 
-  .sub-category-list {
-    border: 1px solid #ddd;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
+.category-section {
+  margin-top: 25px;
+  margin-bottom: 30px;
+  font-size: 16px;
+}
 
-  .sub-category-list li {
-    padding: 8px;
-    cursor: pointer;
-  }
+.category-label {
+  font-size: 14px;
+  font-weight: bold;
+  margin-left: 4px;
+  margin-right: 15px;
+}
 
-  .sub-category-list li.active {
-    background-color: #f0f0f0;
-  }
+.category-dropdown {
+  padding: 6px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 165px;
+}
 
-  .sub-category-list li.hover {
-    background-color: #e0e0e0;
-  }
+.tables-section {
+  display: flex;
+}
 
-  .details-content {
-    width: 900px;
-  }
+.sub-category-section {
+  flex: 1;
+}
 
-  .detail-content-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
+.details-content {
+  flex: 7;
+}
+
+.header-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 0px 3px;
+}
+
+.sub-category-label {
+  font-size: 14px;
+  font-weight: bold;
+  margin-right: 10px;
 }
 
 .detail-content-label {
+  font-size: 14px;
   font-weight: bold;
-  margin-right: 30px;
+  margin-right: 10px;
 }
 
-  .details-table table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .details-table th, .details-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
-
-  .data-add-button {
-    border-radius: 7px;
-    padding: 4px 8px;
-    width: 55px;
-    height: 30px;
-    font-size: 14px;
-    letter-spacing: 0.5px;
-    color: white;
-    cursor: pointer;
-    border: none;
-    background-color: #2789FE;
-  }
-
-  .data-add-button:hover {
-    background-color: #1e6fc1;
-  }
-
-  .data-modify-button {
-    border-radius: 7px;
-    padding: 4px 8px;
-    width: 55px;
-    height: 30px;
-    cursor: pointer;
-    font-size: 14px;
-    letter-spacing: 0.5px;
-    color: black;
-    border: none;
-    background-color: #BDC6CF;
-  }
-
-  .data-modify-button:hover {
-    background-color: #a1a9b2;
+.sub-category-list {
+  max-height: 500px;
+  overflow-y: auto;
 }
 
-  .data-delete-button {
-    border-radius: 7px;
-    padding: 4px 8px;
-    width: 55px;
-    height: 30px;
-    cursor: pointer;
-    font-size: 14px;
-    letter-spacing: 0.5px;
-    color: black;
-    border: none;
-    background-color: #BDC6CF;
-  }
+/* 테이블 및 셀 스타일 */
+.sub-category-table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
-  .data-delete-button:hover {
-      background-color: #a1a9b2;
-  }
+.sub-category-table th {
+  background-color: white;
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+  font-size: 13px;
+} 
+
+.sub-category-table td {
+  border: 1px solid #ddd;
+  padding: 10px 20px;
+  text-align: left;
+  font-size: 13px;
+}
+
+/* 마우스 오버 시 배경색 변경 */
+.sub-category-table td:hover {
+  background-color: #edf7ff; /* 연한 청록색 */
+}
+
+/* 세부 항목 스타일 */
+.details-table {
+  border-collapse: collapse;
+}
+
+.details-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.details-table th, .details-table td {
+  background-color: white;
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+  font-size: 13px;
+}
+
+/* 버튼 스타일 */
+.data-add-button, .data-modify-button, .data-delete-button {
+  border-radius: 7px;
+  padding: 4px 8px;
+  width: 55px;
+  height: 30px;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  border: none;
+  margin-right: 3px;
+}
+
+.data-add-button {
+  color: white;
+  background-color: #2789FE;
+}
+
+.data-add-button:hover {
+  background-color: #1e6fc1;
+}
+
+.data-modify-button, .data-delete-button {
+  color: black;
+  background-color: #BDC6CF;
+}
+
+.data-modify-button:hover, .data-delete-button:hover {
+  background-color: #a1a9b2;
+}

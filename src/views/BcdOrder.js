@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../components/common/Breadcrumb';
 import Table from '../components/common/Table';
-import CustomButton from '../components/CustomButton';
+import CustomButton from '../components/common/CustomButton';
 import EmailModal from '../views/EmailModal';
+import CenterSelect from '../components/CenterSelect';
 import '../styles/BcdOrder.css';
 import '../styles/common/Page.css';
 import axios from 'axios';
@@ -10,11 +11,22 @@ import fileDownload from 'js-file-download'; // 파일 다운로드를 위한 �
 
 /* 발주 페이지 */
 function BcdOrder() {
-
   // 신청 내역, 선택된 신청 내역, 센터 내역, 선택된 센터 상태 관리
   const [applications, setApplications] = useState([]);
   const [selectedApplications, setSelectedApplications] = useState([]);
-  const [centers, setCenters] = useState(['전체', '재단본부', '광화문', '여의도센터', '강남센터', '수원센터', '대구센터', '부산센터', '광주센터', '제주센터', '협력사']);
+  const [centers, setCenters] = useState([
+    '전체',
+    '재단본부',
+    '광화문',
+    '여의도센터',
+    '강남센터',
+    '수원센터',
+    '대구센터',
+    '부산센터',
+    '광주센터',
+    '제주센터',
+    '협력사',
+  ]);
   const [selectedCenter, setSelectedCenter] = useState('전체');
   const [showEmailModal, setShowEmailModal] = useState(false);
 
@@ -36,19 +48,16 @@ function BcdOrder() {
   const fetchBcdOrderList = async () => {
     try {
       const response = await axios.get('/api/bsc/order');
-      console.log('Response data: ', response.data);
-
       const data = response.data.data || response.data;
-      const transformedData = data.map(item => ({
+      const transformedData = data.map((item) => ({
         id: item.draftId,
         center: item.instNm,
         title: item.title,
-        draftDate: parseDate(item.draftDate), 
-        drafter: item.drafter, 
-        respondDate: parseDateTime(item.respondDate), 
+        draftDate: parseDate(item.draftDate),
+        drafter: item.drafter,
+        respondDate: parseDateTime(item.respondDate),
         quantity: item.quantity,
       }));
-      console.log('Transformed data: ', transformedData);
       setApplications(transformedData);
     } catch (error) {
       console.error('Error fetching bcdOrder list: ', error);
@@ -63,7 +72,7 @@ function BcdOrder() {
   // 전체 선택/해제 핸들러
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      setSelectedApplications(applications.map(app => app.id));
+      setSelectedApplications(applications.map((app) => app.id));
     } else {
       setSelectedApplications([]);
     }
@@ -74,7 +83,7 @@ function BcdOrder() {
     if (event.target.checked) {
       setSelectedApplications([...selectedApplications, id]);
     } else {
-      setSelectedApplications(selectedApplications.filter(appId => appId !== id));
+      setSelectedApplications(selectedApplications.filter((appId) => appId !== id));
     }
   };
 
@@ -84,9 +93,10 @@ function BcdOrder() {
   };
 
   // 선택된 센터에 따라 신청 내역 필터링
-  const filteredApplications = selectedCenter === '전체'
-    ? applications
-    : applications.filter(app => app.center === selectedCenter);
+  const filteredApplications =
+    selectedCenter === '전체'
+      ? applications
+      : applications.filter((app) => app.center === selectedCenter);
 
   // 엑셀 변환 버튼 클릭 핸들러
   const handleExcelDownload = async () => {
@@ -117,18 +127,18 @@ function BcdOrder() {
   // 이메일 전송 핸들러
   const handleSendEmail = async (subject, body, fileName) => {
     try {
-        await axios.post('/api/bsc/order', {
-            draftIds: selectedApplications,
-            emailSubject: subject,
-            emailBody: body,
-            fileName: fileName, // fileName 추가
-        });
-        alert('발주 요청이 완료되었습니다.');
-        fetchBcdOrderList(); // 발주 요청 후 리스트 갱신
-        setShowEmailModal(false); // 이메일 작성 모달 닫기
+      await axios.post('/api/bsc/order', {
+        draftIds: selectedApplications,
+        emailSubject: subject,
+        emailBody: body,
+        fileName: fileName, // fileName 추가
+      });
+      alert('발주 요청이 완료되었습니다.');
+      fetchBcdOrderList(); // 발주 요청 후 리스트 갱신
+      setShowEmailModal(false); // 이메일 작성 모달 닫기
     } catch (error) {
-        console.error('Error sending order request: ', error);
-        alert('발주 요청 중 오류가 발생했습니다.');
+      console.error('Error sending order request: ', error);
+      alert('발주 요청 중 오류가 발생했습니다.');
     }
   };
 
@@ -146,16 +156,13 @@ function BcdOrder() {
         />
       ),
     },
-    { 
+    {
       header: (
-        <div className="center-header">
-          센터 <span className="arrow">▼</span>
-          <select value={selectedCenter} onChange={handleCenterChange} className="center-select">
-            {centers.map(center => (
-              <option key={center} value={center}>{center}</option>
-            ))}
-          </select>
-        </div>
+        <CenterSelect
+          centers={centers}
+          selectedCenter={selectedCenter}
+          handleCenterChange={handleCenterChange}
+        />
       ),
       accessor: 'center',
       width: '18%',
@@ -171,11 +178,15 @@ function BcdOrder() {
     <div className="content">
       <div className="order">
         <h2>명함 발주</h2>
-        <div className="header-row">
+        <div className="bcdorder-header-row">
           <Breadcrumb items={['신청 내역 관리', '명함 발주']} />
           <div className="buttons-container">
-            <CustomButton className="excel-button" onClick={handleExcelDownload}>엑셀변환</CustomButton>
-            <CustomButton className="order-request-button" onClick={handleOrderRequest}>발주요청</CustomButton>
+            <CustomButton className="excel-button" onClick={handleExcelDownload}>
+              엑셀변환
+            </CustomButton>
+            <CustomButton className="order-request-button" onClick={handleOrderRequest}>
+              발주요청
+            </CustomButton>
           </div>
         </div>
         <Table columns={columns} data={filteredApplications} />

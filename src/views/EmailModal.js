@@ -8,21 +8,9 @@ const EmailModal = ({ show, onClose, onSend }) => {
   const [body, setBody] = useState('');
   const [fileName, setFileName] = useState(''); 
 
-  const handleSubjectChange = (event) => {
-    setSubject(event.target.value);
-  };
-
-  const handleBodyChange = (event) => {
-    setBody(event.target.value);
-  };
-
-  const handleFileNameChange = (event) => {
-    setFileName(event.target.value);
-  };
-
   const handleSend = () => {
     const fileToSend = fileName.trim() === '' ? '명함발주' : fileName.trim();
-    onSend(subject, body, fileToSend); // fileName 값 포함
+    onSend(subject, body, fileToSend);
   };
 
   if (!show) return null;
@@ -35,30 +23,28 @@ const EmailModal = ({ show, onClose, onSend }) => {
           type="text"
           placeholder="이메일 제목을 입력하세요."
           value={subject}
-          onChange={handleSubjectChange}
+          onChange={(e) => setSubject(e.target.value)}
         />
         <textarea
-          type="text"
           placeholder="전송할 메일의 내용을 입력하세요."
           value={body}
-          onChange={handleBodyChange}
+          onChange={(e) => setBody(e.target.value)}
         />
         <input
           type="text"
           placeholder="엑셀 파일 이름을 입력하세요."
           value={fileName}
-          onChange={handleFileNameChange}
+          onChange={(e) => setFileName(e.target.value)}
         />
         <div className="email-modal-buttons">
-          <button className="email-modal-button cancel" onClick={onClose}><span>취    소</span></button>
-          <button className="email-modal-button confirm" onClick={handleSend}><span>전    송</span></button>
+          <button className="email-modal-button cancel" onClick={onClose}><span>취소</span></button>
+          <button className="email-modal-button confirm" onClick={handleSend}><span>전송</span></button>
         </div>
       </div>
     </div>
   );
 };
 
-// 컴포넌트의 props 타입 정의
 EmailModal.propTypes = {
   show: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,

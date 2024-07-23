@@ -5,6 +5,7 @@ import frontImageBlank from '../assets/images/frontimage_blank.png';
 import backImageEngBlank from '../assets/images/backimage_eng_blank.png';
 import backImageCompany from '../assets/images/backimage_company.png';
 
+/* 명함 시안 미리보기 모달 */
 const PreviewModal = ({ show, onClose, formData }) => {
   const canvasRef = useRef(null);
 
@@ -13,11 +14,6 @@ const PreviewModal = ({ show, onClose, formData }) => {
       drawBusinessCard();
     }
   }, [show]);
-
-  const formatPhoneNumber = (countryCode, number) => {
-    const [part1, part2, part3] = number.split('.');
-    return `+${countryCode}.${part1}.${part2}.${part3}`;
-  };
 
   const drawBusinessCard = () => {
     const canvas = canvasRef.current;
@@ -123,6 +119,11 @@ const PreviewModal = ({ show, onClose, formData }) => {
         }
       }
     };
+  };
+
+  const formatPhoneNumber = (countryCode, number) => {
+    const [part1, part2, part3] = number.split('.');
+    return `+${countryCode}.${part1}.${part2}.${part3}`;
   };
 
   const drawTextWithSpacing = (ctx, text, x, y, spacing) => {

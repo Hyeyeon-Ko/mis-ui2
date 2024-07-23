@@ -61,7 +61,7 @@ function Sidebar() {
           </div>
           <div className="sidebar-section">
             <h2>
-              <Link to="/api/standard" className={isActive('/api/standard')}>기준자료 관리</Link>
+              <Link to="/api/std" className={isActive('/api/standard')}>기준자료 관리</Link>
             </h2>
           </div>
         </>

@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Breadcrumb from '../components/common/Breadcrumb';
-import CustomButton from '../components/CustomButton';
+import CustomButton from '../components/common/CustomButton';
 import FinalConfirmationModal from '../views/FinalConfirmationModal';
 import PreviewModal from '../views/PreviewModal'; 
 import { AuthContext } from '../components/AuthContext';
@@ -76,7 +76,6 @@ function BcdApplySecond() {
   const fetchUserInfo = async (userId) => {
     try {
       const response = await axios.get(`/api/info/${userId}`);
-      console.log('Lookup User Response:', response.data);
       if (response.data && response.data.data) {
         const userData = response.data.data;
         setFormData((prevFormData) => ({
@@ -104,7 +103,6 @@ function BcdApplySecond() {
   const fetchBcdStd = async () => {
     try {
       const response = await axios.get('/api/std/bcd');
-      console.log('BCD Standard Data:', response.data);
       if (response.data && response.data.data) {
         const data = response.data.data;
         const instMap = {};
@@ -140,7 +138,6 @@ function BcdApplySecond() {
   const handleLookupUser = async () => {
     try {
       const response = await axios.get(`/api/info/${userIdInput}`);
-      console.log('Lookup User Response:', response.data);
       if (response.data && response.data.data) {
         const userData = response.data.data;
         setFormData((prevFormData) => ({

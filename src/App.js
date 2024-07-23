@@ -14,8 +14,8 @@ import BcdApplyFirst from './views/BcdApplyFirst';
 import BcdApplySecond from './views/BcdApplySecond';
 import DetailApplication from './views/DetailApplication';
 import PendingApprovalList from './views/PendingApprovalList';
-import { AuthProvider, AuthContext } from './components/AuthContext';
 import StandardData from './views/StandardData';
+import { AuthProvider, AuthContext } from './components/AuthContext';
 
 function MainLayout({ children }) {
   const location = useLocation();
@@ -58,7 +58,7 @@ function App() {
                 <Route path="/api/bcd/own" element={<RequireAuth><BcdApplySecond /></RequireAuth>} />
                 <Route path="/api/bcd/other" element={<RequireAuth><BcdApplySecond /></RequireAuth>} />
                 <Route path="/api/pendingList" element={<RequireAuth><PendingApprovalList /></RequireAuth>} />
-                <Route path="/api/standard" element={<RequireAuth><StandardData /></RequireAuth>} />
+                <Route path="/api/std" element={<RequireAuth><StandardData /></RequireAuth>} />
                 <Route path="/api/bcd/applyList/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
               </Routes>
             </MainLayout>

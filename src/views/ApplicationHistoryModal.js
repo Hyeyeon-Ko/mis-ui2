@@ -5,7 +5,7 @@ import ConditionFilter from '../components/common/ConditionFilter';
 import Table from '../components/common/Table';
 import '../styles/ApplicationHistoryModal.css';
 
-/* 신청이력 모달 */
+/* 신청 이력 모달 */
 const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -52,12 +52,6 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
     }
   };
 
-  const columns = [
-    { header: '제목', accessor: 'title', width: '40%' },
-    { header: '기안일시', accessor: 'draftDate', width: '20%' },
-    { header: '문서상태', accessor: 'applyStatus', width: '20%' }
-  ];
-
   const handleSearch = (filterParams) => {
     const { startDate, endDate, documentType } = filterParams;
     const newData = data.filter(item => {
@@ -78,11 +72,17 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
 
   if (!show) return null;
 
+  const columns = [
+    { header: '제목', accessor: 'title', width: '40%' },
+    { header: '기안일시', accessor: 'draftDate', width: '20%' },
+    { header: '문서상태', accessor: 'applyStatus', width: '20%' }
+  ];
+
   return (
     <div className="history-modal-overlay">
       <div className="history-modal-container">
         <div className="modal-header">
-          <h3>신청이력</h3>
+          <h3>신청 이력</h3>
           <button className="history-modal-close" onClick={onClose}>×</button>
         </div>
         <ConditionFilter

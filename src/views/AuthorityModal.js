@@ -4,6 +4,7 @@ import axios from 'axios';
 import { AuthContext } from '../components/AuthContext';
 import '../styles/AuthorityModal.css';
 
+/* 권한 관리 모달 */
 const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) => {
   const [role, setRole] = useState('');
   const [userId, setUserId] = useState('');
@@ -18,46 +19,52 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
   useEffect(() => {
     if (show) {
       if (adminData) {
-        // Fetch detailed admin data using authId
-        axios.get(`/api/auth/admin/${adminData.authId}`)
-          .then(response => {
-            const data = response.data.data;
-            setRole(data.userRole);
-            setUserId(data.userId || '');
-            setUserName(data.userName || '');
-            setIsStandardChecked(data.detailRole === 'Y');
-            setInitialRole(data.userRole);
-            setInitialStandardChecked(data.detailRole === 'Y');
-            setInitialData({
-              userRole: data.userRole,
-              detailRole: data.detailRole,
-            });
-            setQueryResult([
-              {
-                id: adminData.authId,
-                role: data.userRole,
-                name: `${data.userName}(${data.userId})`,
-                permissions: {
-                  standardDataManagement: data.detailRole === 'Y',
-                },
-              },
-            ]);
-          })
-          .catch(error => {
-            console.error('Error fetching admin data:', error);
-          });
+        fetchAdminData(adminData.authId);
       } else {
-        setRole('');
-        setUserId('');
-        setUserName('');
-        setIsStandardChecked(false);
-        setInitialRole('');
-        setInitialStandardChecked(false);
-        setInitialData({ userRole: '', detailRole: '' });
-        setQueryResult([]);
+        resetForm();
       }
     }
   }, [show, adminData]);
+
+  const fetchAdminData = async (authId) => {
+    try {
+      const response = await axios.get(`/api/auth/admin/${authId}`);
+      const data = response.data.data;
+      setRole(data.userRole);
+      setUserId(data.userId || '');
+      setUserName(data.userName || '');
+      setIsStandardChecked(data.detailRole === 'Y');
+      setInitialRole(data.userRole);
+      setInitialStandardChecked(data.detailRole === 'Y');
+      setInitialData({
+        userRole: data.userRole,
+        detailRole: data.detailRole,
+      });
+      setQueryResult([
+        {
+          id: adminData.authId,
+          role: data.userRole,
+          name: `${data.userName}(${data.userId})`,
+          permissions: {
+            standardDataManagement: data.detailRole === 'Y',
+          },
+        },
+      ]);
+    } catch (error) {
+      console.error('Error fetching admin data:', error);
+    }
+  };
+
+  const resetForm = () => {
+    setRole('');
+    setUserId('');
+    setUserName('');
+    setIsStandardChecked(false);
+    setInitialRole('');
+    setInitialStandardChecked(false);
+    setInitialData({ userRole: '', detailRole: '' });
+    setQueryResult([]);
+  };
 
   const handleRoleChange = (e) => {
     const selectedRole = e.target.value;
@@ -83,28 +90,21 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
       const existingAdmin = existingAdmins.find(admin => admin.userId === userId);
       if (existingAdmin) {
         alert('이미 존재하는 관리자입니다');
-        setRole('');
-        setUserId('');
-        setUserName('');
-        setIsStandardChecked(false);
-        setQueryResult([]);
+        resetForm();
         return;
       }
 
       const response = await axios.post('/api/auth', null, { params: { userId: userId } });
       const userName = response.data.data;
 
-      const result = [
-        {
-          id: 1,
-          role: role,
-          name: `${userName}(${userId})`,
-          permissions: {
-            standardDataManagement: role === 'MASTER',
-          },
+      setQueryResult([{
+        id: 1,
+        role: role,
+        name: `${userName}(${userId})`,
+        permissions: {
+          standardDataManagement: role === 'MASTER',
         },
-      ];
-      setQueryResult(result);
+      }]);
       setUserName(userName);
       setInitialData({
         userRole: role,
@@ -113,12 +113,7 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
     } catch (error) {
       if (error.response && error.response.data && error.response.data.message) {
         alert('본인은 조회할 수 없습니다.');
-        // 폼 초기화
-        setRole('');
-        setUserId('');
-        setUserName('');
-        setIsStandardChecked(false);
-        setQueryResult([]);
+        resetForm();
       } else {
         console.error('Error fetching user name:', error);
       }
@@ -162,12 +157,7 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
     } catch (error) {
       if (error.response && error.response.data && error.response.data.message) {
         alert('이미 존재하는 관리자입니다.');
-        // 폼 초기화
-        setRole('');
-        setUserId('');
-        setUserName('');
-        setIsStandardChecked(false);
-        setQueryResult([]);
+        resetForm();
       } else {
         console.error('Error saving admin:', error);
       }
@@ -183,9 +173,7 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
           <h3>{adminData ? '권한 수정' : '권한 추가'}</h3>
           <button className="authority-close-button" onClick={onClose}>X</button>
         </div>
-        {!adminData && (
-          <p>권한을 부여할 사람을 선택하세요</p>
-        )}
+        {!adminData && <p>권한을 부여할 사람을 선택하세요</p>}
         <div className="input-group">
           <select value={role} onChange={handleRoleChange}>
             <option value="">권한 선택</option>

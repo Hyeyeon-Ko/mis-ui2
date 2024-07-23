@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../components/common/Breadcrumb';
 import Table from '../components/common/Table';
-import CustomButton from '../components/CustomButton';
+import CustomButton from '../components/common/CustomButton';
 import AuthorityModal from '../views/AuthorityModal';
 import ConfirmModal from '../components/common/ConfirmModal';
-import '../styles/AuthorityManagement.css';
-import '../styles/common/Page.css';
 import editIcon from '../assets/images/edit.png';
 import deleteIcon from '../assets/images/delete.png';
+import '../styles/AuthorityManagement.css';
+import '../styles/common/Page.css';
 import axios from 'axios';
 
-/* 권한 관리 페이지 */
+/**
+ * 권한 관리 페이지 컴포넌트
+ */
 function AuthorityManagement() {
   const [applications, setApplications] = useState([]);                // 신청 내역 상태 관리
   const [showModal, setShowModal] = useState(false);                   // 권한 추가/수정 모달 표시 상태 관리
@@ -18,11 +20,16 @@ function AuthorityManagement() {
   const [selectedAdmin, setSelectedAdmin] = useState(null);            // 선택된 관리자 상태 관리
   const [isEditMode, setIsEditMode] = useState(false);                 // 수정 모드 상태 관리
 
-  // 권한 내역 가져오기
+  useEffect(() => {
+    fetchAuthorityList();
+  }, []);
+
+  /**
+   * 권한 내역 가져오기
+   */
   const fetchAuthorityList = async () => {
     try {
       const response = await axios.get('/api/auth');
-      console.log('Fetch Authority List Response:', response.data);
       const data = response.data.data || response.data;
       const transformedData = data.map(item => ({
         id: item.userId,
@@ -43,15 +50,13 @@ function AuthorityManagement() {
     }
   };
 
-  useEffect(() => {
-    fetchAuthorityList();
-  }, []);
-
-  // 수정 핸들러
+  /**
+   * 수정 핸들러
+   * @param {Object} admin 
+   */
   const handleEdit = async (admin) => {
     try {
       const response = await axios.get(`/api/auth/admin/${admin.authId}`);
-      console.log('Fetch Admin Data Response:', response.data);
       const adminData = response.data.data;
 
       setSelectedAdmin({
@@ -68,10 +73,11 @@ function AuthorityManagement() {
     }
   };
 
-  // 권한 삭제 확인 핸들러
+  /**
+   * 권한 삭제 확인 핸들러
+   */
   const handleConfirmDelete = async () => {
     try {
-      console.log('Deleting Admin:', selectedAdmin);
       await axios.delete(`/api/auth/admin/${selectedAdmin.authId}`, {
         params: {
           detailCd: selectedAdmin.detailCd 
@@ -85,17 +91,19 @@ function AuthorityManagement() {
     }
   };
 
-  // 저장 핸들러
+  /**
+   * 저장 핸들러
+   */
   const handleSave = () => {
     fetchAuthorityList();
     setShowModal(false);
     setSelectedAdmin(null);
-    if (isEditMode) {
-      alert('수정이 완료되었습니다.');
-    }
   };
 
-  // 삭제 핸들러
+  /**
+   * 삭제 핸들러
+   * @param {Object} admin 
+   */
   const handleDelete = (admin) => {
     setSelectedAdmin(admin);
     setShowConfirmModal(true);

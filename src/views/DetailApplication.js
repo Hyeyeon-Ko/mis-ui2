@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Breadcrumb from '../components/common/Breadcrumb';
-import CustomButton from '../components/CustomButton';
+import CustomButton from '../components/common/CustomButton';
 import FinalConfirmationModal from '../views/FinalConfirmationModal';
 import RejectReasonModal from '../views/RejectReasonModal';
 import ApplicationHistoryModal from '../views/ApplicationHistoryModal';
@@ -70,8 +70,17 @@ function DetailApplication() {
 
   useEffect(() => {
     fetchBcdStd();
+  }, []);
+
+  useEffect(() => {
     fetchApplicationDetail(draftId);
   }, [draftId]);
+
+  useEffect(() => {
+    if (formData.center) {
+      fetchAddressOptions(formData.center, formData.address);
+    }
+  }, [formData.center]);
 
   useEffect(() => {
     if (addressInputRef.current) {
@@ -83,7 +92,7 @@ function DetailApplication() {
       span.style.fontFamily = 'Arial';
       span.innerText = formData.address;
       document.body.appendChild(span);
-      const width = span.offsetWidth + 24; // 여유 공간을 추가
+      const width = span.offsetWidth + 20;
       addressInputRef.current.style.width = `${width}px`;
       document.body.removeChild(span);
     }
@@ -118,7 +127,7 @@ function DetailApplication() {
           userId: data.userId,
           engAddress: data.engAddress,
         });
-        setFloor(floor || '');
+        setFloor(floor || ''); // 기본 층 값 설정
       } else {
         alert('신청 정보를 불러오는 중 오류가 발생했습니다.');
       }
@@ -130,7 +139,6 @@ function DetailApplication() {
   const fetchBcdStd = async () => {
     try {
       const response = await axios.get('/api/std/bcd');
-      console.log('BCD Standard Data:', response.data);
       if (response.data && response.data.data) {
         const data = response.data.data;
         const instMap = {};
@@ -146,12 +154,41 @@ function DetailApplication() {
         setMappings({ instMap, deptMap, teamMap, gradeMap });
         setBcdData(data);
       } else {
-        console.error('No standard data found');
         alert('기준자료를 불러오는 중 오류가 발생했습니다.');
       }
     } catch (error) {
-      console.error('Error fetching BCD standard data:', error.response ? error.response.data : error.message);
       alert('기준자료를 불러오는 중 오류가 발생했습니다.');
+    }
+  };
+
+  const fetchAddressOptions = (centerCd, baseAddress) => {
+    const selectedInstInfo = bcdData.instInfo.find(inst => inst.detailCd === centerCd);
+
+    const addressOptions = [];
+    let engAddress = '';
+    if (selectedInstInfo) {
+      if (selectedInstInfo.etcItem1) {
+        addressOptions.push(selectedInstInfo.etcItem1);
+        engAddress = selectedInstInfo.etcItem2;
+      }
+      if (selectedInstInfo.etcItem3) {
+        addressOptions.push(selectedInstInfo.etcItem3);
+        engAddress = selectedInstInfo.etcItem4;
+      }
+      if (selectedInstInfo.etcItem5) {
+        addressOptions.push(selectedInstInfo.etcItem5);
+        engAddress = selectedInstInfo.etcItem6;
+      }
+    }
+
+    setAddressOptions(addressOptions);
+
+    if (!baseAddress && addressOptions.length > 0) {
+      setFormData(prevData => ({
+        ...prevData,
+        address: addressOptions[0],
+        engAddress: engAddress
+      }));
     }
   };
 
@@ -273,27 +310,8 @@ function DetailApplication() {
 
   const handleCenterChange = (e) => {
     const selectedCenter = e.target.value;
-    const selectedInstInfo = bcdData.instInfo.find(inst => inst.detailCd === selectedCenter);
-
-    const addressOptions = [];
-    let engAddress = '';
-    if (selectedInstInfo) {
-      if (selectedInstInfo.etcItem1) {
-        addressOptions.push(selectedInstInfo.etcItem1);
-        engAddress = selectedInstInfo.etcItem2; 
-      }
-      if (selectedInstInfo.etcItem3) {
-        addressOptions.push(selectedInstInfo.etcItem3);
-        engAddress = selectedInstInfo.etcItem4; 
-      }
-      if (selectedInstInfo.etcItem5) {
-        addressOptions.push(selectedInstInfo.etcItem5);
-        engAddress = selectedInstInfo.etcItem6; 
-      }
-    }
-
-    setAddressOptions(addressOptions);
-    setFormData({ ...formData, center: selectedCenter, address: addressOptions[0] || '', engAddress, department: '', team: '' });
+    setFormData({ ...formData, center: selectedCenter, department: '', team: '', address: '' });
+    fetchAddressOptions(selectedCenter);
   };
 
   const handleDepartmentChange = (e) => {
@@ -313,13 +331,13 @@ function DetailApplication() {
   const handleFloorChange = (e) => {
     const updatedFloor = e.target.value;
     setFloor(updatedFloor);
-  
+
     const baseAddress = formData.address.split(',')[0];
     const updatedAddress = `${baseAddress}${updatedFloor ? `, ${updatedFloor}` : ''}`;
-  
+
     const originalEngAddress = bcdData.instInfo.find(inst => inst.detailCd === formData.center)?.etcItem2 || '';
     const updatedEngAddress = updatedFloor ? `${updatedFloor}F, ${originalEngAddress}` : originalEngAddress;
-  
+
     setFormData({ ...formData, address: updatedAddress, engAddress: updatedEngAddress });
   };
 

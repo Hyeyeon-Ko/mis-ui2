@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../styles/FinalConfirmationModal.css';
 
+/* 최종 확인 모달 */
 const FinalConfirmationModal = ({ show, onClose, applicant, recipient, cardType, quantity, onConfirm, title, confirmButtonText }) => {
   if (!show) return null;
 
