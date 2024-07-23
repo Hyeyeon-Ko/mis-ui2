@@ -1,8 +1,8 @@
 .circle-button {
   background-color: #F1F4F7;
   border-radius: 50%;
-  width: 380px; 
-  height: 380px; 
+  width: 304px; 
+  height: 304px; 
   letter-spacing: 1px;
   display: flex;
   flex-direction: column; 
@@ -15,12 +15,12 @@
 }
 
 .circle-button .label {
-  font-size: 40px; 
-  margin-bottom: 10px; 
+  font-size: 32px; 
+  margin-bottom: 8px; 
 }
 
 .circle-button .sub-label {
-  font-size: 18px;
+  font-size: 14px;
   text-align: center;
   color: #888; 
 }

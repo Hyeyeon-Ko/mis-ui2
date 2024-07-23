@@ -13,13 +13,13 @@
 
 .history-modal-container {
   background: #fff;
-  padding: 80px 70px 0px 70px;
+  padding: 64px 56px 0px 56px;
   border-radius: 10px;
   text-align: left;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   width: 80%;
-  max-width: 1200px;
-  height: 80%;
+  max-width: 960px;
+  height: 64%;
   position: relative;
 }
 
@@ -27,26 +27,26 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .history-modal-container h3 {
-  margin-bottom: 10px;
-  font-size: 35px;
+  margin-bottom: 8px;
+  font-size: 27px;
   font-weight: bold;
 }
 
 .history-modal-close {
   background: none;
   border: none;
-  font-size: 30px;
+  font-size: 24px;
   cursor: pointer;
   align-self: flex-start;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .history-modal-container .no-data-message {
-  font-size: 20px;
+  font-size: 16px;
   text-align: center;
-  margin-top: 20px;
+  margin-top: 16px;
 }

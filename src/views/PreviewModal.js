@@ -39,46 +39,43 @@ const PreviewModal = ({ show, onClose, formData }) => {
       const darkGray = '#747576';
       const black = '#1A1A1A';
 
-      // Draw name with larger font size
-      ctx.font = 'bold 33px Arial';
+      ctx.font = 'bold 26.4px Arial';
       ctx.fillStyle = black;
-      drawTextWithSpacing(ctx, formData.name, 80, 249, 3);
+      drawTextWithSpacing(ctx, formData.name, 64, 199.2, 2.4);
 
-      // Draw other text with standard font size
-      ctx.font = '17px Arial';
+      ctx.font = '13.6px Arial';
       ctx.fillStyle = black;
-      drawTextWithSpacing(ctx, `${formData.center} ${formData.team}`, 80, 283, -0.5);
-      drawTextWithSpacing(ctx, formData.position, 80, 306, -0.5);
+      drawTextWithSpacing(ctx, `${formData.center} ${formData.team}`, 64, 226.4, -0.4);
+      drawTextWithSpacing(ctx, formData.position, 64, 244.8, -0.4);
       ctx.fillStyle = darkGray;
-      drawTextWithSpacing(ctx, `www.kmi.or.kr`, 80, 380, 0.5);
-      drawTextWithSpacing(ctx, `${formData.firstName}, ${formData.lastName}`, 192, 249, 0);
+      drawTextWithSpacing(ctx, `www.kmi.or.kr`, 64, 304, 0.4);
+      drawTextWithSpacing(ctx, `${formData.firstName}, ${formData.lastName}`, 153.6, 199.2, 0);
 
       ctx.fillStyle = 'black';
-      ctx.font = '19px Arial';
-      ctx.fillText(`Tel`, 350, 234);
-      ctx.fillText(`Fax`, 350, 268);
-      ctx.fillText(`Mobile`, 350, 302);
-      ctx.fillText(`E-Mail`, 350, 336);
+      ctx.font = '15.2px Arial';
+      ctx.fillText(`Tel`, 280, 187.2);
+      ctx.fillText(`Fax`, 280, 214.4);
+      ctx.fillText(`Mobile`, 280, 241.6);
+      ctx.fillText(`E-Mail`, 280, 268.8);
 
-      ctx.font = 'normal 18px Arial';
-      ctx.fillText(`${formData.phone1}.${formData.phone2}.${formData.phone3}`, 430, 234);
-      ctx.fillText(`${formData.fax1}.${formData.fax2}.${formData.fax3}`, 430, 268);
-      ctx.fillText(`${formData.mobile1}.${formData.mobile2}.${formData.mobile3}`, 430, 302);
-      ctx.fillText(`${formData.email}@kmi.or.kr`, 430, 336);
+      ctx.font = '15.2px Arial';
+      ctx.fillText(`${formData.phone1}.${formData.phone2}.${formData.phone3}`, 344, 187.2);
+      ctx.fillText(`${formData.fax1}.${formData.fax2}.${formData.fax3}`, 344, 214.4);
+      ctx.fillText(`${formData.mobile1}.${formData.mobile2}.${formData.mobile3}`, 344, 241.6);
+      ctx.fillText(`${formData.email}@kmi.or.kr`, 344, 268.8);
 
-      ctx.font = 'normal 17px Arial';
+      ctx.font = '13.6px Arial';
 
       const addressParts = formData.address.split(',');
-      console.log(addressParts)
 
       if (addressParts.length === 2) {
         const mainAddress = addressParts[0];
         const floorAddress = addressParts[1].trim() + '층';
         const fullAddress = `${mainAddress} ${floorAddress}`;
 
-        drawTextWithSpacing(ctx, fullAddress, 350, 378, -1.5);
+        drawTextWithSpacing(ctx, fullAddress, 280, 302.4, -1.2);
       } else {
-        drawTextWithSpacing(ctx, formData.address, 350, 378, -1.5);
+        drawTextWithSpacing(ctx, formData.address, 280, 302.4, -1.2);
       }
     };
 
@@ -89,42 +86,40 @@ const PreviewModal = ({ show, onClose, formData }) => {
         const darkGray = '#747576';
         const black = '#1A1A1A';
 
-        // Draw English name with larger font size
-        ctx.font = 'bold 33px Arial';
+        ctx.font = 'bold 26.4px Arial';
         ctx.fillStyle = black;
-        drawTextWithSpacing(ctx, `${formData.lastName} ${formData.firstName}`, 780, 220, 0.5);
+        drawTextWithSpacing(ctx, `${formData.lastName} ${formData.firstName}`, 624, 176, 0.4);
 
-        // Draw other text with standard font size
-        ctx.font = '18px Arial';
+        ctx.font = '14.4px Arial';
         ctx.fillStyle = black;
-        drawTextWithSpacing(ctx, `${formData.engPosition} - ${formData.engTeam}`, 780, 257, 0.2);
+        drawTextWithSpacing(ctx, `${formData.engPosition} - ${formData.engTeam}`, 624, 205.6, 0.16);
         ctx.fillStyle = darkGray;
-        drawTextWithSpacing(ctx, `www.kmi.or.kr`, 780, 380, 0.5);
+        drawTextWithSpacing(ctx, `www.kmi.or.kr`, 624, 304, 0.4);
 
         ctx.fillStyle = 'black';
-        ctx.font = '19px Arial';
-        ctx.fillText(`Tel`, 1050, 206);
-        ctx.fillText(`Fax`, 1050, 240);
-        ctx.fillText(`Mobile`, 1050, 274);
-        ctx.fillText(`E-Mail`, 1050, 308);
-        ctx.fillText(`Office`, 1050, 356);
+        ctx.font = '15.2px Arial';
+        ctx.fillText(`Tel`, 840, 164.8);
+        ctx.fillText(`Fax`, 840, 192);
+        ctx.fillText(`Mobile`, 840, 219.2);
+        ctx.fillText(`E-Mail`, 840, 246.4);
+        ctx.fillText(`Office`, 840, 284.8);
 
-        ctx.font = 'normal 19px Arial';
-        ctx.fillText(formatPhoneNumber(82, `${formData.phone1.slice(1)}.${formData.phone2}.${formData.phone3}`), 1130, 206);
-        ctx.fillText(formatPhoneNumber(82, `${formData.fax1.slice(1)}.${formData.fax2}.${formData.fax3}`), 1130, 240);
-        ctx.fillText(formatPhoneNumber(82, `${formData.mobile1.slice(1)}.${formData.mobile2}.${formData.mobile3}`), 1130, 274);
-        ctx.fillText(`${formData.email}@kmi.or.kr`, 1130, 308);
+        ctx.font = '15.2px Arial';
+        ctx.fillText(formatPhoneNumber(82, `${formData.phone1.slice(1)}.${formData.phone2}.${formData.phone3}`), 904, 164.8);
+        ctx.fillText(formatPhoneNumber(82, `${formData.fax1.slice(1)}.${formData.fax2}.${formData.fax3}`), 904, 192);
+        ctx.fillText(formatPhoneNumber(82, `${formData.mobile1.slice(1)}.${formData.mobile2}.${formData.mobile3}`), 904, 219.2);
+        ctx.fillText(`${formData.email}@kmi.or.kr`, 904, 246.4);
 
-        ctx.font = 'normal 19px Arial';
+        ctx.font = '15.2px Arial';
 
         const engAddressParts = formData.engAddress.split(',');
         if (engAddressParts.length >= 3) {
           const mainEngAddress = engAddressParts.slice(0, 3).join(',').trim();
           const nextLineEngAddress = engAddressParts.slice(3).join(',').trim();
-          drawTextWithSpacing(ctx, mainEngAddress, 1130, 356, -0.7);
-          drawTextWithSpacing(ctx, nextLineEngAddress, 1050, 381, -0.1);
+          drawTextWithSpacing(ctx, mainEngAddress, 904, 284.8, -0.56);
+          drawTextWithSpacing(ctx, nextLineEngAddress, 840, 304.8, -0.08);
         } else {
-          drawTextWithSpacing(ctx, formData.engAddress, 1130, 356, -0.7);
+          drawTextWithSpacing(ctx, formData.engAddress, 904, 284.8, -0.56);
         }
       }
     };
@@ -147,7 +142,7 @@ const PreviewModal = ({ show, onClose, formData }) => {
           <button className="preview-close-button" onClick={onClose}>X</button>
         </div>
         <p>입력된 정보를 바탕으로 제작한 명함 시안입니다. 잘못된 정보가 없는지 다시 한번 확인해주세요.</p>
-        <canvas ref={canvasRef} width="1400" height="450"></canvas>
+        <canvas ref={canvasRef} width="1120" height="360"></canvas>
         <div className="labels">
           <span>앞 면</span>
           <span>뒷 면</span>

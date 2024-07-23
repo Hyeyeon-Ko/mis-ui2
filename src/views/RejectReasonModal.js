@@ -24,15 +24,14 @@ const RejectReasonModal = ({ show, onClose, onConfirm, reason = '', isViewOnly =
   return (
     <div className="reject-modal-overlay">
       <div className="reject-modal-container">
-        <h3>{isViewOnly ? '반려 이유 확인' : '반려 사유 작성'}</h3>
+        <h3>{isViewOnly ? '반려 이유' : '반려 사유 작성'}</h3>
         {isViewOnly ? (
           <div className="reject-reason-content">
             {inputReason || "반려 이유가 제공되지 않았습니다."}
           </div>
         ) : (
           <textarea
-            placeholder={`반려 사유를 작성해주세요.
-해당 내용은 명함 신청자에게 전달됩니다.`}
+            placeholder={`반려 사유를 작성해주세요.\n해당 내용은 명함 신청자에게 전달됩니다.`}
             value={inputReason}
             onChange={handleTextareaChange}
           />

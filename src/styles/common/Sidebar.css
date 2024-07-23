@@ -1,5 +1,5 @@
 .sidebar {
-  width: 300px;
+  width: 240px;
   background-color: #EDF1F5;
   color: black;
   padding: 20px;
@@ -11,20 +11,20 @@
 }
 
 .logo {
-  width: 210px;
-  height: 90px;
-  margin-top: 40px;
-  margin-bottom: 40px;
+  width: 168px;
+  height: 72px;
+  margin-top: 32px;
+  margin-bottom: 32px;
 }
 
 .sidebar-section {
   width: 100%;
-  margin-left: 90px;
+  margin-left: 72px;
 }
 
 .sidebar-section h2 {
-  font-size: 24px;
-  margin-left: 25px;
+  font-size: 20px;
+  margin-left: 20px;
   cursor: pointer;
 }
 
@@ -44,9 +44,9 @@
 }
 
 .sidebar-section li {
-  font-size: 20px;
-  margin-bottom: 13px;
-  margin-left: 25px;
+  font-size: 16px;
+  margin-bottom: 10px;
+  margin-left: 20px;
   cursor: pointer;
 }
 
@@ -66,8 +66,8 @@
 }
 
 .sidebar-section h3 {
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: 20px;
+  margin-bottom: 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -79,8 +79,8 @@
 }
 
 .toggle-icon {
-  margin-right: 5px;
-  margin-bottom: 6px;
+  margin-right: 1px;
+  margin-bottom: 1.2px;
 }
 
 .sidebar-section .active {

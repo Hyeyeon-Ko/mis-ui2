@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Breadcrumb from '../components/common/Breadcrumb';
@@ -14,7 +14,6 @@ import '../styles/common/Page.css';
 import backImage_eng from '../assets/images/backimage_eng.png';
 import backImage_company from '../assets/images/backimage_company.png';
 
-/* 명함 수정 페이지 */
 function DetailApplication() {
   const { auth } = useContext(AuthContext);
   const { draftId } = useParams();
@@ -45,12 +44,12 @@ function DetailApplication() {
     engAddress: '',
   });
 
-  const [addressOptions, setAddressOptions] = useState([]); // 주소 옵션 상태 추가
-  const [floor, setFloor] = useState(''); // 층 상태 추가
+  const [addressOptions, setAddressOptions] = useState([]);
+  const [floor, setFloor] = useState('');
   const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
-  const [previewVisible, setPreviewVisible] = useState(false); // 시안 미리보기 상태 추가
+  const [previewVisible, setPreviewVisible] = useState(false);
   const isReadOnly = new URLSearchParams(location.search).get('readonly') === 'true';
 
   const [bcdData, setBcdData] = useState({
@@ -67,10 +66,28 @@ function DetailApplication() {
     gradeMap: {}
   });
 
+  const addressInputRef = useRef(null);
+
   useEffect(() => {
     fetchBcdStd();
     fetchApplicationDetail(draftId);
   }, [draftId]);
+
+  useEffect(() => {
+    if (addressInputRef.current) {
+      const span = document.createElement('span');
+      span.style.visibility = 'hidden';
+      span.style.position = 'absolute';
+      span.style.whiteSpace = 'pre';
+      span.style.fontSize = '14.5px';
+      span.style.fontFamily = 'Arial';
+      span.innerText = formData.address;
+      document.body.appendChild(span);
+      const width = span.offsetWidth + 24; // 여유 공간을 추가
+      addressInputRef.current.style.width = `${width}px`;
+      document.body.removeChild(span);
+    }
+  }, [formData.address]);
 
   const fetchApplicationDetail = async (draftId) => {
     try {
@@ -82,7 +99,7 @@ function DetailApplication() {
         const [mobile1, mobile2, mobile3] = data.phoneTel.split('-');
         const email = data.email.split('@')[0];
         const [baseAddress, floor] = data.address.split(', ');
-  
+
         setFormData({
           name: data.korNm,
           firstName: data.engNm.split(' ')[1],
@@ -109,8 +126,7 @@ function DetailApplication() {
       alert('신청 정보를 불러오는 중 오류가 발생했습니다.');
     }
   };
-  
-  // 기준자료 불러오기
+
   const fetchBcdStd = async () => {
     try {
       const response = await axios.get('/api/std/bcd');
@@ -476,8 +492,9 @@ function DetailApplication() {
                 <label className="form-label">주소</label>
                 {isReadOnly ? (
                   <div className="address-floor-input">
-                    <input type="text" name="address" value={formData.address} readOnly className="address-select" />
-                    <input type="text3" value={floor} readOnly className="floor-input" />층
+                    <input type="text5" name="address" value={formData.address} readOnly className="address-select" ref={addressInputRef} />
+                    <input type="text3" value={floor} readOnly className="floor-input3" />
+                    <span>층</span>
                   </div>
                 ) : (
                   <div className="address-floor-input">
@@ -486,7 +503,8 @@ function DetailApplication() {
                         <option key={index} value={address}>{address}</option>
                       ))}
                     </select>
-                    <input type="text3" value={floor} onChange={handleFloorChange} required className="floor-input" />층
+                    <input type="text3" value={floor} onChange={handleFloorChange} required className="floor-input2" />
+                    <span>층</span>
                   </div>
                 )}
               </div>
@@ -516,7 +534,7 @@ function DetailApplication() {
         confirmButtonText="수 정"
       />
       <RejectReasonModal show={showRejectModal} onClose={handleRejectClose} onConfirm={handleRejectConfirm} />
-      <ApplicationHistoryModal show={showHistoryModal} onClose={handleHistoryClose} draftId={draftId} /> {/* 신청이력 모달 추가 */}
+      <ApplicationHistoryModal show={showHistoryModal} onClose={handleHistoryClose} draftId={draftId} />
       <PreviewModal
         show={previewVisible}
         onClose={() => setPreviewVisible(false)}

@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
     hngNm: '',
     role: '',
     isAuthenticated: false,
+    sidebarPermissions: [],
   });
 
   // 컴포넌트 마운트 시 세션 저장소에서 인증 상태를 로드
@@ -18,6 +19,7 @@ export const AuthProvider = ({ children }) => {
     const userId = sessionStorage.getItem('userId');
     const hngNm = sessionStorage.getItem('hngNm');
     const role = sessionStorage.getItem('role');
+    const sidebarPermissions = JSON.parse(sessionStorage.getItem('sidebarPermissions')) || [];
 
     if (userId && hngNm && role) {
       setAuth({
@@ -25,22 +27,25 @@ export const AuthProvider = ({ children }) => {
         hngNm,
         role,
         isAuthenticated: true,
+        sidebarPermissions,
       });
     }
   }, []);
 
   // 로그인 함수
-  const login = (userId, hngNm, role) => {
-    console.log('Login called with:', { userId, hngNm, role });
+  const login = (userId, hngNm, role, sidebarPermissions) => {
+    console.log('Login called with:', { userId, hngNm, role, sidebarPermissions });
     setAuth({
       userId,
       hngNm,
       role,
       isAuthenticated: true,
+      sidebarPermissions,
     });
     sessionStorage.setItem('userId', userId);
     sessionStorage.setItem('hngNm', hngNm);
     sessionStorage.setItem('role', role);
+    sessionStorage.setItem('sidebarPermissions', JSON.stringify(sidebarPermissions));
   };
 
   // 로그아웃 함수
@@ -50,10 +55,12 @@ export const AuthProvider = ({ children }) => {
       hngNm: '',
       role: '',
       isAuthenticated: false,
+      sidebarPermissions: [],
     });
     sessionStorage.removeItem('userId');
     sessionStorage.removeItem('hngNm');
     sessionStorage.removeItem('role');
+    sessionStorage.removeItem('sidebarPermissions');
   };
 
   return (

@@ -9,6 +9,7 @@ import '../styles/ApplicationHistoryModal.css';
 const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [documentType, setDocumentType] = useState('');
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
@@ -57,13 +58,13 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
     { header: '문서상태', accessor: 'applyStatus', width: '20%' }
   ];
 
-  const handleSearch = () => {
+  const handleSearch = (filterParams) => {
+    const { startDate, endDate, documentType } = filterParams;
     const newData = data.filter(item => {
       const itemDate = new Date(item.draftDate);
-      return (
-        (!startDate || itemDate >= startDate) &&
-        (!endDate || itemDate <= endDate)
-      );
+      const matchesDate = (!startDate || itemDate >= new Date(startDate)) && (!endDate || itemDate <= new Date(endDate));
+      const matchesDocumentType = !documentType || item.title.includes(documentType);
+      return matchesDate && matchesDocumentType;
     });
     setFilteredData(newData);
   };
@@ -71,6 +72,7 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   const handleReset = () => {
     setStartDate(null);
     setEndDate(null);
+    setDocumentType('');
     setFilteredData(data);
   };
 
@@ -88,6 +90,8 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
           setStartDate={setStartDate}
           endDate={endDate}
           setEndDate={setEndDate}
+          documentType={documentType}
+          setDocumentType={setDocumentType}
           onSearch={handleSearch}
           onReset={handleReset}
         />

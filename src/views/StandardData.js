@@ -11,8 +11,6 @@ function StandardData() {
         <div className="header-row">
           <Breadcrumb items={['기준 자료']} />
           <div className="buttons-container">
-            <button className="data-add-button">추가</button>
-            <button className="data-delete-button">삭제</button>
           </div>
         </div>
       </div>

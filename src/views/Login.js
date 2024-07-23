@@ -34,7 +34,7 @@ const Login = () => {
         console.log('Login response data:', data);
         if (data && data.data) {
           // 로그인 성공 시 사용자 정보를 AuthContext에 저장 -> 메인 페이지로 이동
-          login(userId, data.data.hngNm, data.data.role); 
+          login(userId, data.data.hngNm, data.data.role, data.data.sidebarPermissions); 
           navigate('/');
         } else {
           console.error('Login response data is null or undefined');

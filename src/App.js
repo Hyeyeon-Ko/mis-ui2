@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import './App.css';
 import Header from './components/common/Header';
 import Sidebar from './components/common/Sidebar';
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import Home from './views/Home';
 import Login from './views/Login';
 import MyApplyList from './views/MyApplyList';
@@ -14,8 +14,7 @@ import BcdApplyFirst from './views/BcdApplyFirst';
 import BcdApplySecond from './views/BcdApplySecond';
 import DetailApplication from './views/DetailApplication';
 import PendingApprovalList from './views/PendingApprovalList';
-import { AuthProvider } from './components/AuthContext';
-import RequireAuth from './components/RequireAuth';
+import { AuthProvider, AuthContext } from './components/AuthContext';
 import StandardData from './views/StandardData';
 
 function MainLayout({ children }) {
@@ -33,6 +32,12 @@ function MainLayout({ children }) {
   );
 }
 
+function RequireAuth({ children }) {
+  const { auth } = useContext(AuthContext);
+
+  return auth.isAuthenticated ? children : <Navigate to="/api/login" />;
+}
+
 function App() {
   return (
     <AuthProvider>
@@ -42,7 +47,7 @@ function App() {
           <Route path="*" element={
             <MainLayout>
               <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
                 <Route path="/api/myApplyList" element={<RequireAuth><MyApplyList /></RequireAuth>} />
                 <Route path="/api/myPendingList" element={<RequireAuth><MyPendingList /></RequireAuth>} />
                 <Route path="/api/bcd/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />

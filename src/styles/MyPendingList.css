@@ -1,22 +1,22 @@
 .pending-applications {
-   padding: 10px 20px;
+    padding: 8px 16px;
   }
   
   .pending-applications h2 {
-    font-size: 35px;
-    margin-bottom: 5px;
-    }
+    font-size: 28px;
+    margin-bottom: 4px;
+  }
   
   .modify-button {
-    border-radius: 10px;
-    width: 70px;
-    height: 35px;
+    border-radius: 8px;
+    width: 60px;
+    height: 32px;
     background-color: #BDC6CF;
     color: black;
     border: none;
-    padding: 5px 10px;
+    padding: 5px 8px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
   }
   
@@ -25,15 +25,15 @@
   }
   
   .cancel-button {
-    border-radius: 10px;
-    width: 70px;
-    height: 35px;
+    border-radius: 8px;
+    width: 60px;
+    height: 32px;
     background-color: #2789FE;
     color: white;
     border: none;
-    padding: 5px 10px;
+    padding: 5px 8px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
   }
   

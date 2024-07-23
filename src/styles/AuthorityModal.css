@@ -13,11 +13,11 @@
 
 .add-modal-container {
   background: #fff;
-  padding: 70px 55px 60px 55px;
+  padding: 56px 44px 48px 44px;
   border-radius: 10px;
   text-align: left;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 600px;
+  width: 480px;
   position: relative;
 }
 
@@ -29,46 +29,46 @@
 
 .modal-header h3 {
   margin: 0;
-  font-size: 35px;
+  font-size: 28px;
   font-weight: bold;
 }
 
 .edit-modal-header h3 {
   margin: 0;
-  font-size: 35px;
+  font-size: 28px;
   font-weight: bold;
-  margin-top: 30px;
+  margin-top: 24px;
 }
 
 .modal-header-modify {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
 }
 
 .modal-header-modify h3 {
   margin: 0;
-  font-size: 35px;
+  font-size: 28px;
   font-weight: bold;
 }
 
 .add-modal-container p {
-  font-size: 20px;
-  margin-top: 10px;
+  font-size: 16px;
+  margin-top: 8px;
 }
 
 .input-group {
-  height: 45px;
+  height: 36px;
   display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-  margin-top: 30px;
+  gap: 8px;
+  margin-bottom: 8px;
+  margin-top: 24px;
 }
 
 .input-group select {
-  padding: 12px;
-  font-size: 17px;
+  padding: 10px;
+  font-size: 14px;
   background-color: #f2f5f8;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -76,9 +76,9 @@
 }
 
 .input-group input {
-  width: 160px;
-  padding: 12px;
-  font-size: 17px;
+  width: 128px;
+  padding: 10px;
+  font-size: 14px;
   background-color: #f2f5f8;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -88,12 +88,12 @@
 .input-group select {
   appearance: none;
   background: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 12px center;
-  padding-right: 30px; 
+  padding-right: 35px; 
 }
 
 .input-group .query-button {
-  padding: 12px;
-  font-size: 17px;
+  padding: 10px;
+  font-size: 14px;
   background-color: #BDC6CF;
   border: none;
   border-radius: 5px;
@@ -107,15 +107,15 @@
 .result-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .result-table th,
 .result-table td {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 6.5px;
   text-align: center;
-  font-size: 17px;
+  font-size: 14px;
 }
 
 .result-table th {
@@ -123,23 +123,23 @@
 }
 
 .fixed-width {
-  width: 120px;
+  width: 96px;
 }
 
 .add-modal-buttons {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 50px;
+  gap: 8px;
+  margin-top: 40px;
 }
 
 .add-modal-button {
   border-radius: 5px;
-  padding: 12px 0px 12px 8px;
+  padding: 10px 0px 10px 6.5px;
   cursor: pointer;
-  font-size: 19px;
+  font-size: 16px;
   font-weight: bold;
-  min-width: 100px;
+  min-width: 80px;
 }
 
 .add-modal-button span {
@@ -159,8 +159,8 @@
 .authority-close-button {
   background: none;
   border: none;
-  font-size: 20px;
+  font-size: 16px;
   cursor: pointer;
   align-self: flex-start;
-  margin-top: 10px;
+  margin-top: 8px;
 }
