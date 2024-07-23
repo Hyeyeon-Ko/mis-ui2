@@ -1,43 +1,141 @@
-.standard-data-list {
+.standard-data-content {
     padding: 8px 16px;
   }
   
-  .standard-data-list h2 {
+  .standard-data-content h2 {
     font-size: 28px;
     margin-bottom: 16px;
   }
-  
-  .data-add-button {
-    border-radius: 7px;
-    padding: 11px 7px 11px 22px;
-    cursor: pointer;
-    font-size: 17px;
-    font-weight: bold;
-    letter-spacing: 0.5px;
-    color: white;
-    border: none;
-    background-color: #2789FE;
-    letter-spacing: 1em; 
+
+  .category-section {
+    margin-top: 25px;
+    margin-bottom: 25px;
+    font-size: 16px;
   }
   
+  .category label {
+    font-weight: bold;
+    margin-right: 30px;
+  }
+
+  .main-content {
+    display: flex;
+  }
+
+  .sub-category-sidebar {
+    width: 200px;
+    border-right: 1px solid #ddd;
+    float: left;
+    padding: 10px;
+    margin-left:10px;
+  }
+
+  .sub-category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+  .sub-category-label {
+    font-weight: bold;
+    margin-right: 30px;
+  }
+
+  .sub-category-list {
+    border: 1px solid #ddd;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .sub-category-list li {
+    padding: 8px;
+    cursor: pointer;
+  }
+
+  .sub-category-list li.active {
+    background-color: #f0f0f0;
+  }
+
+  .sub-category-list li.hover {
+    background-color: #e0e0e0;
+  }
+
+  .details-content {
+    width: 900px;
+  }
+
+  .detail-content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.detail-content-label {
+  font-weight: bold;
+  margin-right: 30px;
+}
+
+  .details-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .details-table th, .details-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  .data-add-button {
+    border-radius: 7px;
+    padding: 4px 8px;
+    width: 55px;
+    height: 30px;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    color: white;
+    cursor: pointer;
+    border: none;
+    background-color: #2789FE;
+  }
+
   .data-add-button:hover {
     background-color: #1e6fc1;
   }
-  
-  .data-delete-button {
+
+  .data-modify-button {
     border-radius: 7px;
-    padding: 11px 7px 11px 22px;
+    padding: 4px 8px;
+    width: 55px;
+    height: 30px;
     cursor: pointer;
-    font-size: 17px;
-    font-weight: bold;
+    font-size: 14px;
     letter-spacing: 0.5px;
     color: black;
     border: none;
     background-color: #BDC6CF;
-    letter-spacing: 1em; 
   }
-  
-  .data-delete-button:hover {
+
+  .data-modify-button:hover {
     background-color: #a1a9b2;
+}
+
+  .data-delete-button {
+    border-radius: 7px;
+    padding: 4px 8px;
+    width: 55px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    color: black;
+    border: none;
+    background-color: #BDC6CF;
   }
-  
+
+  .data-delete-button:hover {
+      background-color: #a1a9b2;
+  }
