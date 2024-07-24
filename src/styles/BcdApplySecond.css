@@ -132,8 +132,7 @@ input[type="text2"] {
     font-size: 14.5px;
     background-color: #fff;
     width: auto;
-  }
-  
+}
 
 .floor-input {
     width: 24px;
@@ -153,7 +152,7 @@ input[type="text2"] {
     font-size: 14.5px;
     background-color: #fff;
     text-align: center;
-    margin-left: 25px;
+    margin-left: 27px;
 }
 
 .floor-input3 {
@@ -175,7 +174,7 @@ input[type="text2"] {
 .apply-content select {
     width: 254px;
     height: 37px;
-    padding: 6.5px 0px 6.5px 12px;
+    padding: 6.5px 0px 6.5px 8px;
     border: 1px solid #c8c5c5;
     border-radius: 5px;
     font-size: 14.5px;

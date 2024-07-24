@@ -150,7 +150,8 @@ function MyApplyList() {
   };
 
   const applicationColumns = [
-    { header: '제목', accessor: 'title', width: '32%' },
+    { header: '문서분류', accessor: 'docType', width: '11%' }, 
+    { header: '제목', accessor: 'title', width: '30%' },
     { header: '기안일시', accessor: 'draftDate', width: '14%' },
     { header: '기안자', accessor: 'drafter', width: '9%' },
     { header: '승인/반려일시', accessor: 'approvalDate', width: '14%' },
@@ -174,7 +175,7 @@ function MyApplyList() {
       ),
     },
   ];
-
+  
   return (
     <div className="content">
       <div className="user-applications">

@@ -151,6 +151,7 @@ function BcdOrder() {
       Cell: ({ row }) => (
         <input
           type="checkbox"
+          className="order-checkbox"
           checked={selectedApplications.includes(row.id)}
           onChange={(event) => handleSelect(event, row.id)}
         />

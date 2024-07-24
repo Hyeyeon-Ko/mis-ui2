@@ -3,15 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import ConditionFilter from '../components/common/ConditionFilter';
 import Table from '../components/common/Table';
-import StatusFilters from '../components/StatusFilter';
-import CenterSelect from '../components/CenterSelect';
 import '../styles/ApplicationsList.css';
 import '../styles/common/Page.css';
 import axios from 'axios';
 
-/**
- * 전체 신청 내역 페이지 컴포넌트
- */
 function ApplicationsList() {
   const [applications, setApplications] = useState([]);
   const [startDate, setStartDate] = useState(null);
@@ -23,10 +18,6 @@ function ApplicationsList() {
     statusOrdered: false,
     statusClosed: false,
   });
-  const [centers] = useState([
-    '전체', '재단본부', '광화문', '여의도센터', '강남센터', '수원센터', '대구센터', '부산센터', '광주센터', '제주센터', '협력사'
-  ]);
-  const [selectedCenter, setSelectedCenter] = useState('전체');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -105,10 +96,6 @@ function ApplicationsList() {
     }));
   };
 
-  const handleCenterChange = (event) => {
-    setSelectedCenter(event.target.value);
-  };
-
   const handleSearch = () => {
     fetchApplications({
       documentType,
@@ -133,7 +120,6 @@ function ApplicationsList() {
   const isAnyFilterActive = Object.values(filters).some((value) => value);
 
   const filteredApplications = applications.filter((application) => {
-    if (selectedCenter !== '전체' && application.center !== selectedCenter) return false;
     if (isAnyFilterActive) {
       if (filters.statusApproved && application.status === '승인완료') return true;
       if (filters.statusRejected && application.status === '반려') return true;
@@ -145,11 +131,7 @@ function ApplicationsList() {
   });
 
   const columns = [
-    {
-      header: <CenterSelect centers={centers} selectedCenter={selectedCenter} onCenterChange={handleCenterChange} />,
-      accessor: 'center',
-      width: '12%',
-    },
+    { header: '문서분류', accessor: 'docType', width: '10%' },
     { header: '제목', accessor: 'title', width: '24%' },
     { header: '기안일시', accessor: 'draftDate', width: '13%' },
     { header: '기안자', accessor: 'drafter', width: '6%' },
@@ -173,7 +155,7 @@ function ApplicationsList() {
       ),
     },
   ];
-
+  
   return (
     <div className="content">
       <div className="all-applications">
@@ -188,8 +170,10 @@ function ApplicationsList() {
           setDocumentType={setDocumentType} 
           onSearch={handleSearch} 
           onReset={handleReset}
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          showStatusFilters={true}
         />
-        <StatusFilters filters={filters} onFilterChange={handleFilterChange} />
         {loading ? (
           <p>로딩 중...</p>
         ) : error ? (

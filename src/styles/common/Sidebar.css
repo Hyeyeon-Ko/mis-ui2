@@ -53,6 +53,7 @@
 .sidebar-section a {
   color: inherit; 
   text-decoration: none; 
+  margin-left: 3px;
 }
 
 .sidebar-section li:hover {
@@ -79,8 +80,8 @@
 }
 
 .toggle-icon {
-  margin-right: 1px;
-  margin-bottom: 1.2px;
+  margin-right: 7px;
+  margin-bottom: 5px;
 }
 
 .sidebar-section .active {

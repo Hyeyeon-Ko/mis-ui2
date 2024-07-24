@@ -31,7 +31,6 @@ function MyPendingList() {
   const fetchPendingApplications = async () => {
     try {
       const response = await axios.get('/api/myPendingList');
-      console.log('Pending List Response:', response.data);
       if (response.data && response.data.data && response.data.data.bcdPendingResponses) {
         const data = Array.isArray(response.data.data.bcdPendingResponses) ? response.data.data.bcdPendingResponses : [];
         const transformedData = data.map(application => ({

@@ -4,10 +4,10 @@ import Button from '../common/Button';
 import '../../styles/common/ConditionFilter.css';
 import resetIcon from '../../assets/images/reset.png';
 
-const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documentType, setDocumentType, onSearch, onReset }) => {
+const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documentType, setDocumentType, onSearch, onReset, filters, onFilterChange, showStatusFilters }) => {
   useEffect(() => {
     resetFilters();
-  }, [setStartDate, setEndDate]);
+  }, []);
 
   const formatDate = (date) => {
     return date.toISOString().split('T')[0];
@@ -19,6 +19,7 @@ const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documen
     setStartDate(defaultStartDate);
     setEndDate(new Date());
     setDocumentType('');
+    if (onReset) onReset();
   };
 
   const handleDocumentTypeChange = (event) => {
@@ -27,7 +28,6 @@ const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documen
 
   const handleReset = () => {
     resetFilters();
-    onReset();
   };
 
   const handleSearch = () => {
@@ -54,14 +54,14 @@ const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documen
         <label>기안일자</label>
         <input
           type="date"
-          value={startDate ? formatDate(startDate) : ''}
+          value={startDate ? formatDate(startDate) : formatDate(new Date(new Date().setMonth(new Date().getMonth() - 1)))}
           onChange={handleStartDateChange}
           className="custom-datepicker"
         />
         <span> ~ </span>
         <input
           type="date"
-          value={endDate ? formatDate(endDate) : ''}
+          value={endDate ? formatDate(endDate) : formatDate(new Date())}
           onChange={handleEndDateChange}
           className="custom-datepicker"
         />
@@ -79,6 +79,46 @@ const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documen
         </button>
         <Button onClick={handleSearch} className="search-button">조회</Button>
       </div>
+      {showStatusFilters && (
+        <div className="status-filters">
+          <label>
+            <input
+              type="checkbox"
+              name="statusApproved"
+              checked={filters.statusApproved}
+              onChange={onFilterChange}
+            />
+            승인완료
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="statusRejected"
+              checked={filters.statusRejected}
+              onChange={onFilterChange}
+            />
+            반려
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="statusOrdered"
+              checked={filters.statusOrdered}
+              onChange={onFilterChange}
+            />
+            발주완료
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="statusClosed"
+              checked={filters.statusClosed}
+              onChange={onFilterChange}
+            />
+            완료
+          </label>
+        </div>
+      )}
     </div>
   );
 };
@@ -92,6 +132,9 @@ ConditionFilter.propTypes = {
   setDocumentType: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
   onReset: PropTypes.func.isRequired,
+  filters: PropTypes.object,
+  onFilterChange: PropTypes.func,
+  showStatusFilters: PropTypes.bool,
 };
 
 export default ConditionFilter;

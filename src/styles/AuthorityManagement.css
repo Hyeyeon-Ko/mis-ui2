@@ -48,10 +48,10 @@
 
 .action-icon {
   cursor: pointer;
-  width: 24px;
-  height: 26px;
+  width: 20px;
+  height: 23px;
 }
 
 .action-icon:hover {
-  opacity: 0.7;
+  opacity: 0.6;
 }
