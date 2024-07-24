@@ -11,10 +11,9 @@ import fileDownload from 'js-file-download'; // 파일 다운로드를 위한 �
 
 /* 발주 페이지 */
 function BcdOrder() {
-  // 신청 내역, 선택된 신청 내역, 센터 내역, 선택된 센터 상태 관리
   const [applications, setApplications] = useState([]);
   const [selectedApplications, setSelectedApplications] = useState([]);
-  const [centers, setCenters] = useState([
+  const [centers] = useState([
     '전체',
     '재단본부',
     '광화문',
@@ -162,7 +161,7 @@ function BcdOrder() {
         <CenterSelect
           centers={centers}
           selectedCenter={selectedCenter}
-          handleCenterChange={handleCenterChange}
+          onCenterChange={handleCenterChange}
         />
       ),
       accessor: 'center',

@@ -45,6 +45,7 @@ function PendingApprovalList() {
           endDate: filterParams.endDate || '',
         },
       });
+      
       const data = Array.isArray(response.data.data.bcdPendingResponses) ? response.data.data.bcdPendingResponses : [];
       const transformedData = data.map(item => ({
         ...item,
@@ -56,6 +57,8 @@ function PendingApprovalList() {
         draftId: item.draftId,
         docType: item.docType || '미정'
       }));
+
+      transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
 
       setApplications(transformedData);
     } catch (error) {

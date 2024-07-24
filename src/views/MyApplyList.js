@@ -85,6 +85,8 @@ function MyApplyList() {
         manager: application.approver || application.disapprover || '', 
       }));
 
+      transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
+
       setApplications(transformedData);
     } catch (error) {
       console.error('Error fetching applications:', error.response?.data || error.message);

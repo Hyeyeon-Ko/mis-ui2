@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../../styles/common/Table.css';
 
-/* 테이블 component */
 const Table = ({ columns, data }) => (
   <table className="custom-table">
     <thead>
@@ -13,7 +12,7 @@ const Table = ({ columns, data }) => (
       </tr>
     </thead>
     <tbody>
-      {[...data].reverse().map((row, rowIndex) => (
+      {data.map((row, rowIndex) => (
         <tr key={rowIndex}>
           {columns.map((col, colIndex) => (
             <td key={colIndex}>

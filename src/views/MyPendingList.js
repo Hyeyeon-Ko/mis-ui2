@@ -41,6 +41,9 @@ function MyPendingList() {
           lastUpdateDate: application.lastUpdateDate ? parseDateTime(application.lastUpdateDate) : '',
           lastUpdater: application.lastUpdater,
         }));
+
+        transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
+
         setPendingApplications(transformedData);
       } else {
         console.error('Unexpected response format:', response.data);

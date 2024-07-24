@@ -36,7 +36,7 @@ function StandardData() {
       const response = await axios.get('/api/std/groupInfo', { params: { classCd } });
       const data = response.data.data || [];
       console.log('Fetched subCategories:', data); 
-      setSubCategories(data.reverse());
+      setSubCategories(data);
       setSelectedSubCategory('');
       setSubCategoryName('');
       setDetails([]);
@@ -54,7 +54,7 @@ function StandardData() {
       const response = await axios.get(`/api/std/detailInfo`, { params: { groupCd } });
       const data = response.data.data || [];
       console.log('Fetched details:', data); 
-      setDetails(data.reverse());
+      setDetails(data);
     } catch (error) {
       console.error('Error fetching details:', error);
       setDetails([]);

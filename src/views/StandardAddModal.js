@@ -35,7 +35,7 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
 
   const handleSave = () => {
     if (mode === 'detail' || mode === 'edit') {
-      if (!detailCode || !detailName || !items[0]) {
+      if (!detailCode || !detailName) {
         alert('추가할 정보를 모두 입력해주세요.');
         return;
       }
@@ -90,7 +90,7 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
               <div key={index} className="add-standard-detail-row">
                 <label>항목 {index + 1}</label>
                 <input type="text" value={item} onChange={e => handleItemChange(index, e.target.value)} />
-                {index < items.length - 1 && <hr className="detail-separator" />}
+                {index -1 < items.length - 1 && <hr className="detail-separator" />}
               </div>
             ))}
           </div>

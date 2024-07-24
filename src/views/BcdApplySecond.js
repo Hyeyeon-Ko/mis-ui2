@@ -133,9 +133,12 @@ function BcdApplySecond() {
       e.preventDefault();
     }
   };
-  
 
   const handleLookupUser = async () => {
+    if (!userIdInput) {
+      alert('사번을 입력하세요.');
+      return;
+    }
     try {
       const response = await axios.get(`/api/info/${userIdInput}`);
       if (response.data && response.data.data) {
@@ -145,7 +148,7 @@ function BcdApplySecond() {
           name: userData.userName,
           center: userData.centerNm,
           team: userData.teamNm,
-          teamNm: userData.teamNm, 
+          teamNm: userData.teamNm,
           mobile1: userData.telNum.split('-')[0],
           mobile2: userData.telNum.split('-')[1],
           mobile3: userData.telNum.split('-')[2],

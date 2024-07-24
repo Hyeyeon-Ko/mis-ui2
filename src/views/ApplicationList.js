@@ -27,10 +27,18 @@ function ApplicationsList() {
   }, []);
 
   const parseDateTime = (dateString) => {
-    const date = new Date(dateString);
-    const datePart = date.toISOString().split('T')[0];
-    const timePart = date.toTimeString().split(' ')[0].substring(0, 5);
-    return `${datePart} ${timePart}`;
+    try {
+      const date = new Date(dateString.replace(' ', 'T'));
+      if (isNaN(date)) {
+        throw new Error(`Invalid date: ${dateString}`);
+      }
+      const datePart = date.toISOString().split('T')[0];
+      const timePart = date.toTimeString().split(' ')[0].substring(0, 5);
+      return `${datePart} ${timePart}`;
+    } catch (error) {
+      console.error('Date parsing error:', error);
+      return dateString;
+    }
   };
 
   const getStatusText = (status) => {
@@ -64,6 +72,8 @@ function ApplicationsList() {
         },
       });
 
+      console.log('Raw API Data:', response.data);
+
       const data = Array.isArray(response.data.data.bcdMasterResponses) ? response.data.data.bcdMasterResponses : [];
 
       const transformedData = data.map(application => ({
@@ -78,10 +88,13 @@ function ApplicationsList() {
         draftId: application.draftId,
       }));
 
-      transformedData.sort((a, b) => new Date(a.draftDate) - new Date(b.draftDate));
+      transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
+
+      console.log('Transformed Data:', transformedData);
 
       setApplications(transformedData);
     } catch (error) {
+      console.error('Error fetching applications:', error);
       setError('데이터를 불러오는 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
@@ -155,7 +168,7 @@ function ApplicationsList() {
       ),
     },
   ];
-  
+
   return (
     <div className="content">
       <div className="all-applications">
