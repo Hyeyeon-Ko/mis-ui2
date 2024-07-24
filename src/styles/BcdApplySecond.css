@@ -134,7 +134,13 @@ input[type="text2"] {
     background-color: #fff;
     width: auto;
   }
-  
+
+  .apply-content input:focus {
+    border-color: #a1c0e6; 
+    box-shadow: 0 0 3px rgba(39, 137, 254, 0.5); 
+    outline: none;
+}  
+
 
 .floor-input {
     width: 24px;
