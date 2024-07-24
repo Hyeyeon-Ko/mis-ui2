@@ -11,17 +11,17 @@
     border-radius: 8px;
     width: 60px;
     height: 32px;
-    background-color: #BDC6CF;
+    background-color: #d4dae0;
     color: black;
     border: none;
-    padding: 5px 8px;
+    padding: 4px 8px;
     cursor: pointer;
     font-size: 14px;
     font-weight: bold;
   }
   
   .modify-button:hover {
-    background-color: #BDC6CF;
+    background-color: #A9A9A9;
   }
   
   .cancel-button {
@@ -31,7 +31,7 @@
     background-color: #2789FE;
     color: white;
     border: none;
-    padding: 5px 8px;
+    padding: 4px 8px;
     cursor: pointer;
     font-size: 14px;
     font-weight: bold;

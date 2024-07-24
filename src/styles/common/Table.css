@@ -15,14 +15,15 @@
 }
 
 .custom-table th {
-  background-color: #F1F4F7;
+  background-color: #f4f7fa;
   text-align: center; 
-  border-top: 1px solid #D7D2D2;
-  border-bottom: 1px solid #D7D2D2; 
+  border-top: 1px solid #e6edf3;
+  border-bottom: 1px solid #e6edf3;
 }
 
 .custom-table td {
-  border-bottom: 0.1px solid #ebebeb; 
+  border-bottom: 0.1px solid #ebebeb;
+  padding: 13px 8px;
 }
 
 .button-cell {

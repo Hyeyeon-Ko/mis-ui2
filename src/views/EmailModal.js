@@ -21,18 +21,18 @@ const EmailModal = ({ show, onClose, onSend }) => {
         <h3>이메일 작성</h3>
         <input
           type="text"
-          placeholder="이메일 제목을 입력하세요."
+          placeholder="제목을 입력하세요"
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
         />
         <textarea
-          placeholder="전송할 메일의 내용을 입력하세요."
+          placeholder="내용을 입력하세요"
           value={body}
           onChange={(e) => setBody(e.target.value)}
         />
         <input
           type="text"
-          placeholder="엑셀 파일 이름을 입력하세요."
+          placeholder="엑셀 파일명을 입력하세요"
           value={fileName}
           onChange={(e) => setFileName(e.target.value)}
         />

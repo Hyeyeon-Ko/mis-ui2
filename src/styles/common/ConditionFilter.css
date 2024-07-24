@@ -27,7 +27,7 @@
   width: 120px;
   padding: 4px;
   border: 1px solid #ccc;
-  border-radius: 0;
+  border-radius: 3px;
   background-color: white;
   font-size: 13px;
   text-align: center;
@@ -35,14 +35,27 @@
   margin-right: 8px;
 }
 
+.custom-datepicker:focus{
+  outline: none;
+  border: 1px solid #a1c0e6;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
 /* 문서분류 박스 스타일 수정 */
 .all-application-filter select {
   width: 120px;
   padding: 4px;
   border: 1px solid #ccc;
-  border-radius: 0;
+  border-radius: 3px;
   background-color: white;
   font-size: 13px;
+  text-indent: 3%;
+}
+
+.all-application-filter select:focus{
+  outline: none;
+  border: 1px solid #a1c0e6;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 .reset-button {
@@ -62,12 +75,15 @@
 }
 
 .reset-text {
-  width: 40px;
-  margin-left: 4px;
-  margin-right: 6px;
+  width: 70px;
+  margin-left: 8px;
   text-decoration: underline;
   font-size: 13px;
   color: black;
+}
+
+.reset-text:hover {
+  color: #2789FE;
 }
 
 .search-button {

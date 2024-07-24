@@ -34,12 +34,13 @@
 
 .form-right {
     right: 0;
-    padding-left: 48px;
+    /* padding-left: 40px; */
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
+    margin-bottom: 12px;
 }
 
 .form-group-horizontal {
@@ -57,9 +58,9 @@
 
 .bold-label {
     font-weight: bold;
-    font-size: 20px;
-    margin-top: 40px;
-    margin-bottom: 16px;
+    font-size: 19px;
+    margin-top: 30px;
+    margin-bottom: 12px;
     margin-right: 40px;
 }
 
@@ -132,7 +133,8 @@ input[type="text2"] {
     font-size: 14.5px;
     background-color: #fff;
     width: auto;
-}
+  }
+  
 
 .floor-input {
     width: 24px;
@@ -142,6 +144,7 @@ input[type="text2"] {
     font-size: 14.5px;
     background-color: #fff;
     text-align: center;
+    margin-left: -5px;
 }
 
 .floor-input2 {
@@ -180,6 +183,13 @@ input[type="text2"] {
     font-size: 14.5px;
     background-color: #fff;
     margin-right: -20px;
+    transition: border-color 0.5s;
+}
+
+.apply-content select:focus{
+    outline: none;
+    border: 1px solid #a1c0e6;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 .name-inputs {
@@ -188,7 +198,6 @@ input[type="text2"] {
 }
 
 .card-type {
-    margin-top: 8px;
     display: flex;
     gap: 16px;
 }
@@ -234,7 +243,7 @@ input[type="text2"] {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 48px;
+    margin-top: 55px;
     margin-left: 16px;
     margin-bottom: 16px;
 }
@@ -242,10 +251,10 @@ input[type="text2"] {
 .quantity-selector button {
     padding: 8px 12px; 
     border: 1px solid #ccc;
-    border-radius: 40px;
-    background-color: #f5f5f5;
+    border-radius: 20px;
+    background-color: white;
     cursor: pointer;
-    font-size: 14.5px; 
+    font-size: 14.5px;
     margin-left: 24px;
     margin-right: 24px;
 }
@@ -266,7 +275,7 @@ input[type="text2"] {
 }
 
 .card-preview {
-    max-width: 110%;
+    max-width: 105%;
     margin-top: 20px;
     margin-left: 90px;
     margin-bottom: 20px;
@@ -285,7 +294,7 @@ input[type="text2"] {
 .apply-buttons-container {
     display: flex;
     justify-content: center;
-    margin-top: 40px;
+    margin-top: 60px;
     margin-bottom: 16px;
     margin-right: 160px;
     border-radius: 5px;
@@ -301,13 +310,13 @@ input[type="text2"] {
     }  
   
   .lookup-button {
-    padding: 10px 10px;
+    padding: 11px 14px;
     background-color: #e2e5e9;
     color: rgb(126, 125, 125);
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 14.5px;
+    font-size: 13px;
     font-weight: bold;
     margin-left: -8px;
 }
@@ -317,15 +326,16 @@ input[type="text2"] {
 }
 
 .history-button {
-    padding: 8px 16px;
+    padding: 11px 12px;
     background-color: #e2e5e9;
     color: rgb(126, 125, 125);
     border: none;
-    border-radius: 16px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 14.5px;
+    font-size: 12px;
     font-weight: bold;
     transition: background-color 0.3s, color 0.3s;
+    margin-left: -8px;
 }
 
 .history-button:hover {

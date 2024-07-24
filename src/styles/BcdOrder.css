@@ -30,6 +30,10 @@
   cursor: pointer;
 }
 
+.center-header:hover{
+  color: #2789FE;
+}
+
 .center-select {
   position: absolute;
   top: 0;

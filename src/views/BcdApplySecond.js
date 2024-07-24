@@ -406,7 +406,7 @@ function BcdApplySecond() {
                       type="button"
                       onClick={() => setFormData({ ...formData, quantity: Math.max(formData.quantity - 1, 1) })}
                     >
-                      -
+                      −
                     </button>
                     <span>{formData.quantity}</span>
                     <button
@@ -423,7 +423,7 @@ function BcdApplySecond() {
             <div className="form-right">
               <div className="form-group-horizontal">
                 <label className="bold-label">명함 정보 입력</label>
-                <CustomButton type="button" className="preview-button" onClick={handlePreview}>명함시안미리보기</CustomButton>
+                <CustomButton type="button" className="preview-button" onClick={handlePreview}>명함시안 미리보기</CustomButton>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">이 름</label>
@@ -520,7 +520,7 @@ function BcdApplySecond() {
           </form>
         </div>
         <div className="apply-buttons-container">
-          <CustomButton className="apply-request-button" onClick={handleApplyRequest}>명함신청</CustomButton>
+          <CustomButton className="apply-request-button" onClick={handleApplyRequest}>명함 신청하기</CustomButton>
         </div>
       </div>
       <FinalConfirmationModal 

@@ -355,7 +355,7 @@ function DetailApplication() {
                   <input type="text" value={`${formData.name} (${formData.userId})`} readOnly />
                   {isReadOnly && (
                     <button type="button" className="history-button" onClick={handleHistoryClick}>
-                      신청이력
+                      신청이력 조회
                     </button>
                   )}
                 </div>
@@ -404,7 +404,7 @@ function DetailApplication() {
                         type="button"
                         onClick={() => setFormData({ ...formData, quantity: Math.max(formData.quantity - 1, 1) })}
                       >
-                        -
+                        −
                       </button>
                       <span>{formData.quantity}</span>
                       <button

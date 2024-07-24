@@ -75,14 +75,26 @@
   position: relative;
 }
 
+.input-group select:focus {
+    outline: none;
+    border: 1px solid #a1c0e6;
+     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
 .input-group input {
-  width: 128px;
+  width: 180px;
   padding: 10px;
   font-size: 14px;
-  background-color: #f2f5f8;
+  background-color: white;
   border: 1px solid #ccc;
   border-radius: 5px;
   position: relative;
+}
+
+.input-group input:focus {
+  outline: none;
+  border: 1px solid #a1c0e6;
+   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 .input-group select {
@@ -92,34 +104,36 @@
 }
 
 .input-group .query-button {
-  padding: 10px;
-  font-size: 14px;
-  background-color: #BDC6CF;
+  padding: 10px 10px;
+  font-size: 13px;
+  background-color: #e9ecf0;
   border: none;
   border-radius: 5px;
   cursor: pointer;
 }
 
 .input-group .query-button:hover {
-  background-color: #a1a9b2;
+  background-color: #dee2e7;
 }
 
 .result-table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 16px;
+  margin-top: 12px;
 }
 
 .result-table th,
 .result-table td {
-  border: 1px solid #ddd;
-  padding: 6.5px;
+  border: none;
+  padding: 8px;
   text-align: center;
   font-size: 14px;
+  border-bottom: 0.1px solid #F1F4F7;
 }
 
 .result-table th {
-  background-color: #f2f2f2;
+  background-color: #F1F4F7;
 }
 
 .fixed-width {
@@ -130,7 +144,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: 40px;
+  margin-top: 80px;
 }
 
 .add-modal-button {
@@ -149,6 +163,7 @@
 .add-modal-button.confirm {
   background-color: #2789FE;
   color: white;
+  font-size: 15px;
   border: none;
 }
 

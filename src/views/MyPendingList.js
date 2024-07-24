@@ -88,7 +88,7 @@ function MyPendingList() {
       accessor: 'modify',
       width: '6%',
       Cell: ({ row }) => (
-        <Button className="modify-button" onClick={() => navigate(`/api/bcd/${row.draftId}`, { state: { returnTo: '/api/myPendingList' } })}>수정</Button>
+        <Button className="modify-button" onClick={() => navigate(`/api/bcd/${row.draftId}`, { state: { returnTo: '/api/myPendingList' } })}>수  정</Button>
       ),
     },
     {
@@ -97,7 +97,7 @@ function MyPendingList() {
       width: '9%',
       Cell: ({ row }) => (
         <Button className="cancel-button" onClick={() => handleCancelClick(row)}>
-          취소
+          취  소
         </Button>
       ),
     },

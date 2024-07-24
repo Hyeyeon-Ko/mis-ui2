@@ -188,7 +188,7 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)} 
               />
-              <button className="query-button" onClick={handleQuery}>조회</button>
+              <button className="query-button" onClick={handleQuery}>조  회</button>
             </>
           )}
         </div>

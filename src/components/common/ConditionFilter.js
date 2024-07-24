@@ -74,10 +74,9 @@ const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documen
           <option value="문서수발신">문서수발신</option>
         </select>
         <button className="reset-button" onClick={handleReset}>
-          <img src={resetIcon} alt="Reset" className="reset-icon" />
-          <span className="reset-text">초기화</span>
+          <span className="reset-text">↻ 초기화</span>
         </button>
-        <Button onClick={handleSearch} className="search-button">조회</Button>
+        <Button onClick={handleSearch} className="search-button">조  회</Button>
       </div>
       {showStatusFilters && (
         <div className="status-filters">
