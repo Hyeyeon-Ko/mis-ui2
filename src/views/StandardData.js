@@ -229,14 +229,14 @@ function StandardData() {
         />
       )
     },
-    { header: '상세코드', accessor: 'detailCd', width: '7%' },
-    { header: '상세명', accessor: 'detailNm', width: '10%' },
-    { header: '항목 1', accessor: 'etcItem1', width: '10%' },
-    { header: '항목 2', accessor: 'etcItem2', width: '10%' },
-    { header: '항목 3', accessor: 'etcItem3', width: '10%' },
-    { header: '항목 4', accessor: 'etcItem4', width: '10%' },
-    { header: '항목 5', accessor: 'etcItem5', width: '10%' },
-    { header: '항목 6', accessor: 'etcItem6', width: '10%' },
+    { header: '상세코드', accessor: 'detailCd'},
+    { header: '상세명', accessor: 'detailNm'},
+    { header: '항목 1', accessor: 'etcItem1'},
+    { header: '항목 2', accessor: 'etcItem2'},
+    { header: '항목 3', accessor: 'etcItem3'},
+    { header: '항목 4', accessor: 'etcItem4'},
+    { header: '항목 5', accessor: 'etcItem5'},
+    { header: '항목 6', accessor: 'etcItem6'},
   ];
 
   const getModalTitle = () => {
@@ -294,12 +294,14 @@ function StandardData() {
                 <button className="data-delete-button" onClick={handleDeleteRow}>삭 제</button>
               </div>
             </div>
-            <div className="details-table">
-              <Table
-                columns={detailColumns}
-                data={details}
-              />
-            </div>
+            {/* <div className='details-table-wrapper'> */}
+              <div className="details-table">
+                <Table
+                  columns={detailColumns}
+                  data={details}
+                />
+              </div>
+            {/* </div> */}
           </div>
         </div>
       </div>
