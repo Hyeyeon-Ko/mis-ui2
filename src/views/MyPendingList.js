@@ -22,11 +22,17 @@ function MyPendingList() {
   // Timestamp Parsing: "YYYY-MM-DD HH:MM"
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
-    const datePart = date.toISOString().split('T')[0];
-    const timePart = date.toTimeString().split(' ')[0].substring(0, 5);
-    return `${datePart} ${timePart}`;
+  
+    // 원래 시간 문자열을 원하는 포맷으로 변환
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+  
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
-
+  
   // 승인 대기 내역 가져오기
   const fetchPendingApplications = async () => {
     try {

@@ -16,7 +16,7 @@
   padding: 56px 44px 56px 44px;
   border-radius: 16px;
   text-align: center;
-  width: 60%;
+  width: 1150px;
 }
 
 .preview-modal-header {
@@ -26,6 +26,7 @@
 }
 
 .preview-modal-header h3 {
+  margin-left: 12px;
   font-weight: bold;
 }
 

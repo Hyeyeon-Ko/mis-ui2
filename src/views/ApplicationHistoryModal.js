@@ -85,17 +85,21 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
           <h3>신청 이력</h3>
           <button className="history-modal-close" onClick={onClose}>×</button>
         </div>
-        <ConditionFilter
-          startDate={startDate}
-          setStartDate={setStartDate}
-          endDate={endDate}
-          setEndDate={setEndDate}
-          documentType={documentType}
-          setDocumentType={setDocumentType}
-          onSearch={handleSearch}
-          onReset={handleReset}
-        />
-        <Table columns={columns} data={filteredData} />
+        <div className="condition-filter-container">
+          <ConditionFilter
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
+            documentType={documentType}
+            setDocumentType={setDocumentType}
+            onSearch={handleSearch}
+            onReset={handleReset}
+          />
+        </div>
+        <div className="table-container">
+          <Table columns={columns} data={filteredData} />
+        </div>
       </div>
     </div>
   );

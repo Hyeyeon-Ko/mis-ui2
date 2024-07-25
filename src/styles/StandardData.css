@@ -81,7 +81,7 @@
 .sub-category-table th {
   background-color: white;
   border: 1px solid #ddd;
-  padding: 10px;
+  padding: 11px 20px;
   text-align: center;
   font-size: 13px;
 }
@@ -109,7 +109,7 @@
 .details-table th, .details-table td {
   background-color: white;
   border: 1px solid #ddd;
-  padding: 9px 10px;
+  padding: 10px 20px;
   text-align: center;
   font-size: 13px;
 }

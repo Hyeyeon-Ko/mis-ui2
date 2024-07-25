@@ -19,8 +19,10 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   width: 80%;
   max-width: 960px;
-  height: 64%;
+  height: 80%; /* 높이 조정 */
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-header {
@@ -45,8 +47,16 @@
   margin-top: 8px;
 }
 
-.history-modal-container .no-data-message {
-  font-size: 16px;
-  text-align: center;
-  margin-top: 16px;
+.condition-filter-container {
+  margin-bottom: 16px;
+}
+
+.table-container {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.table-container::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
 }

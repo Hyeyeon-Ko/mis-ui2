@@ -35,7 +35,6 @@ function StandardData() {
     try {
       const response = await axios.get('/api/std/groupInfo', { params: { classCd } });
       const data = response.data.data || [];
-      console.log('Fetched subCategories:', data); 
       setSubCategories(data);
       setSelectedSubCategory('');
       setSubCategoryName('');
@@ -231,7 +230,7 @@ function StandardData() {
       )
     },
     { header: '상세코드', accessor: 'detailCd', width: '7%' },
-    { header: '상세명', accessor: 'detailNm', width: '8%' },
+    { header: '상세명', accessor: 'detailNm', width: '10%' },
     { header: '항목 1', accessor: 'etcItem1', width: '10%' },
     { header: '항목 2', accessor: 'etcItem2', width: '10%' },
     { header: '항목 3', accessor: 'etcItem3', width: '10%' },

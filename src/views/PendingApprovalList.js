@@ -24,16 +24,26 @@ function PendingApprovalList() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchPendingList();
-  }, []);
-
+    // 필터를 적용한 상태로 데이터를 로드
+    fetchPendingList({
+      documentType,
+      startDate: startDate ? startDate.toISOString().split('T')[0] : '',
+      endDate: endDate ? endDate.toISOString().split('T')[0] : '',
+    });
+  }, [startDate, endDate, documentType, selectedCenter]); // 필터 변경 시 데이터 새로 로드
+  
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
-    const datePart = date.toISOString().split('T')[0];
-    const timePart = date.toTimeString().split(' ')[0].substring(0, 5);
-    return `${datePart} ${timePart}`;
+  
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+  
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
-
+  
   const fetchPendingList = async (filterParams = {}) => {
     setLoading(true);
     setError(null);
@@ -84,7 +94,7 @@ function PendingApprovalList() {
       endDate: endDate ? endDate.toISOString().split('T')[0] : '',
     });
   };
-
+  
   const handleReset = () => {
     setStartDate(null);
     setEndDate(null);

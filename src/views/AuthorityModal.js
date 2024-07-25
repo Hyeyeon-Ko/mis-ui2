@@ -69,11 +69,27 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
   const handleRoleChange = (e) => {
     const selectedRole = e.target.value;
     setRole(selectedRole);
+
     if (selectedRole === 'MASTER') {
       setIsStandardChecked(true);
     } else {
       setIsStandardChecked(false);
     }
+
+    // Update table data
+    setQueryResult(prevResult => {
+      if (prevResult.length > 0) {
+        return [{
+          ...prevResult[0],
+          role: selectedRole,
+          permissions: {
+            standardDataManagement: selectedRole === 'MASTER',
+          }
+        }];
+      } else {
+        return prevResult;
+      }
+    });
   };
 
   const handleQuery = async () => {
@@ -87,6 +103,7 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
         return;
       }
 
+      // Check if the userId already exists
       const existingAdmin = existingAdmins.find(admin => admin.userId === userId);
       if (existingAdmin) {
         alert('이미 존재하는 관리자입니다');
@@ -126,6 +143,20 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
       return;
     }
     setIsStandardChecked(!isStandardChecked);
+
+    // Update table data
+    setQueryResult(prevResult => {
+      if (prevResult.length > 0) {
+        return [{
+          ...prevResult[0],
+          permissions: {
+            standardDataManagement: !isStandardChecked
+          }
+        }];
+      } else {
+        return prevResult;
+      }
+    });
   };
 
   const handleSave = async () => {
@@ -211,6 +242,7 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
                       type="checkbox"
                       checked={isStandardChecked}
                       onChange={handleCheckboxChange}
+                      disabled={role === 'MASTER'}
                     />
                   </td>
                 </tr>

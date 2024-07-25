@@ -27,20 +27,17 @@ function ApplicationsList() {
   }, []);
 
   const parseDateTime = (dateString) => {
-    try {
-      const date = new Date(dateString.replace(' ', 'T'));
-      if (isNaN(date)) {
-        throw new Error(`Invalid date: ${dateString}`);
-      }
-      const datePart = date.toISOString().split('T')[0];
-      const timePart = date.toTimeString().split(' ')[0].substring(0, 5);
-      return `${datePart} ${timePart}`;
-    } catch (error) {
-      console.error('Date parsing error:', error);
-      return dateString;
-    }
+    const date = new Date(dateString);
+  
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+  
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
-
+  
   const getStatusText = (status) => {
     switch (status) {
       case 'A':
@@ -72,8 +69,6 @@ function ApplicationsList() {
         },
       });
 
-      console.log('Raw API Data:', response.data);
-
       const data = Array.isArray(response.data.data.bcdMasterResponses) ? response.data.data.bcdMasterResponses : [];
 
       const transformedData = data.map(application => ({
@@ -89,8 +84,6 @@ function ApplicationsList() {
       }));
 
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
-
-      console.log('Transformed Data:', transformedData);
 
       setApplications(transformedData);
     } catch (error) {
