@@ -18,12 +18,14 @@
     text-align: left;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     width: 360px;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
 }
 
 .final-modal-container h3 {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: bold;
-    margin-bottom: 24px;
+    margin-bottom: 22px;
 }
 
 .confirmation-details {
@@ -43,7 +45,7 @@
 }
 
 .detail-value {
-    font-size: 16px;
+    font-size: 15px;
     flex: 1;
     text-align: left;
 }
@@ -52,8 +54,8 @@
     display: flex;
     justify-content: flex-end;
     gap: 8px;
-    margin-top: 24px;
-    margin-bottom: 16px;
+    margin-top: 40px;
+    margin-bottom: 20px;
 }
 
 .final-modal-button {
@@ -76,7 +78,7 @@
 }
 
 .final-modal-button.cancel {
-    background-color: #BDC6CF;
+    /* background-color: #BDC6CF; */
     color: black;
     border: none;
 }
