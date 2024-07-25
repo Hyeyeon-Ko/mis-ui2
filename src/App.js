@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import './App.css';
+import './index.css';
 import Header from './components/common/Header';
 import Sidebar from './components/common/Sidebar';
 import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'react-router-dom';

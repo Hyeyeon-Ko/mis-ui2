@@ -15,7 +15,8 @@
 }
 
 .circle-button .label {
-  font-size: 31px; 
+  font-size: 31px;
+  letter-spacing: 1px;
   margin-bottom: 8px; 
 }
 

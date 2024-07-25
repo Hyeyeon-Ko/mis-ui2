@@ -73,6 +73,7 @@
 
 .sidebar-section h3 {
   font-size: 20px;
+  letter-spacing: 0.5px;
   margin-bottom: 16px;
   cursor: pointer;
   display: flex;
