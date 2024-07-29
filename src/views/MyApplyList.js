@@ -9,14 +9,14 @@ import '../styles/MyApplyList.css';
 import '../styles/common/Page.css';
 import axios from 'axios';
 
-/* 나의 전체 신청 내역 페이지 */
+/* 나의 전체 신청내역 페이지 */
 function MyApplyList() {
-  const [applications, setApplications] = useState([]);                   // 신청 내역 상태 관리
+  const [applications, setApplications] = useState([]);                   // 신청내역 상태 관리
   const [startDate, setStartDate] = useState(null);                       // 시작 날짜 상태 관리
   const [endDate, setEndDate] = useState(null);                           // 종료 날짜 상태 관리
   const [documentType, setDocumentType] = useState('');                   // 문서 타입 상태 관리
   const [showModal, setShowModal] = useState(false);                      // 확인 모달 표시 상태 관리
-  const [selectedApplication, setSelectedApplication] = useState(null);   // 선택된 신청 내역 상태 관리
+  const [selectedApplication, setSelectedApplication] = useState(null);   // 선택된 신청내역 상태 관리
   const [showRejectionModal, setShowRejectionModal] = useState(false);    // 반려 모달 표시 상태 관리
   const [rejectionReason, setRejectionReason] = useState('');             // 반려 이유 상태 관리
   const navigate = useNavigate();                                         // 경로 이동을 위한 네비게이트 함수
@@ -58,7 +58,7 @@ function MyApplyList() {
     }
   };
 
-  // 신청 내역 가져오기
+  // 신청내역 가져오기
   const fetchApplications = async (filterParams = {}) => {
     try {
       const response = await axios.get('/api/myApplyList', {
@@ -186,8 +186,8 @@ function MyApplyList() {
   return (
     <div className="content">
       <div className="user-applications">
-        <h2>전체 신청 내역</h2>
-        <Breadcrumb items={['나의 신청내역', '전체 신청 내역']} />
+        <h2>전체 신청내역</h2>
+        <Breadcrumb items={['나의 신청내역', '전체 신청내역']} />
         <DateFilter 
           startDate={startDate} 
           setStartDate={setStartDate} 

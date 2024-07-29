@@ -27,6 +27,9 @@ function DetailApplication() {
     department: '',
     team: '',
     position: '',
+    engPosition: '',
+    gradeNm: '',
+    enGradeNm: '',
     phone1: '',
     phone2: '',
     phone3: '',
@@ -103,12 +106,16 @@ function DetailApplication() {
       const response = await axios.get(`/api/bcd/applyList/${draftId}`);
       if (response.data && response.data.data) {
         const data = response.data.data;
+        console.log(response);
         const [phone1, phone2, phone3] = data.extTel.split('-');
         const [fax1, fax2, fax3] = data.faxTel.split('-');
         const [mobile1, mobile2, mobile3] = data.phoneTel.split('-');
         const email = data.email.split('@')[0];
         const [baseAddress, floor] = data.address.split(', ');
-
+  
+        // gradeNm을 | 기준으로 분리
+        const [gradeNm, enGradeNm] = data.gradeNm.split('|');
+  
         setFormData({
           name: data.korNm,
           firstName: data.engNm.split(' ')[1],
@@ -117,6 +124,8 @@ function DetailApplication() {
           department: data.deptCd,
           team: data.teamCd,
           position: data.gradeCd,
+          gradeNm: data.gradeCd === '006' ? gradeNm.trim() : '',
+          enGradeNm: data.gradeCd === '006' ? enGradeNm.trim() : '',
           phone1, phone2, phone3,
           fax1, fax2, fax3,
           mobile1, mobile2, mobile3,
@@ -127,7 +136,7 @@ function DetailApplication() {
           userId: data.userId,
           engAddress: data.engAddress,
         });
-        setFloor(floor || ''); // 기본 층 값 설정
+        setFloor(floor || '');
       } else {
         alert('신청 정보를 불러오는 중 오류가 발생했습니다.');
       }
@@ -135,7 +144,7 @@ function DetailApplication() {
       alert('신청 정보를 불러오는 중 오류가 발생했습니다.');
     }
   };
-
+  
   const fetchBcdStd = async () => {
     try {
       const response = await axios.get('/api/std/bcd');
@@ -148,8 +157,14 @@ function DetailApplication() {
 
         data.instInfo.forEach(inst => instMap[inst.detailCd] = inst.detailNm);
         data.deptInfo.forEach(dept => deptMap[dept.detailCd] = dept.detailNm);
-        data.teamInfo.forEach(team => teamMap[team.detailCd] = team.detailNm);
-        data.gradeInfo.forEach(grade => gradeMap[grade.detailCd] = grade.detailNm);
+        data.teamInfo.forEach(team => {
+          const key = `${team.detailNm}|${team.detailCd}`;
+          teamMap[key] = team.detailCd;
+        });
+        data.gradeInfo.forEach(grade => {
+          const key = `${grade.detailNm}|${grade.etcItem1}`;
+          gradeMap[key] = grade.detailCd;
+        });
 
         setMappings({ instMap, deptMap, teamMap, gradeMap });
         setBcdData(data);
@@ -226,7 +241,11 @@ function DetailApplication() {
 
   const handleConfirmRequest = async () => {
     setShowFinalConfirmationModal(false);
-
+  
+    const fullAddress = `${formData.address}${floor ? `, ${floor}` : ''}`;
+  
+    console.log('Full Address:', fullAddress);
+  
     const requestData = {
       drafter: auth.hngNm,
       drafterId: auth.userId,
@@ -237,16 +256,20 @@ function DetailApplication() {
       deptCd: formData.department,
       teamCd: formData.team,
       gradeCd: formData.position,
+      gradeNm: formData.gradeNm,  
+      enGradeNm: formData.enGradeNm,  
       extTel: `${formData.phone1}-${formData.phone2}-${formData.phone3}`,
       faxTel: `${formData.fax1}-${formData.fax2}-${formData.fax3}`,
       phoneTel: `${formData.mobile1}-${formData.mobile2}-${formData.mobile3}`,
       email: `${formData.email}@kmi.or.kr`,
-      address: formData.address,
+      address: fullAddress,
       engAddress: formData.engAddress,
       division: formData.cardType === 'personal' ? 'B' : 'A',
       quantity: formData.quantity,
     };
-
+  
+    console.log('Request Data:', requestData);
+  
     try {
       const response = await axios.post(`/api/bcd/update?draftId=${draftId}`, requestData);
       if (response.data.code === 200) {
@@ -259,7 +282,7 @@ function DetailApplication() {
       alert('명함 수정 중 오류가 발생했습니다.');
     }
   };
-
+      
   const handleApprove = async () => {
     try {
       const response = await axios.post(`/api/bcd/applyList/${draftId}`);
@@ -316,6 +339,26 @@ function DetailApplication() {
 
   const handleDepartmentChange = (e) => {
     setFormData({ ...formData, department: e.target.value, team: '' });
+  };
+
+  const handleTeamChange = (e) => {
+    const selectedTeam = e.target.value;
+    const selectedTeamInfo = bcdData.teamInfo.find(team => team.detailCd === selectedTeam);
+    const engTeam = selectedTeamInfo ? selectedTeamInfo.etcItem1 : '';
+
+    setFormData({ ...formData, team: selectedTeam, engTeam });
+  };
+
+  const handlePositionChange = (e) => {
+    const selectedPosition = e.target.value;
+    const selectedPositionInfo = bcdData.gradeInfo.find(position => position.detailCd === selectedPosition);
+    const enGradeNm = selectedPositionInfo ? selectedPositionInfo.etcItem1 : '';
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      position: selectedPosition,
+      gradeNm: selectedPosition === '006' ? prevFormData.gradeNm : null,
+      enGradeNm: selectedPosition === '006' ? enGradeNm : null,
+    }));
   };
 
   const handlePreview = (e) => {
@@ -457,24 +500,58 @@ function DetailApplication() {
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">팀 명</label>
-                <select name="team" value={formData.team} onChange={handleChange} required={!isReadOnly} disabled={isReadOnly}>
+                <select name="team" value={formData.team} onChange={handleTeamChange} required={!isReadOnly} disabled={isReadOnly}>
                   <option value="">선택하세요</option>
                   {bcdData.teamInfo
                     .filter((team) => team.etcItem1 === formData.department)
                     .map((team) => (
-                      <option key={team.detailCd} value={team.detailCd}>{team.detailNm}</option>
+                      <option key={team.detailCd} value={team.detailCd}>
+                        {`${team.detailNm} | ${team.detailCd}`}
+                      </option>
                     ))}
                 </select>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">직위 / 직책</label>
-                <select name="position" value={formData.position} onChange={handleChange} required={!isReadOnly} disabled={isReadOnly}>
+                <select name="position" value={formData.position} onChange={handlePositionChange} required={!isReadOnly} disabled={isReadOnly}>
                   <option value="">선택하세요</option>
                   {bcdData.gradeInfo.map((position) => (
-                    <option key={position.detailCd} value={position.detailCd}>{position.detailNm}</option>
+                    <option key={position.detailCd} value={position.detailCd}>
+                      {`${position.detailNm}  | ${position.etcItem1}`}
+                    </option>
                   ))}
                 </select>
               </div>
+              {formData.position === '006' && (
+                <div className="additional-inputs">
+                  <div className="form-group-horizontal">
+                    <label className="form-label">직위</label>
+                    <input
+                      type="text"
+                      name="gradeNm"
+                      value={formData.gradeNm}
+                      onChange={handleChange}
+                      required
+                      placeholder="직위"
+                      onClick={handleChange}
+                      required={!isReadOnly} disabled={isReadOnly}
+                    />
+                  </div>
+                  <div className="form-group-horizontal">
+                    <label className="form-label">영문 직위</label>
+                    <input
+                      type="text"
+                      name="enGradeNm"
+                      value={formData.enGradeNm}
+                      onChange={handleChange}
+                      required
+                      placeholder="영문 직위"
+                      onClick={handleChange}
+                      required={!isReadOnly} disabled={isReadOnly}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="form-group-horizontal">
                 <label className="form-label">내선 번호</label>
                 <div className="phone-inputs">

@@ -4,7 +4,7 @@ import axios from 'axios';
 import Breadcrumb from '../components/common/Breadcrumb';
 import CustomButton from '../components/common/CustomButton';
 import FinalConfirmationModal from '../views/FinalConfirmationModal';
-import PreviewModal from '../views/PreviewModal'; 
+import PreviewModal2 from '../views/PreviewModal2'; 
 import { AuthContext } from '../components/AuthContext';
 import '../styles/BcdApplySecond.css';
 import '../styles/common/Page.css';
@@ -27,6 +27,7 @@ function BcdApplySecond() {
     team: '',
     teamNm: '', 
     position: '',
+    gradeNm: '', 
     phone1: '',
     phone2: '',
     phone3: '',
@@ -42,7 +43,7 @@ function BcdApplySecond() {
     cardType: 'personal',
     userId: '',
     engAddress: '',
-    engPosition: '',
+    enGradeNm: '',
     engTeam: '',
   });
 
@@ -112,9 +113,16 @@ function BcdApplySecond() {
 
         data.instInfo.forEach(inst => instMap[inst.detailNm] = inst.detailCd);
         data.deptInfo.forEach(dept => deptMap[dept.detailNm] = dept.detailCd);
-        data.teamInfo.forEach(team => teamMap[team.detailNm] = team.detailCd);
-        data.gradeInfo.forEach(grade => gradeMap[grade.detailNm] = grade.detailCd);
-
+        data.teamInfo.forEach(team => {
+          const key = `${team.detailNm}|${team.detailCd}`;
+          teamMap[team.detailNm] = team.detailCd;
+        });
+        
+        data.gradeInfo.forEach(grade => {
+          const key = `${grade.detailNm}|${grade.etcItem1}`;
+          gradeMap[grade.detailNm] = grade.detailCd;
+        });
+        
         setMappings({ instMap, deptMap, teamMap, gradeMap });
         setBcdData(data);
       } else {
@@ -198,6 +206,7 @@ function BcdApplySecond() {
 
     for (const field of requiredFields) {
       if (!formData[field]) {
+        console.warn('Form validation failed: missing field', field);
         return false;
       }
     }
@@ -213,12 +222,16 @@ function BcdApplySecond() {
       alert('모든 명함 정보를 입력해주세요.');
       return;
     }
+    console.log('Form data before applying:', formData);
     setShowFinalConfirmationModal(true);
   };
 
   const handleConfirmRequest = async () => {
     setShowFinalConfirmationModal(false);
-
+  
+  
+    console.log('Selected Position:', formData.position);
+  
     const requestData = {
       drafter: auth.hngNm,
       drafterId: auth.userId,
@@ -227,9 +240,11 @@ function BcdApplySecond() {
       engNm: `${formData.lastName} ${formData.firstName}`,
       instCd: mappings.instMap[formData.center],
       deptCd: mappings.deptMap[formData.department],
-      teamCd: mappings.teamMap[formData.team],
+      teamCd: mappings.teamMap[formData.team] || '',
       teamNm: formData.team,
-      gradeCd: mappings.gradeMap[formData.position],
+      gradeCd: formData.position,
+      gradeNm: formData.gradeNm,
+      enGradeNm: formData.enGradeNm,
       extTel: `${formData.phone1}-${formData.phone2}-${formData.phone3}`,
       faxTel: `${formData.fax1}-${formData.fax2}-${formData.fax3}`,
       phoneTel: `${formData.mobile1}-${formData.mobile2}-${formData.mobile3}`,
@@ -239,14 +254,16 @@ function BcdApplySecond() {
       division: formData.cardType === 'personal' ? 'B' : 'A',
       quantity: formData.quantity,
     };
-
+  
+    console.log('Request Data:', requestData);
+  
     try {
       const response = await axios.post('/api/bcd/', requestData);
-      console.log('Confirm Request Response:', response.data);
       if (response.data.code === 200) {
         alert('명함 신청이 완료되었습니다.');
         navigate('/api/myApplyList');
       } else {
+        console.error('Server response error:', response.data);
         alert('명함 신청 중 오류가 발생했습니다.');
       }
     } catch (error) {
@@ -254,7 +271,7 @@ function BcdApplySecond() {
       alert('명함 신청 중 오류가 발생했습니다.');
     }
   };
-
+  
   const handleCenterChange = (e) => {
     if (!formData.userId) {
       alert('사번 조회를 통해 명함 대상자를 선택하세요.');
@@ -279,7 +296,7 @@ function BcdApplySecond() {
         engAddress = selectedInstInfo.etcItem6; 
       }
     }
-  
+    
     setAddressOptions(addressOptions);
     setFormData({ ...formData, center: selectedCenter, address: addressOptions[0] || '', engAddress, department: '', team: '' });
   };
@@ -303,9 +320,9 @@ function BcdApplySecond() {
     }
     const selectedPosition = e.target.value;
     const selectedPositionInfo = bcdData.gradeInfo.find(position => position.detailNm === selectedPosition);
-    const engPosition = selectedPositionInfo ? selectedPositionInfo.etcItem1 : '';
-  
-    setFormData({ ...formData, position: selectedPosition, engPosition });
+    const enGradeNm = selectedPositionInfo ? selectedPositionInfo.etcItem1 : '';
+    
+    setFormData({ ...formData, position: selectedPosition, enGradeNm });
   };
 
   const handleDepartmentChange = (e) => {
@@ -331,6 +348,7 @@ function BcdApplySecond() {
       return;
     }
     const updatedAddress = e.target.value + (floor ? `, ${floor}` : '');
+    console.log('Address changed to:', updatedAddress);
     setFormData({ ...formData, address: updatedAddress });
   };
 
@@ -464,10 +482,12 @@ function BcdApplySecond() {
                 <select name="team" value={formData.team} onChange={handleTeamChange} required onClick={handleInputClick}>
                   <option value="">선택하세요</option>
                   {bcdData.teamInfo
-                    .filter((team) => team.etcItem1 === mappings.deptMap[formData.department])
-                    .map((team) => (
-                      <option key={team.detailCd} value={team.detailNm}>{team.detailNm}</option>
-                    ))}
+                  .filter((team) => team.etcItem1 === mappings.deptMap[formData.department])
+                  .map((team) => (
+                    <option key={team.detailCd} value={team.detailNm}>
+                      {`${team.detailNm} | ${team.detailCd}`}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div className="form-group-horizontal">
@@ -475,10 +495,40 @@ function BcdApplySecond() {
                 <select name="position" value={formData.position} onChange={handlePositionChange} required onClick={handleInputClick}>
                   <option value="">선택하세요</option>
                   {bcdData.gradeInfo.map((position) => (
-                    <option key={position.detailCd} value={position.detailNm}>{position.detailNm}</option>
+                    <option key={position.detailCd} value={position.detailCd}>
+                      {`${position.detailNm} | ${position.etcItem1}`}
+                    </option>
                   ))}
                 </select>
               </div>
+              {formData.position === '006' && (
+                <div className="additional-inputs">
+                  <div className="form-group-horizontal">
+                    <label className="form-label">직위</label>
+                    <input
+                      type="text"
+                      name="gradeNm"
+                      value={formData.gradeNm}
+                      onChange={handleChange}
+                      required
+                      placeholder="직위"
+                      onClick={handleInputClick}
+                    />
+                  </div>
+                  <div className="form-group-horizontal">
+                    <label className="form-label">영문 직위</label>
+                    <input
+                      type="text"
+                      name="enGradeNm"
+                      value={formData.enGradeNm}
+                      onChange={handleChange}
+                      required
+                      placeholder="영문 직위"
+                      onClick={handleInputClick}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="form-group-horizontal">
                 <label className="form-label">내선 번호</label>
                 <div className="phone-inputs">
@@ -537,7 +587,7 @@ function BcdApplySecond() {
         title="최종 신청 확인"
         confirmButtonText="신 청"
       />
-      <PreviewModal
+      <PreviewModal2
         show={previewVisible}
         onClose={() => setPreviewVisible(false)}
         formData={formData}

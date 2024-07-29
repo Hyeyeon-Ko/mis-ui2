@@ -23,7 +23,6 @@ const PreviewModal = ({ show, onClose, formData }) => {
 
   useEffect(() => {
     if (show) {
-      console.log('PreviewModal props:', formData);
       drawBusinessCard();
     }
   }, [show, formData, bcdData]);
@@ -34,13 +33,10 @@ const PreviewModal = ({ show, onClose, formData }) => {
       if (response.data && response.data.data) {
         const data = response.data.data;
         setBcdData(data);
-        console.log('Fetched BCD data:', data);
       } else {
-        console.error('No standard data found');
         alert('기준자료를 불러오는 중 오류가 발생했습니다.');
       }
     } catch (error) {
-      console.error('Error fetching BCD standard data:', error.response ? error.response.data : error.message);
       alert('기준자료를 불러오는 중 오류가 발생했습니다.');
     }
   };
@@ -69,10 +65,11 @@ const PreviewModal = ({ show, onClose, formData }) => {
       return item ? item.etcItem1 : '';
     };
 
-    const centerName = findDetailName(bcdData.instInfo, formData.center);
-    const teamName = findDetailName(bcdData.teamInfo, formData.team);
-    const positionName = formData.position === '006' ? formData.gradeNm.split('|')[0] : findDetailName(bcdData.gradeInfo, formData.position);
+    const centerName = formData.center ? formData.center : findDetailName(bcdData.instInfo, formData.center);
+    const teamName = formData.team ? formData.team : findDetailName(bcdData.teamInfo, formData.team);
+    const positionName = formData.position === '006' ? formData.gradeNm : findDetailName(bcdData.gradeInfo, formData.position);
     const engPositionName = formData.position === '006' ? formData.enGradeNm : findEngPosition(bcdData.gradeInfo, formData.position);
+    const engTeamName = formData.engTeam;
 
     imageKorean.onload = () => {
       ctx.drawImage(imageKorean, 0, 0, canvas.width / 2, canvas.height);
@@ -136,7 +133,7 @@ const PreviewModal = ({ show, onClose, formData }) => {
         ctx.font = '14.4px Arial';
         ctx.fillStyle = black;
 
-        drawTextWithSpacing(ctx, `${engPositionName} - ${formData.team}`, 624, 205.6, 0.16);
+        drawTextWithSpacing(ctx, `${engPositionName} - ${engTeamName}`, 624, 205.6, 0.16);
 
         ctx.fillStyle = darkGray;
         drawTextWithSpacing(ctx, `www.kmi.or.kr`, 624, 304, 0.4);
