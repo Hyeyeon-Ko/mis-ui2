@@ -61,7 +61,6 @@ const Login = () => {
 
           if (authorityResponse.ok) {
             const authorityData = await authorityResponse.json();
-            console.log('Authority Check:', authorityData);
 
             // 로그인 성공 시 사용자 정보를 AuthContext에 저장 -> 메인 페이지로 이동
             login(userId, data.data.hngNm, data.data.role, data.data.sidebarPermissions, authorityData.data);

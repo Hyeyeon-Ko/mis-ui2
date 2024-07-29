@@ -32,13 +32,8 @@ function ApplicationsList() {
   }, []);
 
   useEffect(() => {
-    // 필터와 선택된 항목들을 콘솔에 출력하여 확인합니다.
-    console.log('Filters:', filters);
-    console.log('Selected Applications:', selectedApplications);
-
     // 상태에 따른 엑셀 버튼 표시 여부를 업데이트합니다.
     const isShowExcelButton = filters.statusClosed && selectedApplications.length > 0;
-    console.log('Show Excel Button:', isShowExcelButton);
     setShowCheckboxColumn(filters.statusClosed);
     setShowExcelButton(isShowExcelButton);
   }, [filters, selectedApplications]);

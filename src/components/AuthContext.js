@@ -37,7 +37,6 @@ export const AuthProvider = ({ children }) => {
 
   // 로그인 함수
   const login = (userId, hngNm, role, sidebarPermissions, hasStandardDataAuthority) => {
-    console.log('Login called with:', { userId, hngNm, role, sidebarPermissions, hasStandardDataAuthority });
     setAuth({
       userId,
       hngNm,

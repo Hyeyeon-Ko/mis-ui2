@@ -15,7 +15,7 @@ function StandardData() {
   const [subCategoryName, setSubCategoryName] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('detail');
-  const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRows, setSelectedRows] = useState({}); // 수정된 부분
   const [editDetailData, setEditDetailData] = useState(null);
 
   const categories = [
@@ -33,8 +33,10 @@ function StandardData() {
 
   const fetchSubCategories = async (classCd) => {
     try {
+      console.log('Fetching sub-categories for class:', classCd);
       const response = await axios.get('/api/std/groupInfo', { params: { classCd } });
       const data = response.data.data || [];
+      console.log('Sub-categories data:', data);
       setSubCategories(data);
       setSelectedSubCategory('');
       setSubCategoryName('');
@@ -50,9 +52,10 @@ function StandardData() {
 
   const fetchDetails = async (groupCd) => {
     try {
+      console.log('Fetching details for group:', groupCd);
       const response = await axios.get(`/api/std/detailInfo`, { params: { groupCd } });
       const data = response.data.data || [];
-      console.log('Fetched details:', data); 
+      console.log('Fetched details data:', data); 
       setDetails(data);
     } catch (error) {
       console.error('Error fetching details:', error);
@@ -67,6 +70,7 @@ function StandardData() {
   };
 
   const handleSaveRow = async (newRow) => {
+    console.log('Saving row:', newRow);
     if (modalMode === 'detail') {
       try {
         await axios.post('/api/std/detailInfo', {
@@ -132,23 +136,27 @@ function StandardData() {
   };
 
   const handleEditRow = () => {
-    if (selectedRows.length !== 1) {
+    const selectedDetail = Object.keys(selectedRows).find(key => selectedRows[key]);
+    if (!selectedDetail) {
       alert('수정할 상세 코드를 하나만 선택하세요.');
       return;
     }
-    const detailToEdit = details.find(detail => detail.detailCd === selectedRows[0]);
+    const detailToEdit = details.find(detail => detail.detailCd === selectedDetail);
+    console.log('Editing detail:', detailToEdit);
     setEditDetailData(detailToEdit);
     setModalMode('edit');
     setShowModal(true);
   };
 
   const handleDeleteRow = async () => {
-    if (selectedRows.length === 0) {
+    const selectedDetailCodes = Object.keys(selectedRows).filter(key => selectedRows[key]);
+    if (selectedDetailCodes.length === 0) {
       alert('삭제할 상세 코드를 선택하세요.');
       return;
     }
     try {
-      for (const detailCd of selectedRows) {
+      console.log('Deleting details:', selectedDetailCodes);
+      for (const detailCd of selectedDetailCodes) {
         await axios.delete('/api/std/deleteDetailInfo', {
           params: {
             groupCd: selectedSubCategory,
@@ -158,13 +166,14 @@ function StandardData() {
       }
       alert('상세 코드가 삭제되었습니다.');
       fetchDetails(selectedSubCategory);
-      setSelectedRows([]);
+      setSelectedRows({});
     } catch (error) {
       console.error('Error deleting detail info:', error);
     }
   };
 
   const handleSubCategoryClick = (groupCd, groupNm) => {
+    console.log('Sub-category clicked:', groupCd, groupNm);
     setSelectedSubCategory(groupCd);
     setSubCategoryName(`${groupCd} ${groupNm}`);
     fetchDetails(groupCd);
@@ -172,18 +181,21 @@ function StandardData() {
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      setSelectedRows(details.map(detail => detail.detailCd));
+      const newSelectedRows = details.reduce((acc, detail) => {
+        acc[detail.detailCd] = true;
+        return acc;
+      }, {});
+      setSelectedRows(newSelectedRows);
     } else {
-      setSelectedRows([]);
+      setSelectedRows({});
     }
   };
 
   const handleRowSelect = (event, detailCd) => {
-    if (event.target.checked) {
-      setSelectedRows([...selectedRows, detailCd]);
-    } else {
-      setSelectedRows(selectedRows.filter(code => code !== detailCd));
-    }
+    setSelectedRows(prevSelectedRows => ({
+      ...prevSelectedRows,
+      [detailCd]: event.target.checked,
+    }));
   };
 
   const resetModal = () => {
@@ -224,7 +236,7 @@ function StandardData() {
         <input
           type="checkbox"
           className="detail-checkbox"
-          checked={selectedRows.includes(row.original?.detailCd)}
+          checked={!!selectedRows[row.original?.detailCd]}
           onChange={(event) => handleRowSelect(event, row.original?.detailCd)}
         />
       )
