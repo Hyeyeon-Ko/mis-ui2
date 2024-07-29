@@ -42,28 +42,50 @@ function Sidebar() {
       <Link to="/">
         <img src={logo} alt="KMI Logo" className="logo" />
       </Link>
-      {auth.sidebarPermissions && auth.sidebarPermissions.map((perm, index) => (
-        sections[perm] && <SidebarSection 
-          key={index} 
-          title={sections[perm].title} 
-          items={sections[perm].items} 
-          isActive={isActive} 
-          location={location} 
-          defaultOpen={false} 
-        />
-      ))}
+      {auth.role === 'USER' && (
+        <>
+          <SidebarSection 
+            title="신청하기" 
+            items={applyItems} 
+            isActive={isActive} 
+            location={location} 
+            defaultOpen={false} 
+          />
+          <SidebarSection 
+            title="나의 신청내역" 
+            items={myApplyItems} 
+            isActive={isActive} 
+            location={location} 
+            defaultOpen={false} 
+          />
+        </>
+      )}
       {(auth.role === 'ADMIN' || auth.role === 'MASTER') && (
         <>
-          <div className="sidebar-section">
-            <h2>
-              <Link to="/api/auth" className={isActive('/api/auth')}>권한 관리</Link>
-            </h2>
-          </div>
-          <div className="sidebar-section">
-            <h2>
-              <Link to="/api/std" className={isActive('/api/standard')}>기준자료 관리</Link>
-            </h2>
-          </div>
+          {auth.sidebarPermissions && auth.sidebarPermissions.map((perm, index) => (
+            sections[perm] && <SidebarSection 
+              key={index} 
+              title={sections[perm].title} 
+              items={sections[perm].items} 
+              isActive={isActive} 
+              location={location} 
+              defaultOpen={false} 
+            />
+          ))}
+          {auth.role === 'MASTER' && (
+            <div className="sidebar-section">
+              <h2>
+                <Link to="/api/auth" className={isActive('/api/auth')}>권한 관리</Link>
+              </h2>
+            </div>
+          )}
+          {(auth.role === 'MASTER' || auth.role === 'ADMIN') && auth.hasStandardDataAuthority && (
+            <div className="sidebar-section">
+              <h2>
+                <Link to="/api/std" className={isActive('/api/std')}>기준자료 관리</Link>
+              </h2>
+            </div>
+          )}
         </>
       )}
     </div>

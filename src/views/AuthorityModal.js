@@ -164,25 +164,24 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
       alert('권한과 사번을 입력하세요');
       return;
     }
-
+  
     if (role === initialRole && isStandardChecked === initialStandardChecked) {
       alert('권한 또는 기준자료관리 상태가 변경되지 않았습니다');
       return;
     }
-
+  
     const requestData = {
       userRole: role,
       userId: userId,
       userNm: userName,
       detailRole: isStandardChecked ? 'Y' : 'N',
     };
-
+  
     try {
       if (adminData) {
         await axios.put(`/api/auth/admin/${adminData.authId}`, requestData);
-      } else {
-        await axios.post('/api/auth/admin', requestData);
-      }
+        alert('수정 완료되었습니다');
+      } 
       onSave();
       onClose();
     } catch (error) {
@@ -194,7 +193,7 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
       }
     }
   };
-
+  
   if (!show) return null;
 
   return (

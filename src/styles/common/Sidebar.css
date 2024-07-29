@@ -1,3 +1,4 @@
+/* Sidebar.css */
 .sidebar {
   width: 240px;
   background-color: #EDF1F5;
@@ -34,7 +35,7 @@
 }
 
 .sidebar-section h2 a {
-  color: inherit; 
+  color: black; /* 기본 링크 색상 설정 */
   text-decoration: none; 
 }
 
@@ -56,7 +57,7 @@
 }
 
 .sidebar-section a {
-  color: inherit; 
+  color: black; /* 기본 링크 색상 설정 */
   text-decoration: none; 
   margin-left: 3px;
 }
@@ -90,11 +91,7 @@
   margin-bottom: 5px;
 }
 
-.sidebar-section .active {
-  color: #2789FE;
-  font-weight: bold;
-}
-
+.sidebar-section .active a,
 .sidebar-section .active-toggle {
   color: #2789FE;
   font-weight: bold;
