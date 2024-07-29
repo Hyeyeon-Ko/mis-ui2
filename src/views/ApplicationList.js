@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import ConditionFilter from '../components/common/ConditionFilter';
 import Table from '../components/common/Table';
+import CustomButton from '../components/common/CustomButton'; 
 import '../styles/ApplicationsList.css';
 import '../styles/common/Page.css';
 import axios from 'axios';
+import fileDownload from 'js-file-download'; 
 
 function ApplicationsList() {
   const [applications, setApplications] = useState([]);
@@ -20,24 +22,37 @@ function ApplicationsList() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showCheckboxColumn, setShowCheckboxColumn] = useState(false);
+  const [selectedApplications, setSelectedApplications] = useState([]);
+  const [showExcelButton, setShowExcelButton] = useState(false); 
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchApplications();
   }, []);
 
+  useEffect(() => {
+    // 필터와 선택된 항목들을 콘솔에 출력하여 확인합니다.
+    console.log('Filters:', filters);
+    console.log('Selected Applications:', selectedApplications);
+
+    // 상태에 따른 엑셀 버튼 표시 여부를 업데이트합니다.
+    const isShowExcelButton = filters.statusClosed && selectedApplications.length > 0;
+    console.log('Show Excel Button:', isShowExcelButton);
+    setShowCheckboxColumn(filters.statusClosed);
+    setShowExcelButton(isShowExcelButton);
+  }, [filters, selectedApplications]);
+
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
-  
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
-  
     return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
-  
+
   const getStatusText = (status) => {
     switch (status) {
       case 'A':
@@ -136,7 +151,46 @@ function ApplicationsList() {
     return true;
   });
 
+  const handleSelectAll = (isChecked) => {
+    setSelectedApplications(isChecked ? filteredApplications.map(app => app.draftId) : []);
+  };
+
+  const handleSelect = (isChecked, id) => {
+    setSelectedApplications(isChecked
+      ? [...selectedApplications, id]
+      : selectedApplications.filter(appId => appId !== id)
+    );
+  };
+
+  const handleExcelDownload = async () => {
+    if (selectedApplications.length === 0) {
+      alert('엑셀변환 할 명함 신청 목록을 선택하세요.');
+      return;
+    }
+
+    try {
+      const response = await axios.post('/api/bsc/order/excel', selectedApplications, {
+        responseType: 'blob', 
+      });
+      fileDownload(response.data, 'order_details.xlsx');
+    } catch (error) {
+      console.error('Error downloading excel: ', error);
+    }
+  };
+
   const columns = [
+    ...(showCheckboxColumn ? [{
+      header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
+      accessor: 'select',
+      width: '5%',
+      Cell: ({ row }) => (
+        <input
+          type="checkbox"
+          checked={selectedApplications.includes(row.draftId)}
+          onChange={(e) => handleSelect(e.target.checked, row.draftId)}
+        />
+      ),
+    }] : []),
     { header: '문서분류', accessor: 'docType', width: '10%' },
     { header: '제목', accessor: 'title', width: '24%' },
     { header: '기안일시', accessor: 'draftDate', width: '13%' },
@@ -166,7 +220,16 @@ function ApplicationsList() {
     <div className="content">
       <div className="all-applications">
         <h2>전체 신청 내역</h2>
-        <Breadcrumb items={['신청 내역 관리', '전체 신청 내역']} />
+        <div className="application-header-row">
+          <Breadcrumb items={['신청 내역 관리', '전체 신청 내역']} />
+            <div className="application-button-container">
+            {showExcelButton && (
+              <CustomButton className="excel-button2" onClick={handleExcelDownload}>
+                엑셀변환
+              </CustomButton>
+            )}
+          </div>
+        </div>
         <ConditionFilter 
           startDate={startDate} 
           setStartDate={setStartDate} 
@@ -185,7 +248,7 @@ function ApplicationsList() {
         ) : error ? (
           <p>{error}</p>
         ) : (
-          <Table columns={columns} data={filteredApplications} />
+          <Table columns={columns} data={filteredApplications} onSelect={handleSelect} selectedItems={selectedApplications} />
         )}
       </div>
     </div>

@@ -78,3 +78,14 @@
   display: flex;
   gap: 8px;
 }
+
+.application-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.application-button-container {
+  text-align: right; 
+  margin-top: -8px;
+}

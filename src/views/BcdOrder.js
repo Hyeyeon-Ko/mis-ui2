@@ -7,7 +7,7 @@ import CenterSelect from '../components/CenterSelect';
 import '../styles/BcdOrder.css';
 import '../styles/common/Page.css';
 import axios from 'axios';
-import fileDownload from 'js-file-download'; // 파일 다운로드를 위한 라이브러리
+import fileDownload from 'js-file-download'; 
 
 /* 발주 페이지 */
 function BcdOrder() {
