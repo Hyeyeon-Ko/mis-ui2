@@ -15,7 +15,7 @@ function StandardData() {
   const [subCategoryName, setSubCategoryName] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('detail');
-  const [selectedRows, setSelectedRows] = useState([]); // 수정된 부분: 배열로 유지
+  const [selectedRows, setSelectedRows] = useState([]); 
   const [editDetailData, setEditDetailData] = useState(null);
 
   const categories = [
