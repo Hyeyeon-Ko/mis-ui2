@@ -1,6 +1,6 @@
 /* Sidebar.css */
 .sidebar {
-  width: 240px;
+  width: 230px;
   background-color: #EDF1F5;
   color: black;
   padding: 20px;
@@ -33,12 +33,14 @@
 
 .sidebar-section {
   width: 100%;
-  margin-left: 72px;
+  margin-left: 60px;
 }
 
 .sidebar-section h2 {
-  font-size: 20px;
-  margin-left: 20px;
+  font-size: 19px;
+  margin-left: 17px;
+  margin-top: 15px;
+  margin-bottom: 2px;
   cursor: pointer;
 }
 
@@ -53,19 +55,21 @@
 
 .sidebar-section ul {
   list-style: none;
-  padding: 0;
+  margin-top: 7px;
+  margin-bottom: 3px;
+  padding: 0px;
 }
 
 .sidebar-section li {
   font-size: 16px;
-  margin-bottom: 10px;
+  margin-bottom: 7px;
   margin-left: 20px;
   cursor: pointer;
 }
 
 .sidebar-section a {
   text-decoration: none; 
-  margin-left: 3px;
+  margin-left: 9px;
 }
 
 .sidebar-section li:hover {
@@ -78,9 +82,10 @@
 }
 
 .sidebar-section h3 {
-  font-size: 20px;
+  font-size: 19px;
   letter-spacing: 0.5px;
-  margin-bottom: 16px;
+  margin-top: 15px;
+  margin-bottom: 0px;
   cursor: pointer;
   display: flex;
   align-items: center;

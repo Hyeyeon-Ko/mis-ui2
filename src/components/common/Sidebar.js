@@ -110,8 +110,6 @@ function SidebarSection({ title, items, isActive, location, defaultOpen }) {
     setIsOpen(!isOpen);
   };
 
-  const anyItemActive = items.some(item => location.pathname === item.url);
-
   return (
     <div className="sidebar-section">
       <h3 onClick={toggleOpen} className={`toggle-header ${!isOpen && items.some(item => location.pathname === item.url) ? 'active-toggle' : ''}`}>
