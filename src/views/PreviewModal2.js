@@ -60,16 +60,16 @@ const PreviewModal = ({ show, onClose, formData }) => {
       return item ? item.detailNm : '';
     };
 
-    const findEngPosition = (list, detailCd) => {
+    const findEngName = (list, detailCd) => {
       const item = list.find(i => i.detailCd === detailCd);
-      return item ? item.etcItem1 : '';
+      return item ? item.etcItem2 : '';
     };
 
     const centerName = formData.center ? formData.center : findDetailName(bcdData.instInfo, formData.center);
     const teamName = formData.team ? formData.team : findDetailName(bcdData.teamInfo, formData.team);
     const positionName = formData.position === '006' ? formData.gradeNm : findDetailName(bcdData.gradeInfo, formData.position);
-    const engPositionName = formData.position === '006' ? formData.enGradeNm : findEngPosition(bcdData.gradeInfo, formData.position);
-    const engTeamName = formData.engTeam;
+    const engPositionName = formData.position === '006' ? formData.enGradeNm : findEngName(bcdData.gradeInfo, formData.position);
+    const engTeamName = findEngName(bcdData.teamInfo, formData.engTeam);
 
     imageKorean.onload = () => {
       ctx.drawImage(imageKorean, 0, 0, canvas.width / 2, canvas.height);
@@ -79,7 +79,7 @@ const PreviewModal = ({ show, onClose, formData }) => {
 
       ctx.font = 'bold 26.4px Arial';
       ctx.fillStyle = black;
-      drawTextWithSpacing(ctx, formData.name, 64, 199.2, 2.4);
+      drawTextWithSpacing(ctx, formData.name, 64, 198, 2.4);
 
       ctx.font = '13.6px Arial';
       ctx.fillStyle = black;
@@ -105,7 +105,6 @@ const PreviewModal = ({ show, onClose, formData }) => {
       ctx.fillText(`${formData.email}@kmi.or.kr`, 344, 268.8);
 
       ctx.font = '13.6px Arial';
-
       const addressParts = formData.address.split(',');
 
       if (addressParts.length === 2) {
@@ -130,16 +129,16 @@ const PreviewModal = ({ show, onClose, formData }) => {
         ctx.fillStyle = black;
         drawTextWithSpacing(ctx, `${formData.lastName} ${formData.firstName}`, 624, 176, 0.4);
 
-        ctx.font = '14.4px Arial';
+        ctx.font = '13.6px Arial';
         ctx.fillStyle = black;
+        drawTextWithSpacing(ctx, `${engTeamName}`, 624, 205.6, 0.16);
+        drawTextWithSpacing(ctx, `${engPositionName}`, 624, 225, 0.16);
 
-        drawTextWithSpacing(ctx, `${engPositionName} - ${engTeamName}`, 624, 205.6, 0.16);
-
+        ctx.font = '15.2px Arial';
         ctx.fillStyle = darkGray;
         drawTextWithSpacing(ctx, `www.kmi.or.kr`, 624, 304, 0.4);
 
         ctx.fillStyle = black;
-        ctx.font = '15.2px Arial';
         ctx.fillText(`Tel`, 840, 164.8);
         ctx.fillText(`Fax`, 840, 192);
         ctx.fillText(`Mobile`, 840, 219.2);
@@ -152,8 +151,7 @@ const PreviewModal = ({ show, onClose, formData }) => {
         ctx.fillText(formatPhoneNumber(82, `${formData.mobile1.slice(1)}.${formData.mobile2}.${formData.mobile3}`), 904, 219.2);
         ctx.fillText(`${formData.email}@kmi.or.kr`, 904, 246.4);
 
-        ctx.font = '15.2px Arial';
-
+        ctx.font = '14.6px Arial';
         const engAddressParts = formData.engAddress.split(',');
         if (engAddressParts.length >= 3) {
           const mainEngAddress = engAddressParts.slice(0, 3).join(',').trim();

@@ -15,7 +15,7 @@ function StandardData() {
   const [subCategoryName, setSubCategoryName] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('detail');
-  const [selectedRows, setSelectedRows] = useState({}); // 수정된 부분
+  const [selectedRows, setSelectedRows] = useState([]); // 수정된 부분: 배열로 유지
   const [editDetailData, setEditDetailData] = useState(null);
 
   const categories = [
@@ -136,12 +136,11 @@ function StandardData() {
   };
 
   const handleEditRow = () => {
-    const selectedDetail = Object.keys(selectedRows).find(key => selectedRows[key]);
-    if (!selectedDetail) {
+    if (selectedRows.length !== 1) {
       alert('수정할 상세 코드를 하나만 선택하세요.');
       return;
     }
-    const detailToEdit = details.find(detail => detail.detailCd === selectedDetail);
+    const detailToEdit = details.find(detail => detail.detailCd === selectedRows[0]);
     console.log('Editing detail:', detailToEdit);
     setEditDetailData(detailToEdit);
     setModalMode('edit');
@@ -149,14 +148,13 @@ function StandardData() {
   };
 
   const handleDeleteRow = async () => {
-    const selectedDetailCodes = Object.keys(selectedRows).filter(key => selectedRows[key]);
-    if (selectedDetailCodes.length === 0) {
+    if (selectedRows.length === 0) {
       alert('삭제할 상세 코드를 선택하세요.');
       return;
     }
     try {
-      console.log('Deleting details:', selectedDetailCodes);
-      for (const detailCd of selectedDetailCodes) {
+      console.log('Deleting details:', selectedRows);
+      for (const detailCd of selectedRows) {
         await axios.delete('/api/std/deleteDetailInfo', {
           params: {
             groupCd: selectedSubCategory,
@@ -166,7 +164,7 @@ function StandardData() {
       }
       alert('상세 코드가 삭제되었습니다.');
       fetchDetails(selectedSubCategory);
-      setSelectedRows({});
+      setSelectedRows([]);
     } catch (error) {
       console.error('Error deleting detail info:', error);
     }
@@ -181,21 +179,19 @@ function StandardData() {
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      const newSelectedRows = details.reduce((acc, detail) => {
-        acc[detail.detailCd] = true;
-        return acc;
-      }, {});
+      const newSelectedRows = details.map(detail => detail.detailCd);
       setSelectedRows(newSelectedRows);
     } else {
-      setSelectedRows({});
+      setSelectedRows([]);
     }
   };
 
   const handleRowSelect = (event, detailCd) => {
-    setSelectedRows(prevSelectedRows => ({
-      ...prevSelectedRows,
-      [detailCd]: event.target.checked,
-    }));
+    if (event.target.checked) {
+      setSelectedRows(prevSelectedRows => [...prevSelectedRows, detailCd]);
+    } else {
+      setSelectedRows(prevSelectedRows => prevSelectedRows.filter(code => code !== detailCd));
+    }
   };
 
   const resetModal = () => {
@@ -236,7 +232,7 @@ function StandardData() {
         <input
           type="checkbox"
           className="detail-checkbox"
-          checked={!!selectedRows[row.original?.detailCd]}
+          checked={selectedRows.includes(row.original?.detailCd)}
           onChange={(event) => handleRowSelect(event, row.original?.detailCd)}
         />
       )

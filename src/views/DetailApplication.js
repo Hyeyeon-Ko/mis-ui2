@@ -506,7 +506,7 @@ function DetailApplication() {
                     .filter((team) => team.etcItem1 === formData.department)
                     .map((team) => (
                       <option key={team.detailCd} value={team.detailCd}>
-                        {`${team.detailNm} | ${team.detailCd}`}
+                        {`${team.detailNm} | ${team.etcItem2}`}
                       </option>
                     ))}
                 </select>
@@ -517,7 +517,7 @@ function DetailApplication() {
                   <option value="">선택하세요</option>
                   {bcdData.gradeInfo.map((position) => (
                     <option key={position.detailCd} value={position.detailCd}>
-                      {`${position.detailNm}  | ${position.etcItem1}`}
+                      {`${position.detailNm}  | ${position.etcItem2}`}
                     </option>
                   ))}
                 </select>

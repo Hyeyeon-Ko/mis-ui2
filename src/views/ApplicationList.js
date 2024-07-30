@@ -164,7 +164,7 @@ function ApplicationsList() {
     }
 
     try {
-      const response = await axios.post('/api/bsc/order/excel', selectedApplications, {
+      const response = await axios.post('/api/bsc/applyList/orderExcel', selectedApplications, {
         responseType: 'blob', 
       });
       fileDownload(response.data, 'order_details.xlsx');

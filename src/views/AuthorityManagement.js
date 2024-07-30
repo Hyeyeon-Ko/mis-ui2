@@ -44,6 +44,7 @@ function AuthorityManagement() {
           assetManagement: item.assetManagement,
         },
       }));
+
       setApplications(transformedData);
     } catch (error) {
       console.error('Error fetching authority list: ', error);

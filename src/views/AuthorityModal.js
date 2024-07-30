@@ -178,10 +178,15 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
     };
   
     try {
-      if (adminData) {
+      if (!adminData) {
+        // Adding a new admin
+        await axios.post('/api/auth/admin', requestData);
+        alert('추가 완료되었습니다');
+      } else {
+        // Updating an existing admin
         await axios.put(`/api/auth/admin/${adminData.authId}`, requestData);
         alert('수정 완료되었습니다');
-      } 
+      }
       onSave();
       onClose();
     } catch (error) {
@@ -218,7 +223,7 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)} 
               />
-              <button className="query-button" onClick={handleQuery}>조  회</button>
+              <button className="query-button" onClick={handleQuery}>조회</button>
             </>
           )}
         </div>

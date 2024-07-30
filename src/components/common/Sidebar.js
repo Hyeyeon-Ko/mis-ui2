@@ -21,20 +21,26 @@ function Sidebar() {
   ];
 
   const myApplyItems = [
-    { label: '전체 신청 내역', url: '/api/myApplyList' },
+    { label: '전체 신청내역', url: '/api/myApplyList' },
     { label: '승인 대기 내역', url: '/api/myPendingList' },
   ];
 
   const manageItems = [
-    { label: '전체 신청 내역', url: '/api/applyList' },
+    { label: '전체 신청내역', url: '/api/applyList' },
     { label: '승인 대기 내역', url: '/api/pendingList' },
     { label: '명함 발주', url: '/api/bcd/orderList' },
   ];
 
+  const docItems = [
+    { label: '문서 수신 대장', url: '/api/doc/in' },
+    { label: '문서 발신 대장', url: '/api/doc/out' },
+  ]
+
   const sections = {
     'A': { title: '신청하기', items: applyItems },
     'B': { title: '나의 신청내역', items: myApplyItems },
-    'C': { title: '신청 내역 관리', items: manageItems },
+    'C': { title: '신청내역 관리', items: manageItems },
+    'D': { title: '문서수발신 관리', items:docItems },
   };
 
   return (
@@ -88,6 +94,9 @@ function Sidebar() {
           )}
         </>
       )}
+      <div className="sidebar-section">
+          <h2 style={{ color: '#EDF1F5' }}>권한 관리</h2>
+      </div>
     </div>
   );
 }

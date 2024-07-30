@@ -16,6 +16,7 @@ import BcdApplySecond from './views/BcdApplySecond';
 import DetailApplication from './views/DetailApplication';
 import PendingApprovalList from './views/PendingApprovalList';
 import StandardData from './views/StandardData';
+import DocApply from './views/DocApply';
 import { AuthProvider, AuthContext } from './components/AuthContext';
 
 function MainLayout({ children }) {
@@ -49,17 +50,18 @@ function App() {
             <MainLayout>
               <Routes>
                 <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
-                <Route path="/api/myApplyList" element={<RequireAuth><MyApplyList /></RequireAuth>} />
-                <Route path="/api/myPendingList" element={<RequireAuth><MyPendingList /></RequireAuth>} />
-                <Route path="/api/bcd/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
-                <Route path="/api/applyList" element={<RequireAuth><ApplicationsList /></RequireAuth>} />
-                <Route path="/api/bcd/orderList" element={<RequireAuth><BcdOrder /></RequireAuth>} />
                 <Route path="/api/auth" element={<RequireAuth><AuthorityManagement /></RequireAuth>} />
                 <Route path="/api/bcd" element={<RequireAuth><BcdApplyFirst /></RequireAuth>} />
                 <Route path="/api/bcd/own" element={<RequireAuth><BcdApplySecond /></RequireAuth>} />
                 <Route path="/api/bcd/other" element={<RequireAuth><BcdApplySecond /></RequireAuth>} />
+                <Route path="/api/doc" element={<RequireAuth><DocApply></DocApply></RequireAuth>} />
+                <Route path="/api/myApplyList" element={<RequireAuth><MyApplyList /></RequireAuth>} />
+                <Route path="/api/myPendingList" element={<RequireAuth><MyPendingList /></RequireAuth>} />
+                <Route path="/api/applyList" element={<RequireAuth><ApplicationsList /></RequireAuth>} />
                 <Route path="/api/pendingList" element={<RequireAuth><PendingApprovalList /></RequireAuth>} />
+                <Route path="/api/bcd/orderList" element={<RequireAuth><BcdOrder /></RequireAuth>} />
                 <Route path="/api/std" element={<RequireAuth><StandardData /></RequireAuth>} />
+                <Route path="/api/bcd/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
                 <Route path="/api/bcd/applyList/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
               </Routes>
             </MainLayout>

@@ -69,6 +69,7 @@ const Login = () => {
             console.log('Failed to check authority:', authorityResponse);
             alert('권한 확인에 실패했습니다. 다시 시도해주세요.');
           }
+          
         } else {
           alert('로그인 정보가 올바르지 않습니다.');
           setUserId('');

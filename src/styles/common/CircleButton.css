@@ -25,7 +25,7 @@
   color: white;
 }
 
-.circle-button:hover .label {
+.circle-button:hover {
   color: white; 
   font-weight: bold;
 }

@@ -13,7 +13,7 @@
 
 .preview-modal-container {
   background: white;
-  padding: 56px 44px 56px 44px;
+  padding: 50px 44px 56px 44px;
   border-radius: 16px;
   text-align: center;
   width: 1150px;
@@ -28,6 +28,7 @@
 .preview-modal-header h3 {
   margin-left: 12px;
   font-weight: bold;
+  font-size: 22px;
 }
 
 .preview-modal-container p {

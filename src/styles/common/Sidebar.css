@@ -35,13 +35,12 @@
 }
 
 .sidebar-section h2 a {
-  color: black; /* 기본 링크 색상 설정 */
+  color: black; 
   text-decoration: none; 
 }
 
 .sidebar-section h2 a:hover {
   color: #2789FE;
-  font-weight: bold;
 }
 
 .sidebar-section ul {
@@ -57,14 +56,12 @@
 }
 
 .sidebar-section a {
-  color: black; /* 기본 링크 색상 설정 */
   text-decoration: none; 
   margin-left: 3px;
 }
 
 .sidebar-section li:hover {
   color: #2789FE;
-  font-weight: bold;
 }
 
 .sidebar-section {
@@ -83,7 +80,6 @@
 
 .sidebar-section h3:hover {
   color: #2789FE;
-  font-weight: bold;
 }
 
 .toggle-icon {

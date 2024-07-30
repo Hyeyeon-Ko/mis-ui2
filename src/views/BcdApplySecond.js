@@ -79,6 +79,7 @@ function BcdApplySecond() {
       const response = await axios.get(`/api/info/${userId}`);
       if (response.data && response.data.data) {
         const userData = response.data.data;
+        console.log(userData);
         setFormData((prevFormData) => ({
           ...prevFormData,
           name: userData.userName,
@@ -106,20 +107,22 @@ function BcdApplySecond() {
       const response = await axios.get('/api/std/bcd');
       if (response.data && response.data.data) {
         const data = response.data.data;
+        console.log(data);
+  
         const instMap = {};
         const deptMap = {};
         const teamMap = {};
         const gradeMap = {};
-
+  
         data.instInfo.forEach(inst => instMap[inst.detailNm] = inst.detailCd);
         data.deptInfo.forEach(dept => deptMap[dept.detailNm] = dept.detailCd);
         data.teamInfo.forEach(team => {
-          const key = `${team.detailNm}|${team.detailCd}`;
+          const key = `${team.detailNm}|${team.etcItem2}`;
           teamMap[team.detailNm] = team.detailCd;
         });
         
         data.gradeInfo.forEach(grade => {
-          const key = `${grade.detailNm}|${grade.etcItem1}`;
+          const key = `${grade.detailNm}|${grade.etcItem2}`;
           gradeMap[grade.detailNm] = grade.detailCd;
         });
         
@@ -134,7 +137,7 @@ function BcdApplySecond() {
       alert('기준자료를 불러오는 중 오류가 발생했습니다.');
     }
   };
-
+  
   const handleInputClick = (e) => {
     if (!formData.userId) {
       alert('사번 조회를 통해 명함 대상자를 선택하세요.');
@@ -151,6 +154,8 @@ function BcdApplySecond() {
       const response = await axios.get(`/api/info/${userIdInput}`);
       if (response.data && response.data.data) {
         const userData = response.data.data;
+        console.log(userData);
+
         setFormData((prevFormData) => ({
           ...prevFormData,
           name: userData.userName,
@@ -229,7 +234,6 @@ function BcdApplySecond() {
   const handleConfirmRequest = async () => {
     setShowFinalConfirmationModal(false);
   
-  
     console.log('Selected Position:', formData.position);
   
     const requestData = {
@@ -279,6 +283,8 @@ function BcdApplySecond() {
     }
     const selectedCenter = e.target.value;
     const selectedInstInfo = bcdData.instInfo.find(inst => inst.detailNm === selectedCenter);
+
+    console.log('Selected Center Data:', selectedInstInfo); 
   
     const addressOptions = [];
     let engAddress = '';
@@ -301,6 +307,20 @@ function BcdApplySecond() {
     setFormData({ ...formData, center: selectedCenter, address: addressOptions[0] || '', engAddress, department: '', team: '' });
   };
     
+  const handleDepartmentChange = (e) => {
+    if (!formData.userId) {
+      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+      return;
+    }
+
+    const selectedDepartment = e.target.value;
+    const selectedDeptInfo = bcdData.deptInfo.find(dept => dept.detailNm === selectedDepartment);
+  
+    console.log('Selected Department Data:', selectedDeptInfo);    
+
+    setFormData({ ...formData, department: e.target.value, team: '' });
+  };
+
   const handleTeamChange = (e) => {
     if (!formData.userId) {
       alert('사번 조회를 통해 명함 대상자를 선택하세요.');
@@ -309,6 +329,8 @@ function BcdApplySecond() {
     const selectedTeam = e.target.value;
     const selectedTeamInfo = bcdData.teamInfo.find(team => team.detailNm === selectedTeam);
     const engTeam = selectedTeamInfo ? selectedTeamInfo.etcItem1 : '';
+
+    console.log('Selected Team Data:', selectedTeamInfo);
   
     setFormData({ ...formData, team: selectedTeam, engTeam });
   };
@@ -321,16 +343,10 @@ function BcdApplySecond() {
     const selectedPosition = e.target.value;
     const selectedPositionInfo = bcdData.gradeInfo.find(position => position.detailNm === selectedPosition);
     const enGradeNm = selectedPositionInfo ? selectedPositionInfo.etcItem1 : '';
+
+    console.log('Selected Position Data:', selectedPositionInfo);
     
     setFormData({ ...formData, position: selectedPosition, enGradeNm });
-  };
-
-  const handleDepartmentChange = (e) => {
-    if (!formData.userId) {
-      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
-      return;
-    }
-    setFormData({ ...formData, department: e.target.value, team: '' });
   };
 
   const handlePreview = (e) => {
@@ -485,7 +501,7 @@ function BcdApplySecond() {
                   .filter((team) => team.etcItem1 === mappings.deptMap[formData.department])
                   .map((team) => (
                     <option key={team.detailCd} value={team.detailNm}>
-                      {`${team.detailNm} | ${team.detailCd}`}
+                      {`${team.detailNm} | ${team.etcItem2}`}
                     </option>
                   ))}
                 </select>
@@ -496,12 +512,12 @@ function BcdApplySecond() {
                   <option value="">선택하세요</option>
                   {bcdData.gradeInfo.map((position) => (
                     <option key={position.detailCd} value={position.detailCd}>
-                      {`${position.detailNm} | ${position.etcItem1}`}
+                      {`${position.detailNm} | ${position.etcItem2}`}
                     </option>
                   ))}
                 </select>
               </div>
-              {formData.position === '006' && (
+              {formData.position === '000' && (
                 <div className="additional-inputs">
                   <div className="form-group-horizontal">
                     <label className="form-label">직위</label>
