@@ -71,8 +71,8 @@ const PreviewModal = ({ show, onClose, formData }) => {
 
     const centerName = findDetailName(bcdData.instInfo, formData.center);
     const teamName = findDetailName(bcdData.teamInfo, formData.team);
-    const positionName = formData.position === '006' ? formData.gradeNm.split('|')[0] : findDetailName(bcdData.gradeInfo, formData.position);
-    const engPositionName = formData.position === '006' ? formData.enGradeNm : findEngName(bcdData.gradeInfo, formData.position);
+    const positionName = formData.position === '999' ? formData.addGradeNm : findDetailName(bcdData.gradeInfo, formData.position);
+    const engPositionName = formData.position === '999' ? formData.enGradeNm : findEngName(bcdData.gradeInfo, formData.position);
     const engTeamName = findEngName(bcdData.teamInfo, formData.team)
     console.log('ModalData: ', formData.team);
 

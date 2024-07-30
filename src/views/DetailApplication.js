@@ -29,6 +29,7 @@ function DetailApplication() {
     position: '',
     engPosition: '',
     gradeNm: '',
+    addGradeNm: '',
     enGradeNm: '',
     phone1: '',
     phone2: '',
@@ -113,8 +114,9 @@ function DetailApplication() {
         const email = data.email.split('@')[0];
         const [baseAddress, floor] = data.address.split(', ');
   
-        // gradeNm을 | 기준으로 분리
         const [gradeNm, enGradeNm] = data.gradeNm.split('|');
+
+        console.log('engradeNm: ', data.enGradeNm);
   
         setFormData({
           name: data.korNm,
@@ -124,8 +126,9 @@ function DetailApplication() {
           department: data.deptCd,
           team: data.teamCd,
           position: data.gradeCd,
-          gradeNm: data.gradeCd === '006' ? gradeNm.trim() : '',
-          enGradeNm: data.gradeCd === '006' ? enGradeNm.trim() : '',
+          gradeNm: gradeNm.trim(),
+          addGradeNm: data.addGradeNm,
+          enGradeNm: data.enGradeNm,
           phone1, phone2, phone3,
           fax1, fax2, fax3,
           mobile1, mobile2, mobile3,
@@ -243,9 +246,7 @@ function DetailApplication() {
     setShowFinalConfirmationModal(false);
   
     const fullAddress = `${formData.address}${floor ? `, ${floor}` : ''}`;
-  
-    console.log('Full Address:', fullAddress);
-  
+    
     const requestData = {
       drafter: auth.hngNm,
       drafterId: auth.userId,
@@ -256,7 +257,8 @@ function DetailApplication() {
       deptCd: formData.department,
       teamCd: formData.team,
       gradeCd: formData.position,
-      gradeNm: formData.gradeNm,  
+      gradeNm: formData.gradeNm, 
+      addGradeNm: formData.addGradenM,
       enGradeNm: formData.enGradeNm,  
       extTel: `${formData.phone1}-${formData.phone2}-${formData.phone3}`,
       faxTel: `${formData.fax1}-${formData.fax2}-${formData.fax3}`,
@@ -267,9 +269,7 @@ function DetailApplication() {
       division: formData.cardType === 'personal' ? 'B' : 'A',
       quantity: formData.quantity,
     };
-  
-    console.log('Request Data:', requestData);
-  
+    
     try {
       const response = await axios.post(`/api/bcd/update?draftId=${draftId}`, requestData);
       if (response.data.code === 200) {
@@ -352,12 +352,12 @@ function DetailApplication() {
   const handlePositionChange = (e) => {
     const selectedPosition = e.target.value;
     const selectedPositionInfo = bcdData.gradeInfo.find(position => position.detailCd === selectedPosition);
-    const enGradeNm = selectedPositionInfo ? selectedPositionInfo.etcItem1 : '';
+    const enGradeNm = selectedPositionInfo ? selectedPositionInfo.etcItem2 : '';
     setFormData((prevFormData) => ({
       ...prevFormData,
       position: selectedPosition,
-      gradeNm: selectedPosition === '006' ? prevFormData.gradeNm : null,
-      enGradeNm: selectedPosition === '006' ? enGradeNm : null,
+      gradeNm: selectedPosition === '999' ? prevFormData.addGradeNm : null,
+      enGradeNm: selectedPosition === '999' ? enGradeNm : null,
     }));
   };
 
@@ -522,14 +522,14 @@ function DetailApplication() {
                   ))}
                 </select>
               </div>
-              {formData.position === '006' && (
+              {formData.position === '999' && (
                 <div className="additional-inputs">
                   <div className="form-group-horizontal">
                     <label className="form-label">직위</label>
                     <input
                       type="text"
                       name="gradeNm"
-                      value={formData.gradeNm}
+                      value={formData.addGradeNm}
                       onChange={handleChange}
                       required
                       placeholder="직위"

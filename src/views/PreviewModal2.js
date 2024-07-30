@@ -67,8 +67,8 @@ const PreviewModal = ({ show, onClose, formData }) => {
 
     const centerName = formData.center ? formData.center : findDetailName(bcdData.instInfo, formData.center);
     const teamName = formData.team ? formData.team : findDetailName(bcdData.teamInfo, formData.team);
-    const positionName = formData.position === '006' ? formData.gradeNm : findDetailName(bcdData.gradeInfo, formData.position);
-    const engPositionName = formData.position === '006' ? formData.enGradeNm : findEngName(bcdData.gradeInfo, formData.position);
+    const positionName = formData.position === '999' ? formData.gradeNm : findDetailName(bcdData.gradeInfo, formData.position);
+    const engPositionName = formData.position === '999' ? formData.enGradeNm : findEngName(bcdData.gradeInfo, formData.position);
     const engTeamName = findEngName(bcdData.teamInfo, formData.engTeam);
 
     imageKorean.onload = () => {
