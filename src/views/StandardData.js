@@ -302,14 +302,12 @@ function StandardData() {
                 <button className="data-delete-button" onClick={handleDeleteRow}>삭 제</button>
               </div>
             </div>
-            {/* <div className='details-table-wrapper'> */}
               <div className="details-table">
                 <Table
                   columns={detailColumns}
                   data={details}
                 />
               </div>
-            {/* </div> */}
           </div>
         </div>
       </div>

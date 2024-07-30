@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import '../../styles/common/Sidebar.css';
 import logo from '../../assets/images/logo.png';
 import { AuthContext } from '../AuthContext';
+import dropdownDefaultIcon from '../../assets/images/dropdownDefault.png';
+import dropdownActiveIcon from '../../assets/images/dropdownActive.png';
 
 /* Sidebar component */
 function Sidebar() {
@@ -112,8 +114,11 @@ function SidebarSection({ title, items, isActive, location, defaultOpen }) {
 
   return (
     <div className="sidebar-section">
-      <h3 onClick={toggleOpen} className={`toggle-header ${!isOpen && anyItemActive ? 'active-toggle' : ''}`}>
-        <span className="toggle-icon">{isOpen ? '∨' : '>'}</span> {title}
+      <h3 onClick={toggleOpen} className={`toggle-header ${!isOpen && items.some(item => location.pathname === item.url) ? 'active-toggle' : ''}`}>
+        <img 
+          src={isOpen ? dropdownActiveIcon : dropdownDefaultIcon}
+          alt="Toggle Icon"
+          className="toggle-icon"/> {title}
       </h3>
       {isOpen && (
         <ul>
