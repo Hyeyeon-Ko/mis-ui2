@@ -68,11 +68,18 @@ function MyApplyList() {
           endDate: filterParams.endDate || '',
         },
       });
-
-      const data = response.data?.data?.myApplyResponses || [];
-
-      const uniqueData = data.reduce((acc, current) => {
-        const x = acc.find(item => item.draftId === current.draftId);
+  
+      const data = response.data?.data || {};
+      console.log('data: ', data);
+      const combinedData = [
+        ...(data.myBcdResponses || []),
+        ...(data.myDocResponses || [])
+      ];
+  
+      console.log('combinedData: ', combinedData);
+  
+      const uniqueData = combinedData.reduce((acc, current) => {
+        const x = acc.find(item => item.draftId === current.draftId && item.docType === current.docType);
         if (!x) {
           return acc.concat([current]);
         } else {
@@ -89,20 +96,22 @@ function MyApplyList() {
         rejectionReason: application.rejectReason,
         manager: application.approver || application.disapprover || '', 
       }));
-
+  
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
 
+      console.log('transformedDate: ', transformedData);
+  
       setApplications(transformedData);
     } catch (error) {
       console.error('Error fetching applications:', error.response?.data || error.message);
     }
   };
-
+  
   // 상태 버튼 클릭 핸들러
   const handleButtonClick = (application) => {
     setSelectedApplication(application);
     if (application.applyStatus === '반려') {
-      setRejectionReason(application.rejectionReason || '사내메일을 입력하세요.');
+      setRejectionReason(application.rejectionReason);
       setShowRejectionModal(true);
     } else {
       setShowModal(true);

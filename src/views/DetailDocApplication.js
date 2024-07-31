@@ -1,15 +1,14 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../components/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import CustomButton from '../components/common/CustomButton';
+import axios from 'axios';
 import '../styles/DocApply.css';
 import '../styles/common/Page.css';
 
-function DocApply() {
-  const { auth } = useContext(AuthContext);             
-  const navigate = useNavigate();                       
-
+function DetailDocApplication() {
+  const { draftId } = useParams();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     receptionDate: '',
     drafter: '',
@@ -17,31 +16,45 @@ function DocApply() {
     sender: '',
     title: '',
     purpose: '',
-    userId: '',
-    division: '', 
+    division: '',
   });
-
-  const [activeTab, setActiveTab] = useState('reception'); 
+  const [initialData, setInitialData] = useState(null);
+  const [activeTab, setActiveTab] = useState('reception');
+  const [isEdit, setIsEdit] = useState(false);
 
   useEffect(() => {
-    setDefaultValues();
-  }, [auth.hngNm, auth.userId, activeTab]);
+    if (draftId) {
+      fetchDocDetail(draftId);
+      setIsEdit(true);
+    }
+  }, [draftId]);
 
-  const setDefaultValues = () => {
-    const today = new Date();
-    const dateString = today.toISOString().split('T')[0];
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      receptionDate: dateString,
-      drafter: auth.hngNm,
-      userId: auth.userId,
-      division: activeTab === 'reception' ? 'A' : 'B', 
-    }));
+  const fetchDocDetail = async (id) => {
+    try {
+      const response = await axios.get(`/api/doc/${id}`);
+      if (response.data && response.data.data) {
+        const { draftDate, drafter, division, receiver, sender, docTitle, purpose } = response.data.data;
+        const fetchedData = {
+          receptionDate: parseDateTime(draftDate),
+          drafter: drafter || '',
+          division: division || '',
+          receiver: receiver || '',
+          sender: sender || '',
+          title: docTitle || '',
+          purpose: purpose || '',
+        };
+        setFormData(fetchedData);
+        setInitialData(fetchedData);
+        setActiveTab(division === 'A' ? 'reception' : 'sending');
+      }
+    } catch (error) {
+      console.error('Error fetching document details:', error);
+    }
   };
 
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setDefaultValues();
+  const parseDateTime = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
   };
 
   const handleChange = (e) => {
@@ -51,31 +64,27 @@ function DocApply() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (JSON.stringify(formData) === JSON.stringify(initialData)) {
+      alert('수정된 사항이 없습니다.');
+      return;
+    }
     try {
-      const response = await fetch('/api/doc', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          drafterId: formData.userId,
+      if (isEdit) {
+        const payload = {
           drafter: formData.drafter,
-          division: formData.division,
-          sender: activeTab === 'reception' ? formData.receiver : '',
-          receiver: activeTab === 'sending' ? formData.sender : '',
+          division: activeTab === 'reception' ? 'A' : 'B',
+          receiver: activeTab === 'reception' ? null : formData.receiver,
+          sender: activeTab === 'reception' ? formData.sender : null,
           docTitle: formData.title,
           purpose: formData.purpose,
-        }),
-      });
-      if (response.ok) {
-        alert('신청이 완료되었습니다.');
-        navigate('/api/myPendingList');
-      } else {
-        alert('신청에 실패했습니다.');
+        };
+        await axios.post(`/api/doc/update?draftId=${draftId}`, payload);
+        alert('문서 수정이 완료되었습니다');
+        navigate('/api/MyPendingList'); 
       }
     } catch (error) {
-      console.error('Error submitting form data:', error);
-      alert('신청에 실패했습니다.');
+      console.error('Error submitting document:', error);
+      alert('문서 수정 중 오류가 발생했습니다.');
     }
   };
 
@@ -88,13 +97,13 @@ function DocApply() {
           <div className="tab-container">
             <button 
               className={`tab-button ${activeTab === 'reception' ? 'active' : ''}`} 
-              onClick={() => handleTabChange('reception')}
+              onClick={() => setActiveTab('reception')}
             >
               문서 수신
             </button>
             <button 
               className={`tab-button ${activeTab === 'sending' ? 'active' : ''}`} 
-              onClick={() => handleTabChange('sending')}
+              onClick={() => setActiveTab('sending')}
             >
               문서 발신
             </button>
@@ -115,8 +124,6 @@ function DocApply() {
                 type="text"
                 name="drafter"
                 value={formData.drafter}
-                onChange={handleChange}
-                required
                 readOnly
               />
             </div>
@@ -124,8 +131,8 @@ function DocApply() {
               <label>{activeTab === 'reception' ? '발신처' : '수신처'}</label>
               <input 
                 type="text" 
-                name={activeTab === 'reception' ? 'receiver' : 'sender'} 
-                value={activeTab === 'reception' ? formData.receiver : formData.sender} 
+                name={activeTab === 'reception' ? 'sender' : 'receiver'} 
+                value={activeTab === 'reception' ? formData.sender : formData.receiver} 
                 onChange={handleChange} 
                 required 
               />
@@ -150,7 +157,7 @@ function DocApply() {
             </div>
             <div className="doc-apply-button-container">
               <CustomButton className="apply-request-button" type="submit">
-                  문서 신청하기
+                {isEdit ? '문서 수정하기' : '문서 신청하기'}
               </CustomButton>
             </div>
           </form>
@@ -160,4 +167,4 @@ function DocApply() {
   );
 }
 
-export default DocApply;
+export default DetailDocApplication;

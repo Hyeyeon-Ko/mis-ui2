@@ -32,7 +32,6 @@ function ApplicationsList() {
   }, []);
 
   useEffect(() => {
-    // 상태에 따른 엑셀 버튼 표시 여부를 업데이트합니다.
     const isShowExcelButton = filters.statusClosed && selectedApplications.length > 0;
     setShowCheckboxColumn(filters.statusClosed);
     setShowExcelButton(isShowExcelButton);
@@ -173,7 +172,42 @@ function ApplicationsList() {
     }
   };
 
-  const columns = [
+  // Define columns based on documentType
+  const columns = documentType === '문서수발신' ? [
+    ...(showCheckboxColumn ? [{
+      header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
+      accessor: 'select',
+      width: '5%',
+      Cell: ({ row }) => (
+        <input
+          type="checkbox"
+          checked={selectedApplications.includes(row.draftId)}
+          onChange={(e) => handleSelect(e.target.checked, row.draftId)}
+        />
+      ),
+    }] : []),
+    { header: '제목', accessor: 'title', width: '35%' },
+    { header: '기안일시', accessor: 'draftDate', width: '18%' },
+    { header: '기안자', accessor: 'drafter', width: '10%' },
+    { header: '승인일시', accessor: 'approvalDate', width: '15%' },
+    {
+      header: '문서상태',
+      accessor: 'status',
+      width: '13%',
+      Cell: ({ row }) => (
+        <span
+          className={row.status === '승인대기' ? 'status-pending clickable' : ''}
+          onClick={() => {
+            if (row.status === '승인대기') {
+              navigate(`/api/bcd/applyList/${row.draftId}?readonly=true`);
+            }
+          }}
+        >
+          {row.status}
+        </span>
+      ),
+    },
+  ] : [
     ...(showCheckboxColumn ? [{
       header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
       accessor: 'select',
@@ -217,7 +251,7 @@ function ApplicationsList() {
         <h2>전체 신청 내역</h2>
         <div className="application-header-row">
           <Breadcrumb items={['신청 내역 관리', '전체 신청 내역']} />
-            <div className="application-button-container">
+          <div className="application-button-container">
             {showExcelButton && (
               <CustomButton className="excel-button2" onClick={handleExcelDownload}>
                 엑셀변환

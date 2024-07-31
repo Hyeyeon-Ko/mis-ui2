@@ -8,22 +8,18 @@ import '../styles/MyPendingList.css';
 import '../styles/common/Page.css';
 import axios from 'axios';
 
-/* 승인 대기 내역 페이지 */
 function MyPendingList() {
-  const [pendingApplications, setPendingApplications] = useState([]);     // 승인 대기 내역 상태 관리
-  const [showConfirmModal, setShowConfirmModal] = useState(false);        // 확인 모달 표시 상태 관리
-  const [selectedApplication, setSelectedApplication] = useState(null);   // 선택된 신청 내역 상태 관리
-  const navigate = useNavigate();                                         // 경로 이동을 위한 네비게이트 함수
+  const [pendingApplications, setPendingApplications] = useState([]); 
+  const [showConfirmModal, setShowConfirmModal] = useState(false); 
+  const [selectedApplication, setSelectedApplication] = useState(null); 
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     fetchPendingApplications();
   }, []);
 
-  // Timestamp Parsing: "YYYY-MM-DD HH:MM"
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
-  
-    // 원래 시간 문자열을 원하는 포맷으로 변환
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
@@ -33,19 +29,32 @@ function MyPendingList() {
     return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
   
-  // 승인 대기 내역 가져오기
   const fetchPendingApplications = async () => {
     try {
       const response = await axios.get('/api/myPendingList');
-      if (response.data && response.data.data && response.data.data.bcdPendingResponses) {
-        const data = Array.isArray(response.data.data.bcdPendingResponses) ? response.data.data.bcdPendingResponses : [];
-        const transformedData = data.map(application => ({
+      if (response.data && response.data.data) {
+        const data = [
+          ...(response.data.data.bcdPendingResponses || []),
+          ...(response.data.data.docPendingResponses || [])
+        ];
+
+        const uniqueData = data.reduce((acc, current) => {
+          const x = acc.find(item => item.draftId === current.draftId && item.docType === current.docType);
+          if (!x) {
+            return acc.concat([current]);
+          } else {
+            return acc;
+          }
+        }, []);
+
+        const transformedData = uniqueData.map(application => ({
           draftId: application.draftId,
           title: application.title,
           draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
           drafter: application.drafter,
           lastUpdateDate: application.lastUpdateDate ? parseDateTime(application.lastUpdateDate) : '',
-          lastUpdater: application.lastUpdater,
+          lastUpdater: application.lastUpdater || '',
+          docType: application.docType, 
         }));
 
         transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
@@ -59,16 +68,15 @@ function MyPendingList() {
     }
   };
 
-  // 취소 버튼 클릭 핸들러
   const handleCancelClick = (application) => {
     setSelectedApplication(application);
     setShowConfirmModal(true);
   };
 
-  // 확인 모달 확인 버튼 클릭 핸들러
   const handleConfirmCancel = async () => {
     try {
-      await axios.put(`/api/bcd/${selectedApplication.draftId}`);
+      const endpoint = selectedApplication.docType === '명함신청' ? '/api/bcd/' : '/api/doc/';
+      await axios.put(`${endpoint}${selectedApplication.draftId}`);
       setShowConfirmModal(false);
       setSelectedApplication(null);
       fetchPendingApplications();
@@ -80,7 +88,6 @@ function MyPendingList() {
     }
   };
 
-  // 확인 모달 닫기 핸들러
   const handleCloseConfirmModal = () => {
     setShowConfirmModal(false);
     setSelectedApplication(null);
@@ -97,7 +104,12 @@ function MyPendingList() {
       accessor: 'modify',
       width: '6%',
       Cell: ({ row }) => (
-        <Button className="modify-button" onClick={() => navigate(`/api/bcd/${row.draftId}`, { state: { returnTo: '/api/myPendingList' } })}>수  정</Button>
+        <Button
+          className="modify-button"
+          onClick={() => navigate(row.docType === '명함신청' ? `/api/bcd/${row.draftId}` : `/api/doc/${row.draftId}`, { state: { returnTo: '/api/myPendingList' } })}
+        >
+          수 정
+        </Button>
       ),
     },
     {
@@ -106,7 +118,7 @@ function MyPendingList() {
       width: '9%',
       Cell: ({ row }) => (
         <Button className="cancel-button" onClick={() => handleCancelClick(row)}>
-          취  소
+          취 소
         </Button>
       ),
     },
