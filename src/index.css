@@ -2,12 +2,15 @@
   font-family: 'NotoSansKR';
   font-style: normal;
   font-weight: normal;
-  src: url('./fonts/NotoSansKR-VariableFont_wght.ttf') format('truetype');
+  src: url(./fonts/NotoSansKR-VariableFont_wght.ttf) format('truetype');
 }
 
 body {
   margin: 0;
-    font-family: 'NotoSansKR';
+  /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif; */
+    font-family: 'NotoSansKR', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
