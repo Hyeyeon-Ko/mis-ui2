@@ -64,11 +64,16 @@ function StandardData() {
   };
 
   const handleAddRow = () => {
+    if (!selectedSubCategory) {
+      alert('중분류 코드를 선택하세요.');
+      return;
+    }
+  
     setEditDetailData(null);
     setModalMode('detail');
     setShowModal(true);
   };
-
+  
   const handleSaveRow = async (newRow) => {
     console.log('Saving row:', newRow);
     if (modalMode === 'detail') {
@@ -89,7 +94,11 @@ function StandardData() {
         alert('상세 코드가 추가되었습니다.');
         fetchDetails(selectedSubCategory);
       } catch (error) {
-        console.error('Error saving detail info:', error);
+        if (error.response && error.response.data && error.response.data.message) {
+          alert(`해당 중분류그룹에 이미 존재하는 상세코드 입니다`);
+        } else {
+          console.error('Error saving detail info:', error);
+        }
       }
     } else if (modalMode === 'edit') {
       try {
@@ -109,7 +118,11 @@ function StandardData() {
         alert('상세 코드가 수정되었습니다.');
         fetchDetails(selectedSubCategory);
       } catch (error) {
-        console.error('Error updating detail info:', error);
+        if (error.response && error.response.data && error.response.data.message) {
+          alert(`Error: ${error.response.data.message}`);
+        } else {
+          console.error('Error updating detail info:', error);
+        }
       }
     } else {
       try {
@@ -124,12 +137,16 @@ function StandardData() {
           ...prevSubCategories,
         ]);
       } catch (error) {
-        console.error('Error saving group info:', error);
+        if (error.response && error.response.data && error.response.data.message) {
+          alert(`Error: ${error.response.data.message}`);
+        } else {
+          console.error('Error saving group info:', error);
+        }
       }
     }
     setShowModal(false);
   };
-
+  
   const handleAddSubCategoryRow = () => {
     setModalMode('group');
     setShowModal(true);

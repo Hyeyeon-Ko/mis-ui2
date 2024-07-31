@@ -14,6 +14,7 @@ import AuthorityManagement from './views/AuthorityManagement';
 import BcdApplyFirst from './views/BcdApplyFirst';
 import BcdApplySecond from './views/BcdApplySecond';
 import DetailApplication from './views/DetailApplication';
+import DetailDocApplication from './views/DetailDocApplication';
 import PendingApprovalList from './views/PendingApprovalList';
 import StandardData from './views/StandardData';
 import DocApply from './views/DocApply';
@@ -62,6 +63,7 @@ function App() {
                 <Route path="/api/bcd/orderList" element={<RequireAuth><BcdOrder /></RequireAuth>} />
                 <Route path="/api/std" element={<RequireAuth><StandardData /></RequireAuth>} />
                 <Route path="/api/bcd/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
+                <Route path="/api/doc/:draftId" element={<RequireAuth><DetailDocApplication /></RequireAuth>} />
                 <Route path="/api/bcd/applyList/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
               </Routes>
             </MainLayout>
