@@ -29,7 +29,7 @@ function Sidebar() {
 
   const manageItems = [
     { label: '전체 신청내역', url: '/api/applyList' },
-    { label: '승인 대기 내역', url: '/api/pendingList' },
+    { label: '승인대기 내역', url: '/api/pendingList' },
   ];
 
   const docItems = [
@@ -44,7 +44,7 @@ function Sidebar() {
   const sections = {
     'A': { title: '신청하기', items: applyItems },
     'B': { title: '나의 신청내역', items: myApplyItems },
-    'C': { title: '전체 신청내역', items: manageItems },
+    'C': { title: '신청내역 관리', items: manageItems },
     'D': { title: '문서수발신 관리', items:docItems },
     'E': { title: '발주 관리', items: orderItems },
   };

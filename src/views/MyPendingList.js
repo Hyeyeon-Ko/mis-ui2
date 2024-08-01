@@ -127,8 +127,8 @@ function MyPendingList() {
   return (
     <div className="content">
       <div className="pending-applications">
-        <h2>승인 대기 내역</h2>
-        <Breadcrumb items={['나의 신청내역', '승인 대기 내역']} />
+        <h2>승인대기 내역</h2>
+        <Breadcrumb items={['나의 신청내역', '승인대기 내역']} />
         <Table columns={pendingColumns} data={pendingApplications} />
       </div>
       {showConfirmModal && (

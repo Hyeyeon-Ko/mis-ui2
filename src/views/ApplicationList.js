@@ -234,9 +234,9 @@ function ApplicationsList() {
   return (
     <div className="content">
       <div className='all-applications'>
-        <h2>전체 신청 내역</h2>
+        <h2>신청내역 관리</h2>
         <div className="application-header-row">
-          <Breadcrumb items={['신청 내역 관리', '전체 신청 내역']} />
+          <Breadcrumb items={['신청내역 관리', '전체 신청내역']} />
           <div className="application-button-container">
             {showExcelButton && (
               <CustomButton className="excel-button2" onClick={handleExcelDownload}>
