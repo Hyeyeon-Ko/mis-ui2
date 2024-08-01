@@ -3,17 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import ConditionFilter from '../components/common/ConditionFilter';
 import Table from '../components/common/Table';
-import CustomButton from '../components/common/CustomButton'; 
+import CustomButton from '../components/common/CustomButton';
+import DocConfirmModal from '../views/DocConfirmModal';
 import '../styles/ApplicationsList.css';
 import '../styles/common/Page.css';
 import axios from 'axios';
-import fileDownload from 'js-file-download'; 
+import fileDownload from 'js-file-download';
 
 function ApplicationsList() {
   const [applications, setApplications] = useState([]);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const [documentType, setDocumentType] = useState('');
   const [filterInputs, setFilterInputs] = useState({
     startDate: null,
     endDate: null,
@@ -29,7 +27,9 @@ function ApplicationsList() {
   const [error, setError] = useState(null);
   const [showCheckboxColumn, setShowCheckboxColumn] = useState(false);
   const [selectedApplications, setSelectedApplications] = useState([]);
-  const [showExcelButton, setShowExcelButton] = useState(false); 
+  const [showExcelButton, setShowExcelButton] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedDocumentId, setSelectedDocumentId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,12 +44,7 @@ function ApplicationsList() {
 
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
   };
 
   const getStatusText = (status) => {
@@ -84,7 +79,6 @@ function ApplicationsList() {
       });
 
       const { bcdMasterResponses, docMasterResponses } = response.data.data;
-
       const bcdData = Array.isArray(bcdMasterResponses) ? bcdMasterResponses : [];
       const docData = Array.isArray(docMasterResponses) ? docMasterResponses : [];
 
@@ -171,7 +165,7 @@ function ApplicationsList() {
 
     try {
       const response = await axios.post('/api/bsc/applyList/orderExcel', selectedApplications, {
-        responseType: 'blob', 
+        responseType: 'blob',
       });
       fileDownload(response.data, 'order_details.xlsx');
     } catch (error) {
@@ -179,45 +173,26 @@ function ApplicationsList() {
     }
   };
 
-  const columns = documentType === '문서수발신' ? [
-    ...(showCheckboxColumn ? [{
-      header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
-      accessor: 'select',
-      width: '5%',
-      Cell: ({ row }) => (
-        <input
-          type="checkbox"
-          checked={selectedApplications.includes(row.draftId)}
-          onChange={(e) => handleSelect(e.target.checked, row.draftId)}
-        />
-      ),
-    }] : []),
-    { header: '제목', accessor: 'title', width: '35%' },
-    { header: '기안일시', accessor: 'draftDate', width: '18%' },
-    { header: '기안자', accessor: 'drafter', width: '10%' },
-    { header: '승인일시', accessor: 'respondDate', width: '15%' },
-    {
-      header: '문서상태',
-      accessor: 'applyStatus',
-      width: '13%',
-      Cell: ({ row }) => (
-        <span
-          className={row.applyStatus === '승인대기' ? 'status-pending clickable' : ''}
-          onClick={() => {
-            if (row.applyStatus === '승인대기') {
-              if (row.docType === '문서수발신') {
-                navigate(`/api/doc/applyList/${row.draftId}`);
-              } else {
-                navigate(`/api/bcd/applyList/${row.draftId}?readonly=true`);
-              }
-            }
-          }}
-        >
-          {row.applyStatus}
-        </span>
-      ),
-    },
-  ] : [
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedDocumentId(null);
+  };
+
+  const approveDocument = async (documentId) => {
+    try {
+      await axios.put(`/api/doc/confirm`, null, {
+        params: { draftId: documentId },
+      });
+      alert('승인이 완료되었습니다.');
+      closeModal();
+      fetchApplications(filterInputs);
+    } catch (error) {
+      console.error('Error approving document:', error);
+      alert('Error approving document.');
+    }
+  };
+
+  const columns = [
     ...(showCheckboxColumn ? [{
       header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
       accessor: 'select',
@@ -245,11 +220,8 @@ function ApplicationsList() {
           className={row.applyStatus === '승인대기' ? 'status-pending clickable' : ''}
           onClick={() => {
             if (row.applyStatus === '승인대기') {
-              if (row.docType === '문서수발신') {
-                navigate(`/api/doc/applyList/${row.draftId}`);
-              } else {
-                navigate(`/api/bcd/applyList/${row.draftId}?readonly=true`);
-              }
+              setSelectedDocumentId(row.draftId);
+              setModalVisible(true);
             }
           }}
         >
@@ -273,14 +245,14 @@ function ApplicationsList() {
             )}
           </div>
         </div>
-        <ConditionFilter 
-          startDate={filterInputs.startDate} 
-          setStartDate={(date) => setFilterInputs(prev => ({ ...prev, startDate: date }))} 
-          endDate={filterInputs.endDate} 
-          setEndDate={(date) => setFilterInputs(prev => ({ ...prev, endDate: date }))} 
-          documentType={filterInputs.documentType} 
-          setDocumentType={(type) => setFilterInputs(prev => ({ ...prev, documentType: type }))} 
-          onSearch={handleSearch} 
+        <ConditionFilter
+          startDate={filterInputs.startDate}
+          setStartDate={(date) => setFilterInputs(prev => ({ ...prev, startDate: date }))}
+          endDate={filterInputs.endDate}
+          setEndDate={(date) => setFilterInputs(prev => ({ ...prev, endDate: date }))}
+          documentType={filterInputs.documentType}
+          setDocumentType={(type) => setFilterInputs(prev => ({ ...prev, documentType: type }))}
+          onSearch={handleSearch}
           onReset={handleReset}
           filters={filters}
           onFilterChange={handleFilterChange}
@@ -294,6 +266,12 @@ function ApplicationsList() {
           <Table columns={columns} data={filteredApplications} onSelect={handleSelect} selectedItems={selectedApplications} />
         )}
       </div>
+      <DocConfirmModal
+        show={modalVisible}
+        documentId={selectedDocumentId}
+        onClose={closeModal}
+        onApprove={approveDocument}
+      />
     </div>
   );
 }

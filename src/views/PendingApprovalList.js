@@ -4,6 +4,7 @@ import Breadcrumb from '../components/common/Breadcrumb';
 import ConditionFilter from '../components/common/ConditionFilter';
 import Table from '../components/common/Table';
 import CenterSelect from '../components/CenterSelect';
+import DocConfirmModal from '../views/DocConfirmModal'; 
 import '../styles/ApplicationsList.css';
 import '../styles/common/Page.css';
 import axios from 'axios';
@@ -22,6 +23,8 @@ function PendingApprovalList() {
   const [endDate, setEndDate] = useState(null);
   const [documentType, setDocumentType] = useState('');
   const [filters, setFilters] = useState({});
+  const [modalVisible, setModalVisible] = useState(false); 
+  const [selectedDocumentId, setSelectedDocumentId] = useState(null); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -94,7 +97,8 @@ function PendingApprovalList() {
 
   const handleRowClick = (draftId, docType) => {
     if (docType === '문서수발신') {
-      navigate(`/api/doc/applyList/${draftId}`);
+      setSelectedDocumentId(draftId);
+      setModalVisible(true);
     } else {
       navigate(`/api/bcd/applyList/${draftId}?readonly=true`);
     }
@@ -115,6 +119,25 @@ function PendingApprovalList() {
     setDocumentType('');
     setSelectedCenter('전체');
     setFilters({});
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedDocumentId(null);
+  };
+
+  const approveDocument = async (documentId) => {
+    try {
+      await axios.put(`/api/doc/confirm`, null, {
+        params: { draftId: documentId },
+      });
+      alert('승인이 완료되었습니다.');
+      closeModal();
+      fetchPendingList(filters);
+    } catch (error) {
+      console.error('Error approving document:', error);
+      alert('Error approving document.');
+    }
   };
 
   const filteredApplications = applications.filter((app) => {
@@ -173,6 +196,12 @@ function PendingApprovalList() {
           <Table columns={columns} data={filteredApplications} />
         )}
       </div>
+      <DocConfirmModal
+        show={modalVisible}
+        documentId={selectedDocumentId}
+        onClose={closeModal}
+        onApprove={approveDocument}
+      />
     </div>
   );
 }
