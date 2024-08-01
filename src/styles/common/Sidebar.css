@@ -24,18 +24,18 @@
 
 .logo {
   width: 168px;
-  height: 72px;
+  height: 65px;
   margin-top: 32px;
   margin-bottom: 32px;
 }
 
 .sidebar-section {
   width: 100%;
-  margin-left: 45px;
+  margin-left: 35px;
 }
 
 .sidebar-section h2 {
-  font-size: 19px;
+  font-size: 18.5px;
   margin: 5px 0px 15px 28px;
   cursor: pointer;
 }
@@ -79,7 +79,7 @@
 }
 
 .sidebar-section h3 {
-  font-size: 19px;
+  font-size: 18.5px;
   letter-spacing: 0.5px;
   margin-top: 5px;
   margin-bottom: 15px;

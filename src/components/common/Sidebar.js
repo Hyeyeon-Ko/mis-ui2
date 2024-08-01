@@ -24,7 +24,7 @@ function Sidebar() {
 
   const myApplyItems = [
     { label: '전체 신청내역', url: '/api/myApplyList' },
-    { label: '승인 대기 내역', url: '/api/myPendingList' },
+    { label: '승인대기 내역', url: '/api/myPendingList' },
   ];
 
   const manageItems = [
@@ -33,9 +33,9 @@ function Sidebar() {
   ];
 
   const docItems = [
-    { label: '문서 수신 대장', url: '/api/doc/in' },
-    { label: '문서 발신 대장', url: '/api/doc/out' },
-  ];
+    { label: '문서 수신 대장', url: '/api/doc/receiveList' },
+    { label: '문서 발신 대장', url: '/api/doc/sendList' },
+  ]
 
   const orderItems = [
     { label: '명함 발주', url: '/api/bcd/orderList' },
@@ -44,8 +44,8 @@ function Sidebar() {
   const sections = {
     'A': { title: '신청하기', items: applyItems },
     'B': { title: '나의 신청내역', items: myApplyItems },
-    'C': { title: '신청내역 관리', items: manageItems },
-    'D': { title: '문서수발신 관리', items: docItems },
+    'C': { title: '전체 신청내역', items: manageItems },
+    'D': { title: '문서수발신 관리', items:docItems },
     'E': { title: '발주 관리', items: orderItems },
   };
 

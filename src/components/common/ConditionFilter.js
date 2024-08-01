@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../common/Button'; 
 import '../../styles/common/ConditionFilter.css';
-import resetIcon from '../../assets/images/reset.png';
 
 const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documentType, setDocumentType, onSearch, onReset, filters, onFilterChange, showStatusFilters }) => {
   useEffect(() => {
@@ -18,7 +17,7 @@ const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documen
     defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
     setStartDate(defaultStartDate);
     setEndDate(new Date());
-    setDocumentType('');
+    if (setDocumentType) setDocumentType('');
     if (onReset) onReset();
   };
 
@@ -65,14 +64,18 @@ const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documen
           onChange={handleEndDateChange}
           className="custom-datepicker"
         />
-        <label>문서분류</label>
-        <select value={documentType} onChange={handleDocumentTypeChange}>
-          <option value="전체">전체</option>
-          <option value="명함신청">명함신청</option>
-          <option value="법인서류">법인서류</option>
-          <option value="인장관리">인장관리</option>
-          <option value="문서수발신">문서수발신</option>
-        </select>
+        {setDocumentType && (
+          <>
+            <label>문서분류</label>
+            <select value={documentType} onChange={handleDocumentTypeChange}>
+              <option value="전체">전체</option>
+              <option value="명함신청">명함신청</option>
+              <option value="법인서류">법인서류</option>
+              <option value="인장관리">인장관리</option>
+              <option value="문서수발신">문서수발신</option>
+            </select>
+          </>
+        )}
         <button className="reset-button" onClick={handleReset}>
           <span className="reset-text">↻ 초기화</span>
         </button>

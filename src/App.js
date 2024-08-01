@@ -16,6 +16,8 @@ import BcdApplySecond from './views/BcdApplySecond';
 import DetailApplication from './views/DetailApplication';
 import DetailDocApplication from './views/DetailDocApplication';
 import PendingApprovalList from './views/PendingApprovalList';
+import DocInList from './views/DocInList';
+import DocOutList from './views/DocOutList';
 import StandardData from './views/StandardData';
 import DocApply from './views/DocApply';
 import { AuthProvider, AuthContext } from './components/AuthContext';
@@ -60,6 +62,8 @@ function App() {
                 <Route path="/api/myPendingList" element={<RequireAuth><MyPendingList /></RequireAuth>} />
                 <Route path="/api/applyList" element={<RequireAuth><ApplicationsList /></RequireAuth>} />
                 <Route path="/api/pendingList" element={<RequireAuth><PendingApprovalList /></RequireAuth>} />
+                <Route path="/api/doc/receiveList" element={<RequireAuth><DocInList /></RequireAuth>} />
+                <Route path="/api/doc/sendList" element={<RequireAuth><DocOutList /></RequireAuth>} />
                 <Route path="/api/bcd/orderList" element={<RequireAuth><BcdOrder /></RequireAuth>} />
                 <Route path="/api/std" element={<RequireAuth><StandardData /></RequireAuth>} />
                 <Route path="/api/bcd/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
