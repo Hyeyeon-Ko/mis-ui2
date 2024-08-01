@@ -59,11 +59,9 @@ function DocApply() {
       receiver: activeTab === 'sending' ? formData.sender : '',
       docTitle: formData.title,
       purpose: formData.purpose,
-      instCd: auth.instCd, // instCd 추가
+      instCd: auth.instCd, 
     };
     
-    console.log('Payload being sent:', payload); // 백엔드로 전송하는 데이터 로그 출력
-
     try {
       const response = await fetch('/api/doc', {
         method: 'POST',

@@ -1,38 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import '../styles/StandardAddModal.css';
 
 const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory, detailData }) => {
   const [detailCode, setDetailCode] = useState('');
   const [detailName, setDetailName] = useState('');
-  const [items, setItems] = useState([{ value: '' }]);
+  const [items, setItems] = useState([]);
   const [classCd, setClassCode] = useState(selectedCategory);
   const [groupCd, setGroupCode] = useState('');
   const [groupNm, setGroupName] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-
-  const modalRef = useRef(null);
 
   useEffect(() => {
-    // 모달 초기 위치를 중앙으로 설정
-    const setInitialPosition = () => {
-      const modal = modalRef.current;
-      if (modal) {
-        const { innerWidth, innerHeight } = window;
-        const { offsetWidth, offsetHeight } = modal;
-        setPosition({
-          x: (innerWidth - offsetWidth) / 2,
-          y: (innerHeight - offsetHeight) / 2,
-        });
-      }
-    };
-
-    if (show) {
-      setInitialPosition();
-    }
-
     if (mode === 'group') {
       setClassCode(selectedCategory);
     } else if ((mode === 'edit' || mode === 'detail') && detailData) {
@@ -48,7 +28,7 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
       ].filter(item => item !== null && item !== '');
       setItems(initialItems.map(item => ({ value: item })));
     }
-  }, [show, mode, selectedCategory, detailData]);
+  }, [mode, selectedCategory, detailData]);
 
   const handleItemChange = (index, value) => {
     const newItems = [...items];
@@ -92,7 +72,7 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
   const resetForm = () => {
     setDetailCode('');
     setDetailName('');
-    setItems([{ value: '' }]);
+    setItems([]);
     setGroupCode('');
     setGroupName('');
   };
@@ -109,17 +89,15 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
   const handleMouseDown = (e) => {
     setIsDragging(true);
     setOffset({
-      x: e.clientX - position.x,
-      y: e.clientY - position.y,
+      x: e.clientX - e.currentTarget.getBoundingClientRect().left,
+      y: e.clientY - e.currentTarget.getBoundingClientRect().top,
     });
   };
 
   const handleMouseMove = (e) => {
     if (isDragging) {
-      setPosition({
-        x: e.clientX - offset.x,
-        y: e.clientY - offset.y,
-      });
+      e.currentTarget.style.left = `${e.clientX - offset.x}px`;
+      e.currentTarget.style.top = `${e.clientY - offset.y}px`;
     }
   };
 
@@ -127,12 +105,12 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
     setIsDragging(false);
   };
 
-  return show ? (
+  if (!show) return null;
+
+  return (
     <div className="standard-modal-overlay">
       <div
         className="standard-modal-container"
-        ref={modalRef}
-        style={{ top: `${position.y}px`, left: `${position.x}px`, position: 'absolute' }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -146,7 +124,7 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
           <div className="add-standard-details">
             <div className="add-standard-detail-row">
               <label>상세코드</label>
-              <input type="text" value={detailCode} onChange={e => setDetailCode(e.target.value)} />
+              <input type="text" value={detailCode} onChange={e => setDetailCode(e.target.value)} readOnly={mode === 'edit'} />
               <hr className="detail-separator" />
             </div>
             <div className="add-standard-detail-row">
@@ -163,7 +141,7 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
             ))}
             {items.length < 6 && (
               <div className="add-standard-detail-row">
-                <button className="add-item-button" onClick={handleAddItem}>항목 추가</button>
+                <button className="add-item-button" onClick={handleAddItem}>+</button>
               </div>
             )}
           </div>
@@ -191,7 +169,7 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
         </div>
       </div>
     </div>
-  ) : null;
+  );
 };
 
 StandardAddModal.propTypes = {

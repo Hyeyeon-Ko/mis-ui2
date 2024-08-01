@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: false,
     sidebarPermissions: [],
     hasStandardDataAuthority: false,
-    instCd: '', // 추가된 상태 변수
+    instCd: '', 
   });
 
   // 컴포넌트 마운트 시 세션 저장소에서 인증 상태를 로드
@@ -47,14 +47,14 @@ export const AuthProvider = ({ children }) => {
       isAuthenticated: true,
       sidebarPermissions,
       hasStandardDataAuthority,
-      instCd, // 저장
+      instCd, 
     });
     sessionStorage.setItem('userId', userId);
     sessionStorage.setItem('hngNm', hngNm);
     sessionStorage.setItem('role', role);
     sessionStorage.setItem('sidebarPermissions', JSON.stringify(sidebarPermissions));
     sessionStorage.setItem('hasStandardDataAuthority', hasStandardDataAuthority.toString());
-    sessionStorage.setItem('instCd', instCd); // 추가
+    sessionStorage.setItem('instCd', instCd);
   };
 
   // 로그아웃 함수

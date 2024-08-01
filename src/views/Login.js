@@ -48,7 +48,6 @@ const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Login response data:', data); // 로그인 응답 데이터 로그 출력
 
         if (data && data.data) {
           // 기준자료 관리 권한 확인
@@ -70,7 +69,7 @@ const Login = () => {
               data.data.role, 
               data.data.sidebarPermissions, 
               authorityData.data,
-              data.data.instCd // instCd 추가
+              data.data.instCd 
             );
             navigate('/');
           } else {
