@@ -14,6 +14,11 @@ function ApplicationsList() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [documentType, setDocumentType] = useState('');
+  const [filterInputs, setFilterInputs] = useState({
+    startDate: null,
+    endDate: null,
+    documentType: '',
+  });
   const [filters, setFilters] = useState({
     statusApproved: false,
     statusRejected: false,
@@ -78,18 +83,22 @@ function ApplicationsList() {
         },
       });
 
-      const data = Array.isArray(response.data.data.bcdMasterResponses) ? response.data.data.bcdMasterResponses : [];
+      const { bcdMasterResponses, docMasterResponses } = response.data.data;
 
-      const transformedData = data.map(application => ({
-        ...application,
-        center: application.instNm,
+      const bcdData = Array.isArray(bcdMasterResponses) ? bcdMasterResponses : [];
+      const docData = Array.isArray(docMasterResponses) ? docMasterResponses : [];
+
+      const transformedData = [...bcdData, ...docData].map(application => ({
+        draftId: application.draftId,
+        instCd: application.instCd,
+        instNm: application.instNm,
         title: application.title,
         draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
-        drafter: application.drafter,
-        approvalDate: application.respondDate ? parseDateTime(application.respondDate) : '',
+        respondDate: application.respondDate ? parseDateTime(application.respondDate) : '',
         orderDate: application.orderDate ? parseDateTime(application.orderDate) : '',
-        status: getStatusText(application.applyStatus),
-        draftId: application.draftId,
+        drafter: application.drafter,
+        applyStatus: getStatusText(application.applyStatus),
+        docType: application.docType,
       }));
 
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
@@ -113,16 +122,14 @@ function ApplicationsList() {
 
   const handleSearch = () => {
     fetchApplications({
-      documentType,
-      startDate: startDate ? startDate.toISOString().split('T')[0] : '',
-      endDate: endDate ? endDate.toISOString().split('T')[0] : '',
+      documentType: filterInputs.documentType,
+      startDate: filterInputs.startDate ? filterInputs.startDate.toISOString().split('T')[0] : '',
+      endDate: filterInputs.endDate ? filterInputs.endDate.toISOString().split('T')[0] : '',
     });
   };
 
   const handleReset = () => {
-    setStartDate(null);
-    setEndDate(null);
-    setDocumentType('');
+    setFilterInputs({ startDate: null, endDate: null, documentType: '' });
     setFilters({
       statusApproved: false,
       statusRejected: false,
@@ -136,10 +143,10 @@ function ApplicationsList() {
 
   const filteredApplications = applications.filter((application) => {
     if (isAnyFilterActive) {
-      if (filters.statusApproved && application.status === '승인완료') return true;
-      if (filters.statusRejected && application.status === '반려') return true;
-      if (filters.statusOrdered && application.status === '발주완료') return true;
-      if (filters.statusClosed && application.status === '완료') return true;
+      if (filters.statusApproved && application.applyStatus === '승인완료') return true;
+      if (filters.statusRejected && application.applyStatus === '반려') return true;
+      if (filters.statusOrdered && application.applyStatus === '발주완료') return true;
+      if (filters.statusClosed && application.applyStatus === '완료') return true;
       return false;
     }
     return true;
@@ -172,7 +179,6 @@ function ApplicationsList() {
     }
   };
 
-  // Define columns based on documentType
   const columns = documentType === '문서수발신' ? [
     ...(showCheckboxColumn ? [{
       header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
@@ -189,21 +195,25 @@ function ApplicationsList() {
     { header: '제목', accessor: 'title', width: '35%' },
     { header: '기안일시', accessor: 'draftDate', width: '18%' },
     { header: '기안자', accessor: 'drafter', width: '10%' },
-    { header: '승인일시', accessor: 'approvalDate', width: '15%' },
+    { header: '승인일시', accessor: 'respondDate', width: '15%' },
     {
       header: '문서상태',
-      accessor: 'status',
+      accessor: 'applyStatus',
       width: '13%',
       Cell: ({ row }) => (
         <span
-          className={row.status === '승인대기' ? 'status-pending clickable' : ''}
+          className={row.applyStatus === '승인대기' ? 'status-pending clickable' : ''}
           onClick={() => {
-            if (row.status === '승인대기') {
-              navigate(`/api/bcd/applyList/${row.draftId}?readonly=true`);
+            if (row.applyStatus === '승인대기') {
+              if (row.docType === '문서수발신') {
+                navigate(`/api/doc/applyList/${row.draftId}`);
+              } else {
+                navigate(`/api/bcd/applyList/${row.draftId}?readonly=true`);
+              }
             }
           }}
         >
-          {row.status}
+          {row.applyStatus}
         </span>
       ),
     },
@@ -224,22 +234,26 @@ function ApplicationsList() {
     { header: '제목', accessor: 'title', width: '24%' },
     { header: '기안일시', accessor: 'draftDate', width: '13%' },
     { header: '기안자', accessor: 'drafter', width: '6%' },
-    { header: '승인/반려일시', accessor: 'approvalDate', width: '13%' },
+    { header: '승인/반려일시', accessor: 'respondDate', width: '13%' },
     { header: '발주일시', accessor: 'orderDate', width: '14%' },
     {
       header: '문서상태',
-      accessor: 'status',
+      accessor: 'applyStatus',
       width: '10%',
       Cell: ({ row }) => (
         <span
-          className={row.status === '승인대기' ? 'status-pending clickable' : ''}
+          className={row.applyStatus === '승인대기' ? 'status-pending clickable' : ''}
           onClick={() => {
-            if (row.status === '승인대기') {
-              navigate(`/api/bcd/applyList/${row.draftId}?readonly=true`);
+            if (row.applyStatus === '승인대기') {
+              if (row.docType === '문서수발신') {
+                navigate(`/api/doc/applyList/${row.draftId}`);
+              } else {
+                navigate(`/api/bcd/applyList/${row.draftId}?readonly=true`);
+              }
             }
           }}
         >
-          {row.status}
+          {row.applyStatus}
         </span>
       ),
     },
@@ -247,7 +261,7 @@ function ApplicationsList() {
 
   return (
     <div className="content">
-      <div className="all-applications">
+      <div className='all-applications'>
         <h2>전체 신청 내역</h2>
         <div className="application-header-row">
           <Breadcrumb items={['신청 내역 관리', '전체 신청 내역']} />
@@ -260,12 +274,12 @@ function ApplicationsList() {
           </div>
         </div>
         <ConditionFilter 
-          startDate={startDate} 
-          setStartDate={setStartDate} 
-          endDate={endDate} 
-          setEndDate={setEndDate} 
-          documentType={documentType} 
-          setDocumentType={setDocumentType} 
+          startDate={filterInputs.startDate} 
+          setStartDate={(date) => setFilterInputs(prev => ({ ...prev, startDate: date }))} 
+          endDate={filterInputs.endDate} 
+          setEndDate={(date) => setFilterInputs(prev => ({ ...prev, endDate: date }))} 
+          documentType={filterInputs.documentType} 
+          setDocumentType={(type) => setFilterInputs(prev => ({ ...prev, documentType: type }))} 
           onSearch={handleSearch} 
           onReset={handleReset}
           filters={filters}

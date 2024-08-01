@@ -21,28 +21,23 @@ function PendingApprovalList() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [documentType, setDocumentType] = useState('');
+  const [filters, setFilters] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchPendingList({
-      documentType,
-      startDate: startDate ? startDate.toISOString().split('T')[0] : '',
-      endDate: endDate ? endDate.toISOString().split('T')[0] : '',
-    });
-  }, [startDate, endDate, documentType, selectedCenter]); 
-  
+    fetchPendingList(filters);
+  }, [filters]);
+
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
-  
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
-  
     return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
-  
+
   const fetchPendingList = async (filterParams = {}) => {
     setLoading(true);
     setError(null);
@@ -54,19 +49,30 @@ function PendingApprovalList() {
           endDate: filterParams.endDate || '',
         },
       });
-      
-      const data = Array.isArray(response.data.data.bcdPendingResponses) ? response.data.data.bcdPendingResponses : [];
-      const transformedData = data.map(item => ({
-        ...item,
-        center: item.instNm,
+
+      const { bcdPendingResponses, docPendingResponses } = response.data.data;
+
+      const transformedBcdData = (bcdPendingResponses || []).map(item => ({
+        draftId: item.draftId,
         title: item.title,
+        center: item.instNm,
         draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
         drafter: item.drafter,
         status: '승인대기',
-        draftId: item.draftId,
-        docType: item.docType || '미정'
+        docType: item.docType || '명함신청'
       }));
 
+      const transformedDocData = (docPendingResponses || []).map(item => ({
+        draftId: item.draftId,
+        title: item.title,
+        center: item.instNm,
+        draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
+        drafter: item.drafter,
+        status: '승인대기',
+        docType: item.docType || '문서수발신'
+      }));
+
+      const transformedData = [...transformedBcdData, ...transformedDocData];
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
 
       setApplications(transformedData);
@@ -80,33 +86,42 @@ function PendingApprovalList() {
 
   const handleCenterChange = (event) => {
     setSelectedCenter(event.target.value);
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      selectedCenter: event.target.value,
+    }));
   };
 
-  const handleRowClick = (draftId) => {
-    navigate(`/api/bcd/applyList/${draftId}?readonly=true`);
+  const handleRowClick = (draftId, docType) => {
+    if (docType === '문서수발신') {
+      navigate(`/api/doc/applyList/${draftId}`);
+    } else {
+      navigate(`/api/bcd/applyList/${draftId}?readonly=true`);
+    }
   };
 
   const handleSearch = () => {
-    fetchPendingList({
+    setFilters({
       documentType,
       startDate: startDate ? startDate.toISOString().split('T')[0] : '',
       endDate: endDate ? endDate.toISOString().split('T')[0] : '',
+      selectedCenter,
     });
   };
-  
+
   const handleReset = () => {
     setStartDate(null);
     setEndDate(null);
     setDocumentType('');
     setSelectedCenter('전체');
-    fetchPendingList();
+    setFilters({});
   };
 
   const filteredApplications = applications.filter((app) => {
-    if (selectedCenter !== '전체' && app.center !== selectedCenter) return false;
-    if (startDate && new Date(app.draftDate) < new Date(startDate)) return false;
-    if (endDate && new Date(app.draftDate) > new Date(endDate)) return false;
-    if (documentType && app.docType !== documentType) return false;
+    if (filters.selectedCenter && filters.selectedCenter !== '전체' && app.center !== filters.selectedCenter) return false;
+    if (filters.startDate && new Date(app.draftDate) < new Date(filters.startDate)) return false;
+    if (filters.endDate && new Date(app.draftDate) > new Date(filters.endDate)) return false;
+    if (filters.documentType && app.docType !== filters.documentType) return false;
     return true;
   });
 
@@ -127,7 +142,7 @@ function PendingApprovalList() {
       Cell: ({ row }) => (
         <span
           className="status-pending clickable"
-          onClick={() => handleRowClick(row.draftId)}
+          onClick={() => handleRowClick(row.draftId, row.docType)}
         >
           승인대기
         </span>
