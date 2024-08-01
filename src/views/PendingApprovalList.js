@@ -24,13 +24,12 @@ function PendingApprovalList() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 필터를 적용한 상태로 데이터를 로드
     fetchPendingList({
       documentType,
       startDate: startDate ? startDate.toISOString().split('T')[0] : '',
       endDate: endDate ? endDate.toISOString().split('T')[0] : '',
     });
-  }, [startDate, endDate, documentType, selectedCenter]); // 필터 변경 시 데이터 새로 로드
+  }, [startDate, endDate, documentType, selectedCenter]); 
   
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);

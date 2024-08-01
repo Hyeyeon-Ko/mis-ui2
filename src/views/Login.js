@@ -50,7 +50,6 @@ const Login = () => {
         const data = await response.json();
 
         if (data && data.data) {
-          // 기준자료 관리 권한 확인
           const authorityResponse = await fetch('/api/auth/standardData', {
             method: 'GET',
             headers: {
@@ -62,7 +61,6 @@ const Login = () => {
           if (authorityResponse.ok) {
             const authorityData = await authorityResponse.json();
 
-            // 로그인 성공 시 사용자 정보를 AuthContext에 저장 -> 메인 페이지로 이동
             login(
               userId, 
               data.data.hngNm, 

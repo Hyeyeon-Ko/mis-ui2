@@ -76,7 +76,6 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
       setIsStandardChecked(false);
     }
 
-    // Update table data
     setQueryResult(prevResult => {
       if (prevResult.length > 0) {
         return [{
@@ -103,7 +102,6 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
         return;
       }
 
-      // Check if the userId already exists
       const existingAdmin = existingAdmins.find(admin => admin.userId === userId);
       if (existingAdmin) {
         alert('이미 존재하는 관리자입니다');
@@ -144,7 +142,6 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
     }
     setIsStandardChecked(!isStandardChecked);
 
-    // Update table data
     setQueryResult(prevResult => {
       if (prevResult.length > 0) {
         return [{
@@ -179,11 +176,9 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
   
     try {
       if (!adminData) {
-        // Adding a new admin
         await axios.post('/api/auth/admin', requestData);
         alert('추가 완료되었습니다');
       } else {
-        // Updating an existing admin
         await axios.put(`/api/auth/admin/${adminData.authId}`, requestData);
         alert('수정 완료되었습니다');
       }

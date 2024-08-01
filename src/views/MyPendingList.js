@@ -53,7 +53,7 @@ function MyPendingList() {
           draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
           drafter: application.drafter,
           lastUpdateDate: application.lastUpdateDate ? parseDateTime(application.lastUpdateDate) : '',
-          lastUpdater: application.lastUpdater || '',
+          lastUpdater: application.lastUpdateDate ? application.lastUpdater : '', 
           docType: application.docType, 
         }));
 

@@ -106,7 +106,7 @@ function BcdOrder() {
 
     try {
       const response = await axios.post('/api/bsc/order/excel', selectedApplications, {
-        responseType: 'blob', // 서버로부터 바이너리 데이터를 받을 때 설정
+        responseType: 'blob',
       });
       fileDownload(response.data, 'order_details.xlsx');
     } catch (error) {
@@ -120,7 +120,7 @@ function BcdOrder() {
       alert('발주요청 할 명함 신청 목록을 선택하세요.');
       return;
     }
-    setShowEmailModal(true); // 이메일 작성 모달 표시
+    setShowEmailModal(true); 
   };
 
   // 이메일 전송 핸들러
@@ -130,11 +130,11 @@ function BcdOrder() {
         draftIds: selectedApplications,
         emailSubject: subject,
         emailBody: body,
-        fileName: fileName, // fileName 추가
+        fileName: fileName, 
       });
       alert('발주 요청이 완료되었습니다.');
-      fetchBcdOrderList(); // 발주 요청 후 리스트 갱신
-      setShowEmailModal(false); // 이메일 작성 모달 닫기
+      fetchBcdOrderList(); 
+      setShowEmailModal(false); 
     } catch (error) {
       console.error('Error sending order request: ', error);
       alert('발주 요청 중 오류가 발생했습니다.');
