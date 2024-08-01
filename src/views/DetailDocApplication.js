@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import CustomButton from '../components/common/CustomButton';
 import axios from 'axios';
 import '../styles/DocApply.css';
 import '../styles/common/Page.css';
+import { AuthContext } from '../components/AuthContext';
 
 function DetailDocApplication() {
   const { draftId } = useParams();
   const navigate = useNavigate();
+  const { auth } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     receptionDate: '',
     drafter: '',
@@ -26,8 +28,13 @@ function DetailDocApplication() {
     if (draftId) {
       fetchDocDetail(draftId);
       setIsEdit(true);
+    } else {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        drafter: auth.hngNm || ''
+      }));
     }
-  }, [draftId]);
+  }, [draftId, auth.hngNm]);
 
   const fetchDocDetail = async (id) => {
     try {
@@ -36,7 +43,7 @@ function DetailDocApplication() {
         const { draftDate, drafter, division, receiver, sender, docTitle, purpose } = response.data.data;
         const fetchedData = {
           receptionDate: parseDateTime(draftDate),
-          drafter: drafter || '',
+          drafter: auth.hngNm,
           division: division || '',
           receiver: receiver || '',
           sender: sender || '',
@@ -80,7 +87,7 @@ function DetailDocApplication() {
         };
         await axios.post(`/api/doc/update?draftId=${draftId}`, payload);
         alert('문서 수정이 완료되었습니다');
-        navigate('/api/MyPendingList'); 
+        navigate('/api/MyPendingList');
       }
     } catch (error) {
       console.error('Error submitting document:', error);

@@ -79,7 +79,6 @@ function BcdApplySecond() {
       const response = await axios.get(`/api/info/${userId}`);
       if (response.data && response.data.data) {
         const userData = response.data.data;
-        console.log(userData);
         setFormData((prevFormData) => ({
           ...prevFormData,
           name: userData.userName,
