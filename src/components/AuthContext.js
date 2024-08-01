@@ -12,7 +12,8 @@ export const AuthProvider = ({ children }) => {
     role: '',
     isAuthenticated: false,
     sidebarPermissions: [],
-    hasStandardDataAuthority: false, // 추가된 상태 변수
+    hasStandardDataAuthority: false,
+    instCd: '', // 추가된 상태 변수
   });
 
   // 컴포넌트 마운트 시 세션 저장소에서 인증 상태를 로드
@@ -22,6 +23,7 @@ export const AuthProvider = ({ children }) => {
     const role = sessionStorage.getItem('role');
     const sidebarPermissions = JSON.parse(sessionStorage.getItem('sidebarPermissions')) || [];
     const hasStandardDataAuthority = sessionStorage.getItem('hasStandardDataAuthority') === 'true';
+    const instCd = sessionStorage.getItem('instCd') || '';
 
     if (userId && hngNm && role) {
       setAuth({
@@ -31,12 +33,13 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated: true,
         sidebarPermissions,
         hasStandardDataAuthority,
+        instCd,
       });
     }
   }, []);
 
   // 로그인 함수
-  const login = (userId, hngNm, role, sidebarPermissions, hasStandardDataAuthority) => {
+  const login = (userId, hngNm, role, sidebarPermissions, hasStandardDataAuthority, instCd) => {
     setAuth({
       userId,
       hngNm,
@@ -44,12 +47,14 @@ export const AuthProvider = ({ children }) => {
       isAuthenticated: true,
       sidebarPermissions,
       hasStandardDataAuthority,
+      instCd, // 저장
     });
     sessionStorage.setItem('userId', userId);
     sessionStorage.setItem('hngNm', hngNm);
     sessionStorage.setItem('role', role);
     sessionStorage.setItem('sidebarPermissions', JSON.stringify(sidebarPermissions));
     sessionStorage.setItem('hasStandardDataAuthority', hasStandardDataAuthority.toString());
+    sessionStorage.setItem('instCd', instCd); // 추가
   };
 
   // 로그아웃 함수
@@ -61,12 +66,14 @@ export const AuthProvider = ({ children }) => {
       isAuthenticated: false,
       sidebarPermissions: [],
       hasStandardDataAuthority: false,
+      instCd: '',
     });
     sessionStorage.removeItem('userId');
     sessionStorage.removeItem('hngNm');
     sessionStorage.removeItem('role');
     sessionStorage.removeItem('sidebarPermissions');
     sessionStorage.removeItem('hasStandardDataAuthority');
+    sessionStorage.removeItem('instCd');
   };
 
   return (

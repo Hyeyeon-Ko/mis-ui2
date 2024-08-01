@@ -51,21 +51,26 @@ function DocApply() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const payload = {
+      drafterId: formData.userId,
+      drafter: formData.drafter,
+      division: formData.division,
+      sender: activeTab === 'reception' ? formData.receiver : '',
+      receiver: activeTab === 'sending' ? formData.sender : '',
+      docTitle: formData.title,
+      purpose: formData.purpose,
+      instCd: auth.instCd, // instCd 추가
+    };
+    
+    console.log('Payload being sent:', payload); // 백엔드로 전송하는 데이터 로그 출력
+
     try {
       const response = await fetch('/api/doc', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          drafterId: formData.userId,
-          drafter: formData.drafter,
-          division: formData.division,
-          sender: activeTab === 'reception' ? formData.receiver : '',
-          receiver: activeTab === 'sending' ? formData.sender : '',
-          docTitle: formData.title,
-          purpose: formData.purpose,
-        }),
+        body: JSON.stringify(payload),
       });
       if (response.ok) {
         alert('신청이 완료되었습니다.');

@@ -48,13 +48,14 @@ const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log('Login response data:', data); // 로그인 응답 데이터 로그 출력
+
         if (data && data.data) {
           // 기준자료 관리 권한 확인
           const authorityResponse = await fetch('/api/auth/standardData', {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
-              // 필요시, 인증 토큰 추가
               'Authorization': `Bearer ${data.data.token}`
             },
           });
@@ -63,7 +64,14 @@ const Login = () => {
             const authorityData = await authorityResponse.json();
 
             // 로그인 성공 시 사용자 정보를 AuthContext에 저장 -> 메인 페이지로 이동
-            login(userId, data.data.hngNm, data.data.role, data.data.sidebarPermissions, authorityData.data);
+            login(
+              userId, 
+              data.data.hngNm, 
+              data.data.role, 
+              data.data.sidebarPermissions, 
+              authorityData.data,
+              data.data.instCd // instCd 추가
+            );
             navigate('/');
           } else {
             console.log('Failed to check authority:', authorityResponse);
