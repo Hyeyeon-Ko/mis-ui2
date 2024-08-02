@@ -177,7 +177,7 @@ function PendingApprovalList() {
     <div className="content">
       <div className="order">
         <h2>승인 대기 내역</h2>
-        <Breadcrumb items={['신청 내역 관리', '승인 대기 내역']} />
+        <Breadcrumb items={['신청내역 관리', '승인 대기 내역']} />
         <ConditionFilter
           startDate={startDate}
           setStartDate={setStartDate}

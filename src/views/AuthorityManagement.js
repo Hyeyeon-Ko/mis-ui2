@@ -31,6 +31,7 @@ function AuthorityManagement() {
     try {
       const response = await axios.get('/api/auth');
       const data = response.data.data || response.data;
+      console.log('data: ', data);
       const transformedData = data.map(item => ({
         id: item.userId,
         role: item.userRole,
@@ -44,6 +45,7 @@ function AuthorityManagement() {
           assetManagement: item.assetManagement,
         },
       }));
+      console.log('transformedDate: ', transformedData);
 
       setApplications(transformedData);
     } catch (error) {

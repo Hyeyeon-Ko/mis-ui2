@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../components/AuthContext';
 import '../styles/Login.css'; 
@@ -6,11 +6,10 @@ import logo from '../assets/images/logo.png';
 
 /*로그인 페이지*/
 const Login = () => {
-  // 사용자 ID와 비밀번호 상태 관리
   const [userId, setUserId] = useState('');
   const [userPw, setUserPw] = useState('');
+  const userIdRef = useRef(null); 
 
-  // AuthContext에서 login 함수와 useNavigate 훅 사용
   const { auth, login } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -79,17 +78,20 @@ const Login = () => {
           alert('로그인 정보가 올바르지 않습니다.');
           setUserId('');
           setUserPw('');
+          userIdRef.current.focus(); 
         }
       } else {
         alert('로그인에 실패했습니다. 다시 시도해주세요.');
         setUserId('');
         setUserPw('');
+        userIdRef.current.focus(); 
       }
     } catch (error) {
       console.error('Server error:', error);
       alert('서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.');
       setUserId('');
       setUserPw('');
+      userIdRef.current.focus(); 
     }
   };
 
@@ -104,6 +106,7 @@ const Login = () => {
             className="login-input"
             value={userId}
             onChange={(e) => setUserId(e.target.value)}
+            ref={userIdRef} 
           />
           <input
             type="password"
