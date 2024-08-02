@@ -41,13 +41,21 @@ function MainLayout({ children }) {
 function RequireAuth({ children }) {
   const { auth } = useContext(AuthContext);
 
-  return auth.isAuthenticated ? children : <Navigate to="/api/login" />;
+  if (!auth.isAuthenticated) {
+    return <Navigate to="/api/login" />;
+  }
+
+  if ((auth.role === 'ADMIN' || auth.role === 'MASTER') && window.location.pathname === '/') {
+    return <Navigate to="/api/applyList" />;
+  }
+
+  return children;
 }
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <Routes>
           <Route path="/api/login" element={<Login />} />
           <Route path="*" element={
@@ -58,7 +66,7 @@ function App() {
                 <Route path="/api/bcd" element={<RequireAuth><BcdApplyFirst /></RequireAuth>} />
                 <Route path="/api/bcd/own" element={<RequireAuth><BcdApplySecond /></RequireAuth>} />
                 <Route path="/api/bcd/other" element={<RequireAuth><BcdApplySecond /></RequireAuth>} />
-                <Route path="/api/doc" element={<RequireAuth><DocApply></DocApply></RequireAuth>} />
+                <Route path="/api/doc" element={<RequireAuth><DocApply /></RequireAuth>} />
                 <Route path="/api/myApplyList" element={<RequireAuth><MyApplyList /></RequireAuth>} />
                 <Route path="/api/myPendingList" element={<RequireAuth><MyPendingList /></RequireAuth>} />
                 <Route path="/api/applyList" element={<RequireAuth><ApplicationsList /></RequireAuth>} />
@@ -74,8 +82,8 @@ function App() {
             </MainLayout>
           } />
         </Routes>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

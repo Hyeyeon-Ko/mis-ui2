@@ -4,7 +4,6 @@ import { AuthContext } from '../components/AuthContext';
 import '../styles/Login.css'; 
 import logo from '../assets/images/logo.png';
 
-/*로그인 페이지*/
 const Login = () => {
   const [userId, setUserId] = useState('');
   const [userPw, setUserPw] = useState('');
@@ -15,7 +14,11 @@ const Login = () => {
 
   useEffect(() => {
     if (auth.isAuthenticated) {
-      navigate('/');
+      if (auth.role === 'ADMIN' || auth.role === 'MASTER') {
+        navigate('/api/applyList');
+      } else {
+        navigate('/');
+      }
     }
 
     const handlePopState = (event) => {
@@ -31,12 +34,10 @@ const Login = () => {
     };
   }, [auth, navigate]);
 
-  // 로그인 처리 함수
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      // 로그인 API 호출
       const response = await fetch('/api/login', {
         method: 'POST',
         headers: {
@@ -68,7 +69,13 @@ const Login = () => {
               authorityData.data,
               data.data.instCd 
             );
-            navigate('/');
+
+            if (data.data.role === 'ADMIN' || data.data.role === 'MASTER') {
+              navigate('/api/applyList');
+            } else {
+              navigate('/');
+            }
+
           } else {
             console.log('Failed to check authority:', authorityResponse);
             alert('권한 확인에 실패했습니다. 다시 시도해주세요.');

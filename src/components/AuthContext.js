@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 /* 인증 상태 관리 */
 // AuthContext 생성 -> 인증 상태 저장
@@ -6,6 +7,7 @@ export const AuthContext = createContext();
 
 // AuthProvider 컴포넌트 -> 인증 상태 제공
 export const AuthProvider = ({ children }) => {
+  const navigate = useNavigate(); // useNavigate 훅 추가
   const [auth, setAuth] = useState({
     userId: '',
     hngNm: '',
@@ -96,7 +98,9 @@ export const AuthProvider = ({ children }) => {
       if (prevAuth.originalRole === 'USER') return prevAuth; 
       const newMode = !prevAuth.isUserMode;
       sessionStorage.setItem('isUserMode', newMode.toString());
-      return { ...prevAuth, isUserMode: newMode, role: newMode ? 'USER' : prevAuth.originalRole };
+      const newRole = newMode ? 'USER' : prevAuth.originalRole;
+      navigate(newMode ? '/' : '/api/applyList'); // 모드 전환 시 경로 설정
+      return { ...prevAuth, isUserMode: newMode, role: newRole };
     });
   };
 
