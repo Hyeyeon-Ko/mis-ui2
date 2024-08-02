@@ -87,76 +87,78 @@ function DocApply() {
       <div className="doc-content">
         <h2>문서수발신</h2>
         <Breadcrumb items={['신청하기', '문서수발신']} />
-        <div className="doc-apply-content">
+        <div className='doc-main'>
           <div className="tab-container">
             <button 
               className={`tab-button ${activeTab === 'reception' ? 'active' : ''}`} 
               onClick={() => handleTabChange('reception')}
             >
-              문서 수신
+              문서 수신 신청
             </button>
             <button 
               className={`tab-button ${activeTab === 'sending' ? 'active' : ''}`} 
               onClick={() => handleTabChange('sending')}
             >
-              문서 발신
+              문서 발신 신청
             </button>
           </div>
-          <form className="doc-form" onSubmit={handleSubmit}>
-            <div className="doc-form-group">
-              <label>접수 일자</label>
-              <input 
-                type="date" 
-                name="receptionDate" 
-                value={formData.receptionDate} 
-                readOnly 
-              />
-            </div>
-            <div className="doc-form-group">
-              <label>접수인</label>
-              <input
-                type="text"
-                name="drafter"
-                value={formData.drafter}
-                onChange={handleChange}
-                required
-                readOnly
-              />
-            </div>
-            <div className="doc-form-group">
-              <label>{activeTab === 'reception' ? '발신처' : '수신처'}</label>
-              <input 
-                type="text" 
-                name={activeTab === 'reception' ? 'receiver' : 'sender'} 
-                value={activeTab === 'reception' ? formData.receiver : formData.sender} 
-                onChange={handleChange} 
-                required 
-              />
-            </div>
-            <div className="doc-form-group">
-              <label>제 목</label>
-              <textarea 
-                name="title" 
-                value={formData.title} 
-                onChange={handleChange} 
-                required 
-              />
-            </div>
-            <div className="doc-form-group">
-              <label>사용 용도</label>
-              <textarea 
-                name="purpose" 
-                value={formData.purpose} 
-                onChange={handleChange} 
-                required 
-              />
-            </div>
-            <div className="doc-apply-button-container">
-              <CustomButton className="apply-request-button" type="submit">
-                  문서 신청하기
-              </CustomButton>
-            </div>
-          </form>
+          <div className="doc-apply-content">
+            <form className="doc-form" onSubmit={handleSubmit}>
+              <div className="doc-form-group">
+                <label>접수 일자</label>
+                <input 
+                  type="date" 
+                  name="receptionDate" 
+                  value={formData.receptionDate} 
+                  readOnly 
+                />
+              </div>
+              <div className="doc-form-group">
+                <label>접수인</label>
+                <input
+                  type="text"
+                  name="drafter"
+                  value={formData.drafter}
+                  onChange={handleChange}
+                  required
+                  readOnly
+                />
+              </div>
+              <div className="doc-form-group">
+                <label>{activeTab === 'reception' ? '발신처' : '수신처'}</label>
+                <input 
+                  type="text" 
+                  name={activeTab === 'reception' ? 'receiver' : 'sender'} 
+                  value={activeTab === 'reception' ? formData.receiver : formData.sender} 
+                  onChange={handleChange} 
+                  required 
+                />
+              </div>
+              <div className="doc-form-group">
+                <label>제 목</label>
+                <textarea 
+                  name="title" 
+                  value={formData.title} 
+                  onChange={handleChange} 
+                  required 
+                />
+              </div>
+              <div className="doc-form-group">
+                <label>사용 용도</label>
+                <textarea 
+                  name="purpose" 
+                  value={formData.purpose} 
+                  onChange={handleChange} 
+                  required 
+                />
+              </div>
+              <div className="doc-apply-button-container">
+                <CustomButton className="apply-request-button" type="submit">
+                    문서 신청하기
+                </CustomButton>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
