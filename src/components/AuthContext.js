@@ -93,9 +93,10 @@ export const AuthProvider = ({ children }) => {
   // 모드 전환 함수
   const toggleMode = () => {
     setAuth((prevAuth) => {
+      if (prevAuth.originalRole === 'USER') return prevAuth; 
       const newMode = !prevAuth.isUserMode;
       sessionStorage.setItem('isUserMode', newMode.toString());
-      return { ...prevAuth, isUserMode: newMode, role: newMode ? 'USER' : prevAuth.originalRole }; // 역할 변경
+      return { ...prevAuth, isUserMode: newMode, role: newMode ? 'USER' : prevAuth.originalRole };
     });
   };
 

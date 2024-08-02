@@ -384,6 +384,12 @@ function DetailApplication() {
     setFormData({ ...formData, address: updatedAddress, engAddress: updatedEngAddress });
   };
 
+  const handleNumberInput = (e) => {
+    const { value, maxLength } = e.target;
+    const numericValue = value.replace(/\D/g, '');
+    setFormData({ ...formData, [e.target.name]: numericValue.slice(0, maxLength) });
+  };
+
   return (
     <div className="content">
       <div className="apply-content">
@@ -555,25 +561,25 @@ function DetailApplication() {
               <div className="form-group-horizontal">
                 <label className="form-label">내선 번호</label>
                 <div className="phone-inputs">
-                  <input type="tel" name="phone1" value={formData.phone1} onChange={handleChange} required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
-                  <input type="tel" name="phone2" value={formData.phone2} onChange={handleChange} required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
-                  <input type="tel" name="phone3" value={formData.phone3} onChange={handleChange} required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
+                  <input type="tel" name="phone1" value={formData.phone1} onInput={handleNumberInput} maxLength="4" required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
+                  <input type="tel" name="phone2" value={formData.phone2} onInput={handleNumberInput} maxLength="4" required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
+                  <input type="tel" name="phone3" value={formData.phone3} onInput={handleNumberInput} maxLength="4" required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
                 </div>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">팩스 번호</label>
                 <div className="phone-inputs">
-                  <input type="tel" name="fax1" value={formData.fax1} onChange={handleChange} required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
-                  <input type="tel" name="fax2" value={formData.fax2} onChange={handleChange} required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
-                  <input type="tel" name="fax3" value={formData.fax3} onChange={handleChange} required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
+                  <input type="tel" name="fax1" value={formData.fax1} onInput={handleNumberInput} maxLength="4" required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
+                  <input type="tel" name="fax2" value={formData.fax2} onInput={handleNumberInput} maxLength="4" required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
+                  <input type="tel" name="fax3" value={formData.fax3} onInput={handleNumberInput} maxLength="4" required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
                 </div>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">휴대폰 번호</label>
                 <div className="phone-inputs">
-                  <input type="tel" name="mobile1" value={formData.mobile1} onChange={handleChange} required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
-                  <input type="tel" name="mobile2" value={formData.mobile2} onChange={handleChange} required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
-                  <input type="tel" name="mobile3" value={formData.mobile3} onChange={handleChange} required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
+                  <input type="tel" name="mobile1" value={formData.mobile1} onInput={handleNumberInput} maxLength="4" required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
+                  <input type="tel" name="mobile2" value={formData.mobile2} onInput={handleNumberInput} maxLength="4" required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
+                  <input type="tel" name="mobile3" value={formData.mobile3} onInput={handleNumberInput} maxLength="4" required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
                 </div>
               </div>
               <div className="form-group-horizontal">

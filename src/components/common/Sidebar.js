@@ -52,7 +52,7 @@ function Sidebar() {
       <Link to="/">
         <img src={logo} alt="KMI Logo" className="logo" />
       </Link>
-      {auth.isUserMode ? (
+      {auth.isUserMode || auth.role === 'USER' ? (
         <>
           <SidebarSection 
             title="신청하기" 
