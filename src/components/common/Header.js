@@ -20,11 +20,11 @@ function Header() {
               <span> | </span>
               <button onClick={logout} className="logout-button">로그아웃</button>
               <img 
-                src={auth.isUserMode ? userImg : adminImg} 
-                alt={auth.isUserMode ? "User" : "Admin"} 
+                src={auth.isUserMode || auth.originalRole === 'USER' ? userImg : adminImg} 
+                alt={auth.isUserMode || auth.originalRole === 'USER' ? "User" : "Admin"} 
                 className="role-image" 
-                onClick={toggleMode}
-                style={{ cursor: 'pointer' }}
+                onClick={auth.originalRole !== 'USER' ? toggleMode : null}
+                style={{ cursor: auth.originalRole !== 'USER' ? 'pointer' : 'default' }}
               />
             </>
           ) : (
