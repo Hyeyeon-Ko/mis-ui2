@@ -35,18 +35,16 @@ function Sidebar() {
   const docItems = [
     { label: '문서 수신 대장', url: '/api/doc/receiveList' },
     { label: '문서 발신 대장', url: '/api/doc/sendList' },
-  ]
+  ];
 
   const orderItems = [
     { label: '명함 발주', url: '/api/bcd/orderList' },
   ];
 
   const sections = {
-    'A': { title: '신청하기', items: applyItems },
-    'B': { title: '나의 신청내역', items: myApplyItems },
-    'C': { title: '신청내역 관리', items: manageItems },
-    'D': { title: '문서수발신 관리', items:docItems },
-    'E': { title: '발주 관리', items: orderItems },
+    'A': { title: '신청내역 관리', items: manageItems },
+    'B': { title: '문서수발신 관리', items: docItems },
+    'C': { title: '발주 관리', items: orderItems },
   };
 
   return (
@@ -54,7 +52,7 @@ function Sidebar() {
       <Link to="/">
         <img src={logo} alt="KMI Logo" className="logo" />
       </Link>
-      {auth.role === 'USER' && (
+      {auth.isUserMode ? (
         <>
           <SidebarSection 
             title="신청하기" 
@@ -71,8 +69,7 @@ function Sidebar() {
             defaultOpen={false} 
           />
         </>
-      )}
-      {(auth.role === 'ADMIN' || auth.role === 'MASTER') && (
+      ) : (
         <>
           {auth.sidebarPermissions && auth.sidebarPermissions.map((perm, index) => (
             sections[perm] && <SidebarSection 
