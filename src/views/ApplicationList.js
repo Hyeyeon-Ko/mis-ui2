@@ -192,6 +192,15 @@ function ApplicationsList() {
     }
   };
 
+  const handleRowClick = (draftId, docType) => {
+    if (docType === '문서수발신') {
+      setSelectedDocumentId(draftId);
+      setModalVisible(true);
+    } else if (docType === '명함신청') {
+      navigate(`/api/bcd/applyList/${draftId}?readonly=true`);
+    }
+  };
+
   const columns = [
     ...(showCheckboxColumn ? [{
       header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
@@ -220,8 +229,7 @@ function ApplicationsList() {
           className={row.applyStatus === '승인대기' ? 'status-pending clickable' : ''}
           onClick={() => {
             if (row.applyStatus === '승인대기') {
-              setSelectedDocumentId(row.draftId);
-              setModalVisible(true);
+              handleRowClick(row.draftId, row.docType);
             }
           }}
         >
