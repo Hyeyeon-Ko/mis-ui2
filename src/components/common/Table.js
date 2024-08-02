@@ -13,7 +13,7 @@ const Table = ({ columns, data }) => (
     </thead>
     <tbody>
       {data.map((row, rowIndex) => (
-        <tr key={rowIndex}>
+        <tr key={rowIndex} className={row.deleted ? 'deleted' : ''}>
           {columns.map((col, colIndex) => (
             <td key={colIndex}>
               {col.Cell ? col.Cell({ row: row.original || row }) : row[col.accessor]}

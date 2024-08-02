@@ -6,3 +6,9 @@
     font-size: 28px;
     margin-bottom: 16px;
 }
+
+.table-row.deleted {
+    text-decoration: line-through;
+    color: gray; /* 취소선과 함께 색상을 조정할 수 있습니다. */
+  }
+  

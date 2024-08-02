@@ -16,10 +16,10 @@ function Sidebar() {
   };
 
   const applyItems = [
-    { label: '명함신청', url: '/api/bcd' },
-    { label: '법인서류', url: '/api/legalDoc' },
-    { label: '인장관리', url: '/api/seal' },
-    { label: '문서수발신', url: '/api/doc' },
+    { label: '명함 신청', url: '/api/bcd' },
+    { label: '법인서류 신청', url: '/api/legalDoc' },
+    { label: '인장관리 신청', url: '/api/seal' },
+    { label: '문서수발신 신청', url: '/api/doc' },
   ];
 
   const myApplyItems = [

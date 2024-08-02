@@ -85,3 +85,8 @@
 .cancel-button:hover {
   background-color: #1C6CC1;
 }
+
+.custom-table .deleted {
+  text-decoration: line-through;
+  color: gray;
+}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../components/common/Breadcrumb';
 import ConditionFilter from '../components/common/ConditionFilter';
 import Table from '../components/common/Table';
+import ConfirmModal from '../components/common/ConfirmModal';
 import deleteIcon from '../assets/images/delete.png';
 import '../styles/DocInList.css';
 import axios from 'axios';
@@ -10,21 +11,16 @@ function DocInList() {
   const [applications, setApplications] = useState([]);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [filters, setFilters] = useState({});
- 
+  const [filters, setFilters] = useState({
+    startDate: null,
+    endDate: null,
+  });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedDraftId, setSelectedDraftId] = useState(null);
+
   useEffect(() => {
     fetchDocInList(filters);
   }, [filters]);
-
-  const parseDateTime = (dateString) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
-  };
 
   const fetchDocInList = async (filterParams = {}) => {
     try {
@@ -32,28 +28,27 @@ function DocInList() {
         params: {
           startDate: filterParams.startDate || '',
           endDate: filterParams.endDate || '',
-          draftId: Number(filterParams.draftId),
         },
       });
       console.log('response: ', response);
 
       if (response.data && response.data.data) {
         const formattedData = response.data.data.map(item => ({
+          draftId: item.draftId,
           draftDate: item.draftDate,
           docId: item.docId,
-          receiver: item.resSender,
+          resSender: item.resSender,
           title: item.title,
           drafter: item.drafter,
+          status: item.status,
+          deleted: false, // 초기 상태는 삭제되지 않음
         }));
-        console.log('formattedDate: ', formattedData);
+        console.log('formattedData: ', formattedData);
         setApplications(formattedData);
       }
     } catch (error) {
       console.error('Error fetching document list:', error);
     }
-  };
-
-  const handleDelete = () => {
   };
 
   const handleSearch = () => {
@@ -69,29 +64,63 @@ function DocInList() {
     setFilters({});
   };
 
+  const handleDeleteClick = (draftId) => {
+    if (draftId) {
+      setSelectedDraftId(draftId);
+      setShowDeleteModal(true);
+    } else {
+      console.error('Invalid draftId:', draftId);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (selectedDraftId === null) return;
+
+    try {
+      await axios.put('/api/doc/delete', null, {
+        params: {
+          draftId: selectedDraftId,
+        },
+      });
+
+      // 데이터에서 삭제된 항목을 찾아서 업데이트
+      setApplications(prevApps => 
+        prevApps.map(app => 
+          app.draftId === selectedDraftId ? { ...app, deleted: true } : app
+        )
+      );
+
+      setShowDeleteModal(false);
+    } catch (error) {
+      console.error('Error deleting document:', error);
+    }
+  };
+
   const columns = [
     { header: '접수일자', accessor: 'draftDate', width: '8%' },
     { header: '문서번호', accessor: 'docId', width: '8%' },
-    { header: '수신처', accessor: 'receiver', width: '10%' },
+    { header: '수신처', accessor: 'resSender', width: '10%' },
     { header: '제목', accessor: 'title', width: '20%' },
     { header: '접수인', accessor: 'drafter', width: '8%' },
+    { header: '상태', accessor: 'status', width: '8%' },
     {
       header: '신청 삭제',
       accessor: 'delete',
       width: '10%',
-      Cell: ({ row }) => (
-        <div className="icon-cell">
-          <img src={deleteIcon} alt="Delete" className="action-icon" onClick={() => handleDelete(row)} />
-        </div>
-      ),
+      Cell: ({ row }) => {
+        return (
+          <div className="icon-cell">
+            <img
+              src={deleteIcon}
+              alt="Delete"
+              className="action-icon"
+              onClick={() => handleDeleteClick(row.draftId)}
+            />
+          </div>
+        );
+      },
     },
   ];
-
-//   // Sample data to be displayed in the table
-//   const data = [
-//     { draftDate: '24.07.01', docId: '24-001', receiver: 'KB 국민카드', title: '2월 전국센터 간식포인트 지급 요청', drafter: '김규동' },
-//     { draftDate: '24.07.02', docId: '24-002', receiver: '신한은행 서초구지점', title: '한국의학연구소 실소유자 확인 서류', drafter: '윤재준' },
-//   ];
 
   return (
     <div className="content">
@@ -106,10 +135,16 @@ function DocInList() {
           onSearch={handleSearch}
           onReset={handleReset}
         />
-
-        <div class="doc-in-content">
-            <Table columns={columns} data={applications} />
+        <div className="doc-in-content">
+          <Table columns={columns} data={applications} />
         </div>
+        {showDeleteModal && (
+          <ConfirmModal
+            message="이 문서를 삭제하시겠습니까?"
+            onConfirm={handleConfirmDelete}
+            onCancel={() => setShowDeleteModal(false)}
+          />
+        )}
       </div>
     </div>
   );

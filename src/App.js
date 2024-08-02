@@ -21,6 +21,7 @@ import DocOutList from './views/DocOutList';
 import StandardData from './views/StandardData';
 import DocApply from './views/DocApply';
 import { AuthProvider, AuthContext } from './components/AuthContext';
+import { IoMagnet } from 'react-icons/io5';
 
 function MainLayout({ children }) {
   const location = useLocation();
