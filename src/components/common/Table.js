@@ -13,10 +13,16 @@ const Table = ({ columns, data }) => (
     </thead>
     <tbody>
       {data.map((row, rowIndex) => (
-        <tr key={rowIndex} className={row.deleted ? 'deleted' : ''}>
+        <tr key={rowIndex} className={row.status === '신청취소' ? 'cancelled' : ''}>
           {columns.map((col, colIndex) => (
             <td key={colIndex}>
-              {col.Cell ? col.Cell({ row: row.original || row }) : row[col.accessor]}
+              {col.Cell ? (
+                <div className={`icon-cell ${row.status === '신청취소' ? 'disabled' : ''}`}>
+                  {col.Cell({ row: row.original || row })}
+                </div>
+              ) : (
+                row[col.accessor]
+              )}
             </td>
           ))}
         </tr>

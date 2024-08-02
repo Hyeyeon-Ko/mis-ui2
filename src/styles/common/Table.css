@@ -86,7 +86,12 @@
   background-color: #1C6CC1;
 }
 
-.custom-table .deleted {
+.custom-table tr.cancelled {
   text-decoration: line-through;
-  color: gray;
+  color: #888;
+}
+
+.icon-cell.disabled .action-icon {
+  opacity: 0.5; /* Optional: To make the icon visually distinct */
+  pointer-events: none;
 }

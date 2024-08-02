@@ -136,7 +136,7 @@ function DocInList() {
           onReset={handleReset}
         />
         <div className="doc-in-content">
-          <Table columns={columns} data={applications} />
+          <Table columns={columns} data={applications}/>
         </div>
         {showDeleteModal && (
           <ConfirmModal
