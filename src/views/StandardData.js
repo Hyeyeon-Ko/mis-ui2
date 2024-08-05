@@ -112,6 +112,8 @@ function StandardData() {
         etcItem4: newRow.items[3],
         etcItem5: newRow.items[4],
         etcItem6: newRow.items[5],
+        etcItem7: newRow.items[6],
+        etcItem8: newRow.items[7],
       });
   
       try {
@@ -127,6 +129,8 @@ function StandardData() {
           etcItem4: newRow.items[3],
           etcItem5: newRow.items[4],
           etcItem6: newRow.items[5],
+          etcItem7: newRow.items[6],
+          etcItem8: newRow.items[7],
         });
         alert('상세 코드가 추가되었습니다.');
         fetchDetails(selectedSubCategory);
@@ -153,6 +157,8 @@ function StandardData() {
           etcItem4: newRow.items[3],
           etcItem5: newRow.items[4],
           etcItem6: newRow.items[5],
+          etcItem7: newRow.items[6],
+          etcItem8: newRow.items[7],
         });
         alert('상세 코드가 수정되었습니다.');
         fetchDetails(selectedSubCategory);
@@ -272,6 +278,8 @@ function StandardData() {
     { header: '항목 4', accessor: 'etcItem4' },
     { header: '항목 5', accessor: 'etcItem5' },
     { header: '항목 6', accessor: 'etcItem6' },
+    { header: '항목 7', accessor: 'etcItem7' },
+    { header: '항목 8', accessor: 'etcItem8' },
   ];
 
   const getModalTitle = () => {
