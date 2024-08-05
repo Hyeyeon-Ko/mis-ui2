@@ -8,6 +8,7 @@ import '../styles/BcdOrder.css';
 import '../styles/common/Page.css';
 import axios from 'axios';
 import fileDownload from 'js-file-download'; 
+import { FadeLoader } from 'react-spinners';
 
 /* 발주 페이지 */
 function BcdOrder() {
@@ -28,6 +29,7 @@ function BcdOrder() {
   ]);
   const [selectedCenter, setSelectedCenter] = useState('전체');
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Timestamp Parsing: "YYYY-MM-DD"
   const parseDate = (dateString) => {
@@ -125,6 +127,7 @@ function BcdOrder() {
 
   // 이메일 전송 핸들러
   const handleSendEmail = async (subject, body, fileName) => {
+    setIsLoading(true); // 로딩 시작
     try {
       await axios.post('/api/bsc/order', {
         draftIds: selectedApplications,
@@ -138,6 +141,8 @@ function BcdOrder() {
     } catch (error) {
       console.error('Error sending order request: ', error);
       alert('발주 요청 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -191,7 +196,20 @@ function BcdOrder() {
         </div>
         <Table columns={columns} data={filteredApplications} />
       </div>
-      <EmailModal show={showEmailModal} onClose={() => setShowEmailModal(false)} onSend={handleSendEmail} />
+      {isLoading && (
+        <div className="loading-overlay">
+          <FadeLoader
+            color="#ffffff"
+            height={15}
+            loading={isLoading}
+            margin={2}
+            radius={2}
+            speedMultiplier={1}
+            width={5}
+          />
+        </div>
+      )}
+      <EmailModal show={showEmailModal} onClose={() => setShowEmailModal(false)} onSend={handleSendEmail} />  
     </div>
   );
 }
