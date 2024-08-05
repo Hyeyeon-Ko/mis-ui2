@@ -177,6 +177,14 @@ function MyApplyList() {
       accessor: 'applyStatus',
       width: '12%',
       Cell: ({ row }) => (
+        row.applyStatus === '발주완료' ? (
+          <button 
+            className="status-button" 
+            onClick={() => handleButtonClick(row)}
+          >
+            수령확인
+          </button>
+        ):
         row.applyStatus === '발주완료' || row.applyStatus === '반려' ? (
           <button 
             className="status-button" 

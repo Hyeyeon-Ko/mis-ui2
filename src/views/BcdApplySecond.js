@@ -509,7 +509,12 @@ function BcdApplySecond() {
                 <label className="form-label">직위 / 직책</label>
                 <select name="position" value={formData.position} onChange={handlePositionChange} required onClick={handleInputClick}>
                   <option value="">선택하세요</option>
-                  {bcdData.gradeInfo.map((position) => (
+                  {[
+                    ...bcdData.gradeInfo
+                      .filter((position) => position.detailCd !== '999')
+                      .sort((a, b) => a.detailNm.localeCompare(b.detailNm)),
+                    ...bcdData.gradeInfo.filter((position) => position.detailCd === '999')
+                  ].map((position) => (
                     <option key={position.detailCd} value={position.detailCd}>
                       {`${position.detailNm} | ${position.etcItem2}`}
                     </option>
