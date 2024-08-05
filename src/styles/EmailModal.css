@@ -27,45 +27,42 @@
   margin-bottom: 24px;
 }
 
-.email-modal-container input {
+.email-input-group {
+  margin-bottom: 10px;
+}
+
+.email-input-group label {
+  display: block;
+  margin-left: 6px;
+  margin-bottom: 5px;
+  font-weight: 600; 
+}
+
+.email-modal-container input,
+.email-modal-container textarea {
   width: 95%;
   padding: 10px;
   margin-bottom: 8px;
-  font-size: 12px;
+  font-size: 13.5px;
   background-color: white;
   border: 0.1px solid #ccc;
   border-radius: 5px;
   transition: border-bottom-color 0.3s ease;
 }
 
-.email-modal-container input:hover {
+.email-modal-container input:hover,
+.email-modal-container textarea:hover {
   border: 0.1px solid #a2c7f3;
 }
 
-.email-modal-container input:focus {
-  outline: none; /* 기본 포커스 스타일 제거 */
-  border-bottom: 0.1px solid #a2c7f3; /* 원하는 색상과 굵기로 변경 */
+.email-modal-container input:focus,
+.email-modal-container textarea:focus {
+  outline: none;
+  border-bottom: 0.1px solid #a2c7f3;
 }
 
 .email-modal-container textarea {
-  width: 95%;
-  height: 200px;
-  padding: 10px;
-  font-size: 12px;
-  background-color: white;
-  border: 0.1px solid #ccc;
-  border-radius: 5px;
-  resize: none;
-  margin-bottom: 4px;
-}
-
-.email-modal-container textarea:hover {
-  border: 0.1px solid #a1c0e6;
-}
-
-.email-modal-container textarea:focus {
-  border: 0.1px solid #a1c0e6; 
-  outline: none;
+  resize: vertical; 
 }
 
 .email-modal-buttons {

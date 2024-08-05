@@ -265,6 +265,7 @@ function ApplicationsList() {
           filters={filters}
           onFilterChange={handleFilterChange}
           showStatusFilters={true}
+          showDocumentType={true}
         />
         {loading ? (
           <p>로딩 중...</p>

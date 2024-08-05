@@ -126,14 +126,16 @@ function BcdOrder() {
   };
 
   // 이메일 전송 핸들러
-  const handleSendEmail = async (subject, body, fileName) => {
+  const handleSendEmail = async (emailData) => {
     setIsLoading(true); // 로딩 시작
     try {
       await axios.post('/api/bsc/order', {
         draftIds: selectedApplications,
-        emailSubject: subject,
-        emailBody: body,
-        fileName: fileName, 
+        emailSubject: emailData.subject,
+        emailBody: emailData.body,
+        fileName: emailData.fileName,
+        fromEmail: emailData.fromEmail,
+        toEmail: emailData.toEmail,
       });
       alert('발주 요청이 완료되었습니다.');
       fetchBcdOrderList(); 

@@ -187,6 +187,7 @@ function PendingApprovalList() {
           setDocumentType={setDocumentType}
           onSearch={handleSearch}
           onReset={handleReset}
+          showDocumentType={true}
         />
         {loading ? (
           <p>로딩 중...</p>
