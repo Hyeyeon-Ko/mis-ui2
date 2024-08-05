@@ -61,7 +61,6 @@
 .reset-button {
   background: none;
   border: none;
-  cursor: pointer;
   margin-right: 8px;
   padding: 0;
   display: flex;
@@ -94,7 +93,6 @@
   color: white;
   border: none;
   padding: 4px 8px;
-  cursor: pointer;
   font-size: 14px;
   font-weight: bold;
 }

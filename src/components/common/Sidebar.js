@@ -88,7 +88,7 @@ function Sidebar() {
               </h2>
             </div>
           )}
-          {(auth.role === 'MASTER' || auth.role === 'ADMIN') && auth.hasStandardDataAuthority && (
+          {(auth.role === 'MASTER' || auth.role === 'ADMIN') && (
             <div className="sidebar-section">
               <h2>
                 <Link to="/api/std" className={isActive('/api/std')}>기준자료 관리</Link>

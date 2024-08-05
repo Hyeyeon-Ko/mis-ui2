@@ -98,16 +98,16 @@ const PreviewModal = ({ show, onClose, formData }) => {
 
       ctx.fillStyle = 'black';
       ctx.font = '15.2px Arial';
-      ctx.fillText(`Tel`, 280, 187.2);
-      ctx.fillText(`Fax`, 280, 214.4);
-      ctx.fillText(`Mobile`, 280, 241.6);
-      ctx.fillText(`E-Mail`, 280, 268.8);
+      ctx.fillText(`Tel`, 270, 187.2);
+      ctx.fillText(`Fax`, 270, 214.4);
+      ctx.fillText(`Mobile`, 270, 241.6);
+      ctx.fillText(`E-Mail`, 270, 268.8);
 
       ctx.font = '15.2px Arial';
-      ctx.fillText(`${formData.phone1}.${formData.phone2}.${formData.phone3}`, 344, 187.2);
-      ctx.fillText(`${formData.fax1}.${formData.fax2}.${formData.fax3}`, 344, 214.4);
-      ctx.fillText(`${formData.mobile1}.${formData.mobile2}.${formData.mobile3}`, 344, 241.6);
-      ctx.fillText(`${formData.email}@kmi.or.kr`, 344, 268.8);
+      ctx.fillText(`${formData.phone1}.${formData.phone2}.${formData.phone3}`, 334, 187.2);
+      ctx.fillText(`${formData.fax1}.${formData.fax2}.${formData.fax3}`, 334, 214.4);
+      ctx.fillText(`${formData.mobile1}.${formData.mobile2}.${formData.mobile3}`, 334, 241.6);
+      ctx.fillText(`${formData.email}@kmi.or.kr`, 334, 268.8);
 
       ctx.font = '13.6px Arial';
       const addressParts = formData.address.split(',');
@@ -117,9 +117,9 @@ const PreviewModal = ({ show, onClose, formData }) => {
         const floorAddress = addressParts[1].trim() + '층';
         const fullAddress = `${mainAddress} ${floorAddress}`;
 
-        drawTextWithSpacing(ctx, fullAddress, 280, 302.4, -1.2);
+        drawTextWithSpacing(ctx, fullAddress, 270, 302.4, -1.2);
       } else {
-        drawTextWithSpacing(ctx, formData.address, 280, 302.4, -1.2);
+        drawTextWithSpacing(ctx, formData.address, 270, 302.4, -1.2);
       }
     };
 

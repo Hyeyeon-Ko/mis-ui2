@@ -9,24 +9,16 @@ import axios from 'axios';
 
 function DocOutList() {
   const [applications, setApplications] = useState([]);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const [filters, setFilters] = useState({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDraftId, setSelectedDraftId] = useState(null);
  
   useEffect(() => {
-    fetchDocOutList(filters);
-  }, [filters]);
+    fetchDocOutList();
+  }, []);
 
-  const fetchDocOutList = async (filterParams = {}) => {
+  const fetchDocOutList = async () => {
     try {
-      const response = await axios.get('/api/doc/sendList', {
-        params: {
-          startDate: filterParams.startDate || '',
-          endDate: filterParams.endDate || '',
-        },
-      });
+      const response = await axios.get('/api/doc/sendList');
       console.log('response: ', response);
 
       if (response.data && response.data.data) {
@@ -45,19 +37,6 @@ function DocOutList() {
     } catch (error) {
       console.error('Error fetching document list:', error);
     }
-  };
-
-  const handleSearch = () => {
-    setFilters({
-      startDate: startDate ? startDate.toISOString().split('T')[0] : '',
-      endDate: endDate ? endDate.toISOString().split('T')[0] : '',
-    });
-  };
-
-  const handleReset = () => {
-    setStartDate(null);
-    setEndDate(null);
-    setFilters({});
   };
 
   const handleDeleteClick = (draftId) => {
@@ -79,7 +58,7 @@ function DocOutList() {
         },
       });
       setShowDeleteModal(false);
-      fetchDocOutList(filters); // 삭제 후 데이터 새로 고침
+      fetchDocOutList();
     } catch (error) {
       console.error('Error deleting document:', error);
     }
@@ -115,12 +94,13 @@ function DocOutList() {
         <h2>문서 발신 대장</h2>
         <Breadcrumb items={['문서수발신 관리', '문서 발신 대장']} />
         <ConditionFilter
-          startDate={startDate}
-          setStartDate={setStartDate}
-          endDate={endDate}
-          setEndDate={setEndDate}
-          onSearch={handleSearch}
-          onReset={handleReset}
+          startDate={null}
+          setStartDate={() => {}}
+          endDate={null}
+          setEndDate={() => {}}
+          onSearch={() => {}}
+          onReset={() => {}}
+          showDocumentType={false}
         />
         <div className="doc-out-content">
             <Table columns={columns} data={applications} />

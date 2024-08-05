@@ -286,24 +286,20 @@ function BcdApplySecond() {
     console.log('Selected Center Data:', selectedInstInfo); 
   
     const addressOptions = [];
-    let engAddress = '';
     if (selectedInstInfo) {
       if (selectedInstInfo.etcItem1) {
-        addressOptions.push(selectedInstInfo.etcItem1);
-        engAddress = selectedInstInfo.etcItem2; 
+        addressOptions.push({ address: selectedInstInfo.etcItem1, engAddress: selectedInstInfo.etcItem2 });
       }
       if (selectedInstInfo.etcItem3) {
-        addressOptions.push(selectedInstInfo.etcItem3);
-        engAddress = selectedInstInfo.etcItem4; 
+        addressOptions.push({ address: selectedInstInfo.etcItem3, engAddress: selectedInstInfo.etcItem4 });
       }
       if (selectedInstInfo.etcItem5) {
-        addressOptions.push(selectedInstInfo.etcItem5);
-        engAddress = selectedInstInfo.etcItem6; 
+        addressOptions.push({ address: selectedInstInfo.etcItem5, engAddress: selectedInstInfo.etcItem6 });
       }
     }
     
     setAddressOptions(addressOptions);
-    setFormData({ ...formData, center: selectedCenter, address: addressOptions[0] || '', engAddress, department: '', team: '' });
+    setFormData({ ...formData, center: selectedCenter, address: addressOptions[0]?.address || '', engAddress: addressOptions[0]?.engAddress || '', department: '', team: '' });
   };
     
   const handleDepartmentChange = (e) => {
@@ -339,15 +335,32 @@ function BcdApplySecond() {
       alert('사번 조회를 통해 명함 대상자를 선택하세요.');
       return;
     }
+    
     const selectedPosition = e.target.value;
     const selectedPositionInfo = bcdData.gradeInfo.find(position => position.detailNm === selectedPosition);
     const enGradeNm = selectedPositionInfo ? selectedPositionInfo.etcItem1 : '';
-
+  
     console.log('Selected Position Data:', selectedPositionInfo);
     
     setFormData({ ...formData, position: selectedPosition, enGradeNm });
   };
-
+  
+  const fetchFilteredGradeInfo = () => {
+    const selectedTeamInfo = bcdData.teamInfo.find(team => team.detailNm === formData.team);
+    const selectedEtcItem1 = selectedTeamInfo ? selectedTeamInfo.etcItem1 : '';
+    
+    const filteredGradeInfo = bcdData.gradeInfo.filter(grade =>
+      grade.etcItem1 === '000' || grade.etcItem1 === selectedEtcItem1
+    );
+  
+    const sortedFilteredGradeInfo = filteredGradeInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
+    
+    return sortedFilteredGradeInfo;
+  };
+  
+  const filteredGradeInfo = fetchFilteredGradeInfo();
+  
+  
   const handlePreview = (e) => {
     e.preventDefault();
     if (!formData.userId) {
@@ -362,9 +375,10 @@ function BcdApplySecond() {
       alert('사번 조회를 통해 명함 대상자를 선택하세요.');
       return;
     }
-    const updatedAddress = e.target.value + (floor ? `, ${floor}` : '');
+    const selectedAddress = addressOptions.find(option => option.address === e.target.value);
+    const updatedAddress = selectedAddress.address + (floor ? `, ${floor}` : '');
     console.log('Address changed to:', updatedAddress);
-    setFormData({ ...formData, address: updatedAddress });
+    setFormData({ ...formData, address: updatedAddress, engAddress: selectedAddress.engAddress });
   };
 
   const handleFloorChange = (e) => {
@@ -378,7 +392,7 @@ function BcdApplySecond() {
     const baseAddress = formData.address.split(',')[0];
     const updatedAddress = `${baseAddress}${updatedFloor ? `, ${updatedFloor}` : ''}`;
   
-    const originalEngAddress = bcdData.instInfo.find(inst => inst.detailNm === formData.center)?.etcItem2 || '';
+    const originalEngAddress = addressOptions.find(option => option.address === baseAddress)?.engAddress || '';
     const updatedEngAddress = updatedFloor ? `${updatedFloor}F, ${originalEngAddress}` : originalEngAddress;
   
     setFormData({ ...formData, address: updatedAddress, engAddress: updatedEngAddress });
@@ -509,12 +523,7 @@ function BcdApplySecond() {
                 <label className="form-label">직위 / 직책</label>
                 <select name="position" value={formData.position} onChange={handlePositionChange} required onClick={handleInputClick}>
                   <option value="">선택하세요</option>
-                  {[
-                    ...bcdData.gradeInfo
-                      .filter((position) => position.detailCd !== '999')
-                      .sort((a, b) => a.detailNm.localeCompare(b.detailNm)),
-                    ...bcdData.gradeInfo.filter((position) => position.detailCd === '999')
-                  ].map((position) => (
+                  {fetchFilteredGradeInfo().map((position) => (
                     <option key={position.detailCd} value={position.detailCd}>
                       {`${position.detailNm} | ${position.etcItem2}`}
                     </option>
@@ -583,8 +592,8 @@ function BcdApplySecond() {
               <div className="form-group-horizontal">
                 <label className="form-label">주소</label>
                 <select name="address" value={formData.address.split(',')[0]} onChange={handleAddressChange} required className="address-select" onClick={handleInputClick}>
-                  {addressOptions.map((address, index) => (
-                    <option key={index} value={address}>{address}</option>
+                  {addressOptions.map((option, index) => (
+                    <option key={index} value={option.address}>{option.address}</option>
                   ))}
                 </select>
                 <input type="text3" value={floor} onChange={handleFloorChange} required className="floor-input" onClick={handleInputClick} />층

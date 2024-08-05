@@ -127,7 +127,7 @@ function BcdOrder() {
 
   // 이메일 전송 핸들러
   const handleSendEmail = async (emailData) => {
-    setIsLoading(true); // 로딩 시작
+    setIsLoading(true); 
     try {
       await axios.post('/api/bsc/order', {
         draftIds: selectedApplications,
@@ -137,7 +137,6 @@ function BcdOrder() {
         fromEmail: emailData.fromEmail,
         toEmail: emailData.toEmail,
       });
-      alert('발주 요청이 완료되었습니다.');
       fetchBcdOrderList(); 
       setShowEmailModal(false); 
     } catch (error) {

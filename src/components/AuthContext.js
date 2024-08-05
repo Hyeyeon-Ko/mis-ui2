@@ -1,13 +1,12 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-/* 인증 상태 관리 */
 // AuthContext 생성 -> 인증 상태 저장
 export const AuthContext = createContext();
 
 // AuthProvider 컴포넌트 -> 인증 상태 제공
 export const AuthProvider = ({ children }) => {
-  const navigate = useNavigate(); // useNavigate 훅 추가
+  const navigate = useNavigate();
   const [auth, setAuth] = useState({
     userId: '',
     hngNm: '',
@@ -20,7 +19,6 @@ export const AuthProvider = ({ children }) => {
     originalRole: '', 
   });
 
-  // 컴포넌트 마운트 시 세션 저장소에서 인증 상태를 로드
   useEffect(() => {
     const userId = sessionStorage.getItem('userId');
     const hngNm = sessionStorage.getItem('hngNm');
@@ -43,12 +41,12 @@ export const AuthProvider = ({ children }) => {
         isUserMode,
         originalRole,
       });
+      console.log('세션에서 로드된 인증 상태:', { userId, hngNm, role, sidebarPermissions, hasStandardDataAuthority, instCd, isUserMode, originalRole }); // 로드된 상태 로그
     }
   }, []);
 
-  // 로그인 함수
   const login = (userId, hngNm, role, sidebarPermissions, hasStandardDataAuthority, instCd) => {
-    setAuth({
+    const newAuthState = {
       userId,
       hngNm,
       role,
@@ -58,7 +56,9 @@ export const AuthProvider = ({ children }) => {
       instCd,
       isUserMode: false, 
       originalRole: role, 
-    });
+    };
+    setAuth(newAuthState);
+    console.log('새로운 인증 상태 설정:', newAuthState); 
     sessionStorage.setItem('userId', userId);
     sessionStorage.setItem('hngNm', hngNm);
     sessionStorage.setItem('role', role);
@@ -69,7 +69,6 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.setItem('originalRole', role); 
   };
 
-  // 로그아웃 함수
   const logout = () => {
     setAuth({
       userId: '',
@@ -82,6 +81,7 @@ export const AuthProvider = ({ children }) => {
       isUserMode: false, 
       originalRole: '', 
     });
+    console.log('사용자 로그아웃, 인증 상태 초기화');
     sessionStorage.removeItem('userId');
     sessionStorage.removeItem('hngNm');
     sessionStorage.removeItem('role');
@@ -92,14 +92,14 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.removeItem('originalRole');
   };
 
-  // 모드 전환 함수
   const toggleMode = () => {
     setAuth((prevAuth) => {
       if (prevAuth.originalRole === 'USER') return prevAuth; 
       const newMode = !prevAuth.isUserMode;
       sessionStorage.setItem('isUserMode', newMode.toString());
       const newRole = newMode ? 'USER' : prevAuth.originalRole;
-      navigate(newMode ? '/' : '/api/applyList'); // 모드 전환 시 경로 설정
+      navigate(newMode ? '/' : '/api/applyList'); 
+      console.log('모드 전환:', { newMode, newRole }); 
       return { ...prevAuth, isUserMode: newMode, role: newRole };
     });
   };

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Button from '../common/Button'; 
 import '../../styles/common/ConditionFilter.css';
 
-const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documentType, setDocumentType, onSearch, onReset, filters, onFilterChange, showStatusFilters }) => {
+const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documentType, setDocumentType, onSearch, onReset, filters, onFilterChange, showStatusFilters, showDocumentType }) => {
   useEffect(() => {
     resetFilters();
   }, []);
@@ -64,7 +64,7 @@ const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documen
           onChange={handleEndDateChange}
           className="custom-datepicker"
         />
-        {setDocumentType && (
+        {showDocumentType && setDocumentType && (
           <>
             <label>문서분류</label>
             <select value={documentType} onChange={handleDocumentTypeChange}>
@@ -130,13 +130,14 @@ ConditionFilter.propTypes = {
   setStartDate: PropTypes.func.isRequired,
   endDate: PropTypes.instanceOf(Date),
   setEndDate: PropTypes.func.isRequired,
-  documentType: PropTypes.string.isRequired,
-  setDocumentType: PropTypes.func.isRequired,
+  documentType: PropTypes.string,
+  setDocumentType: PropTypes.func,
   onSearch: PropTypes.func.isRequired,
   onReset: PropTypes.func.isRequired,
   filters: PropTypes.object,
   onFilterChange: PropTypes.func,
   showStatusFilters: PropTypes.bool,
+  showDocumentType: PropTypes.bool,
 };
 
 export default ConditionFilter;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import '../styles/EmailModal.css';
+import { FadeLoader } from 'react-spinners';
 
 /* 이메일 작성 모달 */
 const EmailModal = ({ show, onClose, onSend }) => {
@@ -9,6 +10,7 @@ const EmailModal = ({ show, onClose, onSend }) => {
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [fileName, setFileName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (show) {
@@ -25,14 +27,15 @@ const EmailModal = ({ show, onClose, onSend }) => {
         })
         .catch(error => console.error('Error fetching email settings:', error));
     } else {
-      // 초기화
       setSubject('');
       setBody('');
       setFileName('');
+      setIsLoading(false); 
     }
   }, [show]);
 
   const handleSend = () => {
+    setIsLoading(true);
     const fileToSend = fileName.trim() === '' ? '명함발주' : fileName.trim();
     const emailData = {
       fromEmail,
@@ -42,7 +45,11 @@ const EmailModal = ({ show, onClose, onSend }) => {
       fileName: fileToSend,
     };
     console.log('Sending email data: ', emailData);
-    onSend(emailData);
+    onSend(emailData).finally(() => {
+      setIsLoading(false); 
+      window.location.href = '/api/bcd/orderList'; 
+      onClose(); 
+    });
   };
 
   if (!show) return null;
@@ -97,9 +104,18 @@ const EmailModal = ({ show, onClose, onSend }) => {
           />
         </div>
         <div className="email-modal-buttons">
-          <button className="email-modal-button cancel" onClick={onClose}><span>취소</span></button>
-          <button className="email-modal-button confirm" onClick={handleSend}><span>전송</span></button>
+          <button className="email-modal-button cancel" onClick={onClose} disabled={isLoading}>
+            <span>취소</span>
+          </button>
+          <button className="email-modal-button confirm" onClick={handleSend} disabled={isLoading}>
+            <span>전송</span>
+          </button>
         </div>
+        {isLoading && (
+          <div className="loading-overlay">
+            <FadeLoader color="#2789FE" height={15} loading={isLoading} margin={2} radius={2} speedMultiplier={1} width={5} />
+          </div>
+        )}
       </div>
     </div>
   );

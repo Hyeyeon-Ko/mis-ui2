@@ -14,6 +14,7 @@ const Login = () => {
 
   useEffect(() => {
     if (auth.isAuthenticated) {
+      console.log('이미 인증된 사용자:', auth); 
       if (auth.role === 'ADMIN' || auth.role === 'MASTER') {
         navigate('/api/applyList');
       } else {
@@ -36,6 +37,7 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    console.log('로그인 시도, userId:', userId);
 
     try {
       const response = await fetch('/api/login', {
@@ -48,6 +50,7 @@ const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log('로그인 응답 데이터:', data); 
 
         if (data && data.data) {
           const authorityResponse = await fetch('/api/auth/standardData', {
@@ -60,13 +63,14 @@ const Login = () => {
 
           if (authorityResponse.ok) {
             const authorityData = await authorityResponse.json();
+            console.log('권한 데이터:', authorityData); 
 
             login(
               userId, 
               data.data.hngNm, 
               data.data.role, 
               data.data.sidebarPermissions, 
-              authorityData.data,
+              authorityData.data, 
               data.data.instCd 
             );
 
@@ -77,7 +81,7 @@ const Login = () => {
             }
 
           } else {
-            console.log('Failed to check authority:', authorityResponse);
+            console.log('권한 확인 실패:', authorityResponse);
             alert('권한 확인에 실패했습니다. 다시 시도해주세요.');
           }
           
@@ -94,7 +98,7 @@ const Login = () => {
         userIdRef.current.focus(); 
       }
     } catch (error) {
-      console.error('Server error:', error);
+      console.error('서버 에러:', error);
       alert('서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.');
       setUserId('');
       setUserPw('');

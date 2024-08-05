@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import Breadcrumb from '../components/common/Breadcrumb';
 import Table from '../components/common/Table';
 import StandardAddModal from '../views/StandardAddModal';
 import '../styles/StandardData.css';
 import '../styles/common/Page.css';
 import axios from 'axios';
+import { AuthContext } from '../components/AuthContext';
 
 function StandardData() {
   const [subCategories, setSubCategories] = useState([]);
@@ -16,6 +17,7 @@ function StandardData() {
   const [modalMode, setModalMode] = useState('detail');
   const [editDetailData, setEditDetailData] = useState(null);
   const [selectedDetail, setSelectedDetail] = useState(null);
+  const { auth } = useContext(AuthContext);
 
   const categories = [
     { categoryCode: 'A', categoryName: 'A 공통' },
@@ -38,7 +40,7 @@ function StandardData() {
       setDetails([]);
       setSelectedDetail(null);
     } catch (error) {
-      console.error('Error fetching sub-categories:', error.response ? error.response.data : error.message);
+      console.error('중분류를 가져오는 중 에러 발생:', error.response ? error.response.data : error.message);
       setSubCategories([]);
       setSelectedSubCategory('');
       setSubCategoryName('');
@@ -55,12 +57,12 @@ function StandardData() {
         data.sort((a, b) => parseInt(a.detailCd, 10) - parseInt(b.detailCd, 10));
         setDetails(data);
       } else {
-        console.error('Unexpected data format:', data);
+        console.error('예상치 못한 데이터 형식:', data);
         setDetails([]);
       }
       setSelectedDetail(null);
     } catch (error) {
-      console.error('Error fetching details:', error);
+      console.error('상세 정보를 가져오는 중 에러 발생:', error);
       setDetails([]);
       setSelectedDetail(null);
     }
@@ -74,7 +76,7 @@ function StandardData() {
       setModalMode('edit');
       setShowModal(true);
     } catch (error) {
-      console.error('Error fetching selected detail:', error);
+      console.error('선택된 상세 정보를 가져오는 중 에러 발생:', error);
       alert('상세 정보 가져오기에 실패했습니다.');
     }
   };
@@ -100,7 +102,7 @@ function StandardData() {
 
   const handleSaveRow = async (newRow) => {
     if (modalMode === 'detail') {
-      console.log('Saving new detail with the following data:', {
+      console.log('새로운 상세 정보 저장:', {
         detailCd: newRow.detailCode,
         groupCd: selectedSubCategory,
         detailNm: newRow.detailName,
@@ -115,7 +117,7 @@ function StandardData() {
         etcItem7: newRow.items[6],
         etcItem8: newRow.items[7],
       });
-  
+
       try {
         await axios.post('/api/std/detailInfo', {
           detailCd: newRow.detailCode,
@@ -138,9 +140,9 @@ function StandardData() {
         setSelectedDetail(null);
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
-          alert('해당 중분류그룹에 이미 존재하는 상세코드 입니다');
+          alert('해당 중분류 그룹에 이미 존재하는 상세 코드입니다.');
         } else {
-          console.error('Error saving detail info:', error);
+          console.error('상세 정보를 저장하는 중 에러 발생:', error);
         }
       }
     } else if (modalMode === 'edit') {
@@ -165,7 +167,7 @@ function StandardData() {
         setShowModal(false);
         setSelectedDetail(null);
       } catch (error) {
-        console.error('Error updating detail info:', error);
+        console.error('상세 정보를 업데이트하는 중 에러 발생:', error);
         alert('상세 코드 수정에 실패했습니다.');
       }
     } else if (modalMode === 'group') {
@@ -179,7 +181,7 @@ function StandardData() {
         fetchSubCategories(selectedCategory);
         setShowModal(false);
       } catch (error) {
-        console.error('Error saving group info:', error);
+        console.error('중분류 정보를 저장하는 중 에러 발생:', error);
         alert('중분류 코드 추가에 실패했습니다.');
       }
     }
@@ -219,7 +221,7 @@ function StandardData() {
       fetchDetails(selectedSubCategory); 
       setSelectedDetail(null);
     } catch (error) {
-      console.error('Error deleting detail:', error);
+      console.error('상세 정보를 삭제하는 중 에러 발생:', error);
       alert('상세 코드 삭제에 실패했습니다.');
     }
   };
@@ -257,7 +259,7 @@ function StandardData() {
       Cell: ({ row }) => {
         const detailCd = row?.original?.detailCd || row?.detailCd; 
         if (!detailCd) {
-          console.warn('Missing detailCd:', row);
+          console.warn('상세 코드가 누락됨:', row);
           return null;
         }
         return (
@@ -318,7 +320,7 @@ function StandardData() {
           <div className="sub-category-section">
             <div className="header-buttons">
               <label className='sub-category-label'>중분류 코드&gt;&gt;</label>
-              <button className="data-add-button" onClick={handleAddSubCategoryRow}>추 가</button>
+              <button className="data-add-button" onClick={handleAddSubCategoryRow} disabled={!auth.hasStandardDataAuthority}>추 가</button>
             </div>
             <div className="sub-category-table">
               <Table
@@ -331,9 +333,9 @@ function StandardData() {
             <div className="header-buttons">
               <label className='detail-content-label'>상세 코드&gt;&gt;</label>
               <div className="detail-buttons">
-                <button className="data-add-button" onClick={handleAddRow}>추 가</button>
-                <button className="data-modify-button" onClick={handleModifyRow}>수 정</button>
-                <button className="data-delete-button" onClick={handleDeleteRow}>삭 제</button>
+                <button className="data-add-button" onClick={handleAddRow} disabled={!auth.hasStandardDataAuthority}>추 가</button>
+                <button className="data-modify-button" onClick={handleModifyRow} disabled={!auth.hasStandardDataAuthority}>수 정</button>
+                <button className="data-delete-button" onClick={handleDeleteRow} disabled={!auth.hasStandardDataAuthority}>삭 제</button>
               </div>
             </div>
               <div className="details-table">
