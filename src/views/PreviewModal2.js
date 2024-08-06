@@ -23,15 +23,18 @@ const PreviewModal = ({ show, onClose, formData }) => {
 
   useEffect(() => {
     if (show) {
+      console.log('FormData in Preview:', formData); // formData 로그 출력
       drawBusinessCard();
     }
   }, [show, formData, bcdData]);
 
   const fetchBcdStd = async () => {
     try {
+      console.log('Fetching BCD standard data for preview');
       const response = await axios.get('/api/std/bcd');
       if (response.data && response.data.data) {
         const data = response.data.data;
+        console.log('Fetched BCD standard data for preview:', data);
         setBcdData(data);
       } else {
         alert('기준자료를 불러오는 중 오류가 발생했습니다.');
@@ -109,8 +112,8 @@ const PreviewModal = ({ show, onClose, formData }) => {
 
       if (addressParts.length === 2) {
         const mainAddress = addressParts[0];
-        const floorAddress = addressParts[1].trim() + '층';
-        const fullAddress = `${mainAddress} ${floorAddress}`;
+        const floorAddress = addressParts[1].trim();
+        const fullAddress = `${mainAddress}, ${floorAddress}층`;
 
         drawTextWithSpacing(ctx, fullAddress, 270, 302.4, -1.2);
       } else {
@@ -204,4 +207,3 @@ PreviewModal.propTypes = {
 };
 
 export default PreviewModal;
-

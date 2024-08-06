@@ -19,6 +19,7 @@ function MyApplyList() {
   const [selectedApplication, setSelectedApplication] = useState(null);   // 선택된 신청내역 상태 관리
   const [showRejectionModal, setShowRejectionModal] = useState(false);    // 반려 모달 표시 상태 관리
   const [rejectionReason, setRejectionReason] = useState('');             // 반려 이유 상태 관리
+  const [viewedRejections, setViewedRejections] = useState(new Set(JSON.parse(localStorage.getItem('viewedRejections')) || [])); // 반려 이유 확인된 상태 관리
   const navigate = useNavigate();                                         // 경로 이동을 위한 네비게이트 함수
 
   useEffect(() => {
@@ -126,6 +127,11 @@ function MyApplyList() {
 
   // 반려 모달 닫기 핸들러
   const handleCloseRejectionModal = () => {
+    if (selectedApplication) {
+      const newViewedRejections = new Set([...viewedRejections, selectedApplication.draftId]);
+      setViewedRejections(newViewedRejections);
+      localStorage.setItem('viewedRejections', JSON.stringify(Array.from(newViewedRejections)));
+    }
     setShowRejectionModal(false);
     setSelectedApplication(null);
   };
@@ -185,10 +191,14 @@ function MyApplyList() {
             수령확인
           </button>
         ):
-        row.applyStatus === '발주완료' || row.applyStatus === '반려' ? (
+        row.applyStatus === '반려' ? (
           <button 
             className="status-button" 
-            style={row.applyStatus === '반려' ? { color: "#2789FE", textDecoration: 'underline' } : {}}
+            style={
+              viewedRejections.has(row.draftId)
+                ? { color: "black", textDecoration: 'underline' }
+                : { color: "#2789FE", textDecoration: 'underline' }
+            }
             onClick={() => handleButtonClick(row)}
           >
             {row.applyStatus}

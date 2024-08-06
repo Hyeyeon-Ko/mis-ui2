@@ -92,11 +92,9 @@ function BcdApplySecond() {
           userId: userId,
         }));
       } else {
-        console.error('No data found for the user');
         alert('사용자 정보를 불러오는 중 오류가 발생했습니다. 유효한 사번을 입력하세요.');
       }
     } catch (error) {
-      console.error('Error fetching user info:', error.response ? error.response.data : error.message);
       alert('사용자 정보를 불러오는 중 오류가 발생했습니다.');
     }
   };
@@ -106,13 +104,11 @@ function BcdApplySecond() {
       const response = await axios.get('/api/std/bcd');
       if (response.data && response.data.data) {
         const data = response.data.data;
-        console.log(data);
 
         data.instInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
         data.deptInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
         data.teamInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
         data.gradeInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
-        console.log('sorting data: ', data);
   
         const instMap = {};
         const deptMap = {};
@@ -134,11 +130,9 @@ function BcdApplySecond() {
         setMappings({ instMap, deptMap, teamMap, gradeMap });
         setBcdData(data);
       } else {
-        console.error('No standard data found');
         alert('기준자료를 불러오는 중 오류가 발생했습니다.');
       }
     } catch (error) {
-      console.error('Error fetching BCD standard data:', error.response ? error.response.data : error.message);
       alert('기준자료를 불러오는 중 오류가 발생했습니다.');
     }
   };
@@ -159,7 +153,6 @@ function BcdApplySecond() {
       const response = await axios.get(`/api/info/${userIdInput}`);
       if (response.data && response.data.data) {
         const userData = response.data.data;
-        console.log(userData);
 
         setFormData((prevFormData) => ({
           ...prevFormData,
@@ -174,11 +167,9 @@ function BcdApplySecond() {
           userId: userIdInput,
         }));
       } else {
-        console.error('No data found for the user');
         alert('사용자 정보를 불러오는 중 오류가 발생했습니다. 유효한 사번을 입력하세요.');
       }
     } catch (error) {
-      console.error('Error fetching user info:', error.response ? error.response.data : error.message);
       alert('사용자 정보를 불러오는 중 오류가 발생했습니다.');
     }
   };
@@ -216,7 +207,6 @@ function BcdApplySecond() {
 
     for (const field of requiredFields) {
       if (!formData[field]) {
-        console.warn('Form validation failed: missing field', field);
         return false;
       }
     }
@@ -232,14 +222,11 @@ function BcdApplySecond() {
       alert('모든 명함 정보를 입력해주세요.');
       return;
     }
-    console.log('Form data before applying:', formData);
     setShowFinalConfirmationModal(true);
   };
 
   const handleConfirmRequest = async () => {
     setShowFinalConfirmationModal(false);
-  
-    console.log('Selected Position:', formData.position);
   
     const requestData = {
       drafter: auth.hngNm,
@@ -264,19 +251,15 @@ function BcdApplySecond() {
       quantity: formData.quantity,
     };
   
-    console.log('Request Data:', requestData);
-  
     try {
       const response = await axios.post('/api/bcd/', requestData);
       if (response.data.code === 200) {
         alert('명함 신청이 완료되었습니다.');
         navigate('/api/myApplyList');
       } else {
-        console.error('Server response error:', response.data);
         alert('명함 신청 중 오류가 발생했습니다.');
       }
     } catch (error) {
-      console.error('Error submitting application:', error);
       alert('명함 신청 중 오류가 발생했습니다.');
     }
   };
@@ -288,8 +271,6 @@ function BcdApplySecond() {
     }
     const selectedCenter = e.target.value;
     const selectedInstInfo = bcdData.instInfo.find(inst => inst.detailNm === selectedCenter);
-
-    console.log('Selected Center Data:', selectedInstInfo); 
   
     const addressOptions = [];
     if (selectedInstInfo) {
@@ -317,8 +298,6 @@ function BcdApplySecond() {
     const selectedDepartment = e.target.value;
     const selectedDeptInfo = bcdData.deptInfo.find(dept => dept.detailNm === selectedDepartment);
   
-    console.log('Selected Department Data:', selectedDeptInfo);    
-
     setFormData({ ...formData, department: e.target.value, team: '' });
   };
 
@@ -331,8 +310,6 @@ function BcdApplySecond() {
     const selectedTeamInfo = bcdData.teamInfo.find(team => team.detailNm === selectedTeam);
     const engTeam = selectedTeamInfo ? selectedTeamInfo.etcItem1 : '';
 
-    console.log('Selected Team Data:', selectedTeamInfo);
-  
     setFormData({ ...formData, team: selectedTeam, engTeam });
   };
   
@@ -345,8 +322,6 @@ function BcdApplySecond() {
     const selectedPosition = e.target.value;
     const selectedPositionInfo = bcdData.gradeInfo.find(position => position.detailNm === selectedPosition);
     const enGradeNm = selectedPositionInfo ? selectedPositionInfo.etcItem1 : '';
-  
-    console.log('Selected Position Data:', selectedPositionInfo);
     
     setFormData({ ...formData, position: selectedPosition, enGradeNm });
   };
@@ -366,7 +341,6 @@ function BcdApplySecond() {
   
   const filteredGradeInfo = fetchFilteredGradeInfo();
   
-  
   const handlePreview = (e) => {
     e.preventDefault();
     if (!formData.userId) {
@@ -383,7 +357,6 @@ function BcdApplySecond() {
     }
     const selectedAddress = addressOptions.find(option => option.address === e.target.value);
     const updatedAddress = selectedAddress.address + (floor ? `, ${floor}` : '');
-    console.log('Address changed to:', updatedAddress);
     setFormData({ ...formData, address: updatedAddress, engAddress: selectedAddress.engAddress });
   };
 
