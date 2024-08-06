@@ -20,6 +20,8 @@ import DocInList from './views/DocInList';
 import DocOutList from './views/DocOutList';
 import StandardData from './views/StandardData';
 import DocApply from './views/DocApply';
+import CorpDocApply from "./views/CorpDocApply";
+import SealApply from "./views/SealApply";
 import { AuthProvider, AuthContext } from './components/AuthContext';
 import { IoMagnet } from 'react-icons/io5';
 
@@ -67,6 +69,8 @@ function App() {
                 <Route path="/api/bcd/own" element={<RequireAuth><BcdApplySecond /></RequireAuth>} />
                 <Route path="/api/bcd/other" element={<RequireAuth><BcdApplySecond /></RequireAuth>} />
                 <Route path="/api/doc" element={<RequireAuth><DocApply /></RequireAuth>} />
+                <Route path="/api/corpDoc" element={<RequireAuth><CorpDocApply /></RequireAuth>} />
+                <Route path="/api/seal" element={<RequireAuth><SealApply /></RequireAuth>} />
                 <Route path="/api/myApplyList" element={<RequireAuth><MyApplyList /></RequireAuth>} />
                 <Route path="/api/myPendingList" element={<RequireAuth><MyPendingList /></RequireAuth>} />
                 <Route path="/api/applyList" element={<RequireAuth><ApplicationsList /></RequireAuth>} />

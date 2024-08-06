@@ -17,7 +17,7 @@ function Sidebar() {
 
   const applyItems = [
     { label: '명함신청', url: '/api/bcd' },
-    { label: '법인서류', url: '/api/legalDoc' },
+    { label: '법인서류', url: '/api/corpDoc' },
     { label: '인장관리', url: '/api/seal' },
     { label: '문서수발신', url: '/api/doc' },
   ];
@@ -32,6 +32,11 @@ function Sidebar() {
     { label: '승인대기 내역', url: '/api/pendingList' },
   ];
 
+  const corpDocItems = [
+    { label: '서류 발급 대장', url: '/api/corpDoc/issueList'},
+    { label: '서류 수불 대장', url: '/api/corpDoc/rnpList'},
+  ]
+
   const docItems = [
     { label: '문서 수신 대장', url: '/api/doc/receiveList' },
     { label: '문서 발신 대장', url: '/api/doc/sendList' },
@@ -43,8 +48,9 @@ function Sidebar() {
 
   const sections = {
     'A': { title: '신청내역 관리', items: manageItems },
-    'B': { title: '문서수발신 관리', items: docItems },
-    'C': { title: '발주 관리', items: orderItems },
+    'B': { title: '발주 관리', items: orderItems },
+    'C': { title: '법인서류 관리', items: corpDocItems},
+    'E': { title: '문서수발신 관리', items: docItems },
   };
 
   return (
