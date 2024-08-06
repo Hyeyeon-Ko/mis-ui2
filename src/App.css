@@ -1,38 +1,131 @@
-.App {
-  text-align: center;
+#root {
+  height: 100vh;
+  overflow: hidden;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.app {
+  display: flex;
+  height: 100%;
+  flex-direction: row;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.header {
+  flex: 0 0 50px;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: auto; 
+}
+
+.content {
+  flex: 1;
+  padding: 20px 50px;
+  overflow-y: auto;
+}
+
+.section-separator {
+  margin-top: 40px;
+  border-top: 1px solid #ddd;
+  margin-bottom: 20px;
+}
+
+.sidebar {
+  width: 300px;
+  background-color: #EDF1F5;
+  color: black;
+  padding: 20px;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  overflow-y: auto; 
 }
 
-.App-link {
-  color: #61dafb;
+.logo {
+  width: 210px;
+  height: 90px;
+  margin-top: 40px;
+  margin-bottom: 40px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.sidebar-section {
+  width: 100%;
+  margin-left: 90px;
 }
+
+.sidebar-section h2 {
+  font-size: 24px;
+  margin-left: 25px;
+  cursor: pointer;
+}
+
+.sidebar-section h2 a {
+  color: inherit; 
+  text-decoration: none; 
+}
+
+.sidebar-section h2 a:hover {
+  color: #2789FE;
+  font-weight: bold;
+}
+
+.sidebar-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar-section li {
+  font-size: 20px;
+  margin-bottom: 13px;
+  margin-left: 25px;
+  cursor: pointer;
+}
+
+.sidebar-section a {
+  color: inherit; 
+  text-decoration: none; 
+}
+
+.sidebar-section li:hover {
+  color: #2789FE;
+  font-weight: bold;
+}
+
+.sidebar-section {
+  width: 100%;
+  margin-bottom: 0px;
+}
+
+.sidebar-section h3 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-section h3:hover {
+  color: #2789FE;
+  font-weight: bold;
+}
+
+.toggle-icon {
+  margin-right: 5px;
+  margin-bottom: 6px;
+}
+
+.sidebar-section .active {
+  color: #2789FE;
+  font-weight: bold;
+}
+

@@ -1,0 +1,348 @@
+.apply-content {
+    padding: 8px 16px;
+}
+
+.apply-content h2 {
+    font-size: 28px;
+    margin-bottom: 16px;
+}
+
+.form-wrapper {
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 52px;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.business-card-form {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.form-left, .form-right {
+    flex: 1;
+    position: relative;
+}
+
+.form-left {
+    left: 0;
+    padding-right: 16px;
+}
+
+.form-right {
+    right: 0;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+}
+
+.form-group-horizontal {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+    gap: 32px;
+}
+
+.preview-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; 
+}
+
+.bold-label {
+    font-weight: bold;
+    font-size: 19px;
+    margin-top: 30px;
+    margin-bottom: 12px;
+    margin-right: 40px;
+}
+
+.sub-label {
+    font-size: 14.5px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+}
+
+.sub-label2 {
+    font-size: 12px;
+    margin-top: -23px;
+  }
+  
+
+.form-label {
+    width: 80px;
+    text-align: left;
+    margin-right: 8px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.apply-content input[type="text"], 
+input[type="text2"] {
+    width: 240px;
+    height: 24px;
+    padding: 6.5px 0px 6.5px 12px;
+    border: 1px solid #c8c5c5;
+    border-radius: 5px;
+    font-size: 14.3px;
+    background-color: #fff;
+}
+
+.apply-content input[type="text"].english-name {
+    width: 109px;
+    height: 24px;
+    font-size: 14.3px;
+}
+
+.apply-content input[type="text2"] {
+    width: 125px;
+    margin-right: 8px;
+    display: inline-block;
+    font-size: 14.3px;
+}
+
+.apply-content input[type="text3"] {
+    width: 28px;
+    height: 22px;
+    display: inline-block;
+    font-size: 14.3px;
+    margin-right: -24px;
+}
+
+.apply-content input[type="text4"] {
+    width: 40px;
+    height: 24px;
+    display: inline-block;
+    font-size: 14.5px;
+}
+
+.apply-content input[type="text5"] {
+    height: 24px;
+    padding: 6.5px 0px 6.5px 12px;
+    border: 1px solid #c8c5c5;
+    border-radius: 5px;
+    font-size: 14.5px;
+    background-color: #fff;
+    width: auto;
+  }
+
+  .apply-content input:focus {
+    border-color: #a1c0e6; 
+    box-shadow: 0 0 3px rgba(39, 137, 254, 0.5); 
+    outline: none;
+}  
+
+
+.floor-input {
+    width: 24px;
+    padding: 6.5px;
+    border: 1px solid #c8c5c5;
+    border-radius: 5px;
+    font-size: 14.5px;
+    background-color: #fff;
+    text-align: center;
+    margin-left: -5px;
+}
+
+.floor-input2 {
+    width: 24px;
+    padding: 6.5px;
+    border: 1px solid #c8c5c5;
+    border-radius: 5px;
+    font-size: 14.5px;
+    background-color: #fff;
+    text-align: center;
+    margin-left: 27px;
+}
+
+.floor-input3 {
+    width: 24px;
+    padding: 6.5px;
+    border: 1px solid #c8c5c5;
+    border-radius: 5px;
+    font-size: 14.5px;
+    background-color: #fff;
+    text-align: center;
+    margin-left: 8px;
+}
+
+
+.address-floor-input span {
+    margin-left: 30px;
+}
+
+.apply-content select {
+    width: 254px;
+    height: 37px;
+    padding: 6.5px 0px 6.5px 8px;
+    border: 1px solid #c8c5c5;
+    border-radius: 5px;
+    font-size: 14.3px;
+    background-color: #fff;
+    margin-right: -20px;
+    transition: border-color 0.5s;
+}
+
+.apply-content select:focus{
+    outline: none;
+    border: 1px solid #a1c0e6;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.name-inputs {
+    display: flex;
+    gap: 8px;
+}
+
+.card-type {
+    display: flex;
+    gap: 16px;
+}
+
+.card-type label:hover {
+    color: #007bff;
+    cursor: pointer;
+}
+
+.apply-content input[type="tel"].phone-number {
+    width: 67px;
+    height: 24px;
+    padding: 6.5px;
+    text-align: center;
+    border: 1px solid #c8c5c5;
+    border-radius: 5px;
+    font-size: 14.3px;
+    background-color: #fff;
+}
+
+.phone-inputs {
+    display: flex;
+    gap: 4px;
+}
+
+.email-input {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.email-input span {
+    letter-spacing: 1px;
+    font-size: 14.3px;
+}
+
+.quantity-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 50px;
+    margin-left: 16px;
+    margin-bottom: 16px;
+}
+
+.quantity-selector button {
+    padding: 8px 12px; 
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    background-color: white;
+    cursor: pointer;
+    font-size: 14.5px;
+    margin-left: 24px;
+    margin-right: 24px;
+}
+
+.quantity-selector button:hover {
+    background-color: #e0e0e0;
+}
+
+.quantity-selector span {
+    font-size: 18px;
+}
+
+.quantity-display {
+    font-weight: 440;
+    font-size: 20px;
+    margin-top: 40px;
+    margin-bottom: 16px;
+}
+
+.card-preview {
+    max-width: 105%;
+    margin-top: 20px;
+    margin-left: 90px;
+    margin-bottom: 30px;
+    height: auto;
+}
+
+.image-preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: -40px;
+    width: 320px;
+    height: 224px;
+}
+
+.apply-buttons-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 60px;
+    margin-bottom: 16px;
+    margin-right: 160px;
+    border-radius: 5px;
+    padding: 10px 0px 10px 6.5px;
+    font-size: 16px;
+    font-weight: bold;
+}
+  
+.form-horizontal {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    }  
+  
+  .lookup-button {
+    padding: 11px 14px;
+    background-color: #e2e5e9;
+    color: rgb(126, 125, 125);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    margin-left: -8px;
+}
+  
+  .lookup-button:hover {
+    background-color: #d4d9df;
+}
+
+.history-button {
+    padding: 11px 12px;
+    background-color: #e2e5e9;
+    color: rgb(126, 125, 125);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+    margin-left: -8px;
+}
+
+.history-button:hover {
+    background-color: #d4d9df;
+    color: rgb(100, 100, 100);
+}

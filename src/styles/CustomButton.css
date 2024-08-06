@@ -1,0 +1,105 @@
+.custom-button {
+  border-radius: 7px;
+  padding: 10px 12px; 
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 0.4px;
+  color: white;
+  border: none;
+}
+
+.excel-button {
+  background-color: #07AF5A;
+}
+
+.excel-button:hover {
+  background-color: #068c4e;
+}
+
+.excel-button2 {
+  background-color: #d7dde4;
+  color: rgb(85, 84, 84)
+}
+
+.excel-button2:hover {
+  background-color: #07AF5A;
+  color: white
+}
+
+.order-request-button {
+  background-color: #2789FE;
+}
+
+.order-request-button:hover {
+  background-color: #1e6fc1;
+}
+
+.authority-add-button {
+  background-color: #2789FE;
+  margin-top: 5px;
+}
+
+.authority-add-button:hover {
+  background-color: #1e6fc1;
+}
+
+.apply-request-button {
+  background-color: #2789FE;
+}
+
+.apply-request-button:hover {
+  background-color: #1e6fc1;
+}
+
+.apply-request-button span {
+  letter-spacing: 0.4em;
+}
+
+.preview-button {
+  padding: 4px 8px 4px 8px;
+  height: 32px;
+  background-color: #e2e5e9;
+  font-size: 11px;
+  margin-left: 78px;
+  margin-top: 23px;
+  color: rgb(126, 125, 125)
+}
+
+.preview-button:hover { 
+  background-color: #d1d4d8;
+}
+
+.approve-button {
+  background-color: #2789FE;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 6px 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 16px;
+  margin-right: 16px;
+  cursor: pointer;
+}
+
+.approve-button:hover {
+  background-color: #1e6fc1;
+}
+
+.reject-button {
+  background-color: #FF4C4C;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 6px 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 16px;
+  margin-right: 16px;
+  cursor: pointer;
+}
+
+.reject-button:hover {
+  background-color: #E84646;
+}

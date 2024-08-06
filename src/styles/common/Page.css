@@ -1,0 +1,22 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+}
+
+.content {
+  flex: 1;
+  padding: 16px 40px;
+  overflow-y: auto;
+}
+
+.section-separator {
+  margin-top: 32px;
+  border-top: 1px solid #ddd;
+  margin-bottom: 16px;
+}

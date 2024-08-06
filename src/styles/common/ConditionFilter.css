@@ -1,0 +1,119 @@
+.all-application-filter-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+  padding: 10.5px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: white;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.all-application-filter {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.all-application-filter label {
+  margin-bottom: 4px;
+  margin-left: 10px;
+  margin-right: 8px;
+}
+
+/* 기안일자 선택 박스 스타일 수정 */
+.custom-datepicker {
+  width: 120px;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background-color: white;
+  font-size: 13px;
+  text-align: center;
+  margin-left: 6px;
+  margin-right: 8px;
+}
+
+.custom-datepicker:focus{
+  outline: none;
+  border: 1px solid #a1c0e6;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* 문서분류 박스 스타일 수정 */
+.all-application-filter select {
+  width: 120px;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background-color: white;
+  font-size: 13px;
+  text-indent: 3%;
+}
+
+.all-application-filter select:focus{
+  outline: none;
+  border: 1px solid #a1c0e6;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.reset-button {
+  background: none;
+  border: none;
+  margin-right: 8px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.reset-icon {
+  width: 20px;
+  height: 20px;
+  margin-left: 16px;
+}
+
+.reset-text {
+  width: 70px;
+  margin-left: 8px;
+  text-decoration: underline;
+  font-size: 13px;
+  color: black;
+}
+
+.reset-text:hover {
+  color: #2789FE;
+}
+
+.search-button {
+  border-radius: 8px;
+  width: 58px;
+  height: 30px;
+  background-color: #2789FE;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.search-button:hover {
+  background-color: #1e6fc1;
+}
+
+.all-application-filter input[type="text"] {
+  width: 120px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background-color: white;
+  font-size: 13px;
+  text-indent: 3%;
+  margin-left: 4px;
+}
+
+.all-application-filter input[type="text"]:focus{
+  outline: none;
+  border: 1px solid #a1c0e6;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}

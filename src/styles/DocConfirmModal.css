@@ -1,0 +1,108 @@
+.doc-confirm-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .doc-confirm-modal-container {
+    background: #fff;
+    padding: 30px 75px 45px 75px;
+    border-radius: 10px;
+    text-align: left;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 550px;
+    position: relative;
+  }
+  
+  .doc-confirm-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .doc-confirm-modal-header h3 {
+    margin-bottom: 35px;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .doc-confirm-close-button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  
+  .doc-confirm-form-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .doc-confirm-form-group label {
+    font-size: 16px;
+    flex: 0 0 100px;
+    margin-right: 10px;
+  }
+  
+  .doc-confirm-form-group input,
+  .doc-confirm-form-group textarea {
+    width: calc(100% - 110px); 
+    padding: 8px 13px;
+    font-size: 14px;
+    background-color: #f2f5f8;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  
+  .doc-confirm-form-group input:focus,
+  .doc-confirm-form-group textarea:focus {
+    outline: none;
+    border: 1px solid #a1c0e6;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  .doc-confirm-textarea {
+    resize: none;
+    height: 80px;
+  }
+  
+  .doc-confirm-modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+  
+  .doc-confirm-button {
+    border-radius: 5px;
+    padding: 10px 0px 10px 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    min-width: 80px;
+    }
+  
+    .doc-confirm-button span {
+        letter-spacing: 0.4em;
+    }
+
+  .doc-confirm-button.confirm {
+    background-color: #2789FE;
+    color: white;
+    font-size: 15px;
+    border: none;
+  }
+  
+  .doc-confirm-button.confirm:hover {
+    background-color: #1e6fc1;
+  }
+  

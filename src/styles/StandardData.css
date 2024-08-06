@@ -1,0 +1,162 @@
+.detail-checkbox {
+    transform: scale(0.85);
+  }
+  
+  .details-table th, .details-table td {
+    padding: 5px;
+  }
+  
+  .standard-data-content {
+    padding: 8px 16px;
+  }
+  
+  .standard-data-content h2 {
+    font-size: 28px;
+    margin-bottom: 16px;
+  }
+  
+  .category-section {
+    margin-top: 25px;
+    margin-bottom: 30px;
+    font-size: 16px;
+  }
+  
+  .category-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 15px;
+  }
+  
+  .category-dropdown {
+    padding: 6px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 165px;
+    margin-left: 44px;
+  }
+  
+  .tables-section {
+    display: flex;
+  }
+  
+  .sub-category-section {
+    /* flex: 1; */
+    width: 200px;
+  }
+  
+  .details-content {
+    flex: 7;
+    margin-left: 20px;
+    overflow-x: auto;
+  }
+  
+  .header-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .sub-category-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  
+  .detail-content-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 10px;
+    padding-left: 5px;
+  }
+  
+  .sub-category-list {
+    max-height: 500px;
+    overflow-y: auto;
+  }
+  
+  .sub-category-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .sub-category-table th {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 11px 20px;
+    text-align: center;
+    font-size: 13px;
+  }
+  
+  .sub-category-table td {
+    border: 1px solid #ddd;
+    padding: 11px 20px;
+    text-align: left;
+    font-size: 13px;
+  }
+  
+  .sub-category-table td:hover {
+    background-color: #edf7ff;
+  }
+  
+  .details-table {
+    border-collapse: collapse;
+    width: 100%;
+    overflow-x: auto;
+    max-width: 100%;
+    min-width: 100%;
+  }
+  
+  .details-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .details-table th, .details-table td {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  
+  .details-table .checkbox-cell {
+    width: 50px;
+  }
+  
+  .data-add-button, .data-modify-button, .data-delete-button {
+    border-radius: 7px;
+    padding: 4px 8px;
+    width: 55px;
+    height: 30px;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border: none;
+    margin-right: 3px;
+  }
+  
+  .data-add-button {
+    color: white;
+    background-color: #2789fe;
+  }
+  
+  .data-add-button:hover {
+    background-color: #1e6fc1;
+  }
+  
+  .data-modify-button, .data-delete-button {
+    color: black;
+    background-color: #bdc6cf;
+  }
+  
+  .data-modify-button:hover, .data-delete-button:hover {
+    background-color: #a1a9b2;
+  }
+
+  .selected-sub-category-text {
+    color: #2789fe;
+  }

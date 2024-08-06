@@ -1,0 +1,97 @@
+.reject-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.reject-modal-container {
+  background: #fff;
+  padding: 32px 32px;
+  border-radius: 10px;
+  text-align: left;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 400px;
+}
+
+.reject-modal-container h3 {
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.reject-modal-container p {
+  font-size: 16px;
+  margin-top: -2px;
+  margin-bottom: 32px;
+}
+
+.reject-modal-container textarea {
+  width: 375px;
+  height: 160px;
+  padding: 10px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  resize: none;
+}
+
+.reject-modal-container textarea:focus {
+  border: 1px solid #a1c0e6;
+  outline: none;
+}
+
+.reject-reason-content {
+  font-size: 16px;
+  height: 160px;
+  background-color: #F9FAFB;
+  padding: 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+}
+
+.reject-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.reject-modal-button {
+  border-radius: 5px;
+  padding: 10px 13px 10px 19px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  min-width: 80px;
+}
+
+.reject-modal-button span {
+  letter-spacing: 0.4em;
+}
+
+.reject-modal-button.confirm {
+  background-color: #FF4C4C;
+  color: white;
+  border: none;
+}
+
+.reject-modal-button.cancel {
+  color: black;
+  border: none;
+}
+
+.reject-modal-button.confirm:hover {
+  background-color: #E84646;
+}
+
+.reject-modal-button.cancel:hover {
+  background-color: #b2b9c2;
+}
