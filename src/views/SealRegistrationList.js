@@ -23,32 +23,32 @@ function SealRegistrationList() {
     const mockData = [
       {
         draftId: 1,
-        draftDate: '2024-08-01',
-        submitTo: 'Department A',
+        sealName: 'Seal A',
+        sealImage: 'imageA.png',
+        department: 'Department A',
         purpose: 'Official Use',
-        sealType: 'Type A',
-        numSeals: 2,
-        approval: 'Approved',
+        manager: 'Manager A',
+        registrationDate: '2024-08-01',
         deleted: false,
       },
       {
         draftId: 2,
-        draftDate: '2024-08-02',
-        submitTo: 'Department B',
+        sealName: 'Seal B',
+        sealImage: 'imageB.png',
+        department: 'Department B',
         purpose: 'Personal Use',
-        sealType: 'Type B',
-        numSeals: 3,
-        approval: 'Pending',
+        manager: 'Manager B',
+        registrationDate: '2024-08-02',
         deleted: false,
       },
       {
         draftId: 3,
-        draftDate: '2024-08-03',
-        submitTo: 'Department C',
+        sealName: 'Seal C',
+        sealImage: 'imageC.png',
+        department: 'Department C',
         purpose: 'Business Use',
-        sealType: 'Type C',
-        numSeals: 1,
-        approval: 'Rejected',
+        manager: 'Manager C',
+        registrationDate: '2024-08-03',
         deleted: false,
       },
     ];
@@ -80,14 +80,14 @@ function SealRegistrationList() {
 
     if (keyword) {
       filtered = filtered.filter(app => {
-        if (searchType === '제출처') return app.submitTo.includes(keyword);
-        if (searchType === '사용목적') return app.purpose.includes(keyword);
-        if (searchType === '인장구분') return app.sealType.includes(keyword);
+        if (searchType === '사용부서') return app.department.includes(keyword);
+        if (searchType === '용도') return app.purpose.includes(keyword);
+        if (searchType === '관리자') return app.manager.includes(keyword);
         if (searchType === '전체') {
           return (
-            app.submitTo.includes(keyword) ||
+            app.department.includes(keyword) ||
             app.purpose.includes(keyword) ||
-            app.sealType.includes(keyword)
+            app.manager.includes(keyword)
           );
         }
         return true;
@@ -96,7 +96,7 @@ function SealRegistrationList() {
 
     if (startDate && endDate) {
       filtered = filtered.filter(app => {
-        const appDate = new Date(app.draftDate);
+        const appDate = new Date(app.registrationDate);
         const start = new Date(startDate);
         const end = new Date(endDate);
         return appDate >= start && appDate <= end;
@@ -107,12 +107,23 @@ function SealRegistrationList() {
   };
 
   const columns = [
-    { header: '일자', accessor: 'draftDate', width: '10%' },
-    { header: '제출처', accessor: 'submitTo', width: '15%' },
-    { header: '사용목적', accessor: 'purpose', width: '20%' },
-    { header: '인장구분', accessor: 'sealType', width: '15%' },
-    { header: '날인부수', accessor: 'numSeals', width: '10%' },
-    { header: '결재', accessor: 'approval', width: '10%' },
+    { header: '인영', accessor: 'sealName', width: '15%' },
+    {
+      header: '인영이미지',
+      accessor: 'sealImage',
+      width: '15%',
+      Cell: ({ row }) => {
+        return (
+          <div className="image-cell">
+            <img src={row.sealImage} alt={row.sealName} className="seal-image" />
+          </div>
+        );
+      },
+    },
+    { header: '사용부서', accessor: 'department', width: '15%' },
+    { header: '용도', accessor: 'purpose', width: '20%' },
+    { header: '관리자', accessor: 'manager', width: '15%' },
+    { header: '등록일', accessor: 'registrationDate', width: '10%' },
     {
       header: '신청 삭제',
       accessor: 'delete',
