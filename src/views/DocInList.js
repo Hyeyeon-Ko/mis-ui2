@@ -9,8 +9,12 @@ import axios from 'axios';
 
 function DocInList() {
   const [applications, setApplications] = useState([]);
+  const [filteredApplications, setFilteredApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDraftId, setSelectedDraftId] = useState(null);
+
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   useEffect(() => {
     fetchDocInList();
@@ -19,8 +23,6 @@ function DocInList() {
   const fetchDocInList = async () => {
     try {
       const response = await axios.get('/api/doc/receiveList');
-      console.log('response: ', response);
-
       if (response.data && response.data.data) {
         const formattedData = response.data.data.map(item => ({
           draftId: item.draftId,
@@ -32,8 +34,8 @@ function DocInList() {
           status: item.status,
           deleted: false, 
         }));
-        console.log('formattedData: ', formattedData);
         setApplications(formattedData);
+        setFilteredApplications(formattedData);
       }
     } catch (error) {
       console.error('Error fetching document list:', error);
@@ -59,8 +61,13 @@ function DocInList() {
         },
       });
 
-      // 데이터에서 삭제된 항목을 찾아서 업데이트
       setApplications(prevApps => 
+        prevApps.map(app => 
+          app.draftId === selectedDraftId ? { ...app, deleted: true } : app
+        )
+      );
+
+      setFilteredApplications(prevApps => 
         prevApps.map(app => 
           app.draftId === selectedDraftId ? { ...app, deleted: true } : app
         )
@@ -72,10 +79,41 @@ function DocInList() {
     }
   };
 
+  const handleSearch = ({ searchType, keyword, startDate, endDate }) => {
+    let filtered = applications;
+
+    if (keyword) {
+      filtered = filtered.filter(app => {
+        if (searchType === '발신처') return app.resSender.includes(keyword);
+        if (searchType === '제목') return app.title.includes(keyword);
+        if (searchType === '접수인') return app.drafter.includes(keyword);
+        if (searchType === '전체') {
+          return (
+            app.resSender.includes(keyword) ||
+            app.title.includes(keyword) ||
+            app.drafter.includes(keyword)
+          );
+        }
+        return true;
+      });
+    }
+
+    if (startDate && endDate) {
+      filtered = filtered.filter(app => {
+        const appDate = new Date(app.draftDate);
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        return appDate >= start && appDate <= end;
+      });
+    }
+
+    setFilteredApplications(filtered);
+  };
+
   const columns = [
     { header: '접수일자', accessor: 'draftDate', width: '8%' },
     { header: '문서번호', accessor: 'docId', width: '8%' },
-    { header: '수신처', accessor: 'resSender', width: '10%' },
+    { header: '발신처', accessor: 'resSender', width: '10%' },
     { header: '제목', accessor: 'title', width: '20%' },
     { header: '접수인', accessor: 'drafter', width: '8%' },
     { header: '상태', accessor: 'status', width: '8%' },
@@ -104,16 +142,18 @@ function DocInList() {
         <h2>문서 수신 대장</h2>
         <Breadcrumb items={['문서수발신 관리', '문서 수신 대장']} />
         <ConditionFilter
-          startDate={null}
-          setStartDate={() => {}}
-          endDate={null}
-          setEndDate={() => {}}
-          onSearch={() => {}}
-          onReset={() => {}}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+          onSearch={handleSearch}
+          onReset={() => setFilteredApplications(applications)}
           showDocumentType={false}
+          showSearchCondition={true}
+          excludeRecipient={true}
         />
         <div className="doc-in-content">
-          <Table columns={columns} data={applications}/>
+          <Table columns={columns} data={filteredApplications}/>
         </div>
         {showDeleteModal && (
           <ConfirmModal

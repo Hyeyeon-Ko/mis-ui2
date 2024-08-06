@@ -1,9 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../common/Button'; 
 import '../../styles/common/ConditionFilter.css';
 
-const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documentType, setDocumentType, onSearch, onReset, filters, onFilterChange, showStatusFilters, showDocumentType }) => {
+const ConditionFilter = ({
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
+  documentType,
+  setDocumentType,
+  onSearch,
+  onReset,
+  filters,
+  onFilterChange,
+  showStatusFilters,
+  showDocumentType,
+  showSearchCondition,
+  excludeRecipient,
+  excludeSender,
+}) => {
+  const [searchType, setSearchType] = useState('전체');
+  const [keyword, setKeyword] = useState('');
+  
   useEffect(() => {
     resetFilters();
   }, []);
@@ -17,6 +36,8 @@ const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documen
     defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
     setStartDate(defaultStartDate);
     setEndDate(new Date());
+    setSearchType('전체');
+    setKeyword('');
     if (setDocumentType) setDocumentType('');
     if (onReset) onReset();
   };
@@ -34,6 +55,8 @@ const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documen
     adjustedEndDate.setDate(adjustedEndDate.getDate() + 1);
     onSearch({
       documentType,
+      searchType,
+      keyword,
       startDate: startDate ? formatDate(startDate) : '',
       endDate: endDate ? formatDate(adjustedEndDate) : '',
     });
@@ -74,6 +97,24 @@ const ConditionFilter = ({ startDate, setStartDate, endDate, setEndDate, documen
               <option value="인장관리">인장관리</option>
               <option value="문서수발신">문서수발신</option>
             </select>
+          </>
+        )}
+        {showSearchCondition && (
+          <>
+            <label>검색 조건</label>
+            <select value={searchType} onChange={(e) => setSearchType(e.target.value)}>
+              <option value="전체">전체</option>
+              {!excludeSender && <option value="발신처">발신처</option>}
+              {!excludeRecipient && <option value="수신처">수신처</option>}
+              <option value="제목">제목</option>
+              <option value="접수인">접수인</option>
+            </select>
+            <input
+              type="text"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder="검색어 입력"
+            />
           </>
         )}
         <button className="reset-button" onClick={handleReset}>
@@ -138,6 +179,7 @@ ConditionFilter.propTypes = {
   onFilterChange: PropTypes.func,
   showStatusFilters: PropTypes.bool,
   showDocumentType: PropTypes.bool,
+  showSearchCondition: PropTypes.bool,
 };
 
 export default ConditionFilter;

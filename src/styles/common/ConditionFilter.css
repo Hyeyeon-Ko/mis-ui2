@@ -100,3 +100,20 @@
 .search-button:hover {
   background-color: #1e6fc1;
 }
+
+.all-application-filter input[type="text"] {
+  width: 120px;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background-color: white;
+  font-size: 13px;
+  text-indent: 3%;
+  margin-left: 4px;
+}
+
+.all-application-filter input[type="text"]:focus{
+  outline: none;
+  border: 1px solid #a1c0e6;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
