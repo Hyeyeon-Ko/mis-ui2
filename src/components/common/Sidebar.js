@@ -17,8 +17,8 @@ function Sidebar() {
 
   const applyItems = [
     { label: '명함신청', url: '/api/bcd' },
-    { label: '법인서류', url: '/api/corpDoc' },
     { label: '인장관리', url: '/api/seal' },
+    { label: '법인서류', url: '/api/corpDoc' },
     { label: '문서수발신', url: '/api/doc' },
   ];
 
@@ -37,6 +37,12 @@ function Sidebar() {
     { label: '서류 수불 대장', url: '/api/corpDoc/rnpList'},
   ]
 
+  const sealItems = [
+    { label: '인장 관리 대장', url: '/api/seal/managementList' },
+    { label: '인장 반출 대장', url: '/api/seal/exportList' },
+    { label: '인장 등록 대장', url: '/api/seal/registrationList' },
+  ]
+
   const docItems = [
     { label: '문서 수신 대장', url: '/api/doc/receiveList' },
     { label: '문서 발신 대장', url: '/api/doc/sendList' },
@@ -49,7 +55,8 @@ function Sidebar() {
   const sections = {
     'A': { title: '신청내역 관리', items: manageItems },
     'B': { title: '발주 관리', items: orderItems },
-    'C': { title: '법인서류 관리', items: corpDocItems},
+    'C': { title: '인장 관리', items: sealItems},
+    'D': { title: '법인서류 관리', items: corpDocItems},
     'E': { title: '문서수발신 관리', items: docItems },
   };
 
@@ -87,17 +94,17 @@ function Sidebar() {
               defaultOpen={false} 
             />
           ))}
-          {auth.role === 'MASTER' && (
-            <div className="sidebar-section">
-              <h2>
-                <Link to="/api/auth" className={isActive('/api/auth')}>권한 관리</Link>
-              </h2>
-            </div>
-          )}
           {(auth.role === 'MASTER' || auth.role === 'ADMIN') && (
             <div className="sidebar-section">
               <h2>
                 <Link to="/api/std" className={isActive('/api/std')}>기준자료 관리</Link>
+              </h2>
+            </div>
+          )}
+          {auth.role === 'MASTER' && (
+            <div className="sidebar-section">
+              <h2>
+                <Link to="/api/auth" className={isActive('/api/auth')}>권한 관리</Link>
               </h2>
             </div>
           )}
