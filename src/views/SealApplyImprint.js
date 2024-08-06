@@ -9,7 +9,7 @@ function SealApplyImprint() {
         <div className="content">
             <div className="seal-content">
                 <h2>인장신청</h2>
-                <Breadcrumb items={['신청하기', '인장관리']} />
+                <Breadcrumb items={['신청하기', '인장신청']} />
                 <div className='seal-main'>
                     <div className='seal-apply-content'>
                         <form className='seal-form'>

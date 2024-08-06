@@ -22,6 +22,8 @@ import StandardData from './views/StandardData';
 import DocApply from './views/DocApply';
 import CorpDocApply from "./views/CorpDocApply";
 import SealApplyFirst from "./views/SealApplyFirst";
+import SealApplyImprint from "./views/SealApplyImprint";
+import SealApplyExport from "./views/SealApplyExport";
 import { AuthProvider, AuthContext } from './components/AuthContext';
 import { IoMagnet } from 'react-icons/io5';
 
@@ -71,6 +73,8 @@ function App() {
                 <Route path="/api/doc" element={<RequireAuth><DocApply /></RequireAuth>} />
                 <Route path="/api/corpDoc" element={<RequireAuth><CorpDocApply /></RequireAuth>} />
                 <Route path="/api/seal" element={<RequireAuth><SealApplyFirst /></RequireAuth>} />
+                <Route path="/api/seal/imprint" element={<RequireAuth><SealApplyImprint /></RequireAuth>} />
+                <Route path="/api/seal/export" element={<RequireAuth><SealApplyExport /></RequireAuth>} />
                 <Route path="/api/myApplyList" element={<RequireAuth><MyApplyList /></RequireAuth>} />
                 <Route path="/api/myPendingList" element={<RequireAuth><MyPendingList /></RequireAuth>} />
                 <Route path="/api/applyList" element={<RequireAuth><ApplicationsList /></RequireAuth>} />

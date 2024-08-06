@@ -9,8 +9,8 @@ function SealApplyFirst() {
     return (
     <div className="content">
       <div className="seal-content">
-        <h2>인장관리</h2>
-        <Breadcrumb items={['신청하기', '인장관리']} />
+        <h2>인장신청</h2>
+        <Breadcrumb items={['신청하기', '인장신청']} />
         <div className="apply-button-container">
             <CircleButton to="/api/seal/imprint" label="날 인" />
             <CircleButton to="/api/seal/export" label="반 출" />

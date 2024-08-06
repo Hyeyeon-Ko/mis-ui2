@@ -17,7 +17,7 @@ function Sidebar() {
 
   const applyItems = [
     { label: '명함신청', url: '/api/bcd' },
-    { label: '인장관리', url: '/api/seal' },
+    { label: '인장신청', url: '/api/seal' },
     { label: '법인서류', url: '/api/corpDoc' },
     { label: '문서수발신', url: '/api/doc' },
   ];
