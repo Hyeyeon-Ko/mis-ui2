@@ -18,6 +18,11 @@ import DetailDocApplication from './views/DetailDocApplication';
 import PendingApprovalList from './views/PendingApprovalList';
 import DocInList from './views/DocInList';
 import DocOutList from './views/DocOutList';
+import SealManagementList from './views/SealManageMentList';
+import SealRegistrationList from './views/SealRegistrationList';
+import SealExportList from './views/SealExportList';
+import CorpDocRnpList from './views/CorpDocRnpList';
+import CorpDocIssueList from './views/CorpDocIssueList';
 import StandardData from './views/StandardData';
 import DocApply from './views/DocApply';
 import CorpDocApply from "./views/CorpDocApply";
@@ -75,6 +80,11 @@ function App() {
                 <Route path="/api/seal" element={<RequireAuth><SealApplyFirst /></RequireAuth>} />
                 <Route path="/api/seal/imprint" element={<RequireAuth><SealApplyImprint /></RequireAuth>} />
                 <Route path="/api/seal/export" element={<RequireAuth><SealApplyExport /></RequireAuth>} />
+                <Route path="/api/seal/managementList" element={<RequireAuth><SealManagementList /></RequireAuth>} />
+                <Route path="/api/seal/registrationList" element={<RequireAuth><SealRegistrationList /></RequireAuth>} />
+                <Route path="/api/seal/exportList" element={<RequireAuth><SealExportList /></RequireAuth>} />
+                <Route path="/api/corpDoc/rnpList" element={<RequireAuth><CorpDocRnpList /></RequireAuth>} />
+                <Route path="/api/corpDoc/issueList" element={<RequireAuth><CorpDocIssueList /></RequireAuth>} />
                 <Route path="/api/myApplyList" element={<RequireAuth><MyApplyList /></RequireAuth>} />
                 <Route path="/api/myPendingList" element={<RequireAuth><MyPendingList /></RequireAuth>} />
                 <Route path="/api/applyList" element={<RequireAuth><ApplicationsList /></RequireAuth>} />
