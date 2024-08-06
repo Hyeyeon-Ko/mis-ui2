@@ -61,17 +61,7 @@ function DocInList() {
         },
       });
 
-      setApplications(prevApps => 
-        prevApps.map(app => 
-          app.draftId === selectedDraftId ? { ...app, deleted: true } : app
-        )
-      );
-
-      setFilteredApplications(prevApps => 
-        prevApps.map(app => 
-          app.draftId === selectedDraftId ? { ...app, deleted: true } : app
-        )
-      );
+      fetchDocInList();
 
       setShowDeleteModal(false);
     } catch (error) {
