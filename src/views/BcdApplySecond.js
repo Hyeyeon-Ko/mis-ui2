@@ -107,6 +107,12 @@ function BcdApplySecond() {
       if (response.data && response.data.data) {
         const data = response.data.data;
         console.log(data);
+
+        data.instInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
+        data.deptInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
+        data.teamInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
+        data.gradeInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
+        console.log('sorting data: ', data);
   
         const instMap = {};
         const deptMap = {};

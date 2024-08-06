@@ -25,6 +25,8 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
         detailData?.etcItem4 || '',
         detailData?.etcItem5 || '',
         detailData?.etcItem6 || '',
+        detailData?.etcItem7 || '',
+        detailData?.etcItem8 || '',
       ].filter(item => item !== null && item !== '');
       setItems(initialItems.map(item => ({ value: item })));
     }
@@ -37,10 +39,10 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
   };
 
   const handleAddItem = () => {
-    if (items.length < 6) {
+    if (items.length < 8) {
       setItems([...items, { value: '' }]);
     } else {
-      alert('항목은 최대 6개까지 추가할 수 있습니다.');
+      alert('항목은 최대 8개까지 추가할 수 있습니다.');
     }
   };
 
@@ -54,12 +56,15 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
         alert('수정된 내용이 없습니다.');
         return;
       }
-
+  
       if (!detailCode || !detailName) {
         alert('추가할 정보를 모두 입력해주세요.');
         return;
       }
-      onSave({ detailCode, detailName, items: items.map(item => item.value) });
+  
+      const normalizedItems = Array.from({ length: 8 }, (_, index) => items[index]?.value || '');
+  
+      onSave({ detailCode, detailName, items: normalizedItems });
     } else {
       if (!classCd || !groupCd || !groupNm) {
         alert('추가할 정보를 모두 입력해주세요.');
@@ -68,7 +73,7 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
       onSave({ classCd, groupCd, groupNm });
     }
   };
-
+    
   const resetForm = () => {
     setDetailCode('');
     setDetailName('');
@@ -139,7 +144,7 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
                 {index <= items.length - 1 && <hr className="detail-separator" />}
               </div>
             ))}
-            {items.length < 6 && (
+            {items.length < 8 && (
               <div className="add-standard-detail-row">
                 <button className="add-item-button" onClick={handleAddItem}>+</button>
               </div>

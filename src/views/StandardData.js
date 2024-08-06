@@ -10,6 +10,7 @@ import { AuthContext } from '../components/AuthContext';
 function StandardData() {
   const [subCategories, setSubCategories] = useState([]);
   const [details, setDetails] = useState([]);
+  const [headerData, setHeaderData] = useState({});
   const [selectedCategory, setSelectedCategory] = useState('A');
   const [selectedSubCategory, setSelectedSubCategory] = useState('');
   const [subCategoryName, setSubCategoryName] = useState('');
@@ -81,6 +82,16 @@ function StandardData() {
     }
   };
 
+  const fetchHeaderData = async (groupCd) => {
+    try {
+      const response = await axios.get(`/api/std/header`, { params: { groupCd } });
+      const headerData = response.data.data[0];
+      setHeaderData(headerData);
+    } catch (error) {
+      console.error('헤더 정보를 가져오는 중 에러 발생:', error);
+    }
+  };
+
   const handleAddRow = () => {
     if (!selectedSubCategory) {
       alert('중분류 코드를 선택하세요.');
@@ -117,7 +128,7 @@ function StandardData() {
         etcItem7: newRow.items[6],
         etcItem8: newRow.items[7],
       });
-
+  
       try {
         await axios.post('/api/std/detailInfo', {
           detailCd: newRow.detailCode,
@@ -186,7 +197,7 @@ function StandardData() {
       }
     }
   };
-
+  
   const handleAddSubCategoryRow = () => {
     setModalMode('group');
     setShowModal(true);
@@ -196,6 +207,7 @@ function StandardData() {
     setSelectedSubCategory(groupCd);
     setSubCategoryName(`${groupCd} ${groupNm}`);
     fetchDetails(groupCd);
+    fetchHeaderData(groupCd);
     setSelectedDetail(null);
   };
 
@@ -272,16 +284,15 @@ function StandardData() {
         );
       },
     },
-    { header: '상세코드', accessor: 'detailCd' },
-    { header: '상세명', accessor: 'detailNm' },
-    { header: '항목 1', accessor: 'etcItem1' },
-    { header: '항목 2', accessor: 'etcItem2' },
-    { header: '항목 3', accessor: 'etcItem3' },
-    { header: '항목 4', accessor: 'etcItem4' },
-    { header: '항목 5', accessor: 'etcItem5' },
-    { header: '항목 6', accessor: 'etcItem6' },
-    { header: '항목 7', accessor: 'etcItem7' },
-    { header: '항목 8', accessor: 'etcItem8' },
+    { header: headerData.detailNm || '', accessor: 'detailCd' },
+    { header: headerData.etcItem1 || '', accessor: 'detailNm' },
+    { header: headerData.etcItem2 || '', accessor: 'etcItem1' },
+    { header: headerData.etcItem3 || '', accessor: 'etcItem2' },
+    { header: headerData.etcItem4 || '', accessor: 'etcItem3' },
+    { header: headerData.etcItem5 || '', accessor: 'etcItem4' },
+    { header: headerData.etcItem6 || '', accessor: 'etcItem5' },
+    { header: headerData.etcItem7 || '', accessor: 'etcItem6' },
+    { header: headerData.etcItem8 || '', accessor: 'etcItem7' },
   ];
 
   const getModalTitle = () => {
