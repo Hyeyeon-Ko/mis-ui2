@@ -17,7 +17,7 @@ function StandardData() {
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('detail');
   const [editDetailData, setEditDetailData] = useState(null);
-  const [selectedDetail, setSelectedDetail] = useState(null);
+  const [selectedDetails, setSelectedDetails] = useState([]);
   const { auth } = useContext(AuthContext);
 
   const categories = [
@@ -27,7 +27,7 @@ function StandardData() {
 
   useEffect(() => {
     fetchSubCategories(selectedCategory);
-    setSelectedDetail(null);
+    setSelectedDetails([]);
   }, [selectedCategory]);
 
   const fetchSubCategories = async (classCd) => {
@@ -39,14 +39,14 @@ function StandardData() {
       setSelectedSubCategory('');
       setSubCategoryName('');
       setDetails([]);
-      setSelectedDetail(null);
+      setSelectedDetails([]);
     } catch (error) {
       console.error('중분류를 가져오는 중 에러 발생:', error.response ? error.response.data : error.message);
       setSubCategories([]);
       setSelectedSubCategory('');
       setSubCategoryName('');
       setDetails([]);
-      setSelectedDetail(null);
+      setSelectedDetails([]);
     }
   };
 
@@ -61,11 +61,11 @@ function StandardData() {
         console.error('예상치 못한 데이터 형식:', data);
         setDetails([]);
       }
-      setSelectedDetail(null);
+      setSelectedDetails([]);
     } catch (error) {
       console.error('상세 정보를 가져오는 중 에러 발생:', error);
       setDetails([]);
-      setSelectedDetail(null);
+      setSelectedDetails([]);
     }
   };
 
@@ -104,31 +104,15 @@ function StandardData() {
   };
 
   const handleModifyRow = () => {
-    if (!selectedDetail) {
-      alert('수정할 상세 코드를 선택하세요.');
+    if (selectedDetails.length !== 1) {
+      alert('수정할 상세 코드를 하나만 선택하세요.');
       return;
     }
-    fetchSelectedDetail(selectedSubCategory, selectedDetail);
+    fetchSelectedDetail(selectedSubCategory, selectedDetails[0]);
   };
 
   const handleSaveRow = async (newRow) => {
     if (modalMode === 'detail') {
-      console.log('새로운 상세 정보 저장:', {
-        detailCd: newRow.detailCode,
-        groupCd: selectedSubCategory,
-        detailNm: newRow.detailName,
-        fromDd: '',
-        toDd: '',
-        etcItem1: newRow.items[0],
-        etcItem2: newRow.items[1],
-        etcItem3: newRow.items[2],
-        etcItem4: newRow.items[3],
-        etcItem5: newRow.items[4],
-        etcItem6: newRow.items[5],
-        etcItem7: newRow.items[6],
-        etcItem8: newRow.items[7],
-      });
-  
       try {
         await axios.post('/api/std/detailInfo', {
           detailCd: newRow.detailCode,
@@ -148,7 +132,7 @@ function StandardData() {
         alert('상세 코드가 추가되었습니다.');
         fetchDetails(selectedSubCategory);
         setShowModal(false);
-        setSelectedDetail(null);
+        setSelectedDetails([]);
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           alert('해당 중분류 그룹에 이미 존재하는 상세 코드입니다.');
@@ -176,7 +160,7 @@ function StandardData() {
         alert('상세 코드가 수정되었습니다.');
         fetchDetails(selectedSubCategory);
         setShowModal(false);
-        setSelectedDetail(null);
+        setSelectedDetails([]);
       } catch (error) {
         console.error('상세 정보를 업데이트하는 중 에러 발생:', error);
         alert('상세 코드 수정에 실패했습니다.');
@@ -197,7 +181,7 @@ function StandardData() {
       }
     }
   };
-  
+
   const handleAddSubCategoryRow = () => {
     setModalMode('group');
     setShowModal(true);
@@ -208,7 +192,7 @@ function StandardData() {
     setSubCategoryName(`${groupCd} ${groupNm}`);
     fetchDetails(groupCd);
     fetchHeaderData(groupCd);
-    setSelectedDetail(null);
+    setSelectedDetails([]);
   };
 
   const resetModal = () => {
@@ -216,25 +200,41 @@ function StandardData() {
   };
 
   const handleDetailSelect = (detailCd) => {
-    setSelectedDetail(detailCd);
+    setSelectedDetails((prevSelectedDetails) => {
+      if (prevSelectedDetails.includes(detailCd)) {
+        return prevSelectedDetails.filter((code) => code !== detailCd);
+      } else {
+        return [...prevSelectedDetails, detailCd];
+      }
+    });
   };
 
   const handleDeleteRow = async () => {
-    if (!selectedDetail) {
+    if (selectedDetails.length === 0) {
       alert('삭제할 상세 코드를 선택하세요.');
       return;
     }
 
     try {
-      await axios.put('/api/std/deleteDetailInfo', null, {
-        params: { groupCd: selectedSubCategory, detailCd: selectedDetail }
-      });
+      for (const detailCd of selectedDetails) {
+        await axios.put('/api/std/deleteDetailInfo', null, {
+          params: { groupCd: selectedSubCategory, detailCd }
+        });
+      }
       alert('상세 코드가 삭제되었습니다.');
-      fetchDetails(selectedSubCategory); 
-      setSelectedDetail(null);
+      fetchDetails(selectedSubCategory);
+      setSelectedDetails([]);
     } catch (error) {
       console.error('상세 정보를 삭제하는 중 에러 발생:', error);
       alert('상세 코드 삭제에 실패했습니다.');
+    }
+  };
+
+  const handleSelectAll = () => {
+    if (selectedDetails.length === details.length) {
+      setSelectedDetails([]);
+    } else {
+      setSelectedDetails(details.map(detail => detail.detailCd));
     }
   };
 
@@ -265,20 +265,26 @@ function StandardData() {
 
   const detailColumns = [
     {
-      header: '선택',
+      header: (
+        <input
+          type="checkbox"
+          onChange={handleSelectAll}
+          checked={selectedDetails.length === details.length}
+        />
+      ),
       accessor: 'select',
       width: '5%',
       Cell: ({ row }) => {
-        const detailCd = row?.original?.detailCd || row?.detailCd; 
+        const detailCd = row?.original?.detailCd || row?.detailCd;
         if (!detailCd) {
           console.warn('상세 코드가 누락됨:', row);
           return null;
         }
         return (
           <input
-            type="radio"
+            type="checkbox"
             name="detailSelect"
-            checked={selectedDetail === detailCd}
+            checked={selectedDetails.includes(detailCd)}
             onChange={() => handleDetailSelect(detailCd)}
           />
         );
