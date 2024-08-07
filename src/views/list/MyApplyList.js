@@ -78,7 +78,7 @@ function MyApplyList() {
     const minutes = String(date.getMinutes()).padStart(2, '0');
 
     return `${year}-${month}-${day} ${hours}:${minutes}`;
-  };
+  }; 
 
   // applyStatus 매핑
   const getStatusText = (status) => {

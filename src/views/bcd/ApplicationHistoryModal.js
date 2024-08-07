@@ -19,6 +19,7 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
       const transformedData = response.data.data.map((item) => ({
         ...item,
         applyStatus: getStatusText(item.applyStatus),
+        draftDate: parseDateTime(item.draftDate), 
       }));
       setData(transformedData);
       setFilteredData(transformedData);
@@ -32,6 +33,18 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
       fetchHistory(draftId);
     }
   }, [draftId, fetchHistory]);
+
+  const parseDateTime = (dateString) => {
+    const date = new Date(dateString);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  };
 
   const getStatusText = (status) => {
     switch (status) {
@@ -78,7 +91,8 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   const columns = [
     { header: '제목', accessor: 'title', width: '40%' },
     { header: '기안일시', accessor: 'draftDate', width: '20%' },
-    { header: '문서상태', accessor: 'applyStatus', width: '20%' },
+    { header: '수량', accessor: 'quantity', width: '10%' }, 
+    { header: '문서상태', accessor: 'applyStatus', width: '18%' },
   ];
 
   return (

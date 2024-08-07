@@ -70,10 +70,10 @@ function ApplicationsList() {
     } finally {
       setLoading(false);
     }
-  }, []); // empty dependency array here ensures fetchApplications remains stable
+  }, []); 
 
   useEffect(() => {
-    fetchApplications(); // Call fetchApplications on component mount
+    fetchApplications(); 
   }, [fetchApplications]);
 
   useEffect(() => {
