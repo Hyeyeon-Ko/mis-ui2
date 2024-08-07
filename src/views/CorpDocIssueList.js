@@ -110,8 +110,8 @@ function CorpDocIssueList() {
     { header: '일자', accessor: 'draftDate', width: '10%' },
     { header: '제출처', accessor: 'submitTo', width: '15%' },
     { header: '사용목적', accessor: 'purpose', width: '20%' },
-    { header: '인장구분', accessor: 'sealType', width: '15%' },
-    { header: '날인부수', accessor: 'numSeals', width: '10%' },
+    { header: '법인인감증명서', accessor: 'sealType', width: '15%' },
+    { header: '법인등기부등본', accessor: 'numSeals', width: '10%' },
     { header: '결재', accessor: 'approval', width: '10%' },
     {
       header: '신청 삭제',
@@ -136,7 +136,7 @@ function CorpDocIssueList() {
     <div className="content">
       <div className="corpDoc-issue-list">
         <h2>서류 발급 대장</h2>
-        <Breadcrumb items={['법인서류 관리', '서류 수불 대장']} />
+        <Breadcrumb items={['법인서류 관리', '서류 발급 대장']} />
         <ConditionFilter
           startDate={startDate}
           setStartDate={setStartDate}
