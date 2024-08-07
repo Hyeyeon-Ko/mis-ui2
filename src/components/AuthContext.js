@@ -41,7 +41,6 @@ export const AuthProvider = ({ children }) => {
         isUserMode,
         originalRole,
       });
-      console.log('세션에서 로드된 인증 상태:', { userId, hngNm, role, sidebarPermissions, hasStandardDataAuthority, instCd, isUserMode, originalRole }); // 로드된 상태 로그
     }
   }, []);
 
@@ -58,7 +57,6 @@ export const AuthProvider = ({ children }) => {
       originalRole: role, 
     };
     setAuth(newAuthState);
-    console.log('새로운 인증 상태 설정:', newAuthState); 
     sessionStorage.setItem('userId', userId);
     sessionStorage.setItem('hngNm', hngNm);
     sessionStorage.setItem('role', role);
@@ -81,7 +79,6 @@ export const AuthProvider = ({ children }) => {
       isUserMode: false, 
       originalRole: '', 
     });
-    console.log('사용자 로그아웃, 인증 상태 초기화');
     sessionStorage.removeItem('userId');
     sessionStorage.removeItem('hngNm');
     sessionStorage.removeItem('role');
