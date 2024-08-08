@@ -27,3 +27,19 @@
   .full-width {
     width: 100%;
   }
+
+  .clickable {
+    cursor: pointer;
+}
+
+/* 추후 상태변수(영문)로 변경 */
+.status-결재진행중,
+.status-결재완료 {
+    color: #2789FE;
+    text-decoration: underline;
+}
+
+.status-결재완료.confirmed {
+    color: black;
+    text-decoration: underline;
+}
