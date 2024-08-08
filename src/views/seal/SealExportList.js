@@ -1,29 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
+import SealApprovalModal from '../../views/seal/SealApprovalModal';
+import SignitureImage from '../../assets/images/signiture.png';
 import '../../styles/SealExportList.css';
 
 function SealExportList() {
   const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
-
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
+  const [clickedRows, setClickedRows] = useState([]);
 
   useEffect(() => {
     fetchSealExportList();
   }, []);
 
   const fetchSealExportList = () => {
-    const mockData = [
+    const fetchedData = [
       {
         id: 1,
         expDate: '2024-08-01',
         returnDate: '2024-08-02',
         purpose: '사용인감계',
         sealType: { corporateSeal: 1, personalSeal: 0, companySeal: 0 },
-        approval: { applicant: '김', manager: '나', teamLead: '박', director: '이' },
-        notes: '특이사항 없음'
+        applicantName: '김범수',
+        signitureImage: SignitureImage,
+        approval: [
+          { name: '나얼', approvalDate: '2024-08-08', signitureImage: SignitureImage },
+        ],
+        notes: '특이사항 없음',
+        status: '결재진행중',
       },
       {
         id: 2,
@@ -31,13 +40,23 @@ function SealExportList() {
         returnDate: '2024-08-04',
         purpose: '00계약',
         sealType: { corporateSeal: 0, personalSeal: 1, companySeal: 0 },
-        approval: { applicant: '김', manager: '나', teamLead: '박', director: '이' },
-        notes: '첨부파일 있음'
+        applicantName: '나얼',
+        signitureImage: SignitureImage,
+        approval: [
+          { name: '김범수', approvalDate: '2024-08-08', signitureImage: SignitureImage },
+          { name: '박효신', approvalDate: '2024-08-09', signitureImage: SignitureImage },
+          { name: '이수', approvalDate: '2024-08-10', signitureImage: SignitureImage },
+        ],
+        notes: '첨부파일 있음',
+        status: '결재완료',
       },
     ];
 
-    setApplications(mockData);
-    setFilteredApplications(mockData);
+    setApplications(fetchedData);
+    setFilteredApplications(fetchedData);
+
+    const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
+      setClickedRows(clickedRows);
   };
 
   const handleSearch = ({ searchType, keyword, startDate, endDate }) => {
@@ -75,6 +94,30 @@ function SealExportList() {
     setFilteredApplications(filtered);
   };
 
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedDocumentDetails(null);
+  };
+
+  const handleRowClick = (status, document) => {
+    if (status === '결재진행중' || status === '결재완료') {
+      if (status === '결재완료') {
+        setClickedRows(prevClickedRows => {
+          const newClickedRows = [...prevClickedRows, document.id];
+          localStorage.setItem('clickedRows', JSON.stringify(newClickedRows));
+          return newClickedRows;
+        });
+      }
+      setSelectedDocumentDetails({
+        ...document,
+        approvers: document.approval || [],
+        signitureImage: document.signitureImage || SignitureImage,
+      });
+      setModalVisible(true);
+    }
+  };
+  
+
   return (
     <div className="content">
       <div className="seal-export-list">
@@ -100,17 +143,13 @@ function SealExportList() {
                 <th rowSpan="2">반납일자</th>
                 <th rowSpan="2">사용목적</th>
                 <th colSpan="3">인장구분</th>
-                <th colSpan="4">결재</th>
                 <th rowSpan="2">비고</th>
+                <th rowSpan="2">결재</th>
               </tr>
               <tr>
                 <th>법인인감</th>
                 <th>사용인감</th>
                 <th>회사인</th>
-                <th>신청자</th>
-                <th>담당자</th>
-                <th>팀장</th>
-                <th>본부장</th>
               </tr>
             </thead>
             <tbody>
@@ -123,11 +162,15 @@ function SealExportList() {
                   <td>{app.sealType.corporateSeal}</td>
                   <td>{app.sealType.personalSeal}</td>
                   <td>{app.sealType.companySeal}</td>
-                  <td>{app.approval.applicant}</td>
-                  <td>{app.approval.manager}</td>
-                  <td>{app.approval.teamLead}</td>
-                  <td>{app.approval.director}</td>
                   <td>{app.notes}</td>
+                  <td
+                    className={`status-${app.status.replace(/\s+/g, '-').toLowerCase()} clickable ${
+                      clickedRows.includes(app.id) ? 'confirmed' : ''
+                    }`}
+                    onClick={() => handleRowClick(app.status, app)}
+                  >
+                    {app.status}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -136,6 +179,18 @@ function SealExportList() {
           <div>No data available</div>
         )}
       </div>
+      {modalVisible && selectedDocumentDetails && (
+        <SealApprovalModal
+          show={modalVisible}
+          onClose={closeModal}
+          documentDetails={{
+            date: selectedDocumentDetails.date,
+            applicantName: selectedDocumentDetails.applicantName,
+            approvers: selectedDocumentDetails.approvers,
+            signitureImage: selectedDocumentDetails.signitureImage,
+          }}
+        />
+      )}
     </div>
   );
 }
