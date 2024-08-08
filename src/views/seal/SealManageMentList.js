@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
-import Table from '../../components/common/Table';
 import ConfirmModal from '../../components/common/ConfirmModal';
-import deleteIcon from '../../assets/images/delete.png';
 import '../../styles/SealManagementList.css';
 
 function SealManagementList() {
@@ -22,48 +20,25 @@ function SealManagementList() {
   const fetchSealManagementList = () => {
     const mockData = [
       {
-        draftId: 1,
-        draftDate: '2024-08-01',
-        submitTo: 'Department A',
-        purpose: 'Official Use',
-        sealType: 'Type A',
-        numSeals: 2,
-        approval: 'Approved',
-        deleted: false,
+        date: '2024-08-01',
+        submitter: '재단본부',
+        purpose: '사용인감계',
+        sealType: { corporateSeal: 1, personalSeal: 0, companySeal: 0 },
+        quantity : 1,
+        approval: { applicant: '김', manager: '나', teamLead: '박', director: '이' },
       },
       {
-        draftId: 2,
-        draftDate: '2024-08-02',
-        submitTo: 'Department B',
-        purpose: 'Personal Use',
-        sealType: 'Type B',
-        numSeals: 3,
-        approval: 'Pending',
-        deleted: false,
-      },
-      {
-        draftId: 3,
-        draftDate: '2024-08-03',
-        submitTo: 'Department C',
-        purpose: 'Business Use',
-        sealType: 'Type C',
-        numSeals: 1,
-        approval: 'Rejected',
-        deleted: false,
+        date: '2024-08-02',
+        submitter: '재단본부',
+        purpose: '00계약',
+        sealType: { corporateSeal: 0, personalSeal: 1, companySeal: 0 },
+        quantity : 3,
+        approval: { applicant: '김', manager: '나', teamLead: '박', director: '이' },
       },
     ];
 
     setApplications(mockData);
     setFilteredApplications(mockData);
-  };
-
-  const handleDeleteClick = (draftId) => {
-    if (draftId) {
-      setSelectedDraftId(draftId);
-      setShowDeleteModal(true);
-    } else {
-      console.error('Invalid draftId:', draftId);
-    }
   };
 
   const handleConfirmDelete = () => {
@@ -80,14 +55,20 @@ function SealManagementList() {
 
     if (keyword) {
       filtered = filtered.filter(app => {
-        if (searchType === '제출처') return app.submitTo.includes(keyword);
+        if (searchType === '제출처') return app.submitter.includes(keyword);
         if (searchType === '사용목적') return app.purpose.includes(keyword);
-        if (searchType === '인장구분') return app.sealType.includes(keyword);
+        if (searchType === '인장구분') return (
+          app.sealType.corporateSeal.includes(keyword) ||
+          app.sealType.personalSeal.includes(keyword) ||
+          app.sealType.companySeal.includes(keyword)
+        );
         if (searchType === '전체') {
           return (
-            app.submitTo.includes(keyword) ||
+            app.submitter.includes(keyword) ||
             app.purpose.includes(keyword) ||
-            app.sealType.includes(keyword)
+            app.sealType.corporateSeal.includes(keyword) ||
+            app.sealType.personalSeal.includes(keyword) ||
+            app.sealType.companySeal.includes(keyword)
           );
         }
         return true;
@@ -96,7 +77,7 @@ function SealManagementList() {
 
     if (startDate && endDate) {
       filtered = filtered.filter(app => {
-        const appDate = new Date(app.draftDate);
+        const appDate = new Date(app.date);
         const start = new Date(startDate);
         const end = new Date(endDate);
         return appDate >= start && appDate <= end;
@@ -105,32 +86,6 @@ function SealManagementList() {
 
     setFilteredApplications(filtered);
   };
-
-  const columns = [
-    { header: '일자', accessor: 'draftDate', width: '10%' },
-    { header: '제출처', accessor: 'submitTo', width: '15%' },
-    { header: '사용목적', accessor: 'purpose', width: '20%' },
-    { header: '인장구분', accessor: 'sealType', width: '15%' },
-    { header: '날인부수', accessor: 'numSeals', width: '10%' },
-    { header: '결재', accessor: 'approval', width: '10%' },
-    {
-      header: '신청 삭제',
-      accessor: 'delete',
-      width: '10%',
-      Cell: ({ row }) => {
-        return (
-          <div className="icon-cell">
-            <img
-              src={deleteIcon}
-              alt="Delete"
-              className="action-icon"
-              onClick={() => handleDeleteClick(row.draftId)}
-            />
-          </div>
-        );
-      },
-    },
-  ];
 
   return (
     <div className="content">
@@ -148,9 +103,48 @@ function SealManagementList() {
           showSearchCondition={true}
           excludeRecipient={true}
         />
-        <div className="seal-management-content">
-          <Table columns={columns} data={filteredApplications}/>
-        </div>
+        {filteredApplications.length > 0 ? (
+          <table className="table">
+            <thead>
+              <tr>
+                <th rowSpan="2">일자</th>
+                <th rowSpan="2">제출처</th>
+                <th rowSpan="2">사용목적</th>
+                <th colSpan="3">인장구분</th>
+                <th rowSpan="2">날인부수</th>
+                <th colSpan="4">결재</th>
+              </tr>
+              <tr>
+                <th>법인인감</th>
+                <th>사용인감</th>
+                <th>회사인</th>
+                <th>신청자</th>
+                <th>담당자</th>
+                <th>팀장</th>
+                <th>본부장</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredApplications.map((app, index) => (
+                <tr key={index}>
+                  <td>{app.date}</td>
+                  <td>{app.submitter}</td>
+                  <td>{app.purpose}</td>
+                  <td>{app.sealType.corporateSeal}</td>
+                  <td>{app.sealType.personalSeal}</td>
+                  <td>{app.sealType.companySeal}</td>
+                  <td>{app.quantity}</td>
+                  <td>{app.approval.applicant}</td>
+                  <td>{app.approval.manager}</td>
+                  <td>{app.approval.teamLead}</td>
+                  <td>{app.approval.director}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div>No data available</div>
+        )}
         {showDeleteModal && (
           <ConfirmModal
             message="이 문서를 삭제하시겠습니까?"

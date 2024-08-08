@@ -193,7 +193,7 @@ function ApplicationsList() {
   };
 
   const handleRowClick = (draftId, docType) => {
-    if (docType === '문서수발신') {
+    if (docType === '문서수신' || docType === '문서발신') {
       setSelectedDocumentId(draftId);
       setModalVisible(true);
     } else if (docType === '명함신청') {

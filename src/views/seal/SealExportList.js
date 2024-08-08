@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
-import Table from '../../components/common/Table';
-import ConfirmModal from '../../components/common/ConfirmModal';
-import deleteIcon from '../../assets/images/delete.png';
 import '../../styles/SealExportList.css';
 
 function SealExportList() {
   const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedDraftId, setSelectedDraftId] = useState(null);
 
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -22,57 +17,27 @@ function SealExportList() {
   const fetchSealExportList = () => {
     const mockData = [
       {
-        draftId: 1,
-        exportDate: '2024-08-01',
+        id: 1,
+        expDate: '2024-08-01',
         returnDate: '2024-08-02',
-        purpose: 'Official Use',
-        sealType: 'Type A',
-        approval: 'Approved',
-        note: 'First export',
-        deleted: false,
+        purpose: '사용인감계',
+        sealType: { corporateSeal: 1, personalSeal: 0, companySeal: 0 },
+        approval: { applicant: '김', manager: '나', teamLead: '박', director: '이' },
+        notes: '특이사항 없음'
       },
       {
-        draftId: 2,
-        exportDate: '2024-08-02',
-        returnDate: '2024-08-03',
-        purpose: 'Personal Use',
-        sealType: 'Type B',
-        approval: 'Pending',
-        note: 'Second export',
-        deleted: false,
-      },
-      {
-        draftId: 3,
-        exportDate: '2024-08-03',
+        id: 2,
+        expDate: '2024-08-03',
         returnDate: '2024-08-04',
-        purpose: 'Business Use',
-        sealType: 'Type C',
-        approval: 'Rejected',
-        note: 'Third export',
-        deleted: false,
+        purpose: '00계약',
+        sealType: { corporateSeal: 0, personalSeal: 1, companySeal: 0 },
+        approval: { applicant: '김', manager: '나', teamLead: '박', director: '이' },
+        notes: '첨부파일 있음'
       },
     ];
 
     setApplications(mockData);
     setFilteredApplications(mockData);
-  };
-
-  const handleDeleteClick = (draftId) => {
-    if (draftId) {
-      setSelectedDraftId(draftId);
-      setShowDeleteModal(true);
-    } else {
-      console.error('Invalid draftId:', draftId);
-    }
-  };
-
-  const handleConfirmDelete = () => {
-    if (selectedDraftId === null) return;
-
-    const updatedApplications = applications.filter(app => app.draftId !== selectedDraftId);
-    setApplications(updatedApplications);
-    setFilteredApplications(updatedApplications);
-    setShowDeleteModal(false);
   };
 
   const handleSearch = ({ searchType, keyword, startDate, endDate }) => {
@@ -81,11 +46,17 @@ function SealExportList() {
     if (keyword) {
       filtered = filtered.filter(app => {
         if (searchType === '사용목적') return app.purpose.includes(keyword);
-        if (searchType === '인장구분') return app.sealType.includes(keyword);
+        if (searchType === '인장구분') return (
+          app.sealType.corporateSeal.includes(keyword) ||
+          app.sealType.personalSeal.includes(keyword) ||
+          app.sealType.companySeal.includes(keyword)
+        );
         if (searchType === '전체') {
           return (
             app.purpose.includes(keyword) ||
-            app.sealType.includes(keyword)
+            app.sealType.corporateSeal.includes(keyword) ||
+            app.sealType.personalSeal.includes(keyword) ||
+            app.sealType.companySeal.includes(keyword)
           );
         }
         return true;
@@ -94,7 +65,7 @@ function SealExportList() {
 
     if (startDate && endDate) {
       filtered = filtered.filter(app => {
-        const appDate = new Date(app.exportDate);
+        const appDate = new Date(app.expDate);
         const start = new Date(startDate);
         const end = new Date(endDate);
         return appDate >= start && appDate <= end;
@@ -103,33 +74,6 @@ function SealExportList() {
 
     setFilteredApplications(filtered);
   };
-
-  const columns = [
-    { header: '일련번호', accessor: 'draftId', width: '10%' },
-    { header: '반출일자', accessor: 'exportDate', width: '15%' },
-    { header: '반납일자', accessor: 'returnDate', width: '15%' },
-    { header: '사용목적', accessor: 'purpose', width: '20%' },
-    { header: '인장구분', accessor: 'sealType', width: '15%' },
-    { header: '결재', accessor: 'approval', width: '10%' },
-    { header: '비고', accessor: 'note', width: '10%' },
-    {
-      header: '신청 삭제',
-      accessor: 'delete',
-      width: '10%',
-      Cell: ({ row }) => {
-        return (
-          <div className="icon-cell">
-            <img
-              src={deleteIcon}
-              alt="Delete"
-              className="action-icon"
-              onClick={() => handleDeleteClick(row.draftId)}
-            />
-          </div>
-        );
-      },
-    },
-  ];
 
   return (
     <div className="content">
@@ -147,15 +91,49 @@ function SealExportList() {
           showSearchCondition={true}
           excludeRecipient={true}
         />
-        <div className="seal-export-content">
-          <Table columns={columns} data={filteredApplications}/>
-        </div>
-        {showDeleteModal && (
-          <ConfirmModal
-            message="이 문서를 삭제하시겠습니까?"
-            onConfirm={handleConfirmDelete}
-            onCancel={() => setShowDeleteModal(false)}
-          />
+        {filteredApplications.length > 0 ? (
+          <table className="table">
+            <thead>
+              <tr>
+                <th rowSpan="2">일련번호</th>
+                <th rowSpan="2">반출일자</th>
+                <th rowSpan="2">반납일자</th>
+                <th rowSpan="2">사용목적</th>
+                <th colSpan="3">인장구분</th>
+                <th colSpan="4">결재</th>
+                <th rowSpan="2">비고</th>
+              </tr>
+              <tr>
+                <th>법인인감</th>
+                <th>사용인감</th>
+                <th>회사인</th>
+                <th>신청자</th>
+                <th>담당자</th>
+                <th>팀장</th>
+                <th>본부장</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredApplications.map((app, index) => (
+                <tr key={index}>
+                  <td>{app.id}</td>
+                  <td>{app.expDate}</td>
+                  <td>{app.returnDate}</td>
+                  <td>{app.purpose}</td>
+                  <td>{app.sealType.corporateSeal}</td>
+                  <td>{app.sealType.personalSeal}</td>
+                  <td>{app.sealType.companySeal}</td>
+                  <td>{app.approval.applicant}</td>
+                  <td>{app.approval.manager}</td>
+                  <td>{app.approval.teamLead}</td>
+                  <td>{app.approval.director}</td>
+                  <td>{app.notes}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div>No data available</div>
         )}
       </div>
     </div>

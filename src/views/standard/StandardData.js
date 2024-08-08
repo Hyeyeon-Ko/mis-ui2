@@ -85,7 +85,7 @@ function StandardData() {
   const fetchHeaderData = async (groupCd) => {
     try {
       const response = await axios.get(`/api/std/header`, { params: { groupCd } });
-      const headerData = response.data.data[0];
+      const headerData = response.data.data[0] || {};
       setHeaderData(headerData);
     } catch (error) {
       console.error('헤더 정보를 가져오는 중 에러 발생:', error);
