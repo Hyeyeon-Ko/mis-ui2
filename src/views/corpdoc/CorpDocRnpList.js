@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
-import DocConfirmModal from '../../views/doc/DocConfirmModal';
+import CorpDocApprovalModal from '../../views/corpdoc/CorpDocApprovalModal';
+import SignitureImage from '../../assets/images/signiture.png';
 import '../../styles/CorpDocRnpList.css';
-import axios from 'axios';
 
 function CorpDocRnpList() {
   const [applications, setApplications] = useState([]);
@@ -11,8 +11,8 @@ function CorpDocRnpList() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedDocumentId, setSelectedDocumentId] = useState(null);
-  const [confirmedDocs, setConfirmedDocs] = useState([]);
+  const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
+  const [clickedRows, setClickedRows] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,7 +24,13 @@ function CorpDocRnpList() {
           usagePurpose: '결제계좌등록',
           certificate: { incoming: 3, used: 0, left: 18 },
           registry: { incoming: 0, used: 1, left: 20 },
-          status: '결재진행중',
+          status: '결재완료',
+          applicantName: '홍길동',
+          signitureImage: SignitureImage,
+          approvers: [
+            { name: '김철수', approvalDate: '2024-08-08', signitureImage: SignitureImage },
+            { name: '박영희', approvalDate: '2024-08-10', signitureImage: SignitureImage },
+          ],
         },
         {
           id: 2,
@@ -33,14 +39,22 @@ function CorpDocRnpList() {
           usagePurpose: '결제계좌등록',
           certificate: { incoming: 5, used: 0, left: 20 },
           registry: { incoming: 0, used: 9, left: 3 },
-          status: '결재완료',
+          status: '결재진행중',
+          applicantName: '이영희', // Added applicant name
+          approvers: [
+            {},
+          ],
         },
       ];
       setApplications(fetchedData);
       setFilteredApplications(fetchedData);
+
+      const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
+      setClickedRows(clickedRows);
     };
     fetchData();
   }, []);
+  
 
   const handleSearch = ({ searchType, keyword, startDate, endDate }) => {
     let filtered = applications;
@@ -75,30 +89,23 @@ function CorpDocRnpList() {
 
   const closeModal = () => {
     setModalVisible(false);
-    setSelectedDocumentId(null);
+    setSelectedDocumentDetails(null);
   };
 
-  const approveDocument = async (documentId) => {
-    try {
-      await axios.put(`/api/doc/confirm`, null, {
-        params: { draftId: documentId },
-      });
-      alert('승인이 완료되었습니다.');
-      closeModal();
-      setConfirmedDocs(prev => [...prev, documentId]); // Add to confirmed documents
-    } catch (error) {
-      console.error('Error approving document:', error);
-      alert('Error approving document.');
-    }
-  };
-
-  const handleRowClick = (status, draftId) => {
+  const handleRowClick = (status, document) => {
     if (status === '결재진행중' || status === '결재완료') {
-      setSelectedDocumentId(draftId);
-      setModalVisible(true);
-      if (status === '결재완료' && !confirmedDocs.includes(draftId)) {
-        setConfirmedDocs(prev => [...prev, draftId]); // Add to confirmed documents
+      if (status === '결재완료') {
+        setClickedRows(prevClickedRows => {
+          const newClickedRows = [...prevClickedRows, document.id];
+          localStorage.setItem('clickedRows', JSON.stringify(newClickedRows));
+          return newClickedRows;
+        });
       }
+      setSelectedDocumentDetails({
+        ...document,
+        signitureImage: document.signitureImage || SignitureImage,
+      });
+      setModalVisible(true);
     }
   };
 
@@ -151,8 +158,10 @@ function CorpDocRnpList() {
                   <td>{app.registry.used}</td>
                   <td>{app.registry.left}</td>
                   <td
-                    className={`status-${app.status.replace(/\s+/g, '-').toLowerCase()} clickable ${app.status === '결재완료' && confirmedDocs.includes(app.id) ? 'confirmed' : ''}`}
-                    onClick={() => handleRowClick(app.status, app.id)}
+                    className={`status-${app.status.replace(/\s+/g, '-').toLowerCase()} clickable ${
+                      clickedRows.includes(app.id) ? 'confirmed' : ''
+                    }`}
+                    onClick={() => handleRowClick(app.status, app)}
                   >
                     {app.status}
                   </td>
@@ -164,13 +173,16 @@ function CorpDocRnpList() {
           <div>No data available</div>
         )}
       </div>
-      {modalVisible && selectedDocumentId && (
-        // 추후 결재란 포함된 Modal로 변경
-        <DocConfirmModal
+      {modalVisible && selectedDocumentDetails && (
+        <CorpDocApprovalModal
           show={modalVisible}
-          documentId={selectedDocumentId}
           onClose={closeModal}
-          onApprove={approveDocument}
+          documentDetails={{
+            date: selectedDocumentDetails.date,
+            applicantName: selectedDocumentDetails.applicantName,
+            approvers: selectedDocumentDetails.approvers,
+            signitureImage: selectedDocumentDetails.signitureImage,
+          }}
         />
       )}
     </div>
