@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import ConfirmModal from '../../components/common/ConfirmModal';
-import SealApprovalModal from '../../views/seal/SealApprovalModal';
+import SealApprovalModal from './SealApprovalModal';
 import SignitureImage from '../../assets/images/signiture.png';
 import '../../styles/SealManagementList.css';
 
@@ -10,7 +10,6 @@ function SealManagementList() {
   const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedDraftId, setSelectedDraftId] = useState(null);
 
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -60,11 +59,6 @@ function SealManagementList() {
   };
 
   const handleConfirmDelete = () => {
-    if (selectedDraftId === null) return;
-
-    const updatedApplications = applications.filter(app => app.draftId !== selectedDraftId);
-    setApplications(updatedApplications);
-    setFilteredApplications(updatedApplications);
     setShowDeleteModal(false);
   };
 

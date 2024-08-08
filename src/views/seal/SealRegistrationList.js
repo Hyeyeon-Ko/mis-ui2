@@ -7,7 +7,6 @@ import facsimileSeal from '../../assets/images/facsimile_seal.png';
 import companySeal from '../../assets/images/company_seal.png';
 
 function SealRegistrationList() {
-  const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [selectedApplications, setSelectedApplications] = useState([]);
 
@@ -35,9 +34,17 @@ function SealRegistrationList() {
         subManager: '박00',
         date: '2024-08-01',
       },
+      {
+        seal: '회사인',
+        sealImage: companySeal,
+        department: '디지털혁신실',
+        purpose: '계약용',
+        manager: '이00',
+        subManager: '최00',
+        date: '2024-08-02',
+      },
     ];
 
-    setApplications(mockData);
     setFilteredApplications(mockData);
   };
 

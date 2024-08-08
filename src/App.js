@@ -18,7 +18,7 @@ import DetailApplication from './views/bcd/DetailApplication';
 import DetailDocApplication from './views/doc/DetailDocApplication';
 import DocInList from './views/doc/DocInList';
 import DocOutList from './views/doc/DocOutList';
-import SealManagementList from './views/seal/SealManageMentList';
+import SealManagementList from './views/seal/SealManagementList';
 import SealRegistrationList from './views/seal/SealRegistrationList';
 import SealExportList from './views/seal/SealExportList';
 import CorpDocRnpList from './views/corpdoc/CorpDocRnpList';

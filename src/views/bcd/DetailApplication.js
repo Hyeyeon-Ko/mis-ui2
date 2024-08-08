@@ -453,7 +453,7 @@ function DetailApplication() {
                     </div>
                   )}
                 </div>
-                <div className="sub-label2">(수량 단위: 1 * 100매입)</div>
+                <div className="sub-label2">(수량 단위: 1 * 200매)</div>
               </div>
             </div>
             <div className="form-right">
