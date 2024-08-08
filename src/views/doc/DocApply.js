@@ -152,6 +152,13 @@ function DocApply() {
                   required 
                 />
               </div>
+              <div className='corpDoc-form-group'>
+                  <label>첨부파일</label>
+                  <input
+                      type="file"
+                      name="attachment"
+                  />
+              </div>
               <div className="doc-apply-button-container">
                 <CustomButton className="apply-request-button" type="submit">
                     문서 신청하기
