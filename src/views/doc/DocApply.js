@@ -21,6 +21,7 @@ function DocApply() {
     division: '', 
   });
 
+  const [attachment, setAttachment] = useState(null);  // 파일 첨부를 위한 상태 추가
   const [activeTab, setActiveTab] = useState('reception'); 
 
   const setDefaultValues = useCallback(() => {
@@ -49,26 +50,29 @@ function DocApply() {
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   };
 
+  const handleFileChange = (e) => {
+    setAttachment(e.target.files[0]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = {
-      drafterId: formData.userId,
-      drafter: formData.drafter,
-      division: formData.division,
-      sender: activeTab === 'reception' ? formData.receiver : '',
-      receiver: activeTab === 'sending' ? formData.sender : '',
-      docTitle: formData.title,
-      purpose: formData.purpose,
-      instCd: auth.instCd, 
-    };
+    const payload = new FormData();  // FormData 객체 사용
+    payload.append('drafterId', formData.userId);
+    payload.append('drafter', formData.drafter);
+    payload.append('division', formData.division);
+    payload.append('sender', activeTab === 'reception' ? formData.receiver : '');
+    payload.append('receiver', activeTab === 'sending' ? formData.sender : '');
+    payload.append('docTitle', formData.title);
+    payload.append('purpose', formData.purpose);
+    payload.append('instCd', auth.instCd);
+    if (attachment) {
+      payload.append('file', attachment);  // 파일 추가
+    }
     
     try {
       const response = await fetch('/api/doc', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
+        body: payload,  // FormData 객체 전송
       });
       if (response.ok) {
         alert('신청이 완료되었습니다.');
@@ -152,11 +156,12 @@ function DocApply() {
                   required 
                 />
               </div>
-              <div className='corpDoc-form-group'>
+              <div className='doc-form-group'>
                   <label>첨부파일</label>
                   <input
                       type="file"
                       name="attachment"
+                      onChange={handleFileChange}  // 파일 변경 핸들러 추가
                   />
               </div>
               <div className="doc-apply-button-container">
