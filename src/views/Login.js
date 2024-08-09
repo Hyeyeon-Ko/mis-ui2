@@ -37,7 +37,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://101.10.1.87:8080/api/login', {
+      const response = await fetch('/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,7 +49,7 @@ const Login = () => {
         const data = await response.json();
 
         if (data && data.data) {
-          const authorityResponse = await fetch('http://101.10.1.87:8080/api/auth/standardData', {
+          const authorityResponse = await fetch('/api/auth/standardData', {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
