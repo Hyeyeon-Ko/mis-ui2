@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import Button from '../common/Button'; 
-import '../../styles/common/ConditionFilter.css';
+import Button from './Button';
 
 const ConditionFilter = ({
   startDate,
@@ -22,16 +21,8 @@ const ConditionFilter = ({
 }) => {
   const [searchType, setSearchType] = useState('전체');
   const [keyword, setKeyword] = useState('');
-  
-  useEffect(() => {
-    resetFilters();
-  }, []);
 
-  const formatDate = (date) => {
-    return date.toISOString().split('T')[0];
-  };
-
-  const resetFilters = () => {
+  const resetFilters = useCallback(() => {
     const defaultStartDate = new Date();
     defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
     setStartDate(defaultStartDate);
@@ -40,6 +31,14 @@ const ConditionFilter = ({
     setKeyword('');
     if (setDocumentType) setDocumentType('');
     if (onReset) onReset();
+  }, [setStartDate, setEndDate, setDocumentType, onReset]);
+
+  useEffect(() => {
+    resetFilters();
+  }, [resetFilters]);
+
+  const formatDate = (date) => {
+    return date.toISOString().split('T')[0];
   };
 
   const handleDocumentTypeChange = (event) => {
@@ -180,6 +179,8 @@ ConditionFilter.propTypes = {
   showStatusFilters: PropTypes.bool,
   showDocumentType: PropTypes.bool,
   showSearchCondition: PropTypes.bool,
+  excludeRecipient: PropTypes.bool,
+  excludeSender: PropTypes.bool,
 };
 
 export default ConditionFilter;
