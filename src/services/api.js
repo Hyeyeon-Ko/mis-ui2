@@ -2,7 +2,8 @@ import axios from 'axios';
 
 // 환경 변수 API URL
 // API 개발서버
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+//const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+const apiUrl = '101.10.1.87:9090';
 
 // Axios 인스턴스 생성
 const apiClient = axios.create({
