@@ -6,7 +6,9 @@ WORKDIR /app
 
 # 의존성 설치를 위한 패키지 파일 복사
 COPY package.json ./
-COPY package-lock.json ./
+
+# package-lock.json 파일이 있는 경우 삭제
+RUN rm -f package-lock.json
 
 # 의존성 설치
 RUN npm install
