@@ -6,3 +6,40 @@
     font-size: 28px;
     margin-bottom: 16px;
 }
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+    letter-spacing: 0.5px;
+  }
+  
+  .table th, .table td {
+    border: 1px solid #eeecec;
+    padding: 8px;
+    text-align: center;
+  }
+  
+  .table th {
+    background-color: #f4f7fa;
+  }
+  
+  .full-width {
+    width: 100%;
+  }
+
+  .clickable {
+    cursor: pointer;
+}
+
+/* 추후 상태변수(영문)로 변경 */
+.status-결재진행중,
+.status-결재완료 {
+    color: #2789FE;
+    text-decoration: underline;
+}
+
+.status-결재완료.confirmed {
+    color: black;
+    text-decoration: underline;
+}

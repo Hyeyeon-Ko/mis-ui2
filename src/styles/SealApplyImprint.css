@@ -1,97 +1,143 @@
-.seal-content {
-    padding: 8px 16px;
-  }
-  
-  .seal-content h2 {
-    font-size: 28px;
-    margin-bottom: 16px;
-  }
-  
-  .seal-apply-content {
-    background-color: #fff;
-    width: 500px;
-    padding: 50px 150px 40px 150px;
-    border-radius: 12px; 
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-  
-  .seal-main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .seal-bold-label {
-    font-weight: bold;
-    font-size: 21px;
-    margin-bottom: 30px;
-  }
-  
-  .seal-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .seal-form-group {
-    margin-bottom: 15px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .seal-form-group label {
-    font-weight: 580;
-    font-size: 14.5px;
-    color: #222121;
-    margin-bottom: 5px;
-    margin-right: 10px;
-    text-align: left;
-    width: 81%;
-  }
-  
-  .seal-form-group input,
-  .seal-form-group textarea {
-    width: 80%;
-    padding: 10px;
-    padding-left: 15px;
-    border: 1px solid #e4e1e1;
-    border-radius: 6px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    font-size: 14px;
-  }
-  
-  .seal-form-group select {
-    width: 86%;
-    padding: 10px;
-    padding-left: 10px;
-    border: 1px solid #e4e1e1;
-    border-radius: 6px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    font-size: 14px;
-  }
-  
-  
-  .seal-form-group input:focus,
-  .seal-form-group select:focus,
-  .seal-form-group textarea:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 2px rgba(0, 123, 255, 0.5);
-    outline: none;
-  }
-  
-  .seal-form-group textarea {
-    resize: vertical;
-  }
-  
-  .seal-apply-button-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-    margin-right: 160px;
-    border-radius: 5px;
-    padding: 10px 0px 10px 150px;
-    font-size: 16px;
-  }
-  
+.seal-imprint-content {
+  padding: 8px 16px;
+}
+
+.seal-imprint-content h2 {
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+
+.seal-imprint-apply-content {
+  background-color: #fff;
+  width: 500px;
+  padding: 50px 150px 40px 150px;
+  border-radius: 12px; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.seal-imprint-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.seal-imprint-bold-label {
+  font-weight: bold;
+  font-size: 21px;
+  margin-bottom: 30px;
+}
+
+.seal-imprint-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.seal-imprint-form-group {
+  margin-bottom: 15px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.seal-imprint-form-group label {
+  font-weight: 580;
+  font-size: 14.5px;
+  color: #222121;
+  margin-bottom: 5px;
+  margin-right: 10px;
+  text-align: left;
+  width: 81%;
+}
+
+.seal-imprint-form-group input,
+.seal-imprint-form-group textarea {
+  width: 80%;
+  padding: 10px;
+  padding-left: 15px;
+  border: 1px solid #e4e1e1;
+  border-radius: 6px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-size: 14px;
+}
+
+.seal-imprint-form-group select {
+  width: 86%;
+  padding: 10px;
+  padding-left: 10px;
+  border: 1px solid #e4e1e1;
+  border-radius: 6px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-size: 14px;
+}
+
+.seal-imprint-form-group input:focus,
+.seal-imprint-form-group select:focus,
+.seal-imprint-form-group textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 2px rgba(0, 123, 255, 0.5);
+  outline: none;
+}
+
+.seal-imprint-form-group textarea {
+  resize: vertical;
+}
+
+.seal-imprint-apply-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  margin-right: 160px;
+  border-radius: 5px;
+  padding: 10px 0px 10px 150px;
+  font-size: 16px;
+}
+
+.seal-imprint-options {
+  display: flex;
+  justify-content: space-around;
+  width: 80%;
+}
+
+.seal-imprint-detail-option {
+  display: flex;
+  align-items: center;
+}
+
+.seal-imprint-detail-left {
+  margin-right: 20px;
+  margin-bottom: 60px;
+}
+
+.seal-imprint-detail-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.seal-imprint-options label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 20px;
+}
+
+.seal-imprint-options input[type="radio"] {
+  margin-bottom: 2px;
+}
+
+.seal-imprint-options img {
+  border: 2px solid transparent;
+  border-radius: 6px;
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
+
+.seal-imprint-options input[type="radio"]:checked + img {
+  border-color: #007bff;
+}

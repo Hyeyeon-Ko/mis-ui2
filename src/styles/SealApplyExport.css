@@ -1,0 +1,135 @@
+.seal-export-content {
+  padding: 8px 16px;
+}
+
+.seal-export-content h2 {
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+
+.seal-export-apply-content {
+  background-color: #fff;
+  width: 500px;
+  padding: 50px 150px 40px 150px;
+  border-radius: 12px; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.seal-export-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.seal-export-bold-label {
+  font-weight: bold;
+  font-size: 21px;
+  margin-bottom: 30px;
+}
+
+.seal-export-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.seal-export-form-group {
+  margin-bottom: 15px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.seal-export-form-group label {
+  font-weight: 580;
+  font-size: 14.5px;
+  color: #222121;
+  margin-bottom: 5px;
+  margin-right: 10px;
+  text-align: left;
+  width: 81%;
+}
+
+.seal-export-form-group input,
+.seal-export-form-group textarea {
+  width: 80%;
+  padding: 10px;
+  padding-left: 15px;
+  border: 1px solid #e4e1e1;
+  border-radius: 6px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-size: 14px;
+}
+
+.seal-export-form-group select {
+  width: 86%;
+  padding: 10px;
+  padding-left: 10px;
+  border: 1px solid #e4e1e1;
+  border-radius: 6px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-size: 14px;
+}
+
+.seal-export-form-group input:focus,
+.seal-export-form-group select:focus,
+.seal-export-form-group textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 2px rgba(0, 123, 255, 0.5);
+  outline: none;
+}
+
+.seal-export-form-group textarea {
+  resize: vertical;
+}
+
+.file-input {
+  width: 80%;
+}
+
+.seal-export-apply-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  margin-right: 160px;
+  border-radius: 5px;
+  padding: 10px 0px 10px 150px;
+  font-size: 16px;
+}
+
+.seal-export-options {
+  display: flex;
+  justify-content: space-around;
+  width: 80%;
+}
+
+.seal-export-detail-option {
+  display: flex;
+  align-items: center;
+}
+
+.seal-export-detail-left {
+  margin-right: 20px;
+  margin-bottom: 60px;
+}
+
+.seal-export-detail-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.seal-export-options img {
+  border: 2px solid transparent;
+  border-radius: 6px;
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+
+.seal-export-options input[type="radio"]:checked + img {
+  border-color: #007bff;
+}

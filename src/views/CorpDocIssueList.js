@@ -2,59 +2,58 @@ import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../components/common/Breadcrumb';
 import ConditionFilter from '../components/common/ConditionFilter';
 import Table from '../components/common/Table';
-import ConfirmModal from '../components/common/ConfirmModal';
+import CorpDocApprovalModal from '../../views/corpdoc/CorpDocApprovalModal';
 import deleteIcon from '../assets/images/delete.png';
 import '../styles/CorpDocIssueList.css';
 
 function CorpDocIssueList() {
   const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedDraftId, setSelectedDraftId] = useState(null);
-
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
 
   useEffect(() => {
     fetchCorpDocIssueList();
   }, []);
 
   const fetchCorpDocIssueList = () => {
-    const mockData = [
+    const fetchedData = [
       {
-        draftId: 1,
-        draftDate: '2024-08-01',
-        submitTo: 'Department A',
-        purpose: 'Official Use',
-        sealType: 'Type A',
-        numSeals: 2,
-        approval: 'Approved',
-        deleted: false,
+        id: 1,
+        date: '2024-05-02',
+        submitter: '현대로보틱스',
+        usagePurpose: '결제계좌등록',
+        certificate: { incoming: 3, used: 0, left: 18 },
+        registry: { incoming: 0, used: 1, left: 20 },
+        status: '결재진행중',
+        applicantName: '홍길동', // Added applicant name
+        imageUrl: 'path/to/image1.jpg', // Added image URL
+        approvers: [
+          { name: '김철수', approvalDate: '2024-08-08' },
+          { name: '박영희', approvalDate: '2024-08-08' },
+        ],
       },
       {
-        draftId: 2,
-        draftDate: '2024-08-02',
-        submitTo: 'Department B',
-        purpose: 'Personal Use',
-        sealType: 'Type B',
-        numSeals: 3,
-        approval: 'Pending',
-        deleted: false,
-      },
-      {
-        draftId: 3,
-        draftDate: '2024-08-03',
-        submitTo: 'Department C',
-        purpose: 'Business Use',
-        sealType: 'Type C',
-        numSeals: 1,
-        approval: 'Rejected',
-        deleted: false,
+        id: 2,
+        date: '2024-05-03',
+        submitter: '재단본부',
+        usagePurpose: '결제계좌등록',
+        certificate: { incoming: 5, used: 0, left: 20 },
+        registry: { incoming: 0, used: 9, left: 3 },
+        status: '결재진행중',
+        applicantName: '이영희', // Added applicant name
+        imageUrl: 'path/to/image2.jpg', // Added image URL
+        approvers: [
+          {},
+        ],
       },
     ];
 
     setApplications(mockData);
     setFilteredApplications(mockData);
+    
   };
 
   const handleDeleteClick = (draftId) => {
@@ -110,8 +109,8 @@ function CorpDocIssueList() {
     { header: '일자', accessor: 'draftDate', width: '10%' },
     { header: '제출처', accessor: 'submitTo', width: '15%' },
     { header: '사용목적', accessor: 'purpose', width: '20%' },
-    { header: '인장구분', accessor: 'sealType', width: '15%' },
-    { header: '날인부수', accessor: 'numSeals', width: '10%' },
+    { header: '법인인감증명서', accessor: 'sealType', width: '15%' },
+    { header: '법인등기부등본', accessor: 'numSeals', width: '10%' },
     { header: '결재', accessor: 'approval', width: '10%' },
     {
       header: '신청 삭제',
@@ -136,7 +135,7 @@ function CorpDocIssueList() {
     <div className="content">
       <div className="corpDoc-issue-list">
         <h2>서류 발급 대장</h2>
-        <Breadcrumb items={['법인서류 관리', '서류 수불 대장']} />
+        <Breadcrumb items={['법인서류 관리', '서류 발급 대장']} />
         <ConditionFilter
           startDate={startDate}
           setStartDate={setStartDate}
