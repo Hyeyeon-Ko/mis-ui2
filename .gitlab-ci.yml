@@ -9,11 +9,14 @@ variables:
   FRONTEND_IMAGE: $CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$DOCKER_IMAGE:$CI_COMMIT_REF_NAME
   DEPLOY_USER: root  # 배포할 사용자 이름
   DEPLOY_SERVER: 101.10.1.87  # 배포할 서버 IP 주소
+  REGISTRY_URL: $REGISTRY_URL  # GitLab Container Registry URL
+  REGISTRY_USER: $REGISTRY_USER  # GitLab 사용자 이름
+  REGISTRY_PASSWORD: $REGISTRY_PASSWORD  # Access Token
 
 before_script:
   - echo "Docker build start!!"
   - apk add --no-cache docker
-  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+  - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin "$REGISTRY_URL"
   
 build:
   stage: build
@@ -42,9 +45,9 @@ docker-push:
   image: docker:stable
   script:
     - echo "Docker push start!!"
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin "$REGISTRY_URL"
     # Docker 이미지 푸시
-    - docker push $CI_REGISTRY/$FRONTEND_IMAGE
+    - docker push $REGISTRY_URL/$FRONTEND_IMAGE
   tags:
     - mis-runner
   dependencies:
@@ -62,14 +65,14 @@ deploy:
   script:
     - echo "Docker Deploy!!"
     - ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $DEPLOY_USER@$DEPLOY_SERVER "
-        echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY &&
+        echo $REGISTRY_PASSWORD | docker login -u $REGISTRY_USER --password-stdin $REGISTRY_URL &&
         cd / &&
-        export CI_REGISTRY=$CI_REGISTRY &&
+        export CI_REGISTRY=$REGISTRY_URL &&
         export CI_PROJECT_NAMESPACE=$CI_PROJECT_NAMESPACE &&
         export CI_PROJECT_NAME=$CI_PROJECT_NAME &&
         export CI_COMMIT_REF_NAME=$CI_COMMIT_REF_NAME &&
-        docker-compose pull frontend &&
-        docker-compose up -d frontend
+        docker-compose pull $DOCKER_IMAGE &&
+        docker-compose up -d $DOCKER_IMAGE
       "
   tags:
     - mis-runner
