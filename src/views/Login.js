@@ -37,7 +37,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/login`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,7 +49,7 @@ const Login = () => {
         const data = await response.json();
 
         if (data && data.data) {
-          const authorityResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/standardData`, {
+          const authorityResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/standardData`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
