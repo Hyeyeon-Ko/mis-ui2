@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
-import DocstorageAddModal from './DocstorageAddModal'; // 모달 컴포넌트 가져오기
+import DocstorageAddModal from './DocstorageAddModal'; 
 import '../../styles/common/Page.css';
 import '../../styles/TotalDocstorageList.css';
 import axios from 'axios';
@@ -11,7 +11,7 @@ function TotalDocstorageList() {
   const [selectedCenterCode, setSelectedCenterCode] = useState(null);
   const [docstorageDetails, setDocstorageDetails] = useState([]);
   const [centerDocstorageResponses, setCenterDocstorageResponses] = useState(null);
-  const [showAddModal, setShowAddModal] = useState(false); // 모달 열림 상태 관리
+  const [showAddModal, setShowAddModal] = useState(false); 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,21 +19,13 @@ function TotalDocstorageList() {
         const response = await axios.get('/api/docstorageList/total');
         const { centerResponses, centerDocstorageResponses } = response.data.data;
 
-        // 센터 데이터 한글 이름으로 정렬
         const sortedCenterData = [...centerResponses].sort((a, b) => {
           return a.detailNm.localeCompare(b.detailNm, 'ko-KR');
         });
 
-        console.log("정렬된 센터 데이터:", sortedCenterData);
-        console.log("센터 문서보관 데이터", centerDocstorageResponses);
+        setCenterData([ ...sortedCenterData]); 
+        setCenterDocstorageResponses(centerDocstorageResponses[0]); 
 
-        setCenterData([{ detailNm: '전국센터', detailCd: 'ALL' }, ...sortedCenterData]); // '전국센터' 추가
-        setCenterDocstorageResponses(centerDocstorageResponses[0]); // 문서보관 데이터를 상태로 설정
-
-        // 초기 선택된 센터 처리 (첫 번째 센터 선택)
-        if (sortedCenterData.length > 0) {
-          handleCenterClick('ALL'); // '전국센터' 선택
-        }
       } catch (error) {
         console.error('데이터를 불러오는데 실패했습니다.', error);
       }
@@ -43,56 +35,34 @@ function TotalDocstorageList() {
 
   const handleCenterClick = (detailCd) => {
     setSelectedCenterCode(detailCd);
-
+  
     if (!centerDocstorageResponses) return;
-
-    let selectedDetails = [];
-
-    if (detailCd === 'ALL') {
-      // 모든 센터의 데이터를 합쳐서 보여줌
-      selectedDetails = [
-        ...centerDocstorageResponses.foundationResponses,
-        ...centerDocstorageResponses.gwanghwamunResponses,
-        ...centerDocstorageResponses.yeouidoResponses,
-        ...centerDocstorageResponses.gangnamResponses,
-        ...centerDocstorageResponses.suwonResponses,
-        ...centerDocstorageResponses.daeguResponses,
-        ...centerDocstorageResponses.busanResponses,
-        ...centerDocstorageResponses.gwangjuResponses,
-        ...centerDocstorageResponses.jejuResponses,
-      ];
-    } else {
-      const centerMapping = {
-        "100": centerDocstorageResponses.foundationResponses,
-        "101": centerDocstorageResponses.gwanghwamunResponses,
-        "102": centerDocstorageResponses.yeouidoResponses,
-        "103": centerDocstorageResponses.gangnamResponses,
-        "104": centerDocstorageResponses.suwonResponses,
-        "105": centerDocstorageResponses.daeguResponses,
-        "106": centerDocstorageResponses.busanResponses,
-        "107": centerDocstorageResponses.gwangjuResponses,
-        "108": centerDocstorageResponses.jejuResponses,
-      };
-
-      selectedDetails = centerMapping[detailCd] || [];
-    }
-
-    // NO 값을 1부터 순차적으로 매깁니다.
+  
+    const centerMapping = {
+      "100": centerDocstorageResponses.foundationResponses,
+      "101": centerDocstorageResponses.gwanghwamunResponses,
+      "102": centerDocstorageResponses.yeouidoResponses,
+      "103": centerDocstorageResponses.gangnamResponses,
+      "104": centerDocstorageResponses.suwonResponses,
+      "105": centerDocstorageResponses.daeguResponses,
+      "106": centerDocstorageResponses.busanResponses,
+      "107": centerDocstorageResponses.gwangjuResponses,
+      "108": centerDocstorageResponses.jejuResponses,
+    };
+  
+    const selectedDetails = centerMapping[detailCd] || [];
+  
     const numberedDetails = selectedDetails.map((item, index) => ({
       ...item,
       no: index + 1,
     }));
-
-    console.log(`선택된 센터 코드: ${detailCd}`);
-    console.log("선택된 센터의 문서보관 내역:", numberedDetails);
-
+    
     setDocstorageDetails(numberedDetails);
   };
-
+  
   const handleSave = (newData) => {
-    // 새 데이터를 추가한 후 테이블을 업데이트하거나 추가 로직을 처리합니다.
     console.log("새로 추가된 데이터:", newData);
-    setShowAddModal(false); // 모달 닫기
+    setShowAddModal(false); 
   };
 
   const subCategoryColumns = [
@@ -168,9 +138,6 @@ function TotalDocstorageList() {
                 <div className="totalDocstorage-header-buttons">
                 <label className='totalDocstorage-detail-content-label'>문서보관 내역&gt;&gt;</label>
                 <div className="totalDocstorage-detail-buttons">
-                    <button className="totalDocstorage-add-button" onClick={() => setShowAddModal(true)}>추 가</button>
-                    <button className="totalDocstorage-modify-button">수 정</button>
-                    <button className="totalDocstorage-delete-button">삭 제</button>
                     <button className="totalDocstorage-excel-button">엑 셀</button>
                 </div>
                 </div>
@@ -184,8 +151,6 @@ function TotalDocstorageList() {
           </div>
         </div>
       </div>
-
-      {/* 모달 컴포넌트 */}
       <DocstorageAddModal
         show={showAddModal}
         onClose={() => setShowAddModal(false)}
