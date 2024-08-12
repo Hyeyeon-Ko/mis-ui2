@@ -22,6 +22,10 @@ function Sidebar() {
     { label: '문서수발신', url: '/api/doc' },
   ];
 
+  const assetApplyItems = [
+    { label: '문서보관 신청', url: '/api/docstorage' },
+  ]
+
   const myApplyItems = [
     { label: '전체 신청내역', url: '/api/myApplyList' },
     { label: '승인대기 내역', url: '/api/myPendingList' },
@@ -79,6 +83,13 @@ function Sidebar() {
           <SidebarSection 
             title="신청하기" 
             items={applyItems} 
+            isActive={isActive} 
+            location={location} 
+            defaultOpen={false} 
+          />
+          <SidebarSection 
+            title="자산 및 문서 관리" 
+            items={assetApplyItems} 
             isActive={isActive} 
             location={location} 
             defaultOpen={false} 
