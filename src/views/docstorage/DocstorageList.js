@@ -7,12 +7,16 @@ import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 
 function DocstorageList() {
-  const { auth } = useContext(AuthContext); 
-  const [selectedCategory, setSelectedCategory] = useState('B');
+  const { auth } = useContext(AuthContext);
+  const categories = [
+    { categoryCode: 'A', categoryName: '승인대기 내역' },
+    { categoryCode: 'B', categoryName: '문서보관 내역' },
+  ];
+
+  const [selectedCategory, setSelectedCategory] = useState(categories[0].categoryCode);
   const [deptResponses, setDeptResponses] = useState([]);
   const [docstorageDetails, setDocstorageDetails] = useState([]);
   const [deptDocstorageResponses, setDeptDocstorageResponses] = useState([]);
-  const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
     const fetchDocstorageData = async () => {
@@ -30,19 +34,17 @@ function DocstorageList() {
           const firstDeptCd = deptResponses[0].detailCd;
           handleDeptClick(firstDeptCd);
         }
-
       } catch (error) {
         console.error('문서보관 데이터를 불러오는데 실패했습니다.', error);
       }
     };
 
-    if (auth.instCd) {
+    if (auth.instCd && selectedCategory === 'B') {
       fetchDocstorageData();
     }
-  }, [auth.instCd]);
+  }, [auth.instCd, selectedCategory]);
 
   const handleDeptClick = (detailCd) => {
-
     const selectedDept = deptDocstorageResponses.find(dept => dept.deptCd === detailCd);
 
     if (selectedDept) {
@@ -52,7 +54,7 @@ function DocstorageList() {
       }));
       setDocstorageDetails(numberedDetails);
     } else {
-      setDocstorageDetails([]); 
+      setDocstorageDetails([]);
     }
   };
 
@@ -77,21 +79,23 @@ function DocstorageList() {
   ];
 
   const detailColumns = [
-    {
-      header: (
-        <input
-          type="checkbox"
-        />
-      ),
-      accessor: 'select',
-      width: '5%',
-      Cell: () => (
-        <input
-          type="checkbox"
-          name="detailSelect"
-        />
-      ),
-    },
+    ...(selectedCategory === 'B' ? [
+      {
+        header: (
+          <input
+            type="checkbox"
+          />
+        ),
+        accessor: 'select',
+        width: '5%',
+        Cell: () => (
+          <input
+            type="checkbox"
+            name="detailSelect"
+          />
+        ),
+      }
+    ] : []),
     { header: 'NO', accessor: 'no' },
     { header: '팀 명', accessor: 'teamNm' },
     { header: '문서관리번호', accessor: 'docId' },
@@ -107,32 +111,63 @@ function DocstorageList() {
     { header: '기안번호', accessor: 'dpdraftNum' }, 
   ];
 
+  const mappedSubCategories = categories.map(subCategory => ({
+    ...subCategory,
+    onClick: () => {},
+    isSelected: false,
+  }));
+
+  const isApprovalPending = selectedCategory === 'A';
+
   return (
     <div className='content'>
       <div className="docstorage-content">
         <div className='docstorage-content-inner'>
             <h2>문서보관 목록표</h2>
             <Breadcrumb items={['자산 및 문서 관리', '문서보관 목록표']} />
-            <div className="docstorage-tables-section">
-              <div className="docstorage-sub-category-section">
-                <div className="docstorage-header-buttons">
-                  <label className='docstorage-sub-category-label'>부 서&gt;&gt;</label>
-                </div>
-                <div className="docstorage-sub-category-table">
-                  <Table
-                    columns={subCategoryColumns}
-                    data={deptResponses}
-                  />
-                </div>
+            <div className="docstorage-category-section">
+              <div className="docstorage-category">
+                <label htmlFor="category" className="docstorage-category-label">내 역&gt;&gt;</label>
+                <select
+                id="category"
+                className="docstorage-category-dropdown"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                >
+                {categories.map(category => (
+                    <option key={category.categoryCode} value={category.categoryCode}>
+                    {category.categoryName}
+                    </option>
+                ))}
+                </select>
               </div>
+            </div>
+            <div className="docstorage-tables-section">
+              {!isApprovalPending && (
+                <div className="docstorage-sub-category-section">
+                  <div className="docstorage-header-buttons">
+                    <label className='docstorage-sub-category-label'>부 서&gt;&gt;</label>
+                  </div>
+                  <div className="docstorage-sub-category-table">
+                    <Table
+                      columns={subCategoryColumns}
+                      data={deptResponses}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="docstorage-details-content">
                 <div className="docstorage-header-buttons">
-                  <label className='docstorage-detail-content-label'>문서보관 내역&gt;&gt;</label>
-                  <div className="docstorage-detail-buttons">
-                      <button className="docstorage-modify-button">수 정</button>
-                      <button className="docstorage-delete-button">삭 제</button>
-                      <button className="docstorage-excel-button">엑 셀</button>
-                  </div>
+                  <label className='docstorage-detail-content-label'>
+                    {isApprovalPending ? '승인대기 내역' : '문서보관 내역'}&gt;&gt;
+                  </label>
+                  {!isApprovalPending && (
+                    <div className="docstorage-detail-buttons">
+                        <button className="docstorage-modify-button">수 정</button>
+                        <button className="docstorage-delete-button">삭 제</button>
+                        <button className="docstorage-excel-button">엑 셀</button>
+                    </div>
+                  )}
                 </div>
                 <div className="docstorage-details-table">
                   <Table

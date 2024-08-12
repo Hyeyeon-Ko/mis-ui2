@@ -16,15 +16,15 @@ function Docstorage() {
     const fetchDocstorageData = async () => {
       try {
         const response = await axios.get('/api/docstorageList/dept', {
-          params: { userId: auth.userId }, // userId를 쿼리 파라미터로 전달
+          params: { userId: auth.userId }, 
         });
 
         const dataWithNumbers = response.data.data.map((item, index) => ({
           ...item,
-          no: index + 1, // 데이터에 번호 추가
+          no: index + 1, 
         }));
 
-        setDocstorageDetails(dataWithNumbers); // 받아온 데이터를 상태에 저장
+        setDocstorageDetails(dataWithNumbers); 
       } catch (error) {
         console.error('문서보관 데이터를 불러오는데 실패했습니다.', error);
       }
