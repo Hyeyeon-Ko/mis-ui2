@@ -1,0 +1,142 @@
+.totalDocstorage-content {
+    padding: 8px 16px;
+}
+
+.totalDocstorage-content-inner h2 {
+    font-size: 28px;
+    margin-bottom: 16px;
+}
+
+.totalDocstorage-category-section {
+    margin-top: 25px;
+    margin-bottom: 30px;
+    font-size: 16px;
+}
+
+.totalDocstorage-category-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+.totalDocstorage-category-dropdown {
+    padding: 6px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 165px;
+    margin-left: 44px;
+}
+
+.totalDocstorage-tables-section {
+    display: flex;
+}
+
+.totalDocstorage-sub-category-section {
+    width: 200px;
+}
+
+.totalDocstorage-details-content {
+    flex: 7;
+    margin-left: 20px;
+    overflow-x: auto;
+}
+
+.totalDocstorage-header-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.totalDocstorage-sub-category-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 6px;
+    margin-right: 10px;
+    margin-bottom: 4px;
+}
+
+.totalDocstorage-detail-content-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 10px;
+    padding-left: 5px;
+}
+
+.totalDocstorage-sub-category-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.totalDocstorage-sub-category-table th {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 11px 20px;
+    text-align: center;
+    font-size: 13px;
+}
+
+.totalDocstorage-sub-category-table td {
+    border: 1px solid #ddd;
+    padding: 11px 20px;
+    text-align: left;
+    font-size: 13px;
+}
+
+.totalDocstorage-sub-category-table td:hover {
+    background-color: #edf7ff;
+}
+
+.totalDocstorage-details-table {
+    border-collapse: collapse;
+    width: 100%;
+    overflow-x: auto;
+    max-width: 100%;
+    min-width: 100%;
+}
+
+.totalDocstorage-details-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.totalDocstorage-details-table th, .totalDocstorage-details-table td {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.totalDocstorage-add-button, .totalDocstorage-modify-button, .totalDocstorage-delete-button, .totalDocstorage-excel-button {
+    border-radius: 7px;
+    padding: 4px 8px;
+    width: 55px;
+    height: 30px;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border: none;
+    margin-right: 3px;
+}
+
+.totalDocstorage-excel-button {
+    color: white;
+    background-color: #07AF5A;
+}
+
+.totalDocstorage-excel-button:hover {
+    background-color: #068c4e;
+}
+
+.totalDocstorage-add-button, .totalDocstorage-modify-button, .totalDocstorage-delete-button {
+    color: black;
+    background-color: #bdc6cf;
+}
+
+.totalDocstorage-add-button:hover, .totalDocstorage-modify-button:hover, .totalDocstorage-delete-button:hover {
+    background-color: #a1a9b2;
+}

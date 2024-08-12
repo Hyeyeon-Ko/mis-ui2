@@ -52,12 +52,21 @@ function Sidebar() {
     { label: '명함 발주', url: '/api/bcd/orderList' },
   ];
 
+  const assetItems = [
+    { label: '렌탈현황 관리표', url: '/api/rentalList'},
+    { label: '문서보관 목록표', url: '/api/docstorageList'},
+    { label: '전국 렌탈현황 관리표', url: '/api/totalRentalList'},
+    { label: '전국 문서보관 목록표', url: '/api/totalDocstorageList'},
+  ]
+  
+
   const sections = {
     'A': { title: '신청내역 관리', items: manageItems },
     'B': { title: '발주 관리', items: orderItems },
     'C': { title: '인장 관리', items: sealItems},
     'D': { title: '법인서류 관리', items: corpDocItems},
     'E': { title: '문서수발신 관리', items: docItems },
+    'F': { title: '자산 및 문서 관리', items: assetItems },
   };
 
   return (

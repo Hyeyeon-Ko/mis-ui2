@@ -66,9 +66,10 @@ const Login = () => {
               data.data.role, 
               data.data.sidebarPermissions, 
               authorityData.data, 
-              data.data.instCd 
+              data.data.instCd, 
+              // data.data.teamCd,
             );
-
+            
             if (data.data.role === 'ADMIN' || data.data.role === 'MASTER') {
               navigate('/api/applyList');
             } else {
