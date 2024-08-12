@@ -72,14 +72,14 @@
 .totalDocstorage-sub-category-table th {
     background-color: white;
     border: 1px solid #ddd;
-    padding: 11px 20px;
+    padding: 8px 20px;
     text-align: center;
     font-size: 13px;
 }
 
 .totalDocstorage-sub-category-table td {
     border: 1px solid #ddd;
-    padding: 11px 20px;
+    padding: 8px 20px;
     text-align: left;
     font-size: 13px;
 }
@@ -104,7 +104,7 @@
 .totalDocstorage-details-table th, .totalDocstorage-details-table td {
     background-color: white;
     border: 1px solid #ddd;
-    padding: 10px 20px;
+    padding: 8px 20px;
     text-align: center;
     font-size: 13px;
     white-space: nowrap;
