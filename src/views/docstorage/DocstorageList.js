@@ -13,7 +13,7 @@ function DocstorageList() {
     { categoryCode: 'B', categoryName: '문서보관 내역' },
   ];
 
-  const [selectedCategory, setSelectedCategory] = useState(categories[0].categoryCode);
+  const [selectedCategory, setSelectedCategory] = useState('A'); // Default to 'A'
   const [deptResponses, setDeptResponses] = useState([]);
   const [docstorageDetails, setDocstorageDetails] = useState([]);
   const [deptDocstorageResponses, setDeptDocstorageResponses] = useState([]);
@@ -21,25 +21,42 @@ function DocstorageList() {
   useEffect(() => {
     const fetchDocstorageData = async () => {
       try {
-        const response = await axios.get('/api/docstorageList/center', {
-          params: { instCd: auth.instCd },
-        });
+        let response;
+        if (selectedCategory === 'A') {
+          // Fetch approval pending list
+          response = await axios.get('/api/docstorageList/pending', {
+            params: { instCd: '100' }, // Use '100' as the default instCd
+          });
+        } else if (selectedCategory === 'B') {
+          // Fetch document storage list
+          response = await axios.get('/api/docstorageList/center', {
+            params: { instCd: auth.instCd },
+          });
 
-        const { deptResponses, deptDocstorageResponses } = response.data.data;
+          const { deptResponses, deptDocstorageResponses } = response.data.data;
+          setDeptResponses(deptResponses);
+          setDeptDocstorageResponses(deptDocstorageResponses);
 
-        setDeptResponses(deptResponses);
-        setDeptDocstorageResponses(deptDocstorageResponses);
+          if (deptResponses.length > 0) {
+            const firstDeptCd = deptResponses[0].detailCd;
+            handleDeptClick(firstDeptCd);
+          }
+        }
 
-        if (deptResponses.length > 0) {
-          const firstDeptCd = deptResponses[0].detailCd;
-          handleDeptClick(firstDeptCd);
+        if (response && response.data) {
+          const pendingList = response.data.data;
+          const numberedDetails = pendingList.map((item, index) => ({
+            ...item,
+            no: index + 1,
+          }));
+          setDocstorageDetails(numberedDetails);
         }
       } catch (error) {
         console.error('문서보관 데이터를 불러오는데 실패했습니다.', error);
       }
     };
 
-    if (auth.instCd && selectedCategory === 'B') {
+    if (auth.instCd) {
       fetchDocstorageData();
     }
   }, [auth.instCd, selectedCategory]);
@@ -106,18 +123,10 @@ function DocstorageList() {
     { header: '보존연한', accessor: 'storageYear' },
     { header: '생성일자', accessor: 'createDate' },
     { header: '이관일자', accessor: 'transferDate' },
-    { header: '기안번호', accessor: 'tsdNum' }, 
-    { header: '폐기일자', accessor: 'disposalDate' }, 
-    { header: '기안번호', accessor: 'dpdraftNum' }, 
+    { header: '기안번호', accessor: 'tsdNum' },
+    { header: '폐기일자', accessor: 'disposalDate' },
+    { header: '기안번호', accessor: 'dpdraftNum' },
   ];
-
-  const mappedSubCategories = categories.map(subCategory => ({
-    ...subCategory,
-    onClick: () => {},
-    isSelected: false,
-  }));
-
-  const isApprovalPending = selectedCategory === 'A';
 
   return (
     <div className='content'>
@@ -143,7 +152,7 @@ function DocstorageList() {
               </div>
             </div>
             <div className="docstorage-tables-section">
-              {!isApprovalPending && (
+              {selectedCategory !== 'A' && (
                 <div className="docstorage-sub-category-section">
                   <div className="docstorage-header-buttons">
                     <label className='docstorage-sub-category-label'>부 서&gt;&gt;</label>
@@ -159,9 +168,9 @@ function DocstorageList() {
               <div className="docstorage-details-content">
                 <div className="docstorage-header-buttons">
                   <label className='docstorage-detail-content-label'>
-                    {isApprovalPending ? '승인대기 내역' : '문서보관 내역'}&gt;&gt;
+                    {selectedCategory === 'A' ? '승인대기 내역' : '문서보관 내역'}&gt;&gt;
                   </label>
-                  {!isApprovalPending && (
+                  {selectedCategory !== 'A' && (
                     <div className="docstorage-detail-buttons">
                         <button className="docstorage-modify-button">수 정</button>
                         <button className="docstorage-delete-button">삭 제</button>

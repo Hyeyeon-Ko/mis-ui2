@@ -13,6 +13,7 @@ function Docstorage() {
   const [docstorageDetails, setDocstorageDetails] = useState([]); 
   const [showAddModal, setShowAddModal] = useState(false);
 
+  // TODO: 로그인 수정시 로그인 사용자 부서코드 받아오도록 수정
   const deptCd = '006';
 
   useEffect(() => {
@@ -31,7 +32,7 @@ function Docstorage() {
               ...item,
               no: index + 1, 
               typeDisplay: item.type === 'A' ? '이관' : item.type === 'B' ? '파쇄' : '',
-              statusDisplay: item.status === 'N' ? '미신청' : item.status === 'A' ? '승인대기' : item.status === 'E' ? '완료' : ''
+              statusDisplay: item.status === 'A' ? '승인대기' : item.status === 'E' ? '완료' : ''
             }));
 
             setDocstorageDetails(data);
