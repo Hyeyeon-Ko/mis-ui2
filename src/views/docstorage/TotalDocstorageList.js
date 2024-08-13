@@ -12,18 +12,20 @@ function TotalDocstorageList() {
   const [docstorageDetails, setDocstorageDetails] = useState([]);
   const [centerDocstorageResponses, setCenterDocstorageResponses] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false); 
+  const [selectedRows, setSelectedRows] = useState([]); 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get('/api/docstorageList/total');
+        console.log('response: ', response);
         const { centerResponses, centerDocstorageResponses } = response.data.data;
 
         const sortedCenterData = [...centerResponses].sort((a, b) => {
           return a.detailNm.localeCompare(b.detailNm, 'ko-KR');
         });
 
-        setCenterData([ ...sortedCenterData]); 
+        setCenterData([...sortedCenterData]); 
         setCenterDocstorageResponses(centerDocstorageResponses[0]); 
 
       } catch (error) {
@@ -59,12 +61,44 @@ function TotalDocstorageList() {
     
     setDocstorageDetails(numberedDetails);
   };
-  
+
   const handleSave = (newData) => {
     console.log("새로 추가된 데이터:", newData);
     setShowAddModal(false); 
   };
 
+  const handleRowSelect = (e, row) => {
+    const isChecked = e.target.checked;
+    if (isChecked) {
+      setSelectedRows(prevSelectedRows => [...prevSelectedRows, row]);
+    } else {
+      setSelectedRows(prevSelectedRows => prevSelectedRows.filter(selectedRow => selectedRow !== row));
+    }
+  };
+
+  const downloadExcel = async () => {
+    try {
+      const detailIds = selectedRows.map(row => row.detailId);
+  
+      console.log('Selected detail IDs:', detailIds);
+  
+      const response = await axios.post('/api/docstorage/excel', detailIds, {
+        responseType: 'blob', 
+      });
+  
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', '문서보관 목록표.xlsx'); 
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+  
+    } catch (error) {
+      console.error('엑셀 파일 다운로드 중 오류 발생:', error);
+    }
+  };
+    
   const subCategoryColumns = [
     {
       header: '센터명',
@@ -90,14 +124,20 @@ function TotalDocstorageList() {
       header: (
         <input
           type="checkbox"
+          onChange={(e) => {
+            const isChecked = e.target.checked;
+            setSelectedRows(isChecked ? [...docstorageDetails] : []);
+          }}
         />
       ),
       accessor: 'select',
       width: '5%',
-      Cell: () => (
+      Cell: ({ row }) => (
         <input
           type="checkbox"
           name="detailSelect"
+          onChange={(e) => handleRowSelect(e, row)}
+          checked={selectedRows.includes(row)}
         />
       ),
     },
@@ -138,7 +178,7 @@ function TotalDocstorageList() {
                 <div className="totalDocstorage-header-buttons">
                 <label className='totalDocstorage-detail-content-label'>문서보관 내역&gt;&gt;</label>
                 <div className="totalDocstorage-detail-buttons">
-                    <button className="totalDocstorage-excel-button">엑 셀</button>
+                    <button className="totalDocstorage-excel-button" onClick={downloadExcel}>엑 셀</button>
                 </div>
                 </div>
                 <div className="totalDocstorage-details-table">
