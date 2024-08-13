@@ -1,16 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import DocstorageAddModal from '../../views/docstorage/DocstorageAddModal';
+import axios from 'axios';
 import '../../styles/common/Page.css';
 import '../../styles/Docstorage.css';
+import { AuthContext } from '../../components/AuthContext';
 
 function Docstorage() {
-  const [docstorageDetails, setDocstorageDetails] = useState([]);
+  const { auth } = useContext(AuthContext); 
+  const { userId } = auth; 
+  const [docstorageDetails, setDocstorageDetails] = useState([]); 
   const [showAddModal, setShowAddModal] = useState(false);
+
+  const deptCd = '006';
+
+  useEffect(() => {
+    if (userId) {
+      const params = { deptCd };
+      console.log('Sending request with params:', params);  
+
+      axios.get('/api/docstorageList/dept', { params })  
+        .then(response => {
+          let data = response.data.data;
+
+          console.log('Received data:', data);
+
+          if (Array.isArray(data)) {
+            data = data.map((item, index) => ({
+              ...item,
+              no: index + 1, 
+              typeDisplay: item.type === 'A' ? '이관' : item.type === 'B' ? '파쇄' : '',
+              statusDisplay: item.status === 'N' ? '미신청' : item.status === 'A' ? '승인대기' : item.status === 'E' ? '완료' : ''
+            }));
+
+            setDocstorageDetails(data);
+          } else {
+            console.error('Unexpected data format:', data);
+            setDocstorageDetails([]); 
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching docstorage details:', error);
+          setDocstorageDetails([]); 
+        });
+    }
+  }, [userId]); 
 
   const handleSave = (newData) => {
     if (Array.isArray(newData)) {
+      newData = newData.map((item, index) => ({
+        ...item,
+        no: docstorageDetails.length + index + 1,
+        typeDisplay: item.type === 'A' ? '이관' : item.type === 'B' ? '파쇄' : '',
+        statusDisplay: item.status === 'N' ? '미신청' : item.status === 'A' ? '승인대기' : item.status === 'E' ? '완료' : ''
+      }));
+
       setDocstorageDetails([...docstorageDetails, ...newData]);
     } else {
       console.error("Expected newData to be an array, but got:", newData);
@@ -35,6 +80,8 @@ function Docstorage() {
       ),
     },
     { header: 'NO', accessor: 'no' },
+    { header: '분류', accessor: 'typeDisplay' }, 
+    { header: '상태', accessor: 'statusDisplay' }, 
     { header: '팀 명', accessor: 'teamNm' },
     { header: '문서관리번호', accessor: 'docId' },
     { header: '입고위치', accessor: 'location' },
@@ -80,7 +127,7 @@ function Docstorage() {
       <DocstorageAddModal
         show={showAddModal}
         onClose={() => setShowAddModal(false)}
-        onSave={handleSave}  // onSave prop 추가
+        onSave={handleSave}
       />
     </div>
   );
