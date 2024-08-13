@@ -13,7 +13,7 @@ function DocstorageList() {
     { categoryCode: 'B', categoryName: '문서보관 내역' },
   ];
 
-  const [selectedCategory, setSelectedCategory] = useState('A'); // Default to 'A'
+  const [selectedCategory, setSelectedCategory] = useState('A'); 
   const [deptResponses, setDeptResponses] = useState([]);
   const [docstorageDetails, setDocstorageDetails] = useState([]);
   const [deptDocstorageResponses, setDeptDocstorageResponses] = useState([]);
@@ -23,12 +23,11 @@ function DocstorageList() {
       try {
         let response;
         if (selectedCategory === 'A') {
-          // Fetch approval pending list
           response = await axios.get('/api/docstorageList/pending', {
-            params: { instCd: '100' }, // Use '100' as the default instCd
+            // TODO: 로그인 시 센터코드 저장 후 넘겨주기
+            params: { instCd: '100' }, 
           });
         } else if (selectedCategory === 'B') {
-          // Fetch document storage list
           response = await axios.get('/api/docstorageList/center', {
             params: { instCd: auth.instCd },
           });
