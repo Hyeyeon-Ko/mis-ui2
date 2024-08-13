@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import DocstorageAddModal from '../../views/docstorage/DocstorageAddModal';
@@ -12,6 +13,7 @@ function Docstorage() {
   const { userId } = auth; 
   const [docstorageDetails, setDocstorageDetails] = useState([]); 
   const [showAddModal, setShowAddModal] = useState(false);
+  const navigate = useNavigate();              
 
   // TODO: 로그인 수정시 로그인 사용자 부서코드 받아오도록 수정
   const deptCd = '006';

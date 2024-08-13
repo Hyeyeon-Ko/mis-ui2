@@ -87,6 +87,7 @@
     padding: 8px 20px;
     text-align: center;
     font-size: 13px;
+    height: 22px;
   }
   
   .sub-category-table td {
@@ -94,6 +95,7 @@
     padding: 8px 20px;
     text-align: left;
     font-size: 13px;
+    height: 22px;
   }
   
   .sub-category-table td:hover {
@@ -120,6 +122,7 @@
     text-align: center;
     font-size: 13px;
     white-space: nowrap;
+    height: 22px;
   }
   
   .details-table .checkbox-cell {
