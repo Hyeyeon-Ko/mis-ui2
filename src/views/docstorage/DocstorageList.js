@@ -24,7 +24,7 @@ function DocstorageList() {
         let response;
         if (selectedCategory === 'A') {
           response = await axios.get('/api/docstorageList/pending', {
-            // TODO: 로그인 시 센터코드 저장 후 넘겨주기
+            // TODO: 로그인 시 센터코드 저장 후 넘겨주기로 수정
             params: { instCd: '100' }, 
           });
         } else if (selectedCategory === 'B') {
@@ -47,6 +47,7 @@ function DocstorageList() {
           const numberedDetails = pendingList.map((item, index) => ({
             ...item,
             no: index + 1,
+            typeDisplay: item.type === 'A' ? '이관' : item.type === 'B' ? '파쇄' : '',
           }));
           setDocstorageDetails(numberedDetails);
         }
@@ -67,6 +68,7 @@ function DocstorageList() {
       const numberedDetails = selectedDept.docstorageResponseDTOList.map((item, index) => ({
         ...item,
         no: index + 1,
+        typeDisplay: item.type === 'A' ? '이관' : item.type === 'B' ? '파쇄' : '',
       }));
       setDocstorageDetails(numberedDetails);
     } else {
@@ -113,6 +115,7 @@ function DocstorageList() {
       }
     ] : []),
     { header: 'NO', accessor: 'no' },
+    ...(selectedCategory === 'A' ? [{ header: '분류', accessor: 'typeDisplay' }] : []),
     { header: '팀 명', accessor: 'teamNm' },
     { header: '문서관리번호', accessor: 'docId' },
     { header: '입고위치', accessor: 'location' },

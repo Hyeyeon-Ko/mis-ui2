@@ -22,7 +22,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setFile(file);
-
+  
     const reader = new FileReader();
     reader.onload = (event) => {
       const data = new Uint8Array(event.target.result);
@@ -31,8 +31,8 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
       const firstSheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[firstSheetName];
       
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
-
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '', raw: false });
+  
       const validData = jsonData.slice(4).filter(row => row[0] !== null && row[0] !== '').map((row, index) => ({
         no: row[0],
         teamNm: row[1],
@@ -42,15 +42,15 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
         manager: row[5],
         subManager: row[6],
         storageYear: row[7],
-        createDate: row[8] || null, 
-        transferDate: row[9] || null, 
+        createDate: row[8] || null,  
+        transferDate: row[9] || null,
         tsdNum: row[10],
         disposalDate: row[11] || null, 
         dpdNum: row[12],
       }));
-
+  
       console.log('Processed Data:', validData);
-
+  
       setProcessedData(validData);
     };
     reader.readAsArrayBuffer(file);
