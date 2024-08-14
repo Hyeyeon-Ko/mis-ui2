@@ -4,6 +4,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import DocstorageAddModal from '../../views/docstorage/DocstorageAddModal';
 import DocstorageApplyModal from '../../views/docstorage/DocstorageApplyModal';
+import TypeSelect from '../../components/TypeSelect'; 
 import axios from 'axios';
 import '../../styles/common/Page.css';
 import '../../styles/docstorage/Docstorage.css';
@@ -18,6 +19,13 @@ function Docstorage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedDoc, setSelectedDoc] = useState(null); 
+  const [selectedType, setSelectedType] = useState('전체'); 
+  const [types] = useState([
+    '전체',
+    '이관',
+    '파쇄',
+    '미신청',
+  ]);
   const navigate = useNavigate();
 
   const deptCd = '006';
@@ -53,6 +61,10 @@ function Docstorage() {
   useEffect(() => {
     fetchDocstorageDetails();
   }, [userId]);
+
+  const handleTypeChange = (event) => {
+    setSelectedType(event.target.value);
+  };
 
   const handleSave = (newData) => {
     if (Array.isArray(newData)) {
@@ -179,6 +191,15 @@ function Docstorage() {
       alert("신청할 항목을 선택하세요.");
       return;
     }
+    const selectedDocs = docstorageDetails.filter(doc => selectedRows.includes(doc.detailId));
+
+    const hasShreddedDocs = selectedDocs.some(doc => doc.typeDisplay === '파쇄');
+  
+    if (hasShreddedDocs) {
+      alert("파쇄된 문서와 관련해서는 신청이 불가합니다.");
+      return;
+    }
+  
     setShowApplyModal(true);
   };
 
@@ -205,7 +226,17 @@ function Docstorage() {
       ),
     },
     { header: 'NO', accessor: 'no' },
-    { header: '분류', accessor: 'typeDisplay' },
+    {
+      header: (
+        <TypeSelect
+          types={types}
+          selectedType={selectedType}
+          onTypeChange={handleTypeChange}
+        />
+      ),
+      accessor: 'typeDisplay',
+      width: '10%',
+    },
     { header: '상태', accessor: 'statusDisplay' },
     { header: '팀 명', accessor: 'teamNm' },
     { header: '문서관리번호', accessor: 'docId' },
@@ -221,12 +252,19 @@ function Docstorage() {
     { header: '기안번호', accessor: 'dpdNum' },
   ];
 
+  const filteredDocstorageDetails =
+  selectedType === '전체'
+    ? docstorageDetails
+    : selectedType === '미신청'
+    ? docstorageDetails.filter((doc) => doc.typeDisplay === null || doc.typeDisplay === '')
+    : docstorageDetails.filter((doc) => doc.typeDisplay === selectedType);
+
   return (
     <div className='content'>
       <div className='docstorage-content'>
         <div className="docstorage-content-inner">
-          <h2>문서보관 목록표</h2>
-          <Breadcrumb items={['자산 및 문서 관리', '문서보관 목록표']} />
+          <h2>문서보관 신청</h2>
+          <Breadcrumb items={['신청하기', '문서보관 신청']} />
           <div className="docstorage-tables-section">
             <div className="docstorage-details-content">
               <div className="docstorage-header-buttons">
@@ -245,7 +283,7 @@ function Docstorage() {
               <div className="docstorage-details-table">
                 <Table
                   columns={detailColumns}
-                  data={docstorageDetails}
+                  data={filteredDocstorageDetails} 
                 />
               </div>
             </div>

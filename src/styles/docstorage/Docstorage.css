@@ -151,3 +151,31 @@
 .docstorage-apply-button:hover {
     background-color: #1e6fc1;
 }
+
+.type-header {
+    position: relative;
+    display: inline-block;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+  
+.type-header:hover{
+    color: #2789FE;
+}
+
+.type-header span {
+    font-size: 12px;
+}
+
+.type-select {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    font-size: 14px;
+  }  
+  

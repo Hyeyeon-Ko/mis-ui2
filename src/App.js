@@ -4,7 +4,7 @@ import './index.css';
 import Header from './components/common/Header';
 import Sidebar from './components/common/Sidebar';
 import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'react-router-dom';
-import Home from './views/Home';
+import Apply from './views/Apply';
 import Login from './views/Login';
 import MyApplyList from './views/list/MyApplyList';
 import MyPendingList from './views/list/MyPendingList';
@@ -72,7 +72,7 @@ function App() {
           <Route path="*" element={
             <MainLayout>
               <Routes>
-                <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
+                <Route path="/" element={<RequireAuth><Apply /></RequireAuth>} />
                 <Route path="/api/auth" element={<RequireAuth><AuthorityManagement /></RequireAuth>} />
                 <Route path="/api/bcd" element={<RequireAuth><BcdApplyFirst /></RequireAuth>} />
                 <Route path="/api/bcd/own" element={<RequireAuth><BcdApplySecond /></RequireAuth>} />
