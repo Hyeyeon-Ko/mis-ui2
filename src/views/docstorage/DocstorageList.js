@@ -17,6 +17,7 @@ function DocstorageList() {
   const [deptResponses, setDeptResponses] = useState([]);
   const [docstorageDetails, setDocstorageDetails] = useState([]);
   const [deptDocstorageResponses, setDeptDocstorageResponses] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]); // 선택된 행들을 관리
 
   useEffect(() => {
     const fetchDocstorageData = async () => {
@@ -24,7 +25,6 @@ function DocstorageList() {
         let response;
         if (selectedCategory === 'A') {
           response = await axios.get('/api/docstorageList/pending', {
-            // TODO: 로그인 시 센터코드 저장 후 넘겨주기로 수정
             params: { instCd: '100' }, 
           });
         } else if (selectedCategory === 'B') {
@@ -76,6 +76,33 @@ function DocstorageList() {
     }
   };
 
+  const handleRowSelect = (e, row) => {
+    const isChecked = e.target.checked;
+    if (isChecked) {
+      setSelectedRows(prevSelectedRows => [...prevSelectedRows, row.detailId]);
+    } else {
+      setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== row.detailId));
+    }
+  };
+
+  const downloadExcel = async () => {
+    try {
+      const response = await axios.post('/api/docstorage/excel', selectedRows, {
+        responseType: 'blob',
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', '문서보관 목록표.xlsx'); 
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      console.error('엑셀 파일 다운로드 중 오류 발생:', error);
+    }
+  };
+
   const subCategoryColumns = [
     {
       header: '부서명',
@@ -102,14 +129,20 @@ function DocstorageList() {
         header: (
           <input
             type="checkbox"
+            onChange={(e) => {
+              const isChecked = e.target.checked;
+              setSelectedRows(isChecked ? docstorageDetails.map(d => d.detailId) : []);
+            }}
           />
         ),
         accessor: 'select',
         width: '5%',
-        Cell: () => (
+        Cell: ({ row }) => (
           <input
             type="checkbox"
             name="detailSelect"
+            onChange={(e) => handleRowSelect(e, row)}
+            checked={selectedRows.includes(row.detailId)}
           />
         ),
       }
@@ -176,7 +209,7 @@ function DocstorageList() {
                     <div className="docstorage-detail-buttons">
                         <button className="docstorage-modify-button">수 정</button>
                         <button className="docstorage-delete-button">삭 제</button>
-                        <button className="docstorage-excel-button">엑 셀</button>
+                        <button className="docstorage-excel-button" onClick={downloadExcel}>엑 셀</button>
                     </div>
                   )}
                 </div>

@@ -9,46 +9,42 @@ import '../../styles/Docstorage.css';
 import { AuthContext } from '../../components/AuthContext';
 
 function Docstorage() {
-  const { auth } = useContext(AuthContext); 
-  const { userId } = auth; 
-  const [docstorageDetails, setDocstorageDetails] = useState([]); 
+  const { auth } = useContext(AuthContext);
+  const { userId } = auth;
+  const [docstorageDetails, setDocstorageDetails] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
-  const navigate = useNavigate();              
+  const [selectedRows, setSelectedRows] = useState([]);
+  const navigate = useNavigate();
 
-  // TODO: 로그인 수정시 로그인 사용자 부서코드 받아오도록 수정
   const deptCd = '006';
 
   useEffect(() => {
     if (userId) {
       const params = { deptCd };
-      console.log('Sending request with params:', params);  
-
-      axios.get('/api/docstorageList/dept', { params })  
+      axios.get('/api/docstorageList/dept', { params })
         .then(response => {
           let data = response.data.data;
-
-          console.log('Received data:', data);
 
           if (Array.isArray(data)) {
             data = data.map((item, index) => ({
               ...item,
-              no: index + 1, 
+              no: index + 1,
               typeDisplay: item.type === 'A' ? '이관' : item.type === 'B' ? '파쇄' : '',
               statusDisplay: item.status === 'A' ? '승인대기' : item.status === 'E' ? '완료' : ''
             }));
 
             setDocstorageDetails(data);
+            console.log('response: ', response);
           } else {
-            console.error('Unexpected data format:', data);
-            setDocstorageDetails([]); 
+            setDocstorageDetails([]);
           }
         })
         .catch(error => {
           console.error('Error fetching docstorage details:', error);
-          setDocstorageDetails([]); 
+          setDocstorageDetails([]);
         });
     }
-  }, [userId]); 
+  }, [userId]);
 
   const handleSave = (newData) => {
     if (Array.isArray(newData)) {
@@ -66,25 +62,90 @@ function Docstorage() {
     setShowAddModal(false);
   };
 
+  const handleRowSelect = (e, row) => {
+    const isChecked = e.target.checked;
+    if (isChecked) {
+      setSelectedRows(prevSelectedRows => [...prevSelectedRows, row.detailId]);
+    } else {
+      setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== row.detailId));
+    }
+  };
+
+  const handleDelete = async () => {
+    if (selectedRows.length === 0) {
+      alert("삭제할 항목을 선택하세요.");
+      return;
+    }
+  
+    try {
+      for (const detailId of selectedRows) {
+        await axios.delete('/api/docstorage/', {
+          params: { detailId }
+        });
+      }
+      alert('선택된 항목이 삭제되었습니다.');
+  
+      setDocstorageDetails(prevDetails => {
+        const updatedDetails = prevDetails
+          .filter(item => !selectedRows.includes(item.detailId))
+          .map((item, index) => ({
+            ...item,
+            no: index + 1 
+          }));
+        
+        return updatedDetails;
+      });
+  
+      setSelectedRows([]); 
+    } catch (error) {
+      console.error('문서보관 정보를 삭제하는 중 에러 발생:', error);
+      alert('삭제에 실패했습니다.');
+    }
+  };
+  
+  const downloadExcel = async () => {
+    try {
+      const response = await axios.post('/api/docstorage/excel', selectedRows, {
+        responseType: 'blob',
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', '문서보관 목록표.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      console.error('엑셀 파일 다운로드 중 오류 발생:', error);
+    }
+  };
+
   const detailColumns = [
     {
       header: (
         <input
           type="checkbox"
+          onChange={(e) => {
+            const isChecked = e.target.checked;
+            setSelectedRows(isChecked ? docstorageDetails.map(d => d.detailId) : []);
+          }}
         />
       ),
       accessor: 'select',
       width: '5%',
-      Cell: () => (
+      Cell: ({ row }) => (
         <input
           type="checkbox"
           name="detailSelect"
+          onChange={(e) => handleRowSelect(e, row)}
+          checked={selectedRows.includes(row.detailId)}
         />
       ),
     },
     { header: 'NO', accessor: 'no' },
-    { header: '분류', accessor: 'typeDisplay' }, 
-    { header: '상태', accessor: 'statusDisplay' }, 
+    { header: '분류', accessor: 'typeDisplay' },
+    { header: '상태', accessor: 'statusDisplay' },
     { header: '팀 명', accessor: 'teamNm' },
     { header: '문서관리번호', accessor: 'docId' },
     { header: '입고위치', accessor: 'location' },
@@ -112,8 +173,8 @@ function Docstorage() {
                 <div className="docstorage-detail-buttons">
                   <button className="docstorage-add-button" onClick={() => setShowAddModal(true)}>추 가</button>
                   <button className="docstorage-modify-button">수 정</button>
-                  <button className="docstorage-delete-button">삭 제</button>
-                  <button className="docstorage-excel-button">엑 셀</button>
+                  <button className="docstorage-delete-button" onClick={handleDelete}>삭 제</button>
+                  <button className="docstorage-excel-button" onClick={downloadExcel}>엑 셀</button>
                   <button className="docstorage-apply-button">신 청</button>
                 </div>
               </div>

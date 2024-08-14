@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import * as XLSX from 'xlsx';
 import axios from 'axios';
 import '../../styles/DocstorageAddModal.css';
 
 const DocstorageAddModal = ({ show, onClose, onSave }) => {
-  const [activeTab, setActiveTab] = useState('file'); // Default to 'file'
+  const [activeTab, setActiveTab] = useState('file'); 
   const [file, setFile] = useState(null);
-  const [processedData, setProcessedData] = useState([]);
   const [formData, setFormData] = useState({
     teamNm: '',
     docId: '',
@@ -28,40 +26,8 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setFile(file);
-  
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const data = new Uint8Array(event.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-      
-      const firstSheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[firstSheetName];
-      
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '', raw: false });
-  
-      const validData = jsonData.slice(4).filter(row => row[0] !== null && row[0] !== '').map((row, index) => ({
-        no: row[0],
-        teamNm: row[1],
-        docId: row[2],
-        location: row[3],
-        docNm: row[4],
-        manager: row[5],
-        subManager: row[6],
-        storageYear: row[7],
-        createDate: row[8] || null,  
-        transferDate: row[9] || null,
-        tsdNum: row[10],
-        disposalDate: row[11] || null, 
-        dpdNum: row[12],
-      }));
-  
-      console.log('Processed Data:', validData);
-  
-      setProcessedData(validData);
-    };
-    reader.readAsArrayBuffer(file);
+    const selectedFile = e.target.files[0];
+    setFile(selectedFile);
   };
 
   const handleChange = (e) => {
@@ -83,68 +49,71 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
         return;
       }
 
-      const payload = {
-        documents: processedData,
-        teamCd: '020',
-      };
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('teamCd', '020');  
 
-      if (payload.documents.length > 0) {
-        axios.post('/api/docstorage/upload', payload)
+      axios.post('/api/docstorage/upload-file', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+        .then(response => {
+          console.log('Data successfully uploaded:', response.data);
+          onSave(response.data);  
+          alert('파일이 성공적으로 업로드되었습니다!');
+          onClose();
+        })
+        .catch(error => {
+          console.error('There was an error uploading the data!', error);
+        });
+    } 
+    if (activeTab === 'text') {
+        const { teamNm, docId, docNm, manager, storageYear, createDate, disposalDate } = formData;
+  
+        if (!teamNm || !docId || !docNm || !manager || !storageYear || !createDate || !disposalDate) {
+          alert('모든 항목을 입력해 주세요.');
+          return;
+        }
+  
+        if (!validateDateFormat(createDate)) {
+          alert('생성일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
+          return;
+        }
+  
+        if (!validateDateFormat(disposalDate)) {
+          alert('폐기일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
+          return;
+        }
+  
+        const payload = {
+          teamNm,
+          docId,
+          docNm,
+          manager,
+          subManager: formData.subManager,
+          storageYear,
+          createDate,
+          location: formData.location,
+          transferDate: formData.transferDate,
+          tsdNum: formData.tsdNum,
+          disposalDate,
+          dpdNum: formData.dpdNum,
+        };
+  
+        axios.post('/api/docstorage/', payload)
           .then(response => {
             console.log('Data successfully uploaded:', response.data);
-            onSave(payload.documents);
-            alert('항목이 성공적으로 추가되었습니다!');
+            onSave([payload]); 
+            alert('항목이 성공적으로 추가되었습니다.');
             onClose();
           })
           .catch(error => {
             console.error('There was an error uploading the data!', error);
           });
       }
-    } else if (activeTab === 'text') {
-      const { teamNm, docId, docNm, manager, storageYear, createDate, disposalDate } = formData;
-
-      if (!teamNm || !docId || !docNm || !manager || !storageYear || !createDate || !disposalDate) {
-        alert('모든 항목을 입력해 주세요.');
-        return;
-      }
-
-      if (!validateDateFormat(createDate)) {
-        alert('생성일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
-        return;
-      }
-
-      if (!validateDateFormat(disposalDate)) {
-        alert('폐기일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
-        return;
-      }
-
-      const payload = {
-        teamNm,
-        docId,
-        docNm,
-        manager,
-        subManager: formData.subManager,
-        storageYear,
-        createDate,
-        location: formData.location,
-        transferDate: formData.transferDate,
-        tsdNum: formData.tsdNum,
-        disposalDate,
-        dpdNum: formData.dpdNum,
-      };
-
-      axios.post('/api/docstorage/', payload)
-        .then(response => {
-          console.log('Data successfully uploaded:', response.data);
-          onSave([payload]);  // Update parent component with the new data
-          alert('항목이 성공적으로 추가되었습니다.');
-          onClose();
-        })
-        .catch(error => {
-          console.error('There was an error uploading the data!', error);
-        });
-    }
   };
+  
 
   if (!show) return null;
 
