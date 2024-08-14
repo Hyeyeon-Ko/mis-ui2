@@ -19,8 +19,8 @@ function DocstorageList() {
   const [docstorageDetails, setDocstorageDetails] = useState([]);
   const [deptDocstorageResponses, setDeptDocstorageResponses] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [showConfirmModal, setShowConfirmModal] = useState(false); // ConfirmModal 표시 여부
-  const [pendingApproval, setPendingApproval] = useState(null); // 승인 처리할 상태 저장
+  const [showConfirmModal, setShowConfirmModal] = useState(false); 
+  const [pendingApproval, setPendingApproval] = useState(null);
 
   useEffect(() => {
     const fetchDocstorageData = async () => {
@@ -107,14 +107,13 @@ function DocstorageList() {
   };
 
   const showConfirm = () => {
-    setPendingApproval('approve'); // 승인 처리 상태 저장
-    setShowConfirmModal(true); // ConfirmModal 표시
+    setPendingApproval('approve'); 
+    setShowConfirmModal(true); 
   };
 
   const handleConfirmModal = async () => {
     if (pendingApproval === 'approve') {
       try {
-        // 현재 화면에 있는 모든 데이터에서 draftId 추출
         const draftIds = docstorageDetails.map(detail => detail.draftId);
     
         if (draftIds.length === 0) {
@@ -124,7 +123,6 @@ function DocstorageList() {
     
         await axios.put('/api/docstorage/approve', draftIds);
         alert('모든 문서가 승인되었습니다.');
-        // 승인 후 데이터 다시 로드
         setDocstorageDetails([]); 
       } catch (error) {
         console.error('승인 처리 중 오류 발생:', error);
@@ -132,13 +130,45 @@ function DocstorageList() {
       }
     }
 
-    setShowConfirmModal(false); // ConfirmModal 닫기
-    setPendingApproval(null); // 처리 상태 초기화
+    setShowConfirmModal(false); 
+    setPendingApproval(null); 
   };
 
   const handleCloseModal = () => {
-    setShowConfirmModal(false); // ConfirmModal 닫기
-    setPendingApproval(null); // 처리 상태 초기화
+    setShowConfirmModal(false); 
+    setPendingApproval(null); 
+  };
+
+  const handleDelete = async () => {
+    if (selectedRows.length === 0) {
+      alert("삭제할 항목을 선택하세요.");
+      return;
+    }
+  
+    try {
+      for (const detailId of selectedRows) {
+        await axios.delete('/api/docstorage/', {
+          params: { detailId }
+        });
+      }
+      alert('선택된 항목이 삭제되었습니다.');
+  
+      setDocstorageDetails(prevDetails => {
+        const updatedDetails = prevDetails
+          .filter(item => !selectedRows.includes(item.detailId))
+          .map((item, index) => ({
+            ...item,
+            no: index + 1 
+          }));
+        
+        return updatedDetails;
+      });
+  
+      setSelectedRows([]); 
+    } catch (error) {
+      console.error('문서보관 정보를 삭제하는 중 에러 발생:', error);
+      alert('삭제에 실패했습니다.');
+    }
   };
 
   const subCategoryColumns = [
@@ -245,9 +275,9 @@ function DocstorageList() {
                   </label>
                   {selectedCategory === 'B' && (
                     <div className="docstorage-detail-buttons">
-                      <button className="docstorage-modify-button">수 정</button>
-                      <button className="docstorage-delete-button">삭 제</button>
-                      <button className="docstorage-excel-button" onClick={downloadExcel}>엑 셀</button>
+                        <button className="docstorage-modify-button">수 정</button>
+                        <button className="docstorage-delete-button">삭 제</button>
+                        <button className="docstorage-excel-button" onClick={downloadExcel}>엑 셀</button>
                     </div>
                   )}
                 </div>

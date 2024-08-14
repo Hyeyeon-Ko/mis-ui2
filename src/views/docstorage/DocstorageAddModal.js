@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import * as XLSX from 'xlsx';
 import '../../styles/docstorage/DocstorageAddModal.css';
 
 const DocstorageAddModal = ({ show, onClose, onSave, docData }) => {
@@ -80,79 +81,99 @@ const DocstorageAddModal = ({ show, onClose, onSave, docData }) => {
 
   const handleSaveClick = () => {
     if (activeTab === 'file') {
-      if (!file) {
-        alert('파일을 첨부해주세요.');
-        return;
-      }
+        if (!file) {
+            alert('파일을 첨부해주세요.');
+            return;
+        }
 
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('teamCd', '020');  
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const data = new Uint8Array(event.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+                header: 1,
+                defval: '',
+            });
 
-      axios.post('/api/docstorage/upload-file', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-        .then(response => {
-          console.log('Data successfully uploaded:', response.data);
-          onSave(response.data);  
-          alert('파일이 성공적으로 업로드되었습니다!');
-          onClose();
-        })
-        .catch(error => {
-          console.error('There was an error uploading the data!', error);
-        });
-    } 
-    else if (activeTab === 'text') {
-      const { teamNm, docId, docNm, manager, storageYear, createDate, disposalDate } = formData;
+            const extractedData = worksheet
+                .slice(4) 
+                .filter((row) => row[0]) 
+                .map((row) => ({
+                    no: row[0].toString(),
+                    teamNm: row[1].toString(),
+                    docId: row[2].toString(),
+                    location: row[3].toString(),
+                    docNm: row[4].toString(),
+                    manager: row[5].toString(),
+                    subManager: row[6].toString(),
+                    storageYear: row[7].toString(),
+                    createDate: row[8].toString(),
+                    transferDate: row[9].toString(),
+                    tsdNum: row[10].toString(),
+                    disposalDate: row[11].toString(),
+                    dpdNum: row[12].toString(),
+                }));
 
-      if (!teamNm || !docId || !docNm || !manager || !storageYear || !createDate || !disposalDate) {
-        alert('모든 항목을 입력해 주세요.');
-        return;
-      }
+            console.log('Extracted Data:', extractedData);
 
-      if (!validateDateFormat(createDate)) {
-        alert('생성일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
-        return;
-      }
+            axios.post('/api/docstorage/data', extractedData)
+                .then(response => {
+                    console.log('Data successfully sent:', response.data);
+                })
+                .catch(error => {
+                    console.error('Error sending data:', error);
+                });
 
-      if (!validateDateFormat(disposalDate)) {
-        alert('폐기일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
-        return;
-      }
+            onClose();
+        };
+        reader.readAsArrayBuffer(file);
 
-      const payload = {
-        teamNm,
-        docId,
-        docNm,
-        manager,
-        subManager: formData.subManager,
-        storageYear,
-        createDate,
-        location: formData.location,
-        transferDate: formData.transferDate,
-        tsdNum: formData.tsdNum,
-        disposalDate,
-        dpdNum: formData.dpdNum,
-      };
+    } else if (activeTab === 'text') {
+        const { teamNm, docId, docNm, manager, storageYear, createDate, disposalDate } = formData;
 
-      const apiEndpoint = docData ? `/api/docstorage/${docData.detailId}` : '/api/docstorage/';
-      const apiMethod = docData ? axios.put : axios.post;
+        if (!teamNm || !docId || !docNm || !manager || !storageYear || !createDate || !disposalDate) {
+            alert('모든 항목을 입력해 주세요.');
+            return;
+        }
 
-      apiMethod(apiEndpoint, payload)
-        .then(response => {
-          console.log('Data successfully saved:', response.data);
-          onSave([payload]); 
-          alert(docData ? '수정이 완료되었습니다.' : '항목이 성공적으로 추가되었습니다.');
-          onClose();
-        })
-        .catch(error => {
-          console.error('There was an error saving the data!', error);
-        });
+        if (!validateDateFormat(createDate)) {
+            alert('생성일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
+            return;
+        }
+
+        if (!validateDateFormat(disposalDate)) {
+            alert('폐기일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
+            return;
+        }
+
+        const payload = {
+            teamNm,
+            docId,
+            docNm,
+            manager,
+            subManager: formData.subManager,
+            storageYear,
+            createDate,
+            location: formData.location,
+            transferDate: formData.transferDate,
+            tsdNum: formData.tsdNum,
+            disposalDate,
+            dpdNum: formData.dpdNum,
+        };
+
+        axios.post('/api/docstorage/data/receive', [payload])
+            .then(response => {
+                console.log('Data successfully sent:', response.data);
+                alert(docData ? '수정이 완료되었습니다.' : '항목이 성공적으로 추가되었습니다.');
+                onClose();
+            })
+            .catch(error => {
+                console.error('Error sending data:', error);
+            });
     }
   };
-
+    
   if (!show) return null;
 
   return (

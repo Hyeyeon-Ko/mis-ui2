@@ -1,4 +1,3 @@
-/* Modal Overlay */
 .docstorage-modal-overlay {
     position: fixed;
     top: 0;
@@ -12,12 +11,11 @@
     z-index: 1000;
   }
   
-  /* Modal Container */
   .docstorage-modal-container {
     background-color: #ffffff;
     padding: 30px 75px 45px 75px;
     border-radius: 10px;
-    width: 550px; /* Increased width */
+    width: 550px; 
     max-height: 80vh;
     display: flex;
     flex-direction: column;
@@ -37,7 +35,6 @@
     background-color: #f3f3f3;
   }
   
-  /* Modal Header */
   .modal-header {
     display: flex;
     justify-content: space-between;
@@ -49,18 +46,16 @@
   .docstorage-close-button {
     background: none;
     border: none;
-    font-size: 20px;
+    font-size: 17px;
     cursor: pointer;
   }
   
-  /* Instructions */
   .docstorage-instructions {
     font-size: 14px;
     margin-bottom: 30px;
     color: #666;
   }
   
-  /* Tab Container */
   .docstorage-tab-container {
     display: flex;
     justify-content: space-around;
@@ -92,29 +87,26 @@
     border-bottom: 2px solid #007bff;
   }
   
-  /* Content Area */
   .docstorage-modal-content {
     padding: 5px 20px;
     flex-grow: 1;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    min-height: 180px; /* Set minimum height for modal content */
+    min-height: 180px; 
   }
   
-  /* File Input */
   .file-input-container {
     display: flex;
     align-items: left;
-    width: 100%; /* Match tab-container width */
+    width: 100%; 
   }
   
   .file-input-container input[type="file"] {
     flex-grow: 1;
-    width: 100%; /* Ensure the input box takes full width */
+    width: 100%; 
   }
   
-  /* Detail Row */
   .docstorage-add-detail-row {
     margin-bottom: 12px;
     display: flex;
@@ -123,7 +115,7 @@
   
   .docstorage-add-detail-row label {
     font-size: 15px;
-    margin-bottom: 5px; /* Spacing between label and input */
+    margin-bottom: 5px; 
   }
   
   .docstorage-add-detail-row input {
@@ -139,7 +131,6 @@
     box-shadow: 0 0 2px rgba(0, 123, 255, 0.5);
   }
   
-  /* Modal Buttons */
   .docstorage-modal-buttons {
     margin-top: 20px;
     text-align: center;
