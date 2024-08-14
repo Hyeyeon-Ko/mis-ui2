@@ -40,6 +40,15 @@
   margin-top: 5px;
 }
 
+.docstorage-approve-button {
+  background-color: #2789FE;
+  margin-top: 50px;
+  letter-spacing: 5px;
+  width: 100px;
+  height: 40px;
+  padding-left: 15px;
+}
+
 .authority-add-button:hover {
   background-color: #1e6fc1;
 }

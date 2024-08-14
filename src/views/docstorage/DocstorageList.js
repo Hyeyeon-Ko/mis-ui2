@@ -3,6 +3,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import '../../styles/common/Page.css';
 import '../../styles/docstorage/DocstorageList.css';
+import ConfirmModal from '../../components/common/ConfirmModal';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 
@@ -17,7 +18,9 @@ function DocstorageList() {
   const [deptResponses, setDeptResponses] = useState([]);
   const [docstorageDetails, setDocstorageDetails] = useState([]);
   const [deptDocstorageResponses, setDeptDocstorageResponses] = useState([]);
-  const [selectedRows, setSelectedRows] = useState([]); // 선택된 행들을 관리
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [showConfirmModal, setShowConfirmModal] = useState(false); // ConfirmModal 표시 여부
+  const [pendingApproval, setPendingApproval] = useState(null); // 승인 처리할 상태 저장
 
   useEffect(() => {
     const fetchDocstorageData = async () => {
@@ -101,6 +104,41 @@ function DocstorageList() {
     } catch (error) {
       console.error('엑셀 파일 다운로드 중 오류 발생:', error);
     }
+  };
+
+  const showConfirm = () => {
+    setPendingApproval('approve'); // 승인 처리 상태 저장
+    setShowConfirmModal(true); // ConfirmModal 표시
+  };
+
+  const handleConfirmModal = async () => {
+    if (pendingApproval === 'approve') {
+      try {
+        // 현재 화면에 있는 모든 데이터에서 draftId 추출
+        const draftIds = docstorageDetails.map(detail => detail.draftId);
+    
+        if (draftIds.length === 0) {
+          alert('승인할 문서가 없습니다.');
+          return;
+        }
+    
+        await axios.put('/api/docstorage/approve', draftIds);
+        alert('모든 문서가 승인되었습니다.');
+        // 승인 후 데이터 다시 로드
+        setDocstorageDetails([]); 
+      } catch (error) {
+        console.error('승인 처리 중 오류 발생:', error);
+        alert('승인 처리 중 오류가 발생했습니다.');
+      }
+    }
+
+    setShowConfirmModal(false); // ConfirmModal 닫기
+    setPendingApproval(null); // 처리 상태 초기화
+  };
+
+  const handleCloseModal = () => {
+    setShowConfirmModal(false); // ConfirmModal 닫기
+    setPendingApproval(null); // 처리 상태 초기화
   };
 
   const subCategoryColumns = [
@@ -221,6 +259,16 @@ function DocstorageList() {
                 </div>
               </div>
             </div>
+            <div className="docstorage-approve-section">
+              <button className="custom-button docstorage-approve-button" onClick={showConfirm}>승 인</button>
+            </div>
+            {showConfirmModal && (
+              <ConfirmModal
+                message="승인하시겠습니까?"
+                onConfirm={handleConfirmModal}
+                onCancel={handleCloseModal}
+              />
+            )}
         </div>
       </div>
     </div>
