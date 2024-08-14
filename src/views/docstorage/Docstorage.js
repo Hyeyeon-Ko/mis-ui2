@@ -6,7 +6,7 @@ import DocstorageAddModal from '../../views/docstorage/DocstorageAddModal';
 import DocstorageApplyModal from '../../views/docstorage/DocstorageApplyModal';
 import axios from 'axios';
 import '../../styles/common/Page.css';
-import '../../styles/Docstorage.css';
+import '../../styles/docstorage/Docstorage.css';
 import { AuthContext } from '../../components/AuthContext';
 
 function Docstorage() {
@@ -34,7 +34,7 @@ function Docstorage() {
               ...item,
               no: index + 1,
               typeDisplay: item.type === 'A' ? '이관' : item.type === 'B' ? '파쇄' : '',
-              statusDisplay: item.status === 'A' ? '승인대기' : item.status === 'E' ? '완료' : ''
+              statusDisplay: item.status === 'A' ? '신청완료' : item.status === 'E' ? '완료' : ''
             }));
 
             setDocstorageDetails(data);

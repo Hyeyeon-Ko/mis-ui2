@@ -4,7 +4,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
 import ConfirmModal from '../../components/common/ConfirmModal';
-import '../../styles/MyPendingList.css';
+import '../../styles/list/MyPendingList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 

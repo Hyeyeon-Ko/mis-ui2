@@ -3,7 +3,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import CorpDocApprovalModal from '../../views/corpdoc/CorpDocApprovalModal';
 import SignitureImage from '../../assets/images/signiture.png';
-import '../../styles/CorpDocRnpList.css';
+import '../../styles/corpdoc/CorpDocRnpList.css';
 
 function CorpDocRnpList() {
   const [applications, setApplications] = useState([]);

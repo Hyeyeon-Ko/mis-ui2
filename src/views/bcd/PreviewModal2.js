@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import '../../styles/PreviewModal.css';
+import '../../styles/bcd/PreviewModal.css';
 import frontImageBlank from '../../assets/images/frontimage_blank.png';
 import backImageEngBlank from '../../assets/images/backimage_eng_blank.png';
 import backImageCompany from '../../assets/images/backimage_company.png';

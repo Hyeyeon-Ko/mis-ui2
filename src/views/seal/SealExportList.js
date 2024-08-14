@@ -3,7 +3,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import SealApprovalModal from '../../views/seal/SealApprovalModal';
 import SignitureImage from '../../assets/images/signiture.png';
-import '../../styles/SealExportList.css';
+import '../../styles/seal/SealExportList.css';
 
 function SealExportList() {
   const [applications, setApplications] = useState([]);

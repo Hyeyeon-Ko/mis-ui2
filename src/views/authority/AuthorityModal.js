@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import '../../styles/AuthorityModal.css';
+import '../../styles/authority/AuthorityModal.css';
 
 /* 권한 관리 모달 */
 const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) => {

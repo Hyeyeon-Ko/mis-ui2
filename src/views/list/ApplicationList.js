@@ -5,7 +5,7 @@ import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
 import CustomButton from '../../components/common/CustomButton';
 import DocConfirmModal from '../../views/doc/DocConfirmModal';
-import '../../styles/ApplicationsList.css';
+import '../../styles/list/ApplicationsList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 import fileDownload from 'js-file-download';

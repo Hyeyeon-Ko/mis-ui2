@@ -8,7 +8,7 @@ import RejectReasonModal from '../../components/RejectReasonModal';
 import ApplicationHistoryModal from './ApplicationHistoryModal';
 import PreviewModal from './PreviewModal';
 import { AuthContext } from '../../components/AuthContext';
-import '../../styles/BcdApplySecond.css';
+import '../../styles/bcd/BcdApplySecond.css';
 import '../../styles/common/Page.css';
 
 import backImageEng from '../../assets/images/backimage_eng.png';

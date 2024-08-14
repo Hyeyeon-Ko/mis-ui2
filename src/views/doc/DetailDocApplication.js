@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import axios from 'axios';
-import '../../styles/DocApply.css';
+import '../../styles/doc/DocApply.css';
 import '../../styles/common/Page.css';
 import { AuthContext } from '../../components/AuthContext';
 

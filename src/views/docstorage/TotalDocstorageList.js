@@ -3,7 +3,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import DocstorageAddModal from './DocstorageAddModal'; 
 import '../../styles/common/Page.css';
-import '../../styles/TotalDocstorageList.css';
+import '../../styles/docstorage/TotalDocstorageList.css';
 import axios from 'axios';
 
 function TotalDocstorageList() {

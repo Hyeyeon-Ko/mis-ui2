@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import '../../styles/SealApprovalModal.css';
+import '../../styles/seal/SealApprovalModal.css';
 import BlankImage from '../../assets/images/blank.png';
 
 const SealApprovalModal = ({ show, onClose, documentDetails = { signitureImage: BlankImage, approvers: [] } }) => {

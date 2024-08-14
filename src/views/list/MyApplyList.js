@@ -4,7 +4,7 @@ import DateFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import RejectReasonModal from '../../components/RejectReasonModal'; 
-import '../../styles/MyApplyList.css';
+import '../../styles/list/MyApplyList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 

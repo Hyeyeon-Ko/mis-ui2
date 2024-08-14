@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import '../../styles/FinalConfirmationModal.css';
+import '../../styles/bcd/FinalConfirmationModal.css';
 
 /* 최종 확인 모달 */
 const FinalConfirmationModal = ({

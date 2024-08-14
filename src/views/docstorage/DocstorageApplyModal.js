@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import '../../styles/DocstorageApplyModal.css';
+import '../../styles/docstorage/DocstorageApplyModal.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 

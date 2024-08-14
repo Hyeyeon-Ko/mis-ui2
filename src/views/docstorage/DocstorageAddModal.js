@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import '../../styles/DocstorageAddModal.css';
+import '../../styles/docstorage/DocstorageAddModal.css';
 
 const DocstorageAddModal = ({ show, onClose, onSave, docData }) => {
   const [activeTab, setActiveTab] = useState('file');

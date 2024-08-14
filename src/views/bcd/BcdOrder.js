@@ -4,7 +4,7 @@ import Table from '../../components/common/Table';
 import CustomButton from '../../components/common/CustomButton';
 import EmailModal from './EmailModal';
 import CenterSelect from '../../components/CenterSelect';
-import '../../styles/BcdOrder.css';
+import '../../styles/bcd/BcdOrder.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 import fileDownload from 'js-file-download';

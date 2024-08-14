@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import '../../styles/DocConfirmModal.css';
+import '../../styles/doc/DocConfirmModal.css';
 
 const DocConfirmModal = ({ show, documentId, onClose, onApprove }) => {
   const [formData, setFormData] = useState({

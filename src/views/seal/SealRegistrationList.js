@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
-import '../../styles/SealRegistrationList.css';
+import '../../styles/seal/SealRegistrationList.css';
 import corporateSeal from '../../assets/images/corporate_seal.png';
 import facsimileSeal from '../../assets/images/facsimile_seal.png';
 import companySeal from '../../assets/images/company_seal.png';

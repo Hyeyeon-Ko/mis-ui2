@@ -4,7 +4,7 @@ import ConditionFilter from '../../components/common/ConditionFilter';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import SealApprovalModal from './SealApprovalModal';
 import SignitureImage from '../../assets/images/signiture.png';
-import '../../styles/SealManagementList.css';
+import '../../styles/seal/SealManagementList.css';
 
 function SealManagementList() {
   const [applications, setApplications] = useState([]);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import '../../styles/EmailModal.css';
+import '../../styles/bcd/EmailModal.css';
 import { FadeLoader } from 'react-spinners';
 
 /* 이메일 작성 모달 */

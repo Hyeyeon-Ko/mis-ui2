@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
-import '../../styles/ApplicationHistoryModal.css';
+import '../../styles/bcd/ApplicationHistoryModal.css';
 
 /* 신청 이력 모달 */
 const ApplicationHistoryModal = ({ show, onClose, draftId }) => {

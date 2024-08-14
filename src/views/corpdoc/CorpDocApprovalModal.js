@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import '../../styles/CorpDocApprovalModal.css';
+import '../../styles/corpdoc/CorpDocApprovalModal.css';
 import BlankImage from '../../assets/images/blank.png';
 
 const CorpDocApprovalModal = ({ show, onClose, documentDetails = { signitureImage: BlankImage, approvers: [] } }) => {

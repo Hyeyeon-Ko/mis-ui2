@@ -2,7 +2,7 @@ import React from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import '../../styles/common/Page.css';
-import '../../styles/SealApplyImprint.css';
+import '../../styles/seal/SealApplyImprint.css';
 import corporateSeal from '../../assets/images/corporate_seal.png';
 import facsimileSeal from '../../assets/images/facsimile_seal.png';
 import companySeal from '../../assets/images/company_seal.png';

@@ -5,7 +5,7 @@ import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
 import CenterSelect from '../../components/CenterSelect';
 import DocConfirmModal from '../doc/DocConfirmModal';
-import '../../styles/ApplicationsList.css';
+import '../../styles/list/ApplicationsList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 

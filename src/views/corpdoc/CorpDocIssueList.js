@@ -3,7 +3,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import CorpDocApprovalModal from '../../views/corpdoc/CorpDocApprovalModal';
 import SignitureImage from '../../assets/images/signiture.png';
-import '../../styles/CorpDocIssueList.css';
+import '../../styles/corpdoc/CorpDocIssueList.css';
 
 function CorpDocIssueList() {
   const [applications, setApplications] = useState([]);

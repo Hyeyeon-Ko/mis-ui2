@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../components/AuthContext';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
-import '../../styles/DocApply.css';
+import '../../styles/doc/DocApply.css';
 import '../../styles/common/Page.css';
 
 function DocApply() {

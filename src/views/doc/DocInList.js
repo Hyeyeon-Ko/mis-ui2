@@ -4,7 +4,7 @@ import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import deleteIcon from '../../assets/images/delete.png';
-import '../../styles/DocInList.css';
+import '../../styles/doc/DocInList.css';
 import axios from 'axios';
 
 function DocInList() {

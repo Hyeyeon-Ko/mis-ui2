@@ -6,7 +6,7 @@ import CustomButton from '../../components/common/CustomButton';
 import FinalConfirmationModal from './FinalConfirmationModal';
 import PreviewModal2 from './PreviewModal2'; 
 import { AuthContext } from '../../components/AuthContext';
-import '../../styles/BcdApplySecond.css';
+import '../../styles/bcd/BcdApplySecond.css';
 import '../../styles/common/Page.css';
 
 import backImageEng from '../../assets/images/backimage_eng.png';

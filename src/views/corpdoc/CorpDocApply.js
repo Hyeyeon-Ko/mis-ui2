@@ -2,7 +2,7 @@ import React from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import '../../styles/common/Page.css';
-import '../../styles/CorpDocApply.css';
+import '../../styles/corpdoc/CorpDocApply.css';
 
 function CorpDocApply() {
     return (

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import StandardAddModal from '../standard/StandardAddModal';
-import '../../styles/StandardData.css';
+import '../../styles/standard/StandardData.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
