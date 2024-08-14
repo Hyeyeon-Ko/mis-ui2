@@ -211,16 +211,16 @@ function DocstorageList() {
               <div className="docstorage-category">
                 <label htmlFor="category" className="docstorage-category-label">내 역&gt;&gt;</label>
                 <select
-                id="category"
-                className="docstorage-category-dropdown"
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
+                  id="category"
+                  className="docstorage-category-dropdown"
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
                 >
-                {categories.map(category => (
+                  {categories.map(category => (
                     <option key={category.categoryCode} value={category.categoryCode}>
-                    {category.categoryName}
+                      {category.categoryName}
                     </option>
-                ))}
+                  ))}
                 </select>
               </div>
             </div>
@@ -243,11 +243,11 @@ function DocstorageList() {
                   <label className='docstorage-detail-content-label'>
                     {selectedCategory === 'A' ? '승인대기 내역' : '문서보관 내역'}&gt;&gt;
                   </label>
-                  {selectedCategory !== 'A' && (
+                  {selectedCategory === 'B' && (
                     <div className="docstorage-detail-buttons">
-                        <button className="docstorage-modify-button">수 정</button>
-                        <button className="docstorage-delete-button">삭 제</button>
-                        <button className="docstorage-excel-button" onClick={downloadExcel}>엑 셀</button>
+                      <button className="docstorage-modify-button">수 정</button>
+                      <button className="docstorage-delete-button">삭 제</button>
+                      <button className="docstorage-excel-button" onClick={downloadExcel}>엑 셀</button>
                     </div>
                   )}
                 </div>
@@ -259,9 +259,11 @@ function DocstorageList() {
                 </div>
               </div>
             </div>
-            <div className="docstorage-approve-section">
-              <button className="custom-button docstorage-approve-button" onClick={showConfirm}>승 인</button>
-            </div>
+            {selectedCategory === 'A' && (
+              <div className="docstorage-approve-section">
+                <button className="custom-button docstorage-approve-button" onClick={showConfirm}>승 인</button>
+              </div>
+            )}
             {showConfirmModal && (
               <ConfirmModal
                 message="승인하시겠습니까?"
