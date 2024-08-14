@@ -25,7 +25,6 @@
     z-index: 1001;
 }
 
-/* Modal Header */
 .docstorage-apply-modal-header {
     display: flex;
     justify-content: space-between;
@@ -65,15 +64,13 @@
     border-radius: 2px;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0px 2px 5px rgba(88, 88, 88, 0.1);
+    font-weight: bold;
 }
 
 .docstorage-apply-tab:hover {
     background-color: #e9ecef;
     box-shadow: 0px 3px 7px rgba(0, 0, 0, 0.2); 
-}
-
-.docstorage-apply-tab.active {
-    font-weight: bold;
     color: #007bff;
     border-bottom: 2px solid #007bff;
+    font-weight: bold;
 }

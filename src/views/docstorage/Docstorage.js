@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import DocstorageAddModal from '../../views/docstorage/DocstorageAddModal';
+import DocstorageApplyModal from '../../views/docstorage/DocstorageApplyModal';
 import axios from 'axios';
 import '../../styles/common/Page.css';
 import '../../styles/Docstorage.css';
@@ -13,14 +14,15 @@ function Docstorage() {
   const { userId } = auth;
   const [docstorageDetails, setDocstorageDetails] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false); // 수정 모달 상태 추가
+  const [showApplyModal, setShowApplyModal] = useState(false); 
+  const [showEditModal, setShowEditModal] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [selectedDoc, setSelectedDoc] = useState(null); // 선택된 문서 상태 추가
+  const [selectedDoc, setSelectedDoc] = useState(null); 
   const navigate = useNavigate();
 
   const deptCd = '006';
 
-  useEffect(() => {
+  const fetchDocstorageDetails = () => {
     if (userId) {
       const params = { deptCd };
       axios.get('/api/docstorageList/dept', { params })
@@ -46,6 +48,10 @@ function Docstorage() {
           setDocstorageDetails([]);
         });
     }
+  };
+
+  useEffect(() => {
+    fetchDocstorageDetails();
   }, [userId]);
 
   const handleSave = (newData) => {
@@ -141,6 +147,11 @@ function Docstorage() {
   };
 
   const downloadExcel = async () => {
+    if (selectedRows.length === 0) {
+      alert("엑셀로 내보낼 항목을 선택하세요.");
+      return;
+    }
+
     try {
       const response = await axios.post('/api/docstorage/excel', selectedRows, {
         responseType: 'blob',
@@ -156,6 +167,19 @@ function Docstorage() {
     } catch (error) {
       console.error('엑셀 파일 다운로드 중 오류 발생:', error);
     }
+  };
+
+  const handleApplySuccess = () => {
+    fetchDocstorageDetails(); 
+    setSelectedRows([]); 
+  };
+
+  const handleApplyButtonClick = () => {
+    if (selectedRows.length === 0) {
+      alert("신청할 항목을 선택하세요.");
+      return;
+    }
+    setShowApplyModal(true);
   };
 
   const detailColumns = [
@@ -208,14 +232,14 @@ function Docstorage() {
               <div className="docstorage-header-buttons">
                 <label className='docstorage-detail-content-label'>문서보관 내역&gt;&gt;</label>
                 <div className="docstorage-detail-buttons">
-                  <button className="docstorage-add-button" onClick={() => {
-                    setSelectedDoc(null); // 초기 데이터를 설정하기 위해 null로 설정
+                <button className="docstorage-add-button" onClick={() => {
+                    setSelectedDoc(null);
                     setShowAddModal(true);
                   }}>추 가</button>
                   <button className="docstorage-modify-button" onClick={handleEdit}>수 정</button>
                   <button className="docstorage-delete-button" onClick={handleDelete}>삭 제</button>
                   <button className="docstorage-excel-button" onClick={downloadExcel}>엑 셀</button>
-                  <button className="docstorage-apply-button">신 청</button>
+                  <button className="docstorage-apply-button" onClick={handleApplyButtonClick}>신 청</button>
                 </div>
               </div>
               <div className="docstorage-details-table">
@@ -231,19 +255,25 @@ function Docstorage() {
       <DocstorageAddModal
         show={showAddModal}
         onClose={() => setShowAddModal(false)}
-        initialData={selectedDoc ? null : {}} // 추가 모달일 때 기본 데이터
-        docData={null} // 추가 모달일 때 docData는 null
+        initialData={selectedDoc ? null : {}}
+        docData={null} 
         onSave={handleSave}
       />
       {selectedDoc && (
         <DocstorageAddModal
           show={showEditModal}
           onClose={() => setShowEditModal(false)}
-          initialData={null} // 수정 모달일 때 기본 데이터는 필요 없음
-          docData={selectedDoc} // 수정할 데이터
+          initialData={null} 
+          docData={selectedDoc} 
           onSave={handleUpdate}
         />
       )}
+      <DocstorageApplyModal
+        show={showApplyModal}
+        onClose={() => setShowApplyModal(false)}
+        selectedRows={selectedRows} 
+        onApplySuccess={handleApplySuccess} 
+      />
     </div>
   );
 }
