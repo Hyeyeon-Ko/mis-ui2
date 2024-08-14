@@ -13,7 +13,9 @@ function Docstorage() {
   const { userId } = auth;
   const [docstorageDetails, setDocstorageDetails] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false); // 수정 모달 상태 추가
   const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedDoc, setSelectedDoc] = useState(null); // 선택된 문서 상태 추가
   const navigate = useNavigate();
 
   const deptCd = '006';
@@ -102,7 +104,42 @@ function Docstorage() {
       alert('삭제에 실패했습니다.');
     }
   };
-  
+
+  const handleEdit = async () => {
+    if (selectedRows.length !== 1) {
+      alert("수정할 항목을 하나만 선택하세요.");
+      return;
+    }
+
+    try {
+      const detailId = selectedRows[0];
+      const response = await axios.get('/api/docstorage/', { params: { detailId } });
+      const data = response.data.data;
+      console.log("selected Data: ", data);
+      setSelectedDoc(data);
+      setShowEditModal(true);
+    } catch (error) {
+      console.error('문서보관 정보를 가져오는 중 에러 발생:', error);
+      alert('수정할 항목을 불러오지 못했습니다.');
+    }
+  };
+
+  const handleUpdate = async (updatedData) => {
+    try {
+      const response = await axios.put('/api/docstorage/', updatedData);
+      if (response.data.code === 200) {
+        setDocstorageDetails(prevDetails => prevDetails.map(doc =>
+          doc.detailId === updatedData.detailId ? { ...doc, ...updatedData } : doc
+        ));
+        setShowEditModal(false);
+        alert('수정이 완료되었습니다.');
+      }
+    } catch (error) {
+      console.error('문서보관 정보를 수정하는 중 에러 발생:', error);
+      alert('수정에 실패했습니다.');
+    }
+  };
+
   const downloadExcel = async () => {
     try {
       const response = await axios.post('/api/docstorage/excel', selectedRows, {
@@ -157,7 +194,7 @@ function Docstorage() {
     { header: '이관일자', accessor: 'transferDate' },
     { header: '기안번호', accessor: 'tsdNum' },
     { header: '폐기일자', accessor: 'disposalDate' },
-    { header: '기안번호', accessor: 'dpdraftNum' },
+    { header: '기안번호', accessor: 'dpdNum' },
   ];
 
   return (
@@ -171,8 +208,11 @@ function Docstorage() {
               <div className="docstorage-header-buttons">
                 <label className='docstorage-detail-content-label'>문서보관 내역&gt;&gt;</label>
                 <div className="docstorage-detail-buttons">
-                  <button className="docstorage-add-button" onClick={() => setShowAddModal(true)}>추 가</button>
-                  <button className="docstorage-modify-button">수 정</button>
+                  <button className="docstorage-add-button" onClick={() => {
+                    setSelectedDoc(null); // 초기 데이터를 설정하기 위해 null로 설정
+                    setShowAddModal(true);
+                  }}>추 가</button>
+                  <button className="docstorage-modify-button" onClick={handleEdit}>수 정</button>
                   <button className="docstorage-delete-button" onClick={handleDelete}>삭 제</button>
                   <button className="docstorage-excel-button" onClick={downloadExcel}>엑 셀</button>
                   <button className="docstorage-apply-button">신 청</button>
@@ -191,8 +231,19 @@ function Docstorage() {
       <DocstorageAddModal
         show={showAddModal}
         onClose={() => setShowAddModal(false)}
+        initialData={selectedDoc ? null : {}} // 추가 모달일 때 기본 데이터
+        docData={null} // 추가 모달일 때 docData는 null
         onSave={handleSave}
       />
+      {selectedDoc && (
+        <DocstorageAddModal
+          show={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          initialData={null} // 수정 모달일 때 기본 데이터는 필요 없음
+          docData={selectedDoc} // 수정할 데이터
+          onSave={handleUpdate}
+        />
+      )}
     </div>
   );
 }

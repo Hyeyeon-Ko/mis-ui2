@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import '../../styles/DocstorageAddModal.css';
 
-const DocstorageAddModal = ({ show, onClose, onSave }) => {
-  const [activeTab, setActiveTab] = useState('file'); 
+const DocstorageAddModal = ({ show, onClose, onSave, docData }) => {
+  const [activeTab, setActiveTab] = useState('file');
   const [file, setFile] = useState(null);
   const [formData, setFormData] = useState({
     teamNm: '',
@@ -20,6 +20,42 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
     disposalDate: '',
     dpdNum: '',
   });
+
+  useEffect(() => {
+    if (docData) {
+      setFormData({
+        teamNm: docData.teamNm || '',
+        docId: docData.docId || '',
+        docNm: docData.docNm || '',
+        manager: docData.manager || '',
+        subManager: docData.subManager || '',
+        storageYear: docData.storageYear || '',
+        createDate: docData.createDate || '',
+        location: docData.location || '',
+        transferDate: docData.transferDate || '',
+        tsdNum: docData.tsdNum || '',
+        disposalDate: docData.disposalDate || '',
+        dpdNum: docData.dpdNum || '',
+      });
+      setActiveTab('text');
+    } else {
+      setFormData({
+        teamNm: '',
+        docId: '',
+        docNm: '',
+        manager: '',
+        subManager: '',
+        storageYear: '',
+        createDate: '',
+        location: '',
+        transferDate: '',
+        tsdNum: '',
+        disposalDate: '',
+        dpdNum: '',
+      });
+      setActiveTab('file');
+    }
+  }, [docData]);
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -68,52 +104,54 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
           console.error('There was an error uploading the data!', error);
         });
     } 
-    if (activeTab === 'text') {
-        const { teamNm, docId, docNm, manager, storageYear, createDate, disposalDate } = formData;
-  
-        if (!teamNm || !docId || !docNm || !manager || !storageYear || !createDate || !disposalDate) {
-          alert('모든 항목을 입력해 주세요.');
-          return;
-        }
-  
-        if (!validateDateFormat(createDate)) {
-          alert('생성일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
-          return;
-        }
-  
-        if (!validateDateFormat(disposalDate)) {
-          alert('폐기일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
-          return;
-        }
-  
-        const payload = {
-          teamNm,
-          docId,
-          docNm,
-          manager,
-          subManager: formData.subManager,
-          storageYear,
-          createDate,
-          location: formData.location,
-          transferDate: formData.transferDate,
-          tsdNum: formData.tsdNum,
-          disposalDate,
-          dpdNum: formData.dpdNum,
-        };
-  
-        axios.post('/api/docstorage/', payload)
-          .then(response => {
-            console.log('Data successfully uploaded:', response.data);
-            onSave([payload]); 
-            alert('항목이 성공적으로 추가되었습니다.');
-            onClose();
-          })
-          .catch(error => {
-            console.error('There was an error uploading the data!', error);
-          });
+    else if (activeTab === 'text') {
+      const { teamNm, docId, docNm, manager, storageYear, createDate, disposalDate } = formData;
+
+      if (!teamNm || !docId || !docNm || !manager || !storageYear || !createDate || !disposalDate) {
+        alert('모든 항목을 입력해 주세요.');
+        return;
       }
+
+      if (!validateDateFormat(createDate)) {
+        alert('생성일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
+        return;
+      }
+
+      if (!validateDateFormat(disposalDate)) {
+        alert('폐기일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
+        return;
+      }
+
+      const payload = {
+        teamNm,
+        docId,
+        docNm,
+        manager,
+        subManager: formData.subManager,
+        storageYear,
+        createDate,
+        location: formData.location,
+        transferDate: formData.transferDate,
+        tsdNum: formData.tsdNum,
+        disposalDate,
+        dpdNum: formData.dpdNum,
+      };
+
+      const apiEndpoint = docData ? `/api/docstorage/${docData.detailId}` : '/api/docstorage/';
+      const apiMethod = docData ? axios.put : axios.post;
+
+      apiMethod(apiEndpoint, payload)
+        .then(response => {
+          console.log('Data successfully saved:', response.data);
+          onSave([payload]); 
+          alert(docData ? '수정이 완료되었습니다.' : '항목이 성공적으로 추가되었습니다.');
+          onClose();
+        })
+        .catch(error => {
+          console.error('There was an error saving the data!', error);
+        });
+    }
   };
-  
 
   if (!show) return null;
 
@@ -121,11 +159,11 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
     <div className="docstorage-modal-overlay">
       <div className="docstorage-modal-container">
         <div className="modal-header">
-          <h3>문서보관 항목 추가</h3>
+          <h3>문서보관 항목 {docData ? '수정' : '추가'}</h3>
           <button className="docstorage-close-button" onClick={onClose}>X</button>
         </div>
         <p className="docstorage-instructions">
-          엑셀 파일 첨부 혹은 직접 입력으로 렌탈제품을 추가하세요.
+          엑셀 파일 첨부 혹은 직접 입력으로 문서 항목을 추가하세요.
         </p>
         <div className="docstorage-tab-container">
           <button
@@ -184,7 +222,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
               </div>
               <div className="docstorage-add-detail-row">
                 <label>생성일자</label>
-                <input type="text" name="createDate" value={formData.createDate} placeholder='YYYY-MM-DD' onChange={handleChange} />
+                <input type="text" name="createDate" value={formData.createDate} onChange={handleChange} />
               </div>
               <div className="docstorage-add-detail-row">
                 <label>이관일자</label>
@@ -196,7 +234,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
               </div>
               <div className="docstorage-add-detail-row">
                 <label>폐기일자</label>
-                <input type="text" name="disposalDate" value={formData.disposalDate} placeholder='YYYY-MM-DD' onChange={handleChange} />
+                <input type="text" name="disposalDate" value={formData.disposalDate} onChange={handleChange} />
               </div>
               <div className="docstorage-add-detail-row">
                 <label>기안번호</label>
@@ -206,7 +244,9 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
           )}
         </div>
         <div className="docstorage-modal-buttons">
-          <button className="docstorage-modal-button confirm" onClick={handleSaveClick}>추 가</button>
+          <button className="docstorage-modal-button confirm" onClick={handleSaveClick}>
+            {docData ? '수정하기' : '추가하기'}
+          </button>
         </div>
       </div>
     </div>
@@ -216,7 +256,8 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
 DocstorageAddModal.propTypes = {
   show: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,  
+  onSave: PropTypes.func.isRequired,
+  docData: PropTypes.object,
 };
 
 export default DocstorageAddModal;
