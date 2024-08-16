@@ -107,8 +107,11 @@ function BcdApplySecond() {
 
         data.instInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
         data.deptInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
-        data.teamInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
-        data.gradeInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
+        data.teamInfo.sort((a, b) => {
+          if (a.detailCd === '000') return -1;
+          if (b.detailCd === '000') return 1;
+          return a.detailNm.localeCompare(b.detailNm);
+        });
 
         const instMap = {};
         const deptMap = {};
@@ -134,6 +137,8 @@ function BcdApplySecond() {
       alert('기준자료를 불러오는 중 오류가 발생했습니다.');
     }
   };
+
+  console.log("bcdData: ", bcdData);
 
   const handleInputClick = (e) => {
     if (!formData.userId) {
@@ -226,6 +231,21 @@ function BcdApplySecond() {
   const handleConfirmRequest = async () => {
     setShowFinalConfirmationModal(false);
 
+    const isCustomTeam = formData.team === '000';
+
+    let teamCd, teamNm;
+
+    if (isCustomTeam) {
+      teamCd = '000';
+      teamNm = formData.teamNm;
+    } else {
+      const selectedTeam = bcdData.teamInfo.find((team) => team.detailCd === formData.team);
+      if (selectedTeam) {
+        teamCd = selectedTeam.detailCd;
+        teamNm = selectedTeam.detailNm;
+      }
+    }
+
     const requestData = {
       drafter: auth.hngNm,
       drafterId: auth.userId,
@@ -234,8 +254,9 @@ function BcdApplySecond() {
       engNm: `${formData.lastName} ${formData.firstName}`,
       instCd: mappings.instMap[formData.center],
       deptCd: mappings.deptMap[formData.department],
-      teamCd: mappings.teamMap[formData.team] || '',
-      teamNm: formData.team,
+      teamCd: teamCd,
+      teamNm: teamNm, 
+      engTeamNm: isCustomTeam ? formData.engTeam : undefined,
       gradeCd: formData.position,
       gradeNm: formData.gradeNm,
       enGradeNm: formData.enGradeNm,
@@ -478,32 +499,70 @@ function BcdApplySecond() {
                 <select name="department" value={formData.department} onChange={handleDepartmentChange} required onClick={handleInputClick}>
                   <option value="">선택하세요</option>
                   {bcdData.deptInfo
-                    .filter((dept) => dept.etcItem1 === mappings.instMap[formData.center])
+                    .filter((dept) =>                       dept.etcItem1 === mappings.instMap[formData.center])
                     .map((department) => (
                       <option key={department.detailCd} value={department.detailNm}>{department.detailNm}</option>
                     ))}
                 </select>
               </div>
               <div className="form-group-horizontal">
-                <label className="form-label">팀 명</label>
-                <select name="team" value={formData.team} onChange={handleTeamChange} required onClick={handleInputClick}>
+                <label className="form-label">팀</label>
+                <select
+                  name="team"
+                  value={formData.team}
+                  onChange={handleTeamChange}
+                  required
+                  onClick={handleInputClick}
+                >
                   <option value="">선택하세요</option>
                   {bcdData.teamInfo
-                    .filter((team) => team.etcItem1 === mappings.deptMap[formData.department])
+                    .filter(
+                      (team) =>
+                        team.etcItem1 === mappings.deptMap[formData.department] ||
+                        team.detailCd === '000'
+                    )
                     .map((team) => (
-                      <option key={team.detailCd} value={team.detailNm}>
-                        {`${team.detailNm} | ${team.etcItem2}`}
+                      <option key={team.detailCd} value={team.detailCd}>
+                        {team.detailCd === '000' ? team.detailNm : `${team.detailNm} | ${team.etcItem2}`}
                       </option>
                     ))}
                 </select>
               </div>
+              {formData.team === '000' && (
+                <div className="additional-inputs">
+                  <div className="form-group-horizontal">
+                    <label className="form-label">팀 명</label>
+                    <input
+                      type="text"
+                      name="teamNm"
+                      value={formData.teamNm}
+                      onChange={handleChange}
+                      required
+                      placeholder="팀명"
+                      onClick={handleInputClick}
+                    />
+                  </div>
+                  <div className="form-group-horizontal">
+                    <label className="form-label">영문 팀명</label>
+                    <input
+                      type="text"
+                      name="engTeam"
+                      value={formData.engTeam}
+                      onChange={handleChange}
+                      required
+                      placeholder="영문 팀명"
+                      onClick={handleInputClick}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="form-group-horizontal">
                 <label className="form-label">직위 / 직책</label>
                 <select name="position" value={formData.position} onChange={handlePositionChange} required onClick={handleInputClick}>
                   <option value="">선택하세요</option>
                   {fetchFilteredGradeInfo().map((position) => (
                     <option key={position.detailCd} value={position.detailCd}>
-                      {`${position.detailNm} | ${position.etcItem2}`}
+                      {position.detailCd === '000' ? position.detailNm : `${position.detailNm} | ${position.etcItem2}`}
                     </option>
                   ))}
                 </select>
