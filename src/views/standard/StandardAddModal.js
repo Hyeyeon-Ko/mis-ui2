@@ -129,7 +129,11 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
           <div className="add-standard-details">
             <div className="add-standard-detail-row">
               <label>상세코드</label>
-              <input type="text" value={detailCode} onChange={e => setDetailCode(e.target.value)} readOnly={mode === 'edit'} />
+              <input
+                type="text"
+                value={detailCode}
+                onChange={e => setDetailCode(e.target.value)}
+              />
               <hr className="detail-separator" />
             </div>
             <div className="add-standard-detail-row">

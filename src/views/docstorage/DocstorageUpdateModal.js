@@ -1,13 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import * as XLSX from 'xlsx';
 import '../../styles/docstorage/DocstorageAddModal.css';
 import { AuthContext } from '../../components/AuthContext';
 
-const DocstorageAddModal = ({ show, onClose, onSave }) => {
+const DocstorageUpdateModal = ({ show, onClose, onSave, docData }) => {
   const { auth } = useContext(AuthContext);
-  const [activeTab, setActiveTab] = useState('file');
   const [file, setFile] = useState(null);
   const [formData, setFormData] = useState({
     teamNm: '',
@@ -24,9 +22,24 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
     dpdNum: '',
   });
 
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-  };
+  useEffect(() => {
+    if (docData) {
+      setFormData({
+        teamNm: docData.teamNm || '',
+        docId: docData.docId || '',
+        docNm: docData.docNm || '',
+        manager: docData.manager || '',
+        subManager: docData.subManager || '',
+        storageYear: docData.storageYear || '',
+        createDate: docData.createDate || '',
+        location: docData.location || '',
+        transferDate: docData.transferDate || '',
+        tsdNum: docData.tsdNum || '',
+        disposalDate: docData.disposalDate || '',
+        dpdNum: docData.dpdNum || '',
+      });
+    }
+  }, [docData]);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -46,12 +59,12 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
   };
 
   const handleSaveClick = () => {
-    if (activeTab === 'file') {
+    if (!docData) {  
       if (!file) {
         alert('파일을 첨부해주세요.');
         return;
       }
-
+  
       const reader = new FileReader();
       reader.onload = (event) => {
         const data = new Uint8Array(event.target.result);
@@ -61,42 +74,34 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
           header: 1,
           defval: '',
         });
-
+  
         const extractedData = worksheet
-        .slice(4)
-        .filter((row) => row[0])
-        .map((row) => ({
-          no: row[0],
-          deptCd: auth.deptCd,
-          teamNm: row[1] !== undefined ? row[1].toString() : '',
-          docId: row[2] !== undefined ? row[2].toString() : '',
-          location: row[3] !== undefined ? row[3].toString() : '',
-          docNm: row[4] !== undefined ? row[4].toString() : '',
-          manager: row[5] !== undefined ? row[5].toString() : '',
-          subManager: row[6] !== undefined ? row[6].toString() : '',
-          storageYear: row[7] !== undefined ? row[7].toString() : '',
-          createDate: row[8] !== undefined ? row[8].toString() : '',
-          transferDate: row[9] !== undefined ? row[9].toString() : '',
-          tsdNum: row[10] !== undefined ? row[10].toString() : '',
-          disposalDate: row[11] !== undefined ? row[11].toString() : '',
-          dpdNum: row[12] !== undefined ? row[12].toString() : '',
-        }));
-
+          .slice(4)
+          .filter((row) => row[0])
+          .map((row) => ({
+            no: row[0],
+            deptCd: auth.deptCd,
+            teamNm: row[1] !== undefined ? row[1].toString() : '',
+            docId: row[2] !== undefined ? row[2].toString() : '',
+            location: row[3] !== undefined ? row[3].toString() : '',
+            docNm: row[4] !== undefined ? row[4].toString() : '',
+            manager: row[5] !== undefined ? row[5].toString() : '',
+            subManager: row[6] !== undefined ? row[6].toString() : '',
+            storageYear: row[7] !== undefined ? row[7].toString() : '',
+            createDate: row[8] !== undefined ? row[8].toString() : '',
+            transferDate: row[9] !== undefined ? row[9].toString() : '',
+            tsdNum: row[10] !== undefined ? row[10].toString() : '',
+            disposalDate: row[11] !== undefined ? row[11].toString() : '',
+            dpdNum: row[12] !== undefined ? row[12].toString() : '',
+          }));
+  
         console.log('Extracted Data:', extractedData);
-
-        axios
-          .post('/api/docstorage/data', extractedData)
-          .then((response) => {
-            console.log('Data successfully sent:', response.data);
-            onSave(response.data); 
-            onClose();
-          })
-          .catch((error) => {
-            console.error('Error sending data:', error);
-          });
+  
+        onSave(extractedData, true);
+        onClose();
       };
       reader.readAsArrayBuffer(file);
-    } else if (activeTab === 'text') {
+    } else { 
       const {
         teamNm,
         docId,
@@ -106,7 +111,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
         createDate,
         disposalDate,
       } = formData;
-
+  
       if (
         !teamNm ||
         !docId ||
@@ -119,17 +124,17 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
         alert('모든 항목을 입력해 주세요.');
         return;
       }
-
+  
       if (!validateDateFormat(createDate)) {
         alert('생성일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
         return;
       }
-
+  
       if (!validateDateFormat(disposalDate)) {
         alert('폐기일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
         return;
       }
-
+  
       const payload = {
         deptCd: auth.deptCd,
         teamNm,
@@ -145,66 +150,30 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
         disposalDate,
         dpdNum: formData.dpdNum,
       };
-
-      axios
-        .post('/api/docstorage/', payload)
-        .then(response => {
-          console.log('Data successfully saved:', response.data);
-          onSave([payload]); 
-          alert('항목이 성공적으로 추가되었습니다.');
-          onClose();
-        })
-        .catch(error => {
-          console.error('There was an error saving the data!', error);
-        });
+  
+      onSave(payload, false);
+      onClose();
     }
   };
-
+  
   if (!show) return null;
 
   return (
     <div className="docstorage-modal-overlay">
       <div className="docstorage-modal-container">
         <div className="modal-header">
-          <h3>문서보관 항목 추가</h3>
+          <h3>문서보관 항목 수정</h3>
           <button className="docstorage-close-button" onClick={onClose}>
             X
           </button>
         </div>
         <p className="docstorage-instructions">
-          엑셀 파일 첨부 혹은 직접 입력으로 문서 항목을 추가하세요.
+          {docData
+            ? '문서 항목을 수정하세요.'
+            : '엑셀 파일을 첨부해 문서 항목을 수정하세요.'}
         </p>
-        <div className="docstorage-tab-container">
-          <button
-            className={`docstorage-tab ${activeTab === 'file' ? 'active' : ''}`}
-            onClick={() => handleTabChange('file')}
-          >
-            파일 첨부하기
-          </button>
-          <button
-            className={`docstorage-tab ${activeTab === 'text' ? 'active' : ''}`}
-            onClick={() => handleTabChange('text')}
-          >
-            직접 입력하기
-          </button>
-        </div>
-        <hr className="modal-tab-separator" />
         <div className="docstorage-modal-content">
-          {activeTab === 'file' && (
-            <div className="docstorage-add-section">
-              <div className="docstorage-add-detail-row">
-                <label>첨부파일 선택</label>
-                <input
-                  type="file"
-                  name="file"
-                  accept=".xlsx, .xls"
-                  onChange={handleFileChange}
-                />
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'text' && (
+          {docData ? (  
             <div className="docstorage-add-section">
               <div className="docstorage-add-detail-row">
                 <label>팀명</label>
@@ -323,6 +292,18 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
                 />
               </div>
             </div>
+          ) : (  
+            <div className="docstorage-add-section">
+              <div className="docstorage-add-detail-row">
+                <label>첨부파일 선택</label>
+                <input
+                  type="file"
+                  name="file"
+                  accept=".xlsx, .xls"
+                  onChange={handleFileChange}
+                />
+              </div>
+            </div>
           )}
         </div>
         <div className="docstorage-modal-buttons">
@@ -330,7 +311,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
             className="docstorage-modal-button confirm"
             onClick={handleSaveClick}
           >
-            추가하기
+            수정하기
           </button>
         </div>
       </div>
@@ -338,10 +319,11 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
   );
 };
 
-DocstorageAddModal.propTypes = {
+DocstorageUpdateModal.propTypes = {
   show: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
+  docData: PropTypes.object,
 };
 
-export default DocstorageAddModal;
+export default DocstorageUpdateModal;

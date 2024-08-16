@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { useCallback } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import DocstorageAddModal from '../../views/docstorage/DocstorageAddModal';
+import DocstorageUpdateModal from '../../views/docstorage/DocstorageUpdateModal';
 import DocstorageApplyModal from '../../views/docstorage/DocstorageApplyModal';
 import TypeSelect from '../../components/TypeSelect'; 
 import axios from 'axios';
@@ -12,7 +12,7 @@ import { AuthContext } from '../../components/AuthContext';
 
 function Docstorage() {
   const { auth } = useContext(AuthContext);
-  const { userId } = auth;
+  const { userId, deptCd } = auth;
   const [docstorageDetails, setDocstorageDetails] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showApplyModal, setShowApplyModal] = useState(false); 
@@ -27,10 +27,8 @@ function Docstorage() {
     '미신청',
   ]);
 
-  const deptCd = '006';
-
   const fetchDocstorageDetails = useCallback(() => {
-    if (userId) {
+    if (userId && deptCd) {
       const params = { deptCd };
       axios.get('/api/docstorageList/dept', { params })
         .then(response => {
@@ -88,7 +86,6 @@ function Docstorage() {
     const selectedDocs = docstorageDetails.filter(doc => selectedRows.includes(doc.detailId));
     const hasShreddedDocs = selectedDocs.some(doc => doc.type === 'B' && doc.status === 'E');
 
-    // "파쇄"이면서 "완료" 상태인 문서가 있으면 삭제 불가
     if (hasShreddedDocs) {
         alert("파쇄 완료된 문서는 삭제가 불가합니다.");
         return;
@@ -118,51 +115,67 @@ function Docstorage() {
     }
 };
 
-  const handleEdit = async () => {
-    if (selectedRows.length === 0) {
-      alert("선택된 항목이 없습니다.");
-      return;
-    } else if (selectedRows.length !== 1) {
-      alert("수정할 항목을 하나만 선택하세요.");
-      return;
-    }
+const handleEdit = async () => {
+  if (selectedRows.length === 0) {
+    setSelectedDoc(null);
+    setShowEditModal(true);
+    return;
+  } else if (selectedRows.length !== 1) {
+    alert("수정할 항목을 하나만 선택하세요.");
+    return;
+  }
 
-    const detailId = selectedRows[0];
-    const selectedDoc = docstorageDetails.find(doc => doc.detailId === detailId);
+  const detailId = selectedRows[0];
+  const selectedDoc = docstorageDetails.find(doc => doc.detailId === detailId);
 
-    // "파쇄"이면서 "완료" 상태인 문서인지 확인
-    if (selectedDoc.type === 'B' && selectedDoc.status === 'E') {
-        alert("파쇄 완료된 문서는 수정이 불가합니다.");
-        return;
-    }
+  if (selectedDoc.type === 'B' && selectedDoc.status === 'E') {
+    alert("파쇄 완료된 문서는 수정이 불가합니다.");
+    return;
+  }
 
-    try {
-        const response = await axios.get('/api/docstorage/', { params: { detailId } });
-        const data = response.data.data;
-        console.log("selected Data: ", data);
-        setSelectedDoc(data);
-        setShowEditModal(true);
-    } catch (error) {
-        console.error('문서보관 정보를 가져오는 중 에러 발생:', error);
-        alert('수정할 항목을 불러오지 못했습니다.');
-    }
+  try {
+      const response = await axios.get('/api/docstorage/', { params: { detailId } });
+      const data = response.data.data;
+      setSelectedDoc({ ...data, detailId }); 
+      setShowEditModal(true);
+  } catch (error) {
+      console.error('문서보관 정보를 가져오는 중 에러 발생:', error);
+      alert('수정할 항목을 불러오지 못했습니다.');
+  }
 };
 
-  const handleUpdate = async (updatedData) => {
-    try {
-      const response = await axios.put('/api/docstorage/', updatedData);
-      if (response.data.code === 200) {
-        setDocstorageDetails(prevDetails => prevDetails.map(doc =>
-          doc.detailId === updatedData.detailId ? { ...doc, ...updatedData } : doc
-        ));
-        setShowEditModal(false);
-        alert('수정이 완료되었습니다.');
-      }
-    } catch (error) {
-      console.error('문서보관 정보를 수정하는 중 에러 발생:', error);
-      alert('수정에 실패했습니다.');
+const handleUpdate = async (updatedData, isFileUpload = false) => {
+  try {
+    let url;
+    let payload;
+
+    if (isFileUpload) {
+      url = '/api/docstorage/update';
+      payload = updatedData;
+    } else {
+      const { detailId, ...updatePayload } = updatedData;
+      url = `/api/docstorage/?detailId=${detailId}`;
+      payload = updatePayload;
     }
-  };
+
+    const response = await axios.put(url, payload);
+
+    if (response.status === 200) {
+      if (!isFileUpload) {
+        setDocstorageDetails(prevDetails =>
+          prevDetails.map(doc =>
+            doc.detailId === updatedData.detailId ? { ...doc, ...updatedData } : doc
+          )
+        );
+      }
+      setShowEditModal(false);
+      alert('수정이 완료되었습니다.');
+    }
+  } catch (error) {
+    console.error('문서보관 정보를 수정하는 중 에러 발생:', error);
+    alert('수정에 실패했습니다.');
+  }
+};
 
   const downloadExcel = async () => {
     if (selectedRows.length === 0) {
@@ -276,7 +289,7 @@ function Docstorage() {
               <div className="docstorage-header-buttons">
                 <label className='docstorage-detail-content-label'>문서보관 내역&gt;&gt;</label>
                 <div className="docstorage-detail-buttons">
-                <button className="docstorage-add-button" onClick={() => {
+                  <button className="docstorage-add-button" onClick={() => {
                     setSelectedDoc(null);
                     setShowAddModal(true);
                   }}>추 가</button>
@@ -299,19 +312,14 @@ function Docstorage() {
       <DocstorageAddModal
         show={showAddModal}
         onClose={() => setShowAddModal(false)}
-        initialData={selectedDoc ? null : {}}
-        docData={null} 
         onSave={handleSave}
       />
-      {selectedDoc && (
-        <DocstorageAddModal
-          show={showEditModal}
-          onClose={() => setShowEditModal(false)}
-          initialData={null} 
-          docData={selectedDoc} 
-          onSave={handleUpdate}
-        />
-      )}
+      <DocstorageUpdateModal
+        show={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        docData={selectedDoc} 
+        onSave={handleUpdate}
+      />
       <DocstorageApplyModal
         show={showApplyModal}
         onClose={() => setShowApplyModal(false)}
