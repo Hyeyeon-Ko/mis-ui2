@@ -12,21 +12,24 @@ const Table = ({ columns, data }) => (
       </tr>
     </thead>
     <tbody>
-      {data.map((row, rowIndex) => (
-        <tr key={rowIndex} className={row.status === '신청취소' ? 'cancelled' : ''}>
-          {columns.map((col, colIndex) => (
-            <td key={colIndex}>
-              {col.Cell ? (
-                <div className={`icon-cell ${row.status === '신청취소' ? 'disabled' : ''}`}>
-                  {col.Cell({ row: row.original || row })}
-                </div>
-              ) : (
-                row[col.accessor]
-              )}
-            </td>
-          ))}
-        </tr>
-      ))}
+      {data.map((row, rowIndex) => {
+        const isCancelled = row.status === '신청취소' || (row.type === 'B' && row.status === 'E');
+        return (
+          <tr key={rowIndex} className={isCancelled ? 'cancelled' : ''}>
+            {columns.map((col, colIndex) => (
+              <td key={colIndex}>
+                {col.Cell ? (
+                  <div className={`icon-cell ${row.status === '신청취소' ? 'disabled' : ''}`}>
+                    {col.Cell({ row: row.original || row })}
+                  </div>
+                ) : (
+                  row[col.accessor]
+                )}
+              </td>
+            ))}
+          </tr>
+        );
+      })}
     </tbody>
   </table>
 );

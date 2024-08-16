@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import DocstorageAddModal from '../../views/docstorage/DocstorageAddModal';
@@ -26,11 +26,10 @@ function Docstorage() {
     '파쇄',
     '미신청',
   ]);
-  const navigate = useNavigate();
 
   const deptCd = '006';
 
-  const fetchDocstorageDetails = () => {
+  const fetchDocstorageDetails = useCallback(() => {
     if (userId) {
       const params = { deptCd };
       axios.get('/api/docstorageList/dept', { params })
@@ -56,11 +55,11 @@ function Docstorage() {
           setDocstorageDetails([]);
         });
     }
-  };
+  }, [userId, deptCd]);
 
   useEffect(() => {
     fetchDocstorageDetails();
-  }, [userId]);
+  }, [fetchDocstorageDetails]);
 
   const handleTypeChange = (event) => {
     setSelectedType(event.target.value);
@@ -93,54 +92,72 @@ function Docstorage() {
 
   const handleDelete = async () => {
     if (selectedRows.length === 0) {
-      alert("삭제할 항목을 선택하세요.");
-      return;
+        alert("삭제할 항목을 선택하세요.");
+        return;
     }
-  
+
+    const selectedDocs = docstorageDetails.filter(doc => selectedRows.includes(doc.detailId));
+    const hasShreddedDocs = selectedDocs.some(doc => doc.type === 'B' && doc.status === 'E');
+
+    // "파쇄"이면서 "완료" 상태인 문서가 있으면 삭제 불가
+    if (hasShreddedDocs) {
+        alert("파쇄 완료된 문서는 삭제가 불가합니다.");
+        return;
+    }
+
     try {
-      for (const detailId of selectedRows) {
-        await axios.delete('/api/docstorage/', {
-          params: { detailId }
+        for (const detailId of selectedRows) {
+            await axios.delete('/api/docstorage/', { params: { detailId } });
+        }
+        alert('선택된 항목이 삭제되었습니다.');
+
+        setDocstorageDetails(prevDetails => {
+            const updatedDetails = prevDetails
+                .filter(item => !selectedRows.includes(item.detailId))
+                .map((item, index) => ({
+                    ...item,
+                    no: index + 1 
+                }));
+            
+            return updatedDetails;
         });
-      }
-      alert('선택된 항목이 삭제되었습니다.');
-  
-      setDocstorageDetails(prevDetails => {
-        const updatedDetails = prevDetails
-          .filter(item => !selectedRows.includes(item.detailId))
-          .map((item, index) => ({
-            ...item,
-            no: index + 1 
-          }));
-        
-        return updatedDetails;
-      });
-  
-      setSelectedRows([]); 
+
+        setSelectedRows([]); 
     } catch (error) {
-      console.error('문서보관 정보를 삭제하는 중 에러 발생:', error);
-      alert('삭제에 실패했습니다.');
+        console.error('문서보관 정보를 삭제하는 중 에러 발생:', error);
+        alert('삭제에 실패했습니다.');
     }
-  };
+};
 
   const handleEdit = async () => {
-    if (selectedRows.length !== 1) {
+    if (selectedRows.length === 0) {
+      alert("선택된 항목이 없습니다.");
+      return;
+    } else if (selectedRows.length !== 1) {
       alert("수정할 항목을 하나만 선택하세요.");
       return;
     }
 
-    try {
-      const detailId = selectedRows[0];
-      const response = await axios.get('/api/docstorage/', { params: { detailId } });
-      const data = response.data.data;
-      console.log("selected Data: ", data);
-      setSelectedDoc(data);
-      setShowEditModal(true);
-    } catch (error) {
-      console.error('문서보관 정보를 가져오는 중 에러 발생:', error);
-      alert('수정할 항목을 불러오지 못했습니다.');
+    const detailId = selectedRows[0];
+    const selectedDoc = docstorageDetails.find(doc => doc.detailId === detailId);
+
+    // "파쇄"이면서 "완료" 상태인 문서인지 확인
+    if (selectedDoc.type === 'B' && selectedDoc.status === 'E') {
+        alert("파쇄 완료된 문서는 수정이 불가합니다.");
+        return;
     }
-  };
+
+    try {
+        const response = await axios.get('/api/docstorage/', { params: { detailId } });
+        const data = response.data.data;
+        console.log("selected Data: ", data);
+        setSelectedDoc(data);
+        setShowEditModal(true);
+    } catch (error) {
+        console.error('문서보관 정보를 가져오는 중 에러 발생:', error);
+        alert('수정할 항목을 불러오지 못했습니다.');
+    }
+};
 
   const handleUpdate = async (updatedData) => {
     try {
