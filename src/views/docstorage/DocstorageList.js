@@ -4,7 +4,7 @@ import Table from '../../components/common/Table';
 import '../../styles/common/Page.css';
 import '../../styles/docstorage/DocstorageList.css';
 import ConfirmModal from '../../components/common/ConfirmModal';
-import DocstorageUpdateModal from '../../views/docstorage/DocstorageUpdateModal'; // Import the modal
+import DocstorageUpdateModal from '../../views/docstorage/DocstorageUpdateModal'; 
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 
@@ -15,14 +15,14 @@ function DocstorageList() {
     { categoryCode: 'B', categoryName: '문서보관 내역' },
   ];
 
-  const [selectedCategory, setSelectedCategory] = useState('A'); 
+  const [selectedCategory, setSelectedCategory] = useState('B'); 
   const [deptResponses, setDeptResponses] = useState([]);
   const [docstorageDetails, setDocstorageDetails] = useState([]);
   const [deptDocstorageResponses, setDeptDocstorageResponses] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false); 
-  const [showEditModal, setShowEditModal] = useState(false); // For the edit modal
-  const [selectedDoc, setSelectedDoc] = useState(null); // For the selected document
+  const [showEditModal, setShowEditModal] = useState(false); 
+  const [selectedDoc, setSelectedDoc] = useState(null); 
   const [pendingApproval, setPendingApproval] = useState(null);
 
   useEffect(() => {
@@ -102,7 +102,6 @@ function DocstorageList() {
     }
 
     const detailId = selectedRows[0];
-    const selectedDoc = docstorageDetails.find(doc => doc.detailId === detailId);
 
     try {
       const response = await axios.get('/api/docstorage/', { params: { detailId } });
@@ -148,37 +147,37 @@ function DocstorageList() {
     }
   };
 
-  const handleDelete = async () => {
-    if (selectedRows.length === 0) {
-      alert("삭제할 항목을 선택하세요.");
-      return;
-    }
+  // const handleDelete = async () => {
+  //   if (selectedRows.length === 0) {
+  //     alert("삭제할 항목을 선택하세요.");
+  //     return;
+  //   }
   
-    try {
-      for (const detailId of selectedRows) {
-        await axios.delete('/api/docstorage/', {
-          params: { detailId }
-        });
-      }
-      alert('선택된 항목이 삭제되었습니다.');
+  //   try {
+  //     for (const detailId of selectedRows) {
+  //       await axios.delete('/api/docstorage/', {
+  //         params: { detailId }
+  //       });
+  //     }
+  //     alert('선택된 항목이 삭제되었습니다.');
   
-      setDocstorageDetails(prevDetails => {
-        const updatedDetails = prevDetails
-          .filter(item => !selectedRows.includes(item.detailId))
-          .map((item, index) => ({
-            ...item,
-            no: index + 1 
-          }));
+  //     setDocstorageDetails(prevDetails => {
+  //       const updatedDetails = prevDetails
+  //         .filter(item => !selectedRows.includes(item.detailId))
+  //         .map((item, index) => ({
+  //           ...item,
+  //           no: index + 1 
+  //         }));
         
-        return updatedDetails;
-      });
+  //       return updatedDetails;
+  //     });
   
-      setSelectedRows([]); 
-    } catch (error) {
-      console.error('문서보관 정보를 삭제하는 중 에러 발생:', error);
-      alert('삭제에 실패했습니다.');
-    }
-  };
+  //     setSelectedRows([]); 
+  //   } catch (error) {
+  //     console.error('문서보관 정보를 삭제하는 중 에러 발생:', error);
+  //     alert('삭제에 실패했습니다.');
+  //   }
+  // };
 
   const downloadExcel = async () => {
     try {
@@ -336,7 +335,7 @@ function DocstorageList() {
                   {selectedCategory === 'B' && (
                     <div className="docstorage-detail-buttons">
                         <button className="docstorage-modify-button" onClick={handleEdit}>수 정</button>
-                        <button className="docstorage-delete-button" onClick={handleDelete}>삭 제</button>
+                        {/* <button className="docstorage-delete-button" onClick={handleDelete}>삭 제</button> */}
                         <button className="docstorage-excel-button" onClick={downloadExcel}>엑 셀</button>
                     </div>
                   )}

@@ -67,13 +67,16 @@ function TotalDocstorageList() {
     setShowAddModal(false); 
   };
 
-  const handleRowSelect = (e, row) => {
-    const isChecked = e.target.checked;
-    if (isChecked) {
-      setSelectedRows(prevSelectedRows => [...prevSelectedRows, row]);
-    } else {
+  const handleRowSelect = (row) => {
+    if (selectedRows.includes(row)) {
       setSelectedRows(prevSelectedRows => prevSelectedRows.filter(selectedRow => selectedRow !== row));
+    } else {
+      setSelectedRows(prevSelectedRows => [...prevSelectedRows, row]);
     }
+  };
+
+  const handleRowClick = (row) => {
+    handleRowSelect(row);
   };
 
   const downloadExcel = async () => {
@@ -136,7 +139,7 @@ function TotalDocstorageList() {
         <input
           type="checkbox"
           name="detailSelect"
-          onChange={(e) => handleRowSelect(e, row)}
+          onChange={() => handleRowSelect(row)}
           checked={selectedRows.includes(row)}
         />
       ),
@@ -185,6 +188,7 @@ function TotalDocstorageList() {
                     <Table
                     columns={detailColumns}
                     data={docstorageDetails}
+                    onRowClick={handleRowClick} 
                     />
                 </div>
             </div>

@@ -158,7 +158,7 @@ const handleUpdate = async (updatedData, isFileUpload = false) => {
       payload = updatePayload;
     }
 
-    const response = await axios.put(url, payload);
+    const response = await axios.post(url, payload);
 
     if (response.status === 200) {
       if (!isFileUpload) {
