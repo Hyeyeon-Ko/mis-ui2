@@ -66,18 +66,7 @@ function Docstorage() {
   };
 
   const handleSave = (newData) => {
-    if (Array.isArray(newData)) {
-      newData = newData.map((item, index) => ({
-        ...item,
-        no: docstorageDetails.length + index + 1,
-        typeDisplay: item.type === 'A' ? '이관' : item.type === 'B' ? '파쇄' : '',
-        statusDisplay: item.status === 'N' ? '미신청' : item.status === 'A' ? '승인대기' : item.status === 'E' ? '완료' : ''
-      }));
-
-      setDocstorageDetails([...docstorageDetails, ...newData]);
-    } else {
-      console.error("Expected newData to be an array, but got:", newData);
-    }
+    fetchDocstorageDetails(); 
     setShowAddModal(false);
   };
 
