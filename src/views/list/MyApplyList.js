@@ -92,7 +92,7 @@ function MyApplyList() {
       case 'D':
         return '발주완료';
       case 'E':
-        return '완료';
+        return '처리완료';
       case 'F':
         return '신청취소';
       default:
@@ -166,8 +166,8 @@ function MyApplyList() {
   const applicationColumns = [
     { header: '문서분류', accessor: 'docType', width: '11%' }, 
     { header: '제목', accessor: 'title', width: '30%' },
-    { header: '기안일시', accessor: 'draftDate', width: '14%' },
-    { header: '기안자', accessor: 'drafter', width: '9%' },
+    { header: '신청일시', accessor: 'draftDate', width: '14%' },
+    { header: '신청자', accessor: 'drafter', width: '9%' },
     { header: '승인/반려일시', accessor: 'approvalDate', width: '14%' },
     { header: '담당자', accessor: 'manager', width: '9%' }, 
     {

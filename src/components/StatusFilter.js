@@ -37,7 +37,7 @@ function StatusFilters({ filters, onFilterChange }) {
           checked={filters.statusClosed}
           onChange={onFilterChange}
         />
-        완료
+        처리완료
       </label>
     </div>
   );

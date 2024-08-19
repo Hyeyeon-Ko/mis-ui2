@@ -567,7 +567,7 @@ function BcdApplySecond() {
                   ))}
                 </select>
               </div>
-              {formData.position === '999' && (
+              {formData.position === '000' && (
                 <div className="additional-inputs">
                   <div className="form-group-horizontal">
                     <label className="form-label">직위</label>

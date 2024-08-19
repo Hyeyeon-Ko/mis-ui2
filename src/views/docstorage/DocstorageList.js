@@ -35,7 +35,7 @@ function DocstorageList() {
   const statusOptions = [
     { label: '전체', value: '전체' },
     { label: '승인완료', value: '승인완료' },
-    { label: '완료', value: '완료' },
+    { label: '처리완료', value: '처리완료' },
   ];
 
   const fetchDocstorageData = async () => {
@@ -69,7 +69,7 @@ function DocstorageList() {
             ...item,
             no: index + 1,
             typeDisplay: item.type === 'A' ? '이관' : item.type === 'B' ? '파쇄' : '',
-            status: item.status === 'B' ? '승인완료' : item.status === 'E' ? '완료' : item.status,
+            status: item.status === 'B' ? '승인완료' : item.status === 'E' ? '처리완료' : item.status,
           }));
           setDocstorageDetails(numberedDetails);
         } else {
@@ -101,7 +101,7 @@ function DocstorageList() {
         ...item,
         no: index + 1,
         typeDisplay: item.type === 'A' ? '이관' : item.type === 'B' ? '파쇄' : '',
-        status: item.status === 'B' ? '승인완료' : item.status === 'E' ? '완료' : item.status,
+        status: item.status === 'B' ? '승인완료' : item.status === 'E' ? '처리완료' : item.status,
       }));
       setDocstorageDetails(numberedDetails);
     } else {
@@ -345,9 +345,9 @@ function DocstorageList() {
     { header: '보존연한', accessor: 'storageYear' },
     { header: '생성일자', accessor: 'createDate' },
     { header: '이관일자', accessor: 'transferDate' },
-    { header: '기안번호', accessor: 'tsdNum' },
+    { header: '신청번호', accessor: 'tsdNum' },
     { header: '폐기일자', accessor: 'disposalDate' },
-    { header: '기안번호', accessor: 'dpdraftNum' },
+    { header: '신청번호', accessor: 'dpdraftNum' },
   ];
 
   const filteredDocstorageDetails =

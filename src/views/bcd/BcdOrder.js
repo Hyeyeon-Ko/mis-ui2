@@ -174,8 +174,8 @@ function BcdOrder() {
       width: '18%',
     },
     { header: '제목', accessor: 'title', width: '28%' },
-    { header: '기안일자', accessor: 'draftDate', width: '15%' },
-    { header: '기안자', accessor: 'drafter', width: '10%' },
+    { header: '신청일자', accessor: 'draftDate', width: '15%' },
+    { header: '신청자', accessor: 'drafter', width: '10%' },
     { header: '승인일시', accessor: 'respondDate', width: '17%' },
     { header: '수량', accessor: 'quantity', width: '9.5%' },
   ];

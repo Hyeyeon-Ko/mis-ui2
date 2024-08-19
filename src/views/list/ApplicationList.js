@@ -98,7 +98,7 @@ function ApplicationsList() {
       case 'D':
         return '발주완료';
       case 'E':
-        return '완료';
+        return '처리완료';
       case 'F':
         return '신청취소';
       default:
@@ -140,7 +140,7 @@ function ApplicationsList() {
       if (filters.statusApproved && application.applyStatus === '승인완료') return true;
       if (filters.statusRejected && application.applyStatus === '반려') return true;
       if (filters.statusOrdered && application.applyStatus === '발주완료') return true;
-      if (filters.statusClosed && application.applyStatus === '완료') return true;
+      if (filters.statusClosed && application.applyStatus === '처리완료') return true;
       return false;
     }
     return true;
@@ -216,8 +216,8 @@ function ApplicationsList() {
     }] : []),
     { header: '문서분류', accessor: 'docType', width: '10%' },
     { header: '제목', accessor: 'title', width: '24%' },
-    { header: '기안일시', accessor: 'draftDate', width: '13%' },
-    { header: '기안자', accessor: 'drafter', width: '6%' },
+    { header: '신청일시', accessor: 'draftDate', width: '13%' },
+    { header: '신청자', accessor: 'drafter', width: '6%' },
     { header: '승인/반려일시', accessor: 'respondDate', width: '13%' },
     { header: '발주일시', accessor: 'orderDate', width: '14%' },
     {

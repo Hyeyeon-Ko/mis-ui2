@@ -73,7 +73,7 @@ const ConditionFilter = ({
   return (
     <div className="all-application-filter-container">
       <div className="all-application-filter">
-        <label>기안일자</label>
+        <label>신청일자</label>
         <input
           type="date"
           value={startDate ? formatDate(startDate) : formatDate(new Date(new Date().setMonth(new Date().getMonth() - 1)))}
@@ -158,7 +158,7 @@ const ConditionFilter = ({
               checked={filters.statusClosed}
               onChange={onFilterChange}
             />
-            완료
+            처리완료
           </label>
         </div>
       )}

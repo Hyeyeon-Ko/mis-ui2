@@ -292,7 +292,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>기안번호</label>
+                <label>신청번호</label>
                 <input
                   type="text"
                   name="tsdNum"
@@ -312,7 +312,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>기안번호</label>
+                <label>신청번호</label>
                 <input
                   type="text"
                   name="dpdNum"
