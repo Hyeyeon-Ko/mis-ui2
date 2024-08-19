@@ -179,3 +179,33 @@
     font-size: 14px;
   }  
   
+  .custom-table td {
+    user-select: none; 
+  }
+  
+.status-header {
+    position: relative;
+    display: inline-block;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+  
+.status-header:hover{
+    color: #2789FE;
+}
+
+.status-header span {
+    font-size: 12px;
+}
+
+.status-select {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    font-size: 14px;
+  }  

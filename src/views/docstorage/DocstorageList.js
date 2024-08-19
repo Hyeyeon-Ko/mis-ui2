@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import '../../styles/common/Page.css';
@@ -7,12 +7,13 @@ import ConfirmModal from '../../components/common/ConfirmModal';
 import DocstorageUpdateModal from '../../views/docstorage/DocstorageUpdateModal'; 
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
+import StatusSelect from '../../components/StatusSelect';  // StatusSelect 컴포넌트 import
 
 function DocstorageList() {
   const { auth } = useContext(AuthContext);
   const categories = [
-    { categoryCode: 'A', categoryName: '승인대기 내역' },
     { categoryCode: 'B', categoryName: '문서보관 내역' },
+    { categoryCode: 'A', categoryName: '승인대기 내역' },
   ];
 
   const [selectedCategory, setSelectedCategory] = useState('B'); 
@@ -24,71 +25,134 @@ function DocstorageList() {
   const [showEditModal, setShowEditModal] = useState(false); 
   const [selectedDoc, setSelectedDoc] = useState(null); 
   const [pendingApproval, setPendingApproval] = useState(null);
+  const [selectedDeptCd, setSelectedDeptCd] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState('전체');
 
-  useEffect(() => {
-    const fetchDocstorageData = async () => {
-      try {
-        let response;
-        if (selectedCategory === 'A') {
-          response = await axios.get('/api/docstorageList/pending', {
-            params: { instCd: '100' }, 
-          });
-        } else if (selectedCategory === 'B') {
-          response = await axios.get('/api/docstorageList/center', {
-            params: { instCd: auth.instCd },
-          });
+  const dragStartIndex = useRef(null);
+  const dragEndIndex = useRef(null);
+  const dragMode = useRef('select');
 
-          const { deptResponses, deptDocstorageResponses } = response.data.data;
-          setDeptResponses(deptResponses);
-          setDeptDocstorageResponses(deptDocstorageResponses);
+  const statusOptions = [
+    { label: '전체', value: '전체' },
+    { label: '승인완료', value: '승인완료' },
+    { label: '완료', value: '완료' },
+  ];
 
-          if (deptResponses.length > 0) {
-            const firstDeptCd = deptResponses[0].detailCd;
-            handleDeptClick(firstDeptCd);
-          }
+  const fetchDocstorageData = async () => {
+    try {
+      let response;
+      if (selectedCategory === 'A') {
+        response = await axios.get('/api/docstorageList/pending', {
+          params: { instCd: '100' },
+        });
+      } else if (selectedCategory === 'B') {
+        response = await axios.get('/api/docstorageList/center', {
+          params: { instCd: auth.instCd },
+        });
+        console.log('response: ', response);
+  
+        const { deptResponses, deptDocstorageResponses } = response.data.data;
+        setDeptResponses(deptResponses);
+        setDeptDocstorageResponses(deptDocstorageResponses);
+  
+        if (deptResponses.length > 0) {
+          const firstDeptCd = selectedDeptCd || deptResponses[0].detailCd;
+          handleDeptClick(firstDeptCd);
         }
-
-        if (response && response.data) {
-          const pendingList = response.data.data;
+      }
+  
+      if (response && response.data) {
+        const pendingList = response.data.data;
+  
+        if (Array.isArray(pendingList)) {
           const numberedDetails = pendingList.map((item, index) => ({
             ...item,
             no: index + 1,
             typeDisplay: item.type === 'A' ? '이관' : item.type === 'B' ? '파쇄' : '',
+            status: item.status === 'B' ? '승인완료' : item.status === 'E' ? '완료' : item.status,
           }));
           setDocstorageDetails(numberedDetails);
+        } else {
+          setDocstorageDetails([]);
         }
-      } catch (error) {
-        console.error('문서보관 데이터를 불러오는데 실패했습니다.', error);
+      } else {
+        setDocstorageDetails([]);
       }
-    };
-
+    } catch (error) {
+      console.error('문서보관 데이터를 불러오는데 실패했습니다.', error);
+      setDocstorageDetails([]);
+    }
+  };
+  
+  useEffect(() => {
     if (auth.instCd) {
       fetchDocstorageData();
     }
   }, [auth.instCd, selectedCategory]);
 
   const handleDeptClick = (detailCd) => {
-    const selectedDept = deptDocstorageResponses.find(dept => dept.deptCd === detailCd);
 
+    setSelectedRows([]); 
+    setSelectedDeptCd(detailCd);
+    const selectedDept = deptDocstorageResponses.find(dept => dept.deptCd === detailCd);
+  
     if (selectedDept) {
       const numberedDetails = selectedDept.docstorageResponseDTOList.map((item, index) => ({
         ...item,
         no: index + 1,
         typeDisplay: item.type === 'A' ? '이관' : item.type === 'B' ? '파쇄' : '',
+        status: item.status === 'B' ? '승인완료' : item.status === 'E' ? '완료' : item.status,
       }));
       setDocstorageDetails(numberedDetails);
     } else {
       setDocstorageDetails([]);
     }
   };
-
-  const handleRowSelect = (e, row) => {
-    const isChecked = e.target.checked;
-    if (isChecked) {
-      setSelectedRows(prevSelectedRows => [...prevSelectedRows, row.detailId]);
+  
+  const handleRowSelect = (row) => {
+    const detailId = row.detailId;
+    if (selectedRows.includes(detailId)) {
+      setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== detailId));
     } else {
-      setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== row.detailId));
+      setSelectedRows(prevSelectedRows => [...prevSelectedRows, detailId]);
     }
+  };
+
+  const handleMouseDown = (index) => {
+    dragStartIndex.current = index;
+
+    const detailId = docstorageDetails[index].detailId;
+    if (selectedRows.includes(detailId)) {
+      dragMode.current = 'deselect'; 
+    } else {
+      dragMode.current = 'select'; 
+    }
+  };
+
+  const handleMouseOver = (index) => {
+    if (dragStartIndex.current !== null) {
+      dragEndIndex.current = index;
+      const start = Math.min(dragStartIndex.current, dragEndIndex.current);
+      const end = Math.max(dragStartIndex.current, dragEndIndex.current);
+
+      let newSelectedRows = [...selectedRows];
+
+      for (let i = start; i <= end; i++) {
+        const detailId = docstorageDetails[i].detailId;
+        if (dragMode.current === 'select' && !newSelectedRows.includes(detailId)) {
+          newSelectedRows.push(detailId); 
+        } else if (dragMode.current === 'deselect' && newSelectedRows.includes(detailId)) {
+          newSelectedRows = newSelectedRows.filter(id => id !== detailId); 
+        }
+      }
+
+      setSelectedRows(newSelectedRows);
+    }
+  };
+
+  const handleMouseUp = () => {
+    dragStartIndex.current = null;
+    dragEndIndex.current = null;
   };
 
   const handleEdit = async () => {
@@ -128,56 +192,19 @@ function DocstorageList() {
         payload = updatePayload;
       }
 
-      const response = await axios.put(url, payload);
+      const response = await axios.post(url, payload);
 
       if (response.status === 200) {
-        if (!isFileUpload) {
-          setDocstorageDetails(prevDetails =>
-            prevDetails.map(doc =>
-              doc.detailId === updatedData.detailId ? { ...doc, ...updatedData } : doc
-            )
-          );
-        }
         setShowEditModal(false);
         alert('수정이 완료되었습니다.');
+        
+        fetchDocstorageData();
       }
     } catch (error) {
       console.error('문서보관 정보를 수정하는 중 에러 발생:', error);
       alert('수정에 실패했습니다.');
     }
   };
-
-  // const handleDelete = async () => {
-  //   if (selectedRows.length === 0) {
-  //     alert("삭제할 항목을 선택하세요.");
-  //     return;
-  //   }
-  
-  //   try {
-  //     for (const detailId of selectedRows) {
-  //       await axios.delete('/api/docstorage/', {
-  //         params: { detailId }
-  //       });
-  //     }
-  //     alert('선택된 항목이 삭제되었습니다.');
-  
-  //     setDocstorageDetails(prevDetails => {
-  //       const updatedDetails = prevDetails
-  //         .filter(item => !selectedRows.includes(item.detailId))
-  //         .map((item, index) => ({
-  //           ...item,
-  //           no: index + 1 
-  //         }));
-        
-  //       return updatedDetails;
-  //     });
-  
-  //     setSelectedRows([]); 
-  //   } catch (error) {
-  //     console.error('문서보관 정보를 삭제하는 중 에러 발생:', error);
-  //     alert('삭제에 실패했습니다.');
-  //   }
-  // };
 
   const downloadExcel = async () => {
     try {
@@ -225,6 +252,29 @@ function DocstorageList() {
     setPendingApproval(null); 
   };
 
+  const handleFinish = async () => {
+    const selectedDetailIds = docstorageDetails
+      .filter(detail => selectedRows.includes(detail.detailId)) 
+      .map(detail => detail.detailId);
+  
+    if (selectedDetailIds.length === 0) {
+      alert('완료할 문서를 선택하세요.');
+      return;
+    }
+  
+    try {
+      const response = await axios.post('/api/docstorage/finish', selectedDetailIds);
+  
+      if (response.status === 200) {
+        alert('선택된 문서가 완료되었습니다.');
+        fetchDocstorageData(); 
+      }
+    } catch (error) {
+      console.error('문서보관 완료 처리 중 오류 발생:', error);
+      alert('문서보관 완료 처리 중 오류가 발생했습니다.');
+    }
+  };  
+
   const handleCloseModal = () => {
     setShowConfirmModal(false); 
     setPendingApproval(null); 
@@ -268,7 +318,7 @@ function DocstorageList() {
           <input
             type="checkbox"
             name="detailSelect"
-            onChange={(e) => handleRowSelect(e, row)}
+            onChange={() => handleRowSelect(row)}
             checked={selectedRows.includes(row.detailId)}
           />
         ),
@@ -276,6 +326,16 @@ function DocstorageList() {
     ] : []),
     { header: 'NO', accessor: 'no' },
     ...(selectedCategory === 'A' ? [{ header: '분류', accessor: 'typeDisplay' }] : []),
+    {
+      header: (
+        <StatusSelect
+          statusOptions={statusOptions}
+          selectedStatus={selectedStatus}
+          onStatusChange={(e) => setSelectedStatus(e.target.value)} 
+        />
+      ),
+      accessor: 'status',
+    },
     { header: '팀 명', accessor: 'teamNm' },
     { header: '문서관리번호', accessor: 'docId' },
     { header: '입고위치', accessor: 'location' },
@@ -289,6 +349,11 @@ function DocstorageList() {
     { header: '폐기일자', accessor: 'disposalDate' },
     { header: '기안번호', accessor: 'dpdraftNum' },
   ];
+
+  const filteredDocstorageDetails =
+  docstorageDetails.filter((doc) =>
+    selectedStatus === '전체' || doc.status === selectedStatus
+  );
 
   return (
     <div className='content'>
@@ -335,15 +400,18 @@ function DocstorageList() {
                   {selectedCategory === 'B' && (
                     <div className="docstorage-detail-buttons">
                         <button className="docstorage-modify-button" onClick={handleEdit}>수 정</button>
-                        {/* <button className="docstorage-delete-button" onClick={handleDelete}>삭 제</button> */}
                         <button className="docstorage-excel-button" onClick={downloadExcel}>엑 셀</button>
+                        <button className="docstorage-finish-button" onClick={handleFinish}>완 료</button>
                     </div>
                   )}
                 </div>
                 <div className="docstorage-details-table">
                   <Table
                     columns={detailColumns}
-                    data={docstorageDetails}
+                    data={filteredDocstorageDetails}  
+                    onRowMouseDown={handleMouseDown}  
+                    onRowMouseOver={handleMouseOver}  
+                    onRowMouseUp={handleMouseUp} 
                   />
                 </div>
               </div>

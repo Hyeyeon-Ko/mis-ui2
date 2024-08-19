@@ -112,7 +112,7 @@
     white-space: nowrap;
 }
 
-.docstorage-add-button, .docstorage-modify-button, .docstorage-delete-button, .docstorage-excel-button {
+.docstorage-add-button, .docstorage-modify-button, .docstorage-delete-button, .docstorage-excel-button, .docstorage-finish-button {
     border-radius: 7px;
     padding: 4px 8px;
     width: 55px;
@@ -143,8 +143,17 @@
     background-color: #a1a9b2;
 }
 
+.docstorage-finish-button {
+    color: white;
+    background-color: #2789FE;
+}
+
+.docstorage-finish-button:hover {
+    background-color: #1e6fc1;
+}
+
 .docstorage-approve-section {
     display: flex;
     justify-content: center;
-    margin-top: 20px; /* 버튼과 상단 콘텐츠 사이의 여백 조정 */
+    margin-top: 20px; 
   }

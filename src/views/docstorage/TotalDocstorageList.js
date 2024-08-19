@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import DocstorageAddModal from './DocstorageAddModal'; 
@@ -13,6 +13,10 @@ function TotalDocstorageList() {
   const [centerDocstorageResponses, setCenterDocstorageResponses] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false); 
   const [selectedRows, setSelectedRows] = useState([]); 
+
+  const dragStartIndex = useRef(null);
+  const dragEndIndex = useRef(null);
+  const dragMode = useRef('select');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,6 +40,8 @@ function TotalDocstorageList() {
   }, []);
 
   const handleCenterClick = (detailCd) => {
+
+    setSelectedRows([]); 
     setSelectedCenterCode(detailCd);
   
     if (!centerDocstorageResponses) return;
@@ -57,6 +63,7 @@ function TotalDocstorageList() {
     const numberedDetails = selectedDetails.map((item, index) => ({
       ...item,
       no: index + 1,
+      detailId: item.detailId || `id-${index}`, // detailId가 없을 경우 기본값 추가
     }));
     
     setDocstorageDetails(numberedDetails);
@@ -68,15 +75,49 @@ function TotalDocstorageList() {
   };
 
   const handleRowSelect = (row) => {
-    if (selectedRows.includes(row)) {
-      setSelectedRows(prevSelectedRows => prevSelectedRows.filter(selectedRow => selectedRow !== row));
+    const detailId = row.detailId;
+    if (selectedRows.includes(detailId)) {
+      setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== detailId));
     } else {
-      setSelectedRows(prevSelectedRows => [...prevSelectedRows, row]);
+      setSelectedRows(prevSelectedRows => [...prevSelectedRows, detailId]);
     }
   };
 
-  const handleRowClick = (row) => {
-    handleRowSelect(row);
+  const handleMouseDown = (index) => {
+    dragStartIndex.current = index;
+
+    const detailId = docstorageDetails[index].detailId;
+    if (selectedRows.includes(detailId)) {
+      dragMode.current = 'deselect'; // 이미 선택된 항목이면 드래그 모드를 'deselect'로 설정
+    } else {
+      dragMode.current = 'select'; // 선택되지 않은 항목이면 드래그 모드를 'select'로 설정
+    }
+  };
+
+  const handleMouseOver = (index) => {
+    if (dragStartIndex.current !== null) {
+      dragEndIndex.current = index;
+      const start = Math.min(dragStartIndex.current, dragEndIndex.current);
+      const end = Math.max(dragStartIndex.current, dragEndIndex.current);
+
+      let newSelectedRows = [...selectedRows];
+
+      for (let i = start; i <= end; i++) {
+        const detailId = docstorageDetails[i].detailId;
+        if (dragMode.current === 'select' && !newSelectedRows.includes(detailId)) {
+          newSelectedRows.push(detailId); // 선택되지 않은 항목 추가
+        } else if (dragMode.current === 'deselect' && newSelectedRows.includes(detailId)) {
+          newSelectedRows = newSelectedRows.filter(id => id !== detailId); // 이미 선택된 항목 제거
+        }
+      }
+
+      setSelectedRows(newSelectedRows);
+    }
+  };
+
+  const handleMouseUp = () => {
+    dragStartIndex.current = null;
+    dragEndIndex.current = null;
   };
 
   const downloadExcel = async () => {
@@ -129,7 +170,7 @@ function TotalDocstorageList() {
           type="checkbox"
           onChange={(e) => {
             const isChecked = e.target.checked;
-            setSelectedRows(isChecked ? [...docstorageDetails] : []);
+            setSelectedRows(isChecked ? docstorageDetails.map(d => d.detailId) : []);
           }}
         />
       ),
@@ -140,7 +181,7 @@ function TotalDocstorageList() {
           type="checkbox"
           name="detailSelect"
           onChange={() => handleRowSelect(row)}
-          checked={selectedRows.includes(row)}
+          checked={selectedRows.includes(row.detailId)}
         />
       ),
     },
@@ -188,7 +229,9 @@ function TotalDocstorageList() {
                     <Table
                     columns={detailColumns}
                     data={docstorageDetails}
-                    onRowClick={handleRowClick} 
+                    onRowMouseDown={handleMouseDown}  
+                    onRowMouseOver={handleMouseOver}  
+                    onRowMouseUp={handleMouseUp} 
                     />
                 </div>
             </div>

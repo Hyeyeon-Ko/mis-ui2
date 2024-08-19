@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useContext, useCallback, useRef } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import DocstorageAddModal from '../../views/docstorage/DocstorageAddModal';
 import DocstorageUpdateModal from '../../views/docstorage/DocstorageUpdateModal';
 import DocstorageApplyModal from '../../views/docstorage/DocstorageApplyModal';
 import TypeSelect from '../../components/TypeSelect'; 
+import StatusSelect from '../../components/StatusSelect';
 import axios from 'axios';
 import '../../styles/common/Page.css';
 import '../../styles/docstorage/Docstorage.css';
@@ -20,12 +21,23 @@ function Docstorage() {
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedDoc, setSelectedDoc] = useState(null); 
   const [selectedType, setSelectedType] = useState('전체'); 
+  const [selectedStatus, setSelectedStatus] = useState('전체');  
   const [types] = useState([
     '전체',
     '이관',
     '파쇄',
     '미신청',
   ]);
+  const statusOptions = [
+    { label: '전체', value: '전체' },
+    { label: '신청완료', value: '신청완료' },
+    { label: '승인완료', value: '승인완료' },
+    { label: '완료', value: '완료' },
+  ];
+
+  const dragStartIndex = useRef(null);
+  const dragEndIndex = useRef(null);
+  const dragMode = useRef('select'); 
 
   const fetchDocstorageDetails = useCallback(() => {
     if (userId && deptCd) {
@@ -39,11 +51,10 @@ function Docstorage() {
               ...item,
               no: index + 1,
               typeDisplay: item.type === 'A' ? '이관' : item.type === 'B' ? '파쇄' : '',
-              statusDisplay: item.status === 'A' ? '신청완료' : item.status === 'E' ? '완료' : ''
+              statusDisplay: item.status === 'A' ? '신청완료' : item.status === 'B' ? '승인완료' : item.status === 'E' ? '완료' : '',
             }));
 
             setDocstorageDetails(data);
-            console.log('response: ', response);
           } else {
             setDocstorageDetails([]);
           }
@@ -63,18 +74,59 @@ function Docstorage() {
     setSelectedType(event.target.value);
   };
 
+  const handleStatusChange = (event) => {  
+    setSelectedStatus(event.target.value);
+  };
+
   const handleSave = (newData) => {
     fetchDocstorageDetails(); 
     setShowAddModal(false);
   };
 
-  const handleRowSelect = (e, row) => {
+  const handleRowSelect = (e, row, index) => {
     const isChecked = e.target.checked;
     if (isChecked) {
       setSelectedRows(prevSelectedRows => [...prevSelectedRows, row.detailId]);
     } else {
       setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== row.detailId));
     }
+  };
+
+  const handleMouseDown = (index) => {
+    dragStartIndex.current = index;
+
+    const detailId = docstorageDetails[index].detailId;
+    if (selectedRows.includes(detailId)) {
+      dragMode.current = 'deselect'; 
+    } else {
+      dragMode.current = 'select'; 
+    }
+  };
+
+  const handleMouseOver = (index) => {
+    if (dragStartIndex.current !== null) {
+      dragEndIndex.current = index;
+      const start = Math.min(dragStartIndex.current, dragEndIndex.current);
+      const end = Math.max(dragStartIndex.current, dragEndIndex.current);
+
+      let newSelectedRows = [...selectedRows];
+
+      for (let i = start; i <= end; i++) {
+        const detailId = docstorageDetails[i].detailId;
+        if (dragMode.current === 'select' && !newSelectedRows.includes(detailId)) {
+          newSelectedRows.push(detailId); 
+        } else if (dragMode.current === 'deselect' && newSelectedRows.includes(detailId)) {
+          newSelectedRows = newSelectedRows.filter(id => id !== detailId); 
+        }
+      }
+
+      setSelectedRows(newSelectedRows);
+    }
+  };
+
+  const handleMouseUp = () => {
+    dragStartIndex.current = null;
+    dragEndIndex.current = null;
   };
 
   const handleDelete = async () => {
@@ -170,6 +222,7 @@ const handleUpdate = async (updatedData, isFileUpload = false) => {
       }
       setShowEditModal(false);
       alert('수정이 완료되었습니다.');
+      fetchDocstorageDetails();
     }
   } catch (error) {
     console.error('문서보관 정보를 수정하는 중 에러 발생:', error);
@@ -235,11 +288,11 @@ const handleUpdate = async (updatedData, isFileUpload = false) => {
       ),
       accessor: 'select',
       width: '5%',
-      Cell: ({ row }) => (
+      Cell: ({ row, index }) => (
         <input
           type="checkbox"
           name="detailSelect"
-          onChange={(e) => handleRowSelect(e, row)}
+          onChange={(e) => handleRowSelect(e, row, index)}
           checked={selectedRows.includes(row.detailId)}
         />
       ),
@@ -256,7 +309,17 @@ const handleUpdate = async (updatedData, isFileUpload = false) => {
       accessor: 'typeDisplay',
       width: '10%',
     },
-    { header: '상태', accessor: 'statusDisplay' },
+    {
+      header: (
+        <StatusSelect
+          statusOptions={statusOptions}
+          selectedStatus={selectedStatus}  
+          onStatusChange={handleStatusChange} 
+        />
+      ),
+      accessor: 'statusDisplay',
+      width: '10%',
+    },
     { header: '팀 명', accessor: 'teamNm' },
     { header: '문서관리번호', accessor: 'docId' },
     { header: '입고위치', accessor: 'location' },
@@ -272,11 +335,9 @@ const handleUpdate = async (updatedData, isFileUpload = false) => {
   ];
 
   const filteredDocstorageDetails =
-  selectedType === '전체'
-    ? docstorageDetails
-    : selectedType === '미신청'
-    ? docstorageDetails.filter((doc) => doc.typeDisplay === null || doc.typeDisplay === '')
-    : docstorageDetails.filter((doc) => doc.typeDisplay === selectedType);
+  docstorageDetails
+    .filter((doc) => selectedType === '전체' || doc.typeDisplay === selectedType || (selectedType === '미신청' && !doc.typeDisplay))
+    .filter((doc) => selectedStatus === '전체' || doc.statusDisplay === selectedStatus); 
 
   return (
     <div className='content'>
@@ -302,7 +363,10 @@ const handleUpdate = async (updatedData, isFileUpload = false) => {
               <div className="docstorage-details-table">
                 <Table
                   columns={detailColumns}
-                  data={filteredDocstorageDetails} 
+                  data={filteredDocstorageDetails}
+                  onRowMouseDown={handleMouseDown}  
+                  onRowMouseOver={handleMouseOver}  
+                  onRowMouseUp={handleMouseUp}    
                 />
               </div>
             </div>
