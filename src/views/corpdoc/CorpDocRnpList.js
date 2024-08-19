@@ -113,7 +113,7 @@ function CorpDocRnpList() {
     <div className='content'>
       <div className='corpDoc-rnp-list'>
         <h2>서류 수불 대장</h2>
-        <Breadcrumb items={['법인서류 관리', '서류 수불 대장']} />
+        <Breadcrumb items={['법인서류 대장', '서류 수불 대장']} />
         <ConditionFilter
           startDate={startDate}
           setStartDate={setStartDate}

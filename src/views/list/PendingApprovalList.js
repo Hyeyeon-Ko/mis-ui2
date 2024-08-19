@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
@@ -10,6 +10,8 @@ import '../../styles/common/Page.css';
 import axios from 'axios';
 
 function PendingApprovalList() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [applications, setApplications] = useState([]);
   const [centers] = useState([
     '전체', '재단본부', '광화문', '여의도센터', '강남센터',
@@ -20,11 +22,27 @@ function PendingApprovalList() {
   const [error, setError] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [documentType, setDocumentType] = useState('');
   const [filters, setFilters] = useState({});
-  const [modalVisible, setModalVisible] = useState(false); 
-  const [selectedDocumentId, setSelectedDocumentId] = useState(null); 
-  const navigate = useNavigate();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedDocumentId, setSelectedDocumentId] = useState(null);
+
+  const queryParams = new URLSearchParams(location.search);
+  const documentType = queryParams.get('documentType') || '';
+
+  const getBreadcrumbItems = () => {
+    switch (documentType) {
+      case '명함신청':
+        return ['명함 관리', '승인대기 내역'];
+      case '인장신청':
+        return ['인장 관리', '승인대기 내역'];
+      case '법인서류':
+        return ['법인서류 관리', '승인대기 내역'];
+      case '문서수발신':
+        return ['문서수발신 관리', '승인대기 내역'];
+      default:
+        return ['신청내역 관리', '승인대기 내역'];
+    }
+  };
 
   const fetchPendingList = useCallback(async (filterParams = {}) => {
     setLoading(true);
@@ -32,7 +50,7 @@ function PendingApprovalList() {
     try {
       const response = await axios.get('/api/pendingList', {
         params: {
-          documentType: filterParams.documentType || '',
+          documentType,
           startDate: filterParams.startDate || '',
           endDate: filterParams.endDate || '',
         },
@@ -70,7 +88,7 @@ function PendingApprovalList() {
     } finally {
       setLoading(false);
     }
-  }, []); 
+  }, [documentType]);
 
   useEffect(() => {
     fetchPendingList(filters);
@@ -105,7 +123,6 @@ function PendingApprovalList() {
 
   const handleSearch = () => {
     setFilters({
-      documentType,
       startDate: startDate ? startDate.toISOString().split('T')[0] : '',
       endDate: endDate ? endDate.toISOString().split('T')[0] : '',
       selectedCenter,
@@ -115,7 +132,6 @@ function PendingApprovalList() {
   const handleReset = () => {
     setStartDate(null);
     setEndDate(null);
-    setDocumentType('');
     setSelectedCenter('전체');
     setFilters({});
   };
@@ -175,18 +191,18 @@ function PendingApprovalList() {
   return (
     <div className="content">
       <div className="order">
-        <h2>승인 대기 내역</h2>
-        <Breadcrumb items={['신청내역 관리', '승인 대기 내역']} />
+        <h2>승인대기 내역</h2>
+        <Breadcrumb items={getBreadcrumbItems()} /> 
         <ConditionFilter
           startDate={startDate}
           setStartDate={setStartDate}
           endDate={endDate}
           setEndDate={setEndDate}
           documentType={documentType}
-          setDocumentType={setDocumentType}
+          setDocumentType={() => {}}
           onSearch={handleSearch}
           onReset={handleReset}
-          showDocumentType={true}
+          showDocumentType={false}
         />
         {loading ? (
           <p>로딩 중...</p>

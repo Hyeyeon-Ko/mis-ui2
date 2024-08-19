@@ -126,7 +126,7 @@ function DocOutList() {
     <div className="content">
       <div className="doc-out-list">
         <h2>문서 발신 대장</h2>
-        <Breadcrumb items={['문서수발신 관리', '문서 발신 대장']} />
+        <Breadcrumb items={['문서수발신 대장', '문서 발신 대장']} />
         <ConditionFilter
           startDate={startDate}
           setStartDate={setStartDate}

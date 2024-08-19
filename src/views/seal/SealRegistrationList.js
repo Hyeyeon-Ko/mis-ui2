@@ -91,7 +91,7 @@ function SealRegistrationList() {
       <div className='seal-registration-list'>
         <h2>인장 등록 대장</h2>
         <div className="seal-header-row">
-          <Breadcrumb items={['인장 관리', '인장 등록 대장']} />
+          <Breadcrumb items={['인장 대장', '인장 등록 대장']} />
           <div className="seal-header-buttons">
             <CustomButton className="seal-add-button" onClick={handleAddApplication}>추 가</CustomButton>
             <CustomButton className="seal-modify-button" onClick={handleModifyApplication}>수 정</CustomButton>

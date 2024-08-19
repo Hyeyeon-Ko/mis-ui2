@@ -57,7 +57,7 @@ function RequireAuth({ children }) {
   }
 
   if ((auth.role === 'ADMIN' || auth.role === 'MASTER') && window.location.pathname === '/') {
-    return <Navigate to="/api/applyList" />;
+    return <Navigate to="/api/std" />;
   }
 
   return children;

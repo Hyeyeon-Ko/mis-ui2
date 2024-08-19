@@ -126,7 +126,7 @@ function SealManagementList() {
     <div className="content">
       <div className="seal-management-list">
         <h2>인장 관리 대장</h2>
-        <Breadcrumb items={['인장 관리', '인장 관리 대장']} />
+        <Breadcrumb items={['인장 대장', '인장 관리 대장']} />
         <ConditionFilter
           startDate={startDate}
           setStartDate={setStartDate}

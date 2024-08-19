@@ -122,7 +122,7 @@ function SealExportList() {
     <div className="content">
       <div className="seal-export-list">
         <h2>인장 반출 대장</h2>
-        <Breadcrumb items={['인장 관리', '인장 반출 대장']} />
+        <Breadcrumb items={['인장 대장', '인장 반출 대장']} />
         <ConditionFilter
           startDate={startDate}
           setStartDate={setStartDate}

@@ -172,15 +172,19 @@ const handleEdit = async () => {
     setSelectedDoc(null);
     setShowEditModal(true);
     return;
-  } else if (selectedRows.length !== 1) {
-    alert("수정할 항목을 하나만 선택하세요.");
-    return;
   }
 
   const detailId = selectedRows[0];
+  
+  if (selectedRows.length > 1) {
+    setSelectedDoc(null);
+    setShowEditModal(true);
+    return;
+  }
+
   const selectedDoc = docstorageDetails.find(doc => doc.detailId === detailId);
 
-  if (selectedDoc.type === 'B' && selectedDoc.status === 'E') {
+  if (selectedDoc.type === 'B' && selectedDoc.status === 'B') {
     alert("파쇄 완료된 문서는 수정이 불가합니다.");
     return;
   }
@@ -198,31 +202,23 @@ const handleEdit = async () => {
 
 const handleUpdate = async (updatedData, isFileUpload = false) => {
   try {
-    let url;
-    let payload;
-
     if (isFileUpload) {
-      url = '/api/docstorage/update';
-      payload = updatedData;
-    } else {
-      const { detailId, ...updatePayload } = updatedData;
-      url = `/api/docstorage/?detailId=${detailId}`;
-      payload = updatePayload;
-    }
-
-    const response = await axios.post(url, payload);
-
-    if (response.status === 200) {
-      if (!isFileUpload) {
-        setDocstorageDetails(prevDetails =>
-          prevDetails.map(doc =>
-            doc.detailId === updatedData.detailId ? { ...doc, ...updatedData } : doc
-          )
-        );
+      const response = await axios.post('/api/docstorage/update', updatedData);
+      if (response.status === 200) {
+        alert('수정이 완료되었습니다.');
+        setShowEditModal(false);
+        fetchDocstorageDetails();
       }
-      setShowEditModal(false);
-      alert('수정이 완료되었습니다.');
-      fetchDocstorageDetails();
+    } else {
+      const { detailId } = selectedDoc; 
+      const response = await axios.put('/api/docstorage/', updatedData, {
+        params: { detailId } 
+      });
+      if (response.status === 200) {
+        alert('수정이 완료되었습니다.');
+        setShowEditModal(false);
+        fetchDocstorageDetails();
+      }
     }
   } catch (error) {
     console.error('문서보관 정보를 수정하는 중 에러 발생:', error);

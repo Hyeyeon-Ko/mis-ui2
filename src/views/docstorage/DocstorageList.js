@@ -166,6 +166,12 @@ function DocstorageList() {
     }
 
     const detailId = selectedRows[0];
+    const selectedDoc = docstorageDetails.find(doc => doc.detailId === detailId);
+
+    if (selectedDoc.type === 'B' && selectedDoc.status === 'E') {
+      alert("파쇄 완료된 문서는 수정이 불가합니다.");
+      return;
+    }
 
     try {
       const response = await axios.get('/api/docstorage/', { params: { detailId } });
@@ -180,25 +186,23 @@ function DocstorageList() {
 
   const handleUpdate = async (updatedData, isFileUpload = false) => {
     try {
-      let url;
-      let payload;
-
       if (isFileUpload) {
-        url = '/api/docstorage/update';
-        payload = updatedData;
+        const response = await axios.post('/api/docstorage/update', updatedData);
+        if (response.status === 200) {
+          alert('수정이 완료되었습니다.');
+          setShowEditModal(false);
+          fetchDocstorageData();
+        }
       } else {
-        const { detailId, ...updatePayload } = updatedData;
-        url = `/api/docstorage/?detailId=${detailId}`;
-        payload = updatePayload;
-      }
-
-      const response = await axios.post(url, payload);
-
-      if (response.status === 200) {
-        setShowEditModal(false);
-        alert('수정이 완료되었습니다.');
-        
-        fetchDocstorageData();
+        const { detailId } = selectedDoc; 
+        const response = await axios.put('/api/docstorage/', updatedData, {
+          params: { detailId } 
+        });
+        if (response.status === 200) {
+          alert('수정이 완료되었습니다.');
+          setShowEditModal(false);
+          fetchDocstorageData();
+        }
       }
     } catch (error) {
       console.error('문서보관 정보를 수정하는 중 에러 발생:', error);

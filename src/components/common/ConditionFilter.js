@@ -8,17 +8,15 @@ const ConditionFilter = ({
   setStartDate,
   endDate,
   setEndDate,
-  documentType,
-  setDocumentType,
   onSearch,
   onReset,
   filters,
   onFilterChange,
   showStatusFilters,
-  showDocumentType,
   showSearchCondition,
   excludeRecipient,
   excludeSender,
+  documentType,  // 추가된 props
 }) => {
   const [searchType, setSearchType] = useState('전체');
   const [keyword, setKeyword] = useState('');
@@ -38,12 +36,7 @@ const ConditionFilter = ({
     setEndDate(new Date());
     setSearchType('전체');
     setKeyword('');
-    if (setDocumentType) setDocumentType('');
     if (onReset) onReset();
-  };
-
-  const handleDocumentTypeChange = (event) => {
-    setDocumentType(event.target.value === '전체' ? '' : event.target.value);
   };
 
   const handleReset = () => {
@@ -54,7 +47,6 @@ const ConditionFilter = ({
     const adjustedEndDate = new Date(endDate);
     adjustedEndDate.setDate(adjustedEndDate.getDate() + 1);
     onSearch({
-      documentType,
       searchType,
       keyword,
       startDate: startDate ? formatDate(startDate) : '',
@@ -87,18 +79,6 @@ const ConditionFilter = ({
           onChange={handleEndDateChange}
           className="custom-datepicker"
         />
-        {showDocumentType && setDocumentType && (
-          <>
-            <label>문서분류</label>
-            <select value={documentType} onChange={handleDocumentTypeChange}>
-              <option value="전체">전체</option>
-              <option value="명함신청">명함신청</option>
-              <option value="법인서류">법인서류</option>
-              <option value="인장관리">인장관리</option>
-              <option value="문서수발신">문서수발신</option>
-            </select>
-          </>
-        )}
         {showSearchCondition && (
           <>
             <label>검색 조건</label>
@@ -133,24 +113,28 @@ const ConditionFilter = ({
             />
             승인완료
           </label>
-          <label>
-            <input
-              type="checkbox"
-              name="statusRejected"
-              checked={filters.statusRejected}
-              onChange={onFilterChange}
-            />
-            반려
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              name="statusOrdered"
-              checked={filters.statusOrdered}
-              onChange={onFilterChange}
-            />
-            발주완료
-          </label>
+          {documentType !== '문서수발신' && (
+            <label>
+              <input
+                type="checkbox"
+                name="statusRejected"
+                checked={filters.statusRejected}
+                onChange={onFilterChange}
+              />
+              반려
+            </label>
+          )}
+          {documentType === '명함신청' && (
+            <label>
+              <input
+                type="checkbox"
+                name="statusOrdered"
+                checked={filters.statusOrdered}
+                onChange={onFilterChange}
+              />
+              발주완료
+            </label>
+          )}
           <label>
             <input
               type="checkbox"
@@ -171,15 +155,13 @@ ConditionFilter.propTypes = {
   setStartDate: PropTypes.func.isRequired,
   endDate: PropTypes.instanceOf(Date),
   setEndDate: PropTypes.func.isRequired,
-  documentType: PropTypes.string,
-  setDocumentType: PropTypes.func,
   onSearch: PropTypes.func.isRequired,
   onReset: PropTypes.func.isRequired,
   filters: PropTypes.object,
   onFilterChange: PropTypes.func,
   showStatusFilters: PropTypes.bool,
-  showDocumentType: PropTypes.bool,
   showSearchCondition: PropTypes.bool,
+  documentType: PropTypes.string,  
 };
 
 export default ConditionFilter;

@@ -1,21 +1,25 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
 import CustomButton from '../../components/common/CustomButton';
-import DocConfirmModal from '../../views/doc/DocConfirmModal';
+import DocConfirmModal from '../doc/DocConfirmModal';
 import '../../styles/list/ApplicationsList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 import fileDownload from 'js-file-download';
 
 function ApplicationsList() {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const documentTypeFromUrl = queryParams.get('documentType');
+
   const [applications, setApplications] = useState([]);
   const [filterInputs, setFilterInputs] = useState({
     startDate: null,
     endDate: null,
-    documentType: '',
+    documentType: documentTypeFromUrl || '',
   });
   const [filters, setFilters] = useState({
     statusApproved: false,
@@ -32,13 +36,28 @@ function ApplicationsList() {
   const [selectedDocumentId, setSelectedDocumentId] = useState(null);
   const navigate = useNavigate();
 
+  const getBreadcrumbItems = () => {
+    switch (documentTypeFromUrl) {
+      case '명함신청':
+        return ['명함 관리', '전체 신청내역'];
+      case '인장신청':
+        return ['인장 관리', '전체 신청내역'];
+      case '법인서류':
+        return ['법인서류 관리', '전체 신청내역'];
+      case '문서수발신':
+        return ['문서수발신 관리', '전체 신청내역'];
+      default:
+        return ['신청내역 관리', '전체 신청내역'];
+    }
+  };
+
   const fetchApplications = useCallback(async (filterParams = {}) => {
     setLoading(true);
     setError(null);
     try {
       const response = await axios.get('/api/applyList', {
         params: {
-          documentType: filterParams.documentType || null,
+          documentType: filterParams.documentType || documentTypeFromUrl || null,
           startDate: filterParams.startDate || '',
           endDate: filterParams.endDate || '',
         },
@@ -70,18 +89,23 @@ function ApplicationsList() {
     } finally {
       setLoading(false);
     }
-  }, []); 
+  }, [documentTypeFromUrl]);
 
   useEffect(() => {
-    fetchApplications(); 
+    fetchApplications();
   }, [fetchApplications]);
 
   useEffect(() => {
-    const isShowExcelButton = filters.statusClosed && selectedApplications.length > 0;
-    setShowCheckboxColumn(filters.statusClosed);
-    setShowExcelButton(isShowExcelButton);
-  }, [filters, selectedApplications]);
-
+    if (documentTypeFromUrl === '명함신청') {
+      const isShowExcelButton = filters.statusClosed && selectedApplications.length > 0;
+      setShowCheckboxColumn(filters.statusClosed);
+      setShowExcelButton(isShowExcelButton);
+    } else {
+      setShowCheckboxColumn(false);
+      setShowExcelButton(false);
+    }
+  }, [filters, selectedApplications, documentTypeFromUrl]);
+  
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
@@ -123,7 +147,7 @@ function ApplicationsList() {
   };
 
   const handleReset = () => {
-    setFilterInputs({ startDate: null, endDate: null, documentType: '' });
+    setFilterInputs({ startDate: null, endDate: null, documentType: documentTypeFromUrl || '' });
     setFilters({
       statusApproved: false,
       statusRejected: false,
@@ -200,9 +224,9 @@ function ApplicationsList() {
       navigate(`/api/bcd/applyList/${draftId}?readonly=true`);
     }
   };
-  
+
   const columns = [
-    ...(showCheckboxColumn ? [{
+    ...(showCheckboxColumn && documentTypeFromUrl === '명함신청' ? [{
       header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
       accessor: 'select',
       width: '5%',
@@ -238,20 +262,20 @@ function ApplicationsList() {
       ),
     },
   ];
-
+  
   return (
     <div className="content">
       <div className='all-applications'>
-        <h2>신청내역 관리</h2>
+        <h2>전체 신청내역</h2>
         <div className="application-header-row">
-          <Breadcrumb items={['신청내역 관리', '전체 신청내역']} />
+          <Breadcrumb items={getBreadcrumbItems()} /> 
           <div className="application-button-container">
-            {showExcelButton && (
-              <CustomButton className="excel-button2" onClick={handleExcelDownload}>
-                엑셀변환
-              </CustomButton>
-            )}
-          </div>
+          {showExcelButton && documentTypeFromUrl === '명함신청' && (
+            <CustomButton className="excel-button2" onClick={handleExcelDownload}>
+              엑셀변환
+            </CustomButton>
+          )}
+        </div>
         </div>
         <ConditionFilter
           startDate={filterInputs.startDate}

@@ -185,7 +185,7 @@ function BcdOrder() {
       <div className="order">
         <h2>명함 발주</h2>
         <div className="bcdorder-header-row">
-          <Breadcrumb items={['신청 내역 관리', '명함 발주']} />
+          <Breadcrumb items={['발주 관리', '명함 발주']} />
           <div className="buttons-container">
             <CustomButton className="excel-button" onClick={handleExcelDownload}>
               엑셀변환

@@ -132,7 +132,7 @@ export const AuthProvider = ({ children }) => {
       const newMode = !prevAuth.isUserMode;
       sessionStorage.setItem('isUserMode', newMode.toString());
       const newRole = newMode ? 'USER' : prevAuth.originalRole;
-      navigate(newMode ? '/' : '/api/applyList');
+      navigate(newMode ? '/' : '/api/std');
 
       console.log('Mode toggled:', { newMode, newRole });
 

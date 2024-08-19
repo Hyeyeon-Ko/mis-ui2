@@ -113,7 +113,7 @@ function CorpDocIssueList() {
     <div className='content'>
       <div className='corpDoc-issue-list'>
         <h2>서류 발급 대장</h2>
-        <Breadcrumb items={['법인서류 관리', '서류 발급 대장']} />
+        <Breadcrumb items={['법인서류 대장', '서류 발급 대장']} />
         <ConditionFilter
           startDate={startDate}
           setStartDate={setStartDate}
