@@ -169,7 +169,7 @@ const PreviewModal = ({ show, onClose, formData }) => {
       console.log('PreviewModal props:', formData);
       drawBusinessCard();
     }
-  }, [show, formData, drawBusinessCard]); // formData를 의존성 배열에 추가
+  }, [show, formData, drawBusinessCard]); 
 
   const formatPhoneNumber = (countryCode, number) => {
     const [part1, part2, part3] = number.split('.');
