@@ -133,6 +133,7 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
                 type="text"
                 value={detailCode}
                 onChange={e => setDetailCode(e.target.value)}
+                disabled={detailCode === "000"}
               />
               <hr className="detail-separator" />
             </div>
