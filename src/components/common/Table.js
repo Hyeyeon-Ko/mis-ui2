@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../../styles/common/Table.css';
 
-const Table = ({ columns, data, onRowMouseDown = () => {}, onRowMouseOver = () => {}, onRowMouseUp = () => {} }) => (
+const Table = ({ columns, data, onRowClick = () => {}, onRowMouseDown = () => {}, onRowMouseOver = () => {}, onRowMouseUp = () => {} }) => (
   <table className="custom-table">
     <thead>
       <tr>
@@ -18,6 +18,7 @@ const Table = ({ columns, data, onRowMouseDown = () => {}, onRowMouseOver = () =
           <tr
             key={rowIndex}
             className={isCancelled ? 'cancelled' : ''}
+            onClick={() => onRowClick(row, rowIndex)}  
             onMouseDown={() => onRowMouseDown(rowIndex)}
             onMouseOver={() => onRowMouseOver(rowIndex)}
             onMouseUp={onRowMouseUp}
@@ -43,6 +44,7 @@ const Table = ({ columns, data, onRowMouseDown = () => {}, onRowMouseOver = () =
 Table.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.object).isRequired,
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  onRowClick: PropTypes.func,
   onRowMouseDown: PropTypes.func,
   onRowMouseOver: PropTypes.func,
   onRowMouseUp: PropTypes.func,

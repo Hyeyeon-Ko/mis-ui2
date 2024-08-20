@@ -22,7 +22,6 @@ function TotalDocstorageList() {
     const fetchData = async () => {
       try {
         const response = await axios.get('/api/docstorageList/total');
-        console.log('response: ', response);
         const { centerResponses, centerDocstorageResponses } = response.data.data;
 
         const sortedCenterData = [...centerResponses].sort((a, b) => {
@@ -40,7 +39,6 @@ function TotalDocstorageList() {
   }, []);
 
   const handleCenterClick = (detailCd) => {
-
     setSelectedRows([]); 
     setSelectedCenterCode(detailCd);
   
@@ -63,18 +61,17 @@ function TotalDocstorageList() {
     const numberedDetails = selectedDetails.map((item, index) => ({
       ...item,
       no: index + 1,
-      detailId: item.detailId || `id-${index}`, // detailId가 없을 경우 기본값 추가
+      detailId: item.detailId || `id-${index}`, 
     }));
     
     setDocstorageDetails(numberedDetails);
   };
 
   const handleSave = (newData) => {
-    console.log("새로 추가된 데이터:", newData);
     setShowAddModal(false); 
   };
 
-  const handleRowSelect = (row) => {
+  const handleRowClick = (row) => {
     const detailId = row.detailId;
     if (selectedRows.includes(detailId)) {
       setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== detailId));
@@ -88,9 +85,9 @@ function TotalDocstorageList() {
 
     const detailId = docstorageDetails[index].detailId;
     if (selectedRows.includes(detailId)) {
-      dragMode.current = 'deselect'; // 이미 선택된 항목이면 드래그 모드를 'deselect'로 설정
+      dragMode.current = 'deselect'; 
     } else {
-      dragMode.current = 'select'; // 선택되지 않은 항목이면 드래그 모드를 'select'로 설정
+      dragMode.current = 'select'; 
     }
   };
 
@@ -105,9 +102,9 @@ function TotalDocstorageList() {
       for (let i = start; i <= end; i++) {
         const detailId = docstorageDetails[i].detailId;
         if (dragMode.current === 'select' && !newSelectedRows.includes(detailId)) {
-          newSelectedRows.push(detailId); // 선택되지 않은 항목 추가
+          newSelectedRows.push(detailId); 
         } else if (dragMode.current === 'deselect' && newSelectedRows.includes(detailId)) {
-          newSelectedRows = newSelectedRows.filter(id => id !== detailId); // 이미 선택된 항목 제거
+          newSelectedRows = newSelectedRows.filter(id => id !== detailId); 
         }
       }
 
@@ -123,9 +120,6 @@ function TotalDocstorageList() {
   const downloadExcel = async () => {
     try {
       const detailIds = selectedRows.map(row => row.detailId);
-  
-      console.log('Selected detail IDs:', detailIds);
-  
       const response = await axios.post('/api/docstorage/excel', detailIds, {
         responseType: 'blob', 
       });
@@ -180,7 +174,7 @@ function TotalDocstorageList() {
         <input
           type="checkbox"
           name="detailSelect"
-          onChange={() => handleRowSelect(row)}
+          onChange={() => handleRowClick(row)}
           checked={selectedRows.includes(row.detailId)}
         />
       ),
@@ -229,6 +223,7 @@ function TotalDocstorageList() {
                     <Table
                     columns={detailColumns}
                     data={docstorageDetails}
+                    onRowClick={handleRowClick}  
                     onRowMouseDown={handleMouseDown}  
                     onRowMouseOver={handleMouseOver}  
                     onRowMouseUp={handleMouseUp} 

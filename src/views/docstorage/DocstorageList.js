@@ -1,14 +1,14 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
-import '../../styles/common/Page.css';
-import '../../styles/docstorage/DocstorageList.css';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import DocstorageUpdateModal from './DocstorageUpdateModal'; 
 import DocstorageBulkUpdateModal from './DocstorageBulkUpdateModal'; 
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 import StatusSelect from '../../components/StatusSelect';  
+import '../../styles/common/Page.css';
+import '../../styles/docstorage/DocstorageList.css';
 
 function DocstorageList() {
   const { auth } = useContext(AuthContext);
@@ -106,7 +106,7 @@ function DocstorageList() {
     fetchDocstorageData(detailCd);
   };
 
-  const handleRowSelect = (row) => {
+  const handleRowClick = (row) => {
     const detailId = row.detailId;
     if (selectedRows.includes(detailId)) {
       setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== detailId));
@@ -335,7 +335,7 @@ function DocstorageList() {
           <input
             type="checkbox"
             name="detailSelect"
-            onChange={() => handleRowSelect(row)}
+            onChange={() => handleRowClick(row)}
             checked={selectedRows.includes(row.detailId)}
           />
         ),
@@ -428,6 +428,7 @@ function DocstorageList() {
                   <Table
                     columns={detailColumns}
                     data={filteredDocstorageDetails}  
+                    onRowClick={handleRowClick}  // 행 클릭 이벤트 핸들러 추가
                     onRowMouseDown={handleMouseDown}  
                     onRowMouseOver={handleMouseOver}  
                     onRowMouseUp={handleMouseUp} 

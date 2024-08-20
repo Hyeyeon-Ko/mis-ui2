@@ -212,6 +212,11 @@ function StandardData() {
     });
   };
 
+  const handleRowClick = (row) => {
+    const detailCd = row.detailCd;
+    handleDetailSelect(detailCd);
+  };
+
   const handleDeleteRow = async () => {
     if (selectedDetails.length === 0) {
       alert('삭제할 상세 코드를 선택하세요.');
@@ -362,6 +367,7 @@ function StandardData() {
                 <Table
                   columns={detailColumns}
                   data={details}
+                  onRowClick={handleRowClick}  
                 />
               </div>
           </div>

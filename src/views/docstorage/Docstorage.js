@@ -85,6 +85,11 @@ function Docstorage() {
     setShowAddModal(false);
   };
 
+  const handleRowClick = (row, index) => {
+    const isChecked = !selectedRows.includes(row.detailId);
+    handleRowSelect({ target: { checked: isChecked } }, row, index);
+  };
+
   const handleRowSelect = (e, row, index) => {
     const isChecked = e.target.checked;
     if (isChecked) {
@@ -376,6 +381,7 @@ const handleBulkUpdate = async (payload) => {
                 <Table
                   columns={detailColumns}
                   data={filteredDocstorageDetails}
+                  onRowClick={handleRowClick}  // 행 클릭 이벤트 핸들러 추가
                   onRowMouseDown={handleMouseDown}  
                   onRowMouseOver={handleMouseOver}  
                   onRowMouseUp={handleMouseUp}    
