@@ -25,6 +25,7 @@ function DetailApplication() {
     lastName: '',
     center: '',
     department: '',
+    team: '',
     teamNm: '',
     addTeamNm: '',
     addEngTeamNm: '',
@@ -204,11 +205,6 @@ function DetailApplication() {
     }
   };
 
-  useEffect(() => {
-    // bcdData가 변경될 때마다 콘솔에 출력
-    console.log('formData:', formData);
-  }, [formData]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -256,7 +252,7 @@ function DetailApplication() {
       deptCd: formData.department,
       teamCd: formData.team,
       teamNm: formData.team === '000' ? formData.addTeamNm : formData.teamNm,
-      engTeamNm: formData.team === '000' ? formData.addEngTeamNm : formData.engTeamNm,
+      engTeamNm: formData.team === '000' ? formData.addEngTeamNm : "",
       gradeCd: formData.position,
       gradeNm: formData.gradeNm,
       addGradeNm: formData.addGradenM,
@@ -345,14 +341,15 @@ function DetailApplication() {
   const handleTeamChange = (e) => {
     const selectedTeam = e.target.value;
     const selectedTeamInfo = bcdData.teamInfo.find((team) => team.detailCd === selectedTeam);
-    const engTeam = selectedTeamInfo ? selectedTeamInfo.etcItem1 : '';
+    const teamNm = selectedTeamInfo ? selectedTeamInfo.detailNm : '';
 
-    setFormData({ ...formData, team: selectedTeam, engTeam });
+    setFormData({ ...formData, team: selectedTeam, teamNm: teamNm });
   };
 
   const handlePositionChange = (e) => {
     const selectedPosition = e.target.value;
     const selectedPositionInfo = bcdData.gradeInfo.find((position) => position.detailCd === selectedPosition);
+    const gradNm = selectedPositionInfo ? selectedPositionInfo.etcItem2: '';
     const enGradeNm = selectedPositionInfo ? selectedPositionInfo.etcItem2 : '';
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -561,7 +558,7 @@ function DetailApplication() {
                   <option value="">선택하세요</option>
                   {bcdData.gradeInfo.map((position) => (
                     <option key={position.detailCd} value={position.detailCd}>
-                      {`${position.detailNm}  | ${position.etcItem2}`}
+                      {position.detailCd === '000' ? position.detailNm: `${position.detailNm}  | ${position.etcItem2}`}
                     </option>
                   ))}
                 </select>

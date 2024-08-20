@@ -165,7 +165,7 @@ const PreviewModal = ({ show, onClose, formData }) => {
           const mainEngAddress = engAddressParts.slice(0, 3).join(',').trim();
           const nextLineEngAddress = engAddressParts.slice(3).join(',').trim();
           drawTextWithMaxWidth(ctx, mainEngAddress, 904, 284.8, -0.56, 240, 14.6);
-          drawTextWithMaxWidth(ctx, nextLineEngAddress, 840, 304.8, -0.08, 240, 14.6);
+          drawTextWithMaxWidth(ctx, nextLineEngAddress, 840, 304.8, -0.08, 270, 14.6);
             } else {
               drawTextWithMaxWidth(ctx, formData.engAddress, 904, 284.8, -0.56, 240, 14.6);
             }
