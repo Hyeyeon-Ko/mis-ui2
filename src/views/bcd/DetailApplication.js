@@ -25,7 +25,9 @@ function DetailApplication() {
     lastName: '',
     center: '',
     department: '',
-    team: '',
+    teamNm: '',
+    addTeamNm: '',
+    addEngTeamNm: '',
     position: '',
     engPosition: '',
     gradeNm: '',
@@ -136,6 +138,7 @@ function DetailApplication() {
         const [mobile1, mobile2, mobile3] = data.phoneTel.split('-');
         const email = data.email.split('@')[0];
         const [baseAddress, floor] = data.address.split(', ');
+        const [teamNm] = data.teamNm.split('|');
         const [gradeNm] = data.gradeNm.split('|');
 
         setFormData({
@@ -146,6 +149,9 @@ function DetailApplication() {
           department: data.deptCd,
           team: data.teamCd,
           position: data.gradeCd,
+          teamNm: teamNm.trim(),
+          addTeamNm: data.addTeamNm,
+          addEngTeamNm: data.addEngTeamNm,
           gradeNm: gradeNm.trim(),
           addGradeNm: data.addGradeNm,
           enGradeNm: data.enGradeNm,
@@ -198,6 +204,11 @@ function DetailApplication() {
     }
   };
 
+  useEffect(() => {
+    // bcdData가 변경될 때마다 콘솔에 출력
+    console.log('formData:', formData);
+  }, [formData]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -244,6 +255,8 @@ function DetailApplication() {
       instCd: formData.center,
       deptCd: formData.department,
       teamCd: formData.team,
+      teamNm: formData.team === '000' ? formData.addTeamNm : formData.teamNm,
+      engTeamNm: formData.team === '000' ? formData.addEngTeamNm : formData.engTeamNm,
       gradeCd: formData.position,
       gradeNm: formData.gradeNm,
       addGradeNm: formData.addGradenM,
@@ -344,8 +357,8 @@ function DetailApplication() {
     setFormData((prevFormData) => ({
       ...prevFormData,
       position: selectedPosition,
-      gradeNm: selectedPosition === '999' ? prevFormData.addGradeNm : null,
-      enGradeNm: selectedPosition === '999' ? enGradeNm : null,
+      gradeNm: selectedPosition === '000' ? prevFormData.addGradeNm : null,
+      enGradeNm: selectedPosition === '000' ? enGradeNm : null,
     }));
   };
 
@@ -483,28 +496,65 @@ function DetailApplication() {
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">부서</label>
-                <select name="department" value={formData.department} onChange={handleDepartmentChange} required={!isReadOnly} disabled={isReadOnly}>
+                <select 
+                  name="department" 
+                  value={formData.department} 
+                  onChange={handleDepartmentChange} 
+                  required={!isReadOnly} 
+                  disabled={isReadOnly}
+                  defaultValue={bcdData.deptInfo.find((dept) => dept.detailCd === formData.department)?.detailCd || ''}
+                >
                   <option value="">선택하세요</option>
                   {bcdData.deptInfo
                     .filter((dept) => dept.etcItem1 === formData.center)
                     .map((department) => (
-                      <option key={department.detailCd} value={department.detailCd}>{department.detailNm}</option>
-                    ))}
-                </select>
-              </div>
-              <div className="form-group-horizontal">
-                <label className="form-label">팀 명</label>
-                <select name="team" value={formData.team} onChange={handleTeamChange} required={!isReadOnly} disabled={isReadOnly}>
-                  <option value="">선택하세요</option>
-                  {bcdData.teamInfo
-                    .filter((team) => team.etcItem1 === formData.department)
-                    .map((team) => (
-                      <option key={team.detailCd} value={team.detailCd}>
-                        {`${team.detailNm} | ${team.etcItem2}`}
+                      <option key={department.detailCd} value={department.detailCd}>
+                        {department.detailNm}
                       </option>
                     ))}
                 </select>
               </div>
+              <div className="form-group-horizontal">
+                <label className="form-label">팀</label>
+                <select name="team" value={formData.team} onChange={handleTeamChange} required={!isReadOnly} disabled={isReadOnly}>
+                  <option value="">선택하세요</option>
+                  {bcdData.teamInfo
+                    .filter((team) => team.etcItem1 === formData.department || team.detailCd === '000')
+                    .map((team) => (
+                      <option key={team.detailCd} value={team.detailCd}>
+                        {team.detailCd === '000' ? team.detailNm : `${team.detailNm} | ${team.etcItem2}`}
+                      </option>
+                    ))}
+                </select>
+              </div>
+              {formData.team === '000' && (
+                <div className="additional-inputs">
+                  <div className="form-group-horizontal">
+                    <label className="form-label">팀 명</label>
+                    <input
+                      type="text"
+                      name="addTeamNm"
+                      value={formData.addTeamNm}
+                      onChange={handleChange}
+                      required
+                      placeholder="팀명"
+                      disabled={isReadOnly}
+                    />
+                  </div>
+                  <div className="form-group-horizontal">
+                    <label className="form-label">영문 팀명</label>
+                    <input
+                      type="text"
+                      name="addEngTeamNm"
+                      value={formData.addEngTeamNm}
+                      onChange={handleChange}
+                      required
+                      placeholder="영문 팀명"
+                      disabled={isReadOnly}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="form-group-horizontal">
                 <label className="form-label">직위 / 직책</label>
                 <select name="position" value={formData.position} onChange={handlePositionChange} required={!isReadOnly} disabled={isReadOnly}>
@@ -516,10 +566,10 @@ function DetailApplication() {
                   ))}
                 </select>
               </div>
-              {formData.position === '999' && (
+              {formData.position === '000' && (
                 <div className="additional-inputs">
                 <div className="form-group-horizontal">
-                  <label className="form-label">직위</label>
+                  <label className="form-label">직위명</label>
                   <input
                     type="text"
                     name="addGradeNm"
@@ -531,7 +581,7 @@ function DetailApplication() {
                   />
                 </div>
                 <div className="form-group-horizontal">
-                  <label className="form-label">영문 직위</label>
+                  <label className="form-label">영문 직위명</label>
                   <input
                     type="text"
                     name="enGradeNm"

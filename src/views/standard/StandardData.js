@@ -142,6 +142,7 @@ function StandardData() {
       }
     } else if (modalMode === 'edit') {
       try {
+        const oriDetailCd = selectedDetails[0];
         await axios.put('/api/std/detailInfo', {
           groupCd: selectedSubCategory,
           detailCd: newRow.detailCode,
@@ -156,6 +157,8 @@ function StandardData() {
           etcItem6: newRow.items[5],
           etcItem7: newRow.items[6],
           etcItem8: newRow.items[7],
+        }, {
+          params: {oriDetailCd}
         });
         alert('상세 코드가 수정되었습니다.');
         fetchDetails(selectedSubCategory);
