@@ -32,6 +32,8 @@ import SealApplyExport from "./views/seal/SealApplyExport";
 import Docstorage from "./views/docstorage/Docstorage";
 import DocstorageList from './views/docstorage/DocstorageList';
 import TotalDocstorageList from './views/docstorage/TotalDocstorageList';
+import RentalManage from './views/rental/RentalManage';
+import TotalRentalManage from './views/rental/TotalRentalManage';
 import { AuthProvider, AuthContext } from './components/AuthContext';
 
 function MainLayout({ children }) {
@@ -96,6 +98,8 @@ function App() {
                 <Route path="/api/docstorage" element={<RequireAuth><Docstorage /></RequireAuth>} />
                 <Route path="/api/docstorageList" element={<RequireAuth><DocstorageList /></RequireAuth>} />
                 <Route path="/api/totalDocstorageList" element={<RequireAuth><TotalDocstorageList /></RequireAuth>} />
+                <Route path="/api/rentalList" element={<RequireAuth><RentalManage /></RequireAuth>} />
+                <Route path="/api/totalRentalList" element={<RequireAuth><TotalRentalManage /></RequireAuth>} />
                 <Route path="/api/bcd/orderList" element={<RequireAuth><BcdOrder /></RequireAuth>} />
                 <Route path="/api/std" element={<RequireAuth><StandardData /></RequireAuth>} />
                 <Route path="/api/bcd/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />

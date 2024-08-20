@@ -46,14 +46,14 @@ function TotalDocstorageList() {
   
     const centerMapping = {
       "100": centerDocstorageResponses.foundationResponses,
-      "101": centerDocstorageResponses.gwanghwamunResponses,
-      "102": centerDocstorageResponses.yeouidoResponses,
-      "103": centerDocstorageResponses.gangnamResponses,
-      "104": centerDocstorageResponses.suwonResponses,
-      "105": centerDocstorageResponses.daeguResponses,
-      "106": centerDocstorageResponses.busanResponses,
-      "107": centerDocstorageResponses.gwangjuResponses,
-      "108": centerDocstorageResponses.jejuResponses,
+      "111": centerDocstorageResponses.gwanghwamunResponses,
+      "112": centerDocstorageResponses.yeouidoResponses,
+      "113": centerDocstorageResponses.gangnamResponses,
+      "211": centerDocstorageResponses.suwonResponses,
+      "611": centerDocstorageResponses.daeguResponses,
+      "612": centerDocstorageResponses.busanResponses,
+      "711": centerDocstorageResponses.gwangjuResponses,
+      "811": centerDocstorageResponses.jejuResponses,
     };
   
     const selectedDetails = centerMapping[detailCd] || [];

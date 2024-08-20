@@ -1,0 +1,108 @@
+.totalRentalManage-content {
+    padding: 8px 16px;
+}
+
+.totalRentalManage-content-inner h2 {
+    font-size: 28px;
+    margin-bottom: 16px;
+}
+
+.totalRentalManage-tables-section {
+    display: flex;
+}
+
+.totalRentalManage-sub-category-section {
+    width: 200px;
+}
+
+.totalRentalManage-details-content {
+    flex: 7;
+    margin-left: 20px;
+    overflow-x: auto;
+}
+
+.totalRentalManage-header-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.totalRentalManage-sub-category-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 6px;
+    margin-right: 10px;
+    margin-bottom: 4px;
+}
+
+.totalRentalManage-detail-content-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 10px;
+    padding-left: 5px;
+}
+
+.totalRentalManage-sub-category-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.totalRentalManage-sub-category-table th {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 8px 20px;
+    text-align: center;
+    font-size: 13px;
+}
+
+.totalRentalManage-sub-category-table td {
+    border: 1px solid #ddd;
+    padding: 8px 20px;
+    text-align: left;
+    font-size: 13px;
+}
+
+.totalRentalManage-sub-category-table td:hover {
+    background-color: #edf7ff;
+}
+
+.totalRentalManage-details-table {
+    border-collapse: collapse;
+    width: 100%;
+    overflow-x: auto;
+    max-width: 100%;
+    min-width: 100%;
+}
+
+.totalRentalManage-details-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.totalRentalManage-details-table th, .totalRentalManage-details-table td {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 8px 20px;
+    text-align: center;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.totalRentalManage-excel-button {
+    border-radius: 7px;
+    padding: 4px 8px;
+    width: 55px;
+    height: 30px;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border: none;
+    color: white;
+    background-color: #07AF5A;
+}
+
+.totalRentalManage-excel-button:hover {
+    background-color: #068c4e;
+}

@@ -168,7 +168,7 @@ function BcdOrder() {
           className="order-checkbox"
           checked={selectedApplications.includes(row.id)}
           onChange={(event) => handleSelect(event, row.id)}
-          onClick={(e) => e.stopPropagation()} // 체크박스 클릭 시 행 클릭 이벤트 중복 실행 방지
+          onClick={(e) => e.stopPropagation()} 
         />
       ),
     },
