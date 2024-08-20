@@ -57,33 +57,39 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
         const data = new Uint8Array(event.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
-        const worksheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+        const worksheet = workbook.Sheets[sheetName];
+      
+        const jsonOptions = {
           header: 1,
           defval: '',
-        });
-
-        const extractedData = worksheet
-        .slice(4)
-        .filter((row) => row[0])
-        .map((row) => ({
-          no: row[0],
-          deptCd: auth.deptCd,
-          teamNm: row[1] !== undefined ? row[1].toString() : '',
-          docId: row[2] !== undefined ? row[2].toString() : '',
-          location: row[3] !== undefined ? row[3].toString() : '',
-          docNm: row[4] !== undefined ? row[4].toString() : '',
-          manager: row[5] !== undefined ? row[5].toString() : '',
-          subManager: row[6] !== undefined ? row[6].toString() : '',
-          storageYear: row[7] !== undefined ? row[7].toString() : '',
-          createDate: row[8] !== undefined ? row[8].toString() : '',
-          transferDate: row[9] !== undefined ? row[9].toString() : '',
-          tsdNum: row[10] !== undefined ? row[10].toString() : '',
-          disposalDate: row[11] !== undefined ? row[11].toString() : '',
-          dpdNum: row[12] !== undefined ? row[12].toString() : '',
-        }));
-
+          raw: false, 
+          dateNF: 'yyyy-mm-dd',
+        };
+      
+        const worksheetData = XLSX.utils.sheet_to_json(worksheet, jsonOptions);
+      
+        const extractedData = worksheetData
+          .slice(4)
+          .filter((row) => row[0])
+          .map((row) => ({
+            no: row[0],
+            deptCd: auth.deptCd,
+            teamNm: row[1] !== undefined ? row[1].toString() : '',
+            docId: row[2] !== undefined ? row[2].toString() : '',
+            location: row[3] !== undefined ? row[3].toString() : '',
+            docNm: row[4] !== undefined ? row[4].toString() : '',
+            manager: row[5] !== undefined ? row[5].toString() : '',
+            subManager: row[6] !== undefined ? row[6].toString() : '',
+            storageYear: row[7] !== undefined ? row[7].toString() : '',
+            createDate: row[8] !== undefined ? row[8].toString() : '', 
+            transferDate: row[9] !== undefined ? row[9].toString() : '', 
+            tsdNum: row[10] !== undefined ? row[10].toString() : '',
+            disposalDate: row[11] !== undefined ? row[11].toString() : '',
+            dpdNum: row[12] !== undefined ? row[12].toString() : '',
+          }));
+      
         console.log('Extracted Data:', extractedData);
-
+      
         axios
           .post('/api/docstorage/data', extractedData)
           .then((response) => {
@@ -95,7 +101,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
             console.error('Error sending data:', error);
           });
       };
-      reader.readAsArrayBuffer(file);
+            reader.readAsArrayBuffer(file);
     } else if (activeTab === 'text') {
       const {
         teamNm,

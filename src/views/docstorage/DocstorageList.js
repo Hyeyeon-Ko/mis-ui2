@@ -4,10 +4,11 @@ import Table from '../../components/common/Table';
 import '../../styles/common/Page.css';
 import '../../styles/docstorage/DocstorageList.css';
 import ConfirmModal from '../../components/common/ConfirmModal';
-import DocstorageUpdateModal from '../../views/docstorage/DocstorageUpdateModal'; 
+import DocstorageUpdateModal from './DocstorageUpdateModal'; 
+import DocstorageBulkUpdateModal from './DocstorageBulkUpdateModal'; 
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
-import StatusSelect from '../../components/StatusSelect';  // StatusSelect 컴포넌트 import
+import StatusSelect from '../../components/StatusSelect';  
 
 function DocstorageList() {
   const { auth } = useContext(AuthContext);
@@ -19,7 +20,6 @@ function DocstorageList() {
   const [selectedCategory, setSelectedCategory] = useState('B'); 
   const [deptResponses, setDeptResponses] = useState([]);
   const [docstorageDetails, setDocstorageDetails] = useState([]);
-  const [deptDocstorageResponses, setDeptDocstorageResponses] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false); 
   const [showEditModal, setShowEditModal] = useState(false); 
@@ -27,6 +27,7 @@ function DocstorageList() {
   const [pendingApproval, setPendingApproval] = useState(null);
   const [selectedDeptCd, setSelectedDeptCd] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState('전체');
+  const [showBulkEditModal, setShowBulkEditModal] = useState(false); 
 
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
@@ -38,77 +39,73 @@ function DocstorageList() {
     { label: '처리완료', value: '처리완료' },
   ];
 
-  const fetchDocstorageData = async () => {
+  const fetchDeptList = async () => {
     try {
-      let response;
-      if (selectedCategory === 'A') {
-        response = await axios.get('/api/docstorageList/pending', {
-          params: { instCd: '100' },
-        });
-      } else if (selectedCategory === 'B') {
-        response = await axios.get('/api/docstorageList/center', {
-          params: { instCd: auth.instCd },
-        });
-        console.log('response: ', response);
-  
-        const { deptResponses, deptDocstorageResponses } = response.data.data;
-        setDeptResponses(deptResponses);
-        setDeptDocstorageResponses(deptDocstorageResponses);
-  
-        if (deptResponses.length > 0) {
-          const firstDeptCd = selectedDeptCd || deptResponses[0].detailCd;
-          handleDeptClick(firstDeptCd);
-        }
-      }
-  
-      if (response && response.data) {
-        const pendingList = response.data.data;
-  
-        if (Array.isArray(pendingList)) {
-          const numberedDetails = pendingList.map((item, index) => ({
-            ...item,
-            no: index + 1,
-            typeDisplay: item.type === 'A' ? '이관' : item.type === 'B' ? '파쇄' : '',
-            status: item.status === 'B' ? '승인완료' : item.status === 'E' ? '처리완료' : item.status,
-          }));
-          setDocstorageDetails(numberedDetails);
-        } else {
-          setDocstorageDetails([]);
-        }
-      } else {
-        setDocstorageDetails([]);
+      const response = await axios.get('/api/docstorageList/deptList', {
+        params: { instCd: auth.instCd },
+      });
+      setDeptResponses(response.data.data);
+      if (response.data.data.length > 0) {
+        handleDeptClick(response.data.data[0].detailCd);
       }
     } catch (error) {
-      console.error('문서보관 데이터를 불러오는데 실패했습니다.', error);
-      setDocstorageDetails([]);
+      console.error('부서 리스트를 불러오는데 실패했습니다.', error);
+    }
+  };
+
+  const fetchPendingApprovalList = async () => {
+    try {
+      const response = await axios.get('/api/docstorageList/pending', {
+        params: { instCd: auth.instCd },
+      });
+      const pendingList = response.data.data;
+      const numberedDetails = pendingList.map((item, index) => ({
+        ...item,
+        no: index + 1,
+        typeDisplay: item.type === 'A' ? '이관' : item.type === 'B' ? '파쇄' : '',
+        status: item.status === 'B' ? '승인완료' : item.status === 'E' ? '처리완료' : item.status, 
+      }));
+      setDocstorageDetails(numberedDetails);
+      setSelectedRows([]);
+    } catch (error) {
+      console.error('승인대기 내역을 불러오는데 실패했습니다.', error);
     }
   };
   
-  useEffect(() => {
-    if (auth.instCd) {
-      fetchDocstorageData();
-    }
-  }, [auth.instCd, selectedCategory]);
-
-  const handleDeptClick = (detailCd) => {
-
-    setSelectedRows([]); 
-    setSelectedDeptCd(detailCd);
-    const selectedDept = deptDocstorageResponses.find(dept => dept.deptCd === detailCd);
-  
-    if (selectedDept) {
-      const numberedDetails = selectedDept.docstorageResponseDTOList.map((item, index) => ({
+  const fetchDocstorageData = async (deptCd) => {
+    try {
+      const response = await axios.get('/api/docstorageList/center', {
+        params: { deptCd },
+      });
+      const numberedDetails = response.data.data.map((item, index) => ({
         ...item,
         no: index + 1,
         typeDisplay: item.type === 'A' ? '이관' : item.type === 'B' ? '파쇄' : '',
         status: item.status === 'B' ? '승인완료' : item.status === 'E' ? '처리완료' : item.status,
       }));
       setDocstorageDetails(numberedDetails);
-    } else {
-      setDocstorageDetails([]);
+      setSelectedRows([]);
+    } catch (error) {
+      console.error('문서보관 내역을 불러오는데 실패했습니다.', error);
     }
   };
-  
+
+  useEffect(() => {
+    if (auth.instCd) {
+      if (selectedCategory === 'A') {
+        fetchPendingApprovalList();
+      } else {
+        fetchDeptList(); 
+      }
+    }
+  }, [auth.instCd, selectedCategory]);
+
+  const handleDeptClick = (detailCd) => {
+    setSelectedDeptCd(detailCd);
+    setSelectedRows([]);
+    fetchDocstorageData(detailCd);
+  };
+
   const handleRowSelect = (row) => {
     const detailId = row.detailId;
     if (selectedRows.includes(detailId)) {
@@ -160,29 +157,43 @@ function DocstorageList() {
       setSelectedDoc(null);
       setShowEditModal(true);
       return;
-    } else if (selectedRows.length !== 1) {
-      alert("수정할 항목을 하나만 선택하세요.");
-      return;
-    }
-
-    const detailId = selectedRows[0];
-    const selectedDoc = docstorageDetails.find(doc => doc.detailId === detailId);
-
-    if (selectedDoc.type === 'B' && selectedDoc.status === 'E') {
-      alert("파쇄 완료된 문서는 수정이 불가합니다.");
-      return;
-    }
-
-    try {
-      const response = await axios.get('/api/docstorage/', { params: { detailId } });
-      const data = response.data.data;
-      setSelectedDoc({ ...data, detailId }); 
-      setShowEditModal(true);
-    } catch (error) {
-      console.error('문서보관 정보를 가져오는 중 에러 발생:', error);
-      alert('수정할 항목을 불러오지 못했습니다.');
+    } else if (selectedRows.length === 1) {
+      const detailId = selectedRows[0];
+      const selectedDoc = docstorageDetails.find(doc => doc.detailId === detailId);
+  
+      if (selectedDoc.type === 'B' && selectedDoc.status === 'E') {
+        alert("파쇄 완료된 문서는 수정이 불가합니다.");
+        return;
+      }
+  
+      try {
+        const response = await axios.get('/api/docstorage/', { params: { detailId } });
+        const data = response.data.data;
+        setSelectedDoc({ ...data, detailId });
+        setShowEditModal(true);
+      } catch (error) {
+        console.error('문서보관 정보를 가져오는 중 에러 발생:', error);
+        alert('수정할 항목을 불러오지 못했습니다.');
+      }
+    } else if (selectedRows.length > 1) {
+      setShowBulkEditModal(true); 
     }
   };
+
+  const handleBulkUpdate = async (payload) => {
+    try {
+      const response = await axios.put('/api/docstorage/bulkUpdate', payload);
+      if (response.status === 200) {
+        alert('일괄 수정이 완료되었습니다.');
+        setShowBulkEditModal(false);
+        fetchDocstorageData(selectedDeptCd); 
+        setSelectedRows([]);
+      }
+    } catch (error) {
+      console.error('문서 일괄 수정 중 오류 발생:', error);
+      alert('일괄 수정에 실패했습니다.');
+    }
+  };  
 
   const handleUpdate = async (updatedData, isFileUpload = false) => {
     try {
@@ -191,7 +202,8 @@ function DocstorageList() {
         if (response.status === 200) {
           alert('수정이 완료되었습니다.');
           setShowEditModal(false);
-          fetchDocstorageData();
+          fetchDocstorageData(selectedDeptCd); 
+          setSelectedRows([]);
         }
       } else {
         const { detailId } = selectedDoc; 
@@ -201,7 +213,8 @@ function DocstorageList() {
         if (response.status === 200) {
           alert('수정이 완료되었습니다.');
           setShowEditModal(false);
-          fetchDocstorageData();
+          fetchDocstorageData(selectedDeptCd); 
+          setSelectedRows([]);
         }
       }
     } catch (error) {
@@ -271,7 +284,7 @@ function DocstorageList() {
   
       if (response.status === 200) {
         alert('선택된 문서가 완료되었습니다.');
-        fetchDocstorageData(); 
+        fetchDocstorageData(selectedDeptCd); 
       }
     } catch (error) {
       console.error('문서보관 완료 처리 중 오류 발생:', error);
@@ -330,16 +343,18 @@ function DocstorageList() {
     ] : []),
     { header: 'NO', accessor: 'no' },
     ...(selectedCategory === 'A' ? [{ header: '분류', accessor: 'typeDisplay' }] : []),
-    {
-      header: (
-        <StatusSelect
-          statusOptions={statusOptions}
-          selectedStatus={selectedStatus}
-          onStatusChange={(e) => setSelectedStatus(e.target.value)} 
-        />
-      ),
-      accessor: 'status',
-    },
+    ...(selectedCategory === 'B' ? [
+      {
+        header: (
+          <StatusSelect
+            statusOptions={statusOptions}
+            selectedStatus={selectedStatus}
+            onStatusChange={(e) => setSelectedStatus(e.target.value)} 
+          />
+        ),
+        accessor: 'status',
+      }
+    ] : []),
     { header: '팀 명', accessor: 'teamNm' },
     { header: '문서관리번호', accessor: 'docId' },
     { header: '입고위치', accessor: 'location' },
@@ -436,8 +451,17 @@ function DocstorageList() {
               <DocstorageUpdateModal
                 show={showEditModal}
                 onClose={() => setShowEditModal(false)}
-                docData={selectedDoc} 
+                docData={selectedDoc}
+                selectedDetailIds={selectedRows}
                 onSave={handleUpdate}
+              />
+            )}
+            {showBulkEditModal && (
+              <DocstorageBulkUpdateModal
+                show={showBulkEditModal}
+                onClose={() => setShowBulkEditModal(false)}
+                selectedDetailIds={selectedRows}
+                onSave={handleBulkUpdate}
               />
             )}
         </div>

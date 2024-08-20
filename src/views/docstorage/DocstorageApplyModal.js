@@ -1,19 +1,18 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import '../../styles/docstorage/DocstorageApplyModal.css';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-
+import { AuthContext } from '../../components/AuthContext';
 const DocstorageApplyModal = ({ show, onClose, selectedRows, onApplySuccess }) => {
-  const navigate = useNavigate();
 
+  const { auth } = useContext(AuthContext);
   if (!show) return null;
 
   const handleApply = async (type) => {
     try {
       const applyData = {
-        instCd: '100',  
-        deptCd: '006',  
+        instCd: auth.instCd,  
+        deptCd: auth.deptCd,  
         type: type,     
         detailIds: selectedRows,
       };

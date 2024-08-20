@@ -30,9 +30,9 @@ export const AuthProvider = ({ children }) => {
     const instCd = sessionStorage.getItem('instCd') || '';
     const deptCd = sessionStorage.getItem('deptCd') || ''; 
     const teamCd = sessionStorage.getItem('teamCd') || '';
-    const isUserMode = sessionStorage.getItem('isUserMode') === 'true';
+    const isUserMode = sessionStorage.getItem('isUserMode') === 'true';  
     const originalRole = sessionStorage.getItem('originalRole') || role;
-
+  
     if (userId && hngNm && role) {
       setAuth({
         userId,
@@ -47,22 +47,9 @@ export const AuthProvider = ({ children }) => {
         isUserMode,
         originalRole,
       });
-
-      console.log('Session restored:', {
-        userId,
-        hngNm,
-        role,
-        sidebarPermissions,
-        hasStandardDataAuthority,
-        instCd,
-        deptCd, 
-        teamCd,
-        isUserMode,
-        originalRole,
-      });
     }
   }, []);
-
+  
   const login = (userId, hngNm, role, sidebarPermissions, hasStandardDataAuthority, instCd, deptCd, teamCd) => { 
     const newAuthState = {
       userId,

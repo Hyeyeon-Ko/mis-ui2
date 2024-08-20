@@ -179,7 +179,7 @@
     font-size: 14px;
   }  
   
-  .custom-table td {
+  .custom-table th, td {
     user-select: none; 
   }
   

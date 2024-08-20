@@ -4,6 +4,7 @@ import Table from '../../components/common/Table';
 import DocstorageAddModal from '../../views/docstorage/DocstorageAddModal';
 import DocstorageUpdateModal from '../../views/docstorage/DocstorageUpdateModal';
 import DocstorageApplyModal from '../../views/docstorage/DocstorageApplyModal';
+import DocstorageBulkUpdateModal from '../../views/docstorage/DocstorageBulkUpdateModal';
 import TypeSelect from '../../components/TypeSelect'; 
 import StatusSelect from '../../components/StatusSelect';
 import axios from 'axios';
@@ -18,6 +19,7 @@ function Docstorage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showApplyModal, setShowApplyModal] = useState(false); 
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showBulkEditModal, setShowBulkEditModal] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedDoc, setSelectedDoc] = useState(null); 
   const [selectedType, setSelectedType] = useState('전체'); 
@@ -177,8 +179,7 @@ const handleEdit = async () => {
   const detailId = selectedRows[0];
   
   if (selectedRows.length > 1) {
-    setSelectedDoc(null);
-    setShowEditModal(true);
+    setShowBulkEditModal(true);
     return;
   }
 
@@ -223,6 +224,21 @@ const handleUpdate = async (updatedData, isFileUpload = false) => {
   } catch (error) {
     console.error('문서보관 정보를 수정하는 중 에러 발생:', error);
     alert('수정에 실패했습니다.');
+  }
+};
+
+const handleBulkUpdate = async (payload) => {
+  try {
+    const response = await axios.put('/api/docstorage/bulkUpdate', payload);
+    if (response.status === 200) {
+      alert('일괄 수정이 완료되었습니다.');
+      setShowBulkEditModal(false);
+      fetchDocstorageDetails();
+      setSelectedRows([]);
+    }
+  } catch (error) {
+    console.error('문서 일괄 수정 중 오류 발생:', error);
+    alert('일괄 수정에 실패했습니다.');
   }
 };
 
@@ -385,6 +401,12 @@ const handleUpdate = async (updatedData, isFileUpload = false) => {
         onClose={() => setShowApplyModal(false)}
         selectedRows={selectedRows} 
         onApplySuccess={handleApplySuccess} 
+      />
+      <DocstorageBulkUpdateModal
+        show={showBulkEditModal}
+        onClose={() => setShowBulkEditModal(false)}
+        selectedDetailIds={selectedRows}
+        onSave={handleBulkUpdate}
       />
     </div>
   );
