@@ -16,7 +16,7 @@ const ConditionFilter = ({
   showSearchCondition,
   excludeRecipient,
   excludeSender,
-  documentType,  // 추가된 props
+  documentType, 
 }) => {
   const [searchType, setSearchType] = useState('전체');
   const [keyword, setKeyword] = useState('');

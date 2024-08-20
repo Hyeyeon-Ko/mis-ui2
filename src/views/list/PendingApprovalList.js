@@ -170,22 +170,19 @@ function PendingApprovalList() {
       accessor: 'center',
       width: '10%',
     },
-    { header: '제목', accessor: 'title', width: '28%' },
-    { header: '신청일시', accessor: 'draftDate', width: '12%' },
-    { header: '신청자', accessor: 'drafter', width: '8%' },
-    {
-      header: '문서상태',
-      accessor: 'status',
-      width: '10%',
+    { header: '제목', accessor: 'title', width: '28%',
       Cell: ({ row }) => (
         <span
-          className="status-pending clickable"
-          onClick={() => handleRowClick(row.draftId, row.docType)}
+          className="status-pending clickable" 
+          onClick={() => handleRowClick(row.draftId, row.docType)} 
         >
-          승인대기
+          {row.title}
         </span>
-      ),
+      ),  
     },
+    { header: '신청일시', accessor: 'draftDate', width: '12%' },
+    { header: '신청자', accessor: 'drafter', width: '8%' },
+    { header: '문서상태', accessor: 'status', width: '10%' },
   ];
 
   return (

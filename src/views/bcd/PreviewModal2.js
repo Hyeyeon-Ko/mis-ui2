@@ -31,6 +31,24 @@ const PreviewModal = ({ show, onClose, formData }) => {
     }
   }, []);
 
+  const drawTextWithMaxWidth = (ctx, text, x, y, spacing, maxWidth, initialFontSize, isBold = false) => {
+    let fontSize = initialFontSize;
+    ctx.font = `${isBold ? 'bold ' : ''}${fontSize}px Arial`; 
+    
+    let textWidth = ctx.measureText(text).width;
+    
+    while (textWidth > maxWidth && fontSize > 0) {
+      fontSize -= 1;
+      ctx.font = `${isBold ? 'bold ' : ''}${fontSize}px Arial`; 
+      textWidth = ctx.measureText(text).width;
+    }
+    
+    for (let i = 0; i < text.length; i++) {
+      ctx.fillText(text[i], x, y);
+      x += ctx.measureText(text[i]).width + spacing;
+    }
+  };
+  
   const drawBusinessCard = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -69,17 +87,17 @@ const PreviewModal = ({ show, onClose, formData }) => {
 
       ctx.font = 'bold 26.4px Arial';
       ctx.fillStyle = black;
-      drawTextWithSpacing(ctx, formData.name, 64, 198, 2.4);
+      drawTextWithMaxWidth(ctx, formData.name, 64, 198, -0.5, 85, 26.4, true);
 
       ctx.font = '13.6px Arial';
       ctx.fillStyle = black;
-      drawTextWithSpacing(ctx, `${centerName} ${teamName}`, 64, 226.4, -0.4);
+      drawTextWithMaxWidth(ctx, `${centerName} ${teamName}`, 64, 226.4, -0.4, 150, 13.6);
 
       drawTextWithSpacing(ctx, positionName, 64, 244.8, -0.4);
 
       ctx.fillStyle = darkGray;
       drawTextWithSpacing(ctx, `www.kmi.or.kr`, 64, 304, 0.4);
-      drawTextWithSpacing(ctx, `${formData.firstName}, ${formData.lastName}`, 153.6, 199.2, 0);
+      drawTextWithMaxWidth(ctx, `${formData.firstName}, ${formData.lastName}`, 150, 199.2, 0, 85, 13.6);
 
       ctx.fillStyle = 'black';
       ctx.font = '15.2px Arial';
@@ -102,9 +120,9 @@ const PreviewModal = ({ show, onClose, formData }) => {
         const floorAddress = addressParts[1].trim();
         const fullAddress = `${mainAddress}, ${floorAddress}층`;
 
-        drawTextWithSpacing(ctx, fullAddress, 270, 302.4, -1.2);
+        drawTextWithMaxWidth(ctx, fullAddress, 270, 302.4, -1.2, 300, 13.6);
       } else {
-        drawTextWithSpacing(ctx, formData.address, 270, 302.4, -1.2);
+        drawTextWithMaxWidth(ctx, formData.address, 270, 302.4, -1.2, 300, 13.6);
       }
     };
 
@@ -117,11 +135,11 @@ const PreviewModal = ({ show, onClose, formData }) => {
 
         ctx.font = 'bold 26.4px Arial';
         ctx.fillStyle = black;
-        drawTextWithSpacing(ctx, `${formData.lastName} ${formData.firstName}`, 624, 176, 0.4);
+        drawTextWithMaxWidth(ctx, `${formData.lastName} ${formData.firstName}`, 624, 176, 0.4, 170, 26.4, true);
 
         ctx.font = '13.6px Arial';
         ctx.fillStyle = black;
-        drawTextWithSpacing(ctx, `${engTeamName}`, 624, 205.6, 0.16);
+        drawTextWithMaxWidth(ctx, `${engTeamName}`, 624, 205.6, 0.16, 180, 13.6);
         drawTextWithSpacing(ctx, `${engPositionName}`, 624, 225, 0.16);
 
         ctx.font = '15.2px Arial';
@@ -146,11 +164,11 @@ const PreviewModal = ({ show, onClose, formData }) => {
         if (engAddressParts.length >= 3) {
           const mainEngAddress = engAddressParts.slice(0, 3).join(',').trim();
           const nextLineEngAddress = engAddressParts.slice(3).join(',').trim();
-          drawTextWithSpacing(ctx, mainEngAddress, 904, 284.8, -0.56);
-          drawTextWithSpacing(ctx, nextLineEngAddress, 840, 304.8, -0.08);
-        } else {
-          drawTextWithSpacing(ctx, formData.engAddress, 904, 284.8, -0.56);
-        }
+          drawTextWithMaxWidth(ctx, mainEngAddress, 904, 284.8, -0.56, 240, 14.6);
+          drawTextWithMaxWidth(ctx, nextLineEngAddress, 840, 304.8, -0.08, 240, 14.6);
+            } else {
+              drawTextWithMaxWidth(ctx, formData.engAddress, 904, 284.8, -0.56, 240, 14.6);
+            }
       }
     };
   }, [formData, bcdData]);

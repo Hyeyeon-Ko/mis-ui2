@@ -88,6 +88,15 @@ function BcdOrder() {
     }
   };
 
+  // 행 클릭 시 체크박스 선택/해제 핸들러
+  const handleRowClick = (id) => {
+    if (selectedApplications.includes(id)) {
+      setSelectedApplications(selectedApplications.filter((appId) => appId !== id));
+    } else {
+      setSelectedApplications([...selectedApplications, id]);
+    }
+  };
+
   // 센터 선택 핸들러
   const handleCenterChange = (event) => {
     setSelectedCenter(event.target.value);
@@ -159,6 +168,7 @@ function BcdOrder() {
           className="order-checkbox"
           checked={selectedApplications.includes(row.id)}
           onChange={(event) => handleSelect(event, row.id)}
+          onClick={(e) => e.stopPropagation()} // 체크박스 클릭 시 행 클릭 이벤트 중복 실행 방지
         />
       ),
     },
@@ -172,12 +182,62 @@ function BcdOrder() {
       ),
       accessor: 'center',
       width: '18%',
+      Cell: ({ row }) => (
+        <div onClick={() => handleRowClick(row.id)}>
+          {row.center}
+        </div>
+      ),
     },
-    { header: '제목', accessor: 'title', width: '28%' },
-    { header: '신청일자', accessor: 'draftDate', width: '15%' },
-    { header: '신청자', accessor: 'drafter', width: '10%' },
-    { header: '승인일시', accessor: 'respondDate', width: '17%' },
-    { header: '수량', accessor: 'quantity', width: '9.5%' },
+    { 
+      header: '제목', 
+      accessor: 'title', 
+      width: '28%', 
+      Cell: ({ row }) => (
+        <div onClick={() => handleRowClick(row.id)}>
+          {row.title}
+        </div>
+      ),
+    },
+    { 
+      header: '신청일자', 
+      accessor: 'draftDate', 
+      width: '15%', 
+      Cell: ({ row }) => (
+        <div onClick={() => handleRowClick(row.id)}>
+          {row.draftDate}
+        </div>
+      ),
+    },
+    { 
+      header: '신청자', 
+      accessor: 'drafter', 
+      width: '10%', 
+      Cell: ({ row }) => (
+        <div onClick={() => handleRowClick(row.id)}>
+          {row.drafter}
+        </div>
+      ),
+    },
+    { 
+      header: '승인일시', 
+      accessor: 'respondDate', 
+      width: '17%', 
+      Cell: ({ row }) => (
+        <div onClick={() => handleRowClick(row.id)}>
+          {row.respondDate}
+        </div>
+      ),
+    },
+    { 
+      header: '수량', 
+      accessor: 'quantity', 
+      width: '9.5%', 
+      Cell: ({ row }) => (
+        <div onClick={() => handleRowClick(row.id)}>
+          {row.quantity}
+        </div>
+      ),
+    },
   ];
 
   return (

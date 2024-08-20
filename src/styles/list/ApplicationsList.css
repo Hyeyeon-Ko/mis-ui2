@@ -39,9 +39,8 @@
 }
 
 .status-pending {
-  color: #2789FE;
   cursor: pointer;
-  border-bottom: 1px solid #2789FE;
+  border-bottom: 1px solid rgb(153, 153, 153);
 }
 
 .center-header {

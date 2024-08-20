@@ -239,30 +239,32 @@ function ApplicationsList() {
       ),
     }] : []),
     { header: '문서분류', accessor: 'docType', width: '10%' },
-    { header: '제목', accessor: 'title', width: '24%' },
-    { header: '신청일시', accessor: 'draftDate', width: '13%' },
-    { header: '신청자', accessor: 'drafter', width: '6%' },
-    { header: '승인/반려일시', accessor: 'respondDate', width: '13%' },
-    { header: '발주일시', accessor: 'orderDate', width: '14%' },
     {
-      header: '문서상태',
-      accessor: 'applyStatus',
-      width: '10%',
+      header: '제목',
+      accessor: 'title',
+      width: '24%',
       Cell: ({ row }) => (
         <span
-          className={row.applyStatus === '승인대기' ? 'status-pending clickable' : ''}
-          onClick={() => {
-            if (row.applyStatus === '승인대기') {
-              handleRowClick(row.draftId, row.docType);
-            }
-          }}
+          className="status-pending clickable"
+          onClick={() => handleRowClick(row.draftId, row.docType)}
         >
-          {row.applyStatus}
+          {row.title}
         </span>
       ),
     },
+    { header: '신청일시', accessor: 'draftDate', width: '13%' },
+    { header: '신청자', accessor: 'drafter', width: '6%' },
+    {
+      header: documentTypeFromUrl === '문서수발신' ? '승인일시' : '승인/반려일시',
+      accessor: 'respondDate',
+      width: '13%',
+    },
+    ...(documentTypeFromUrl === '문서수발신' ? [] : [
+      { header: '발주일시', accessor: 'orderDate', width: '14%' },
+    ]),
+    { header: '문서상태', accessor: 'applyStatus', width: '10%' },
   ];
-  
+    
   return (
     <div className="content">
       <div className='all-applications'>
