@@ -229,11 +229,11 @@ function BcdApplySecond() {
 
   const handleConfirmRequest = async () => {
     setShowFinalConfirmationModal(false);
-
+  
     const isCustomTeam = formData.team === '000';
-
+  
     let teamCd, teamNm;
-
+  
     if (isCustomTeam) {
       teamCd = '000';
       teamNm = formData.teamNm;
@@ -244,7 +244,7 @@ function BcdApplySecond() {
         teamNm = selectedTeam.detailNm;
       }
     }
-
+  
     const requestData = {
       drafter: auth.hngNm,
       drafterId: auth.userId,
@@ -268,7 +268,9 @@ function BcdApplySecond() {
       division: formData.cardType === 'personal' ? 'B' : 'A',
       quantity: formData.quantity,
     };
-
+  
+    console.log('Final requestData:', requestData);
+  
     try {
       const response = await axios.post('/api/bcd/', requestData);
       if (response.data.code === 200) {
@@ -281,7 +283,7 @@ function BcdApplySecond() {
       alert('명함 신청 중 오류가 발생했습니다.');
     }
   };
-
+  
   useEffect(() => {
     console.log('formData: ', formData);
   }, [formData]);
@@ -333,30 +335,45 @@ function BcdApplySecond() {
       alert('사번 조회를 통해 명함 대상자를 선택하세요.');
       return;
     }
+  
     const selectedTeam = e.target.value;
-    const selectedTeamInfo = bcdData.teamInfo.find((team) => team.detailCd === selectedTeam);
-    const engTeam = selectedTeamInfo ? selectedTeamInfo.etcItem2 : '';
-
-    setFormData({ ...formData, team: selectedTeam, teamNm: selectedTeamInfo.detailNm, engTeam });
+  
+    if (selectedTeam === '000') { 
+      setFormData({ ...formData, team: selectedTeam, teamNm: '', engTeam: '' });
+    } else {
+      const selectedTeamInfo = bcdData.teamInfo.find((team) => team.detailCd === selectedTeam);
+  
+      if (selectedTeamInfo) {
+        const engTeam = selectedTeamInfo.etcItem2 || '';  
+        setFormData({ ...formData, team: selectedTeam, teamNm: selectedTeamInfo.detailNm, engTeam });
+      } else {
+        setFormData({ ...formData, team: '', teamNm: '', engTeam: '' });  
+      }
+    }
   };
-
+  
   const handlePositionChange = (e) => {
     if (!formData.userId) {
       alert('사번 조회를 통해 명함 대상자를 선택하세요.');
       return;
     }
-
+  
     const selectedPosition = e.target.value;
     const selectedPositionInfo = bcdData.gradeInfo.find((position) => position.detailCd === selectedPosition);
-    const enGradeNm = selectedPositionInfo ? selectedPositionInfo.etcItem2 : '';
-
-    setFormData({ ...formData,
-      position: selectedPosition,
-      gradeNm: selectedPosition === '000' ? formData.addGradeNm : selectedPositionInfo.detailNm,
-      enGradeNm: selectedPosition === '000' ? enGradeNm : '',
-    });
+  
+    if (selectedPositionInfo) {
+      const enGradeNm = selectedPositionInfo.etcItem2 || '';  
+      setFormData({
+        ...formData,
+        position: selectedPosition,
+        gradeNm: selectedPosition === '000' ? formData.addGradeNm : selectedPositionInfo.detailNm,
+        enGradeNm: selectedPosition === '000' ? formData.enGradeNm : enGradeNm,
+      });
+    } else {
+      setFormData({ ...formData, position: '', gradeNm: '', enGradeNm: '' });  
+    }
   };
-
+  
   const fetchFilteredGradeInfo = () => {
     const selectedTeamInfo = bcdData.teamInfo.find((team) => team.detailNm === formData.team);
     const selectedEtcItem1 = selectedTeamInfo ? selectedTeamInfo.etcItem1 : '';
