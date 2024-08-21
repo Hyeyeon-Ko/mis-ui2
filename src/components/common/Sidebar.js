@@ -12,10 +12,24 @@ function Sidebar() {
   const { auth } = useContext(AuthContext);
 
   const isActive = (url) => {
-    const currentPath = location.pathname.split('?')[0];
-    return currentPath === url ? 'active' : '';
+    const currentPath = location.pathname;
+    const currentQueryParams = new URLSearchParams(location.search);
+    const itemPath = url.split('?')[0];
+    const itemQueryParams = new URLSearchParams(url.split('?')[1]);
+  
+    if (currentPath !== itemPath) {
+      return '';
+    }
+  
+    for (const [key, value] of itemQueryParams.entries()) {
+      if (currentQueryParams.get(key) !== value) {
+        return '';
+      }
+    }
+  
+    return 'active';
   };
-
+    
   const applyItems = [
     { label: '명함신청', url: '/api/bcd' },
     { label: '인장신청', url: '/api/seal' },
@@ -160,13 +174,20 @@ function SidebarSection({ title, items, isActive, location, defaultOpen }) {
     setIsOpen(!isOpen);
   };
 
+  const isAnyItemActive = items.some(item => isActive(item.url) === 'active');
+
   return (
     <div className="sidebar-section">
-      <h3 onClick={toggleOpen} className={`toggle-header ${!isOpen && items.some(item => location.pathname.startsWith(item.url)) ? 'active-toggle' : ''}`}>
+      <h3 
+        onClick={toggleOpen} 
+        className={`toggle-header ${!isOpen && isAnyItemActive ? 'active-toggle' : ''}`}
+      >
         <img
           src={isOpen ? dropdownActiveIcon : dropdownDefaultIcon}
           alt="Toggle Icon"
-          className="toggle-icon" /> {title}
+          className="toggle-icon" 
+        /> 
+        {title}
       </h3>
       {isOpen && (
         <ul>

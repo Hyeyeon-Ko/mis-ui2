@@ -141,21 +141,29 @@ function Docstorage() {
         alert("삭제할 항목을 선택하세요.");
         return;
     }
-
+  
     const selectedDocs = docstorageDetails.filter(doc => selectedRows.includes(doc.detailId));
+    
+    const hasInvalidDocs = selectedDocs.some(doc => doc.status === 'B' || doc.status === 'E');
+    
+    if (hasInvalidDocs) {
+        alert("승인완료 또는 처리완료인 문서는 삭제가 불가합니다.");
+        return;
+    }
+  
     const hasShreddedDocs = selectedDocs.some(doc => doc.type === 'B' && doc.status === 'E');
-
+  
     if (hasShreddedDocs) {
         alert("파쇄 완료된 문서는 삭제가 불가합니다.");
         return;
     }
-
+  
     try {
         for (const detailId of selectedRows) {
             await axios.delete('/api/docstorage/', { params: { detailId } });
         }
         alert('선택된 항목이 삭제되었습니다.');
-
+  
         setDocstorageDetails(prevDetails => {
             const updatedDetails = prevDetails
                 .filter(item => !selectedRows.includes(item.detailId))
@@ -166,86 +174,100 @@ function Docstorage() {
             
             return updatedDetails;
         });
-
+  
         setSelectedRows([]); 
     } catch (error) {
         console.error('문서보관 정보를 삭제하는 중 에러 발생:', error);
         alert('삭제에 실패했습니다.');
     }
-};
-
-const handleEdit = async () => {
-  if (selectedRows.length === 0) {
-    setSelectedDoc(null);
-    setShowEditModal(true);
-    return;
-  }
-
-  const detailId = selectedRows[0];
+  };
   
-  if (selectedRows.length > 1) {
-    setShowBulkEditModal(true);
-    return;
-  }
 
-  const selectedDoc = docstorageDetails.find(doc => doc.detailId === detailId);
-
-  if (selectedDoc.type === 'B' && selectedDoc.status === 'B') {
-    alert("파쇄 완료된 문서는 수정이 불가합니다.");
-    return;
-  }
-
-  try {
-      const response = await axios.get('/api/docstorage/', { params: { detailId } });
-      const data = response.data.data;
-      setSelectedDoc({ ...data, detailId }); 
-      setShowEditModal(true);
-  } catch (error) {
-      console.error('문서보관 정보를 가져오는 중 에러 발생:', error);
-      alert('수정할 항목을 불러오지 못했습니다.');
-  }
-};
-
-const handleUpdate = async (updatedData, isFileUpload = false) => {
-  try {
-    if (isFileUpload) {
-      const response = await axios.post('/api/docstorage/update', updatedData);
-      if (response.status === 200) {
-        alert('수정이 완료되었습니다.');
-        setShowEditModal(false);
-        fetchDocstorageDetails();
-      }
-    } else {
-      const { detailId } = selectedDoc; 
-      const response = await axios.put('/api/docstorage/', updatedData, {
-        params: { detailId } 
-      });
-      if (response.status === 200) {
-        alert('수정이 완료되었습니다.');
-        setShowEditModal(false);
-        fetchDocstorageDetails();
-      }
+  const handleEdit = async () => {
+    if (selectedRows.length === 0) {
+      setSelectedDoc(null);
+      setShowEditModal(true); 
+      return;
     }
-  } catch (error) {
-    console.error('문서보관 정보를 수정하는 중 에러 발생:', error);
-    alert('수정에 실패했습니다.');
-  }
-};
 
-const handleBulkUpdate = async (payload) => {
-  try {
-    const response = await axios.put('/api/docstorage/bulkUpdate', payload);
-    if (response.status === 200) {
-      alert('일괄 수정이 완료되었습니다.');
-      setShowBulkEditModal(false);
-      fetchDocstorageDetails();
-      setSelectedRows([]);
+    const selectedDocs = docstorageDetails.filter(doc => selectedRows.includes(doc.detailId));
+    
+    const hasInvalidDocs = selectedDocs.some(doc => 
+      (doc.type === 'A' || doc.type === 'B') && (doc.status === 'B' || doc.status === 'E')
+    );
+
+    if (hasInvalidDocs) {
+      alert("승인완료 또는 처리완료인 문서는 수정이 불가합니다.");
+      return;
     }
-  } catch (error) {
-    console.error('문서 일괄 수정 중 오류 발생:', error);
-    alert('일괄 수정에 실패했습니다.');
-  }
-};
+
+    if (selectedRows.length === 1) {
+      const detailId = selectedRows[0];
+      try {
+        const response = await axios.get('/api/docstorage/', { params: { detailId } });
+        const data = response.data.data;
+        setSelectedDoc({ ...data, detailId }); 
+        setShowEditModal(true); 
+      } catch (error) {
+        console.error('문서보관 정보를 가져오는 중 에러 발생:', error);
+        alert('수정할 항목을 불러오지 못했습니다.');
+      }
+      return;
+    }
+
+    if (selectedRows.length > 1) {
+      setShowBulkEditModal(true); 
+    }
+  };
+
+  const handleUpdate = async (updatedData, isFileUpload = false) => {
+    try {
+        if (isFileUpload) {
+            const response = await axios.post('/api/docstorage/update', updatedData);
+            if (response.status === 200) {
+                alert('수정이 완료되었습니다.');
+                setShowEditModal(false);
+                fetchDocstorageDetails();
+            }
+        } else {
+            const { detailId } = selectedDoc; 
+            const response = await axios.put('/api/docstorage/', updatedData, {
+                params: { detailId } 
+            });
+            if (response.status === 200) {
+                alert('수정이 완료되었습니다.');
+                setShowEditModal(false);
+                fetchDocstorageDetails();
+            }
+        }
+    } catch (error) {
+        if (error.response) {
+            if (error.response.status === 400) {
+                alert("존재하지 않는 문서관리번호가 존재합니다."); 
+            } else {
+                alert('수정 중 오류가 발생했습니다.');
+            }
+        } else {
+            console.error('문서보관 정보를 수정하는 중 에러 발생:', error);
+            alert('수정에 실패했습니다.');
+        }
+    }
+  };
+
+  const handleBulkUpdate = async (payload) => {
+    try {
+      const response = await axios.put('/api/docstorage/bulkUpdate', payload);
+      if (response.status === 200) {
+        alert('일괄 수정이 완료되었습니다.');
+        setShowBulkEditModal(false);
+        fetchDocstorageDetails();
+        setSelectedRows([]);
+      }
+    } catch (error) {
+      console.error('문서 일괄 수정 중 오류 발생:', error);
+      alert('일괄 수정에 실패했습니다.');
+    }
+  };
 
   const downloadExcel = async () => {
     if (selectedRows.length === 0) {
@@ -280,18 +302,19 @@ const handleBulkUpdate = async (payload) => {
       alert("신청할 항목을 선택하세요.");
       return;
     }
+    
     const selectedDocs = docstorageDetails.filter(doc => selectedRows.includes(doc.detailId));
-
-    const hasShreddedDocs = selectedDocs.some(doc => doc.typeDisplay === '파쇄');
   
-    if (hasShreddedDocs) {
-      alert("파쇄된 문서와 관련해서는 신청이 불가합니다.");
+    const hasInvalidDocs = selectedDocs.some(doc => doc.type === 'B' || doc.status === 'A');
+    
+    if (hasInvalidDocs) {
+      alert("이미 신청한 문서 또는 파쇄 문서는 신청이 불가합니다.");
       return;
     }
   
     setShowApplyModal(true);
   };
-
+  
   const detailColumns = [
     {
       header: (
@@ -354,7 +377,11 @@ const handleBulkUpdate = async (payload) => {
   const filteredDocstorageDetails =
   docstorageDetails
     .filter((doc) => selectedType === '전체' || doc.typeDisplay === selectedType || (selectedType === '미신청' && !doc.typeDisplay))
-    .filter((doc) => selectedStatus === '전체' || doc.statusDisplay === selectedStatus); 
+    .filter((doc) => selectedStatus === '전체' || doc.statusDisplay === selectedStatus)
+    .map((doc, index) => ({
+      ...doc,
+      no: index + 1, 
+    })); 
 
   return (
     <div className='content'>
@@ -381,7 +408,7 @@ const handleBulkUpdate = async (payload) => {
                 <Table
                   columns={detailColumns}
                   data={filteredDocstorageDetails}
-                  onRowClick={handleRowClick}  // 행 클릭 이벤트 핸들러 추가
+                  onRowClick={handleRowClick}  
                   onRowMouseDown={handleMouseDown}  
                   onRowMouseOver={handleMouseOver}  
                   onRowMouseUp={handleMouseUp}    

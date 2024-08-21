@@ -13,12 +13,12 @@
 
 .email-modal-container {
   background: #fff;
-  padding: 36px;
+  padding: 40px 60px;
   border-radius: 8px;
   text-align: left;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   width: 432px;
-  position: relative; /* 로딩 스피너를 위한 상대 위치 설정 */
+  position: relative;
 }
 
 .email-modal-container h3 {

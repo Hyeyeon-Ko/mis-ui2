@@ -23,6 +23,24 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
     disposalDate: '',
     dpdNum: '',
   });
+  const resetFormData = () => {
+    setFormData({
+      teamNm: '',
+      docId: '',
+      docNm: '',
+      manager: '',
+      subManager: '',
+      storageYear: '',
+      createDate: '',
+      location: '',
+      transferDate: '',
+      tsdNum: '',
+      disposalDate: '',
+      dpdNum: '',
+    });
+    setFile(null);
+    setActiveTab('file');
+  };
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -88,8 +106,6 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
             dpdNum: row[12] !== undefined ? row[12].toString() : '',
           }));
       
-        console.log('Extracted Data:', extractedData);
-      
         axios
           .post('/api/docstorage/data', extractedData)
           .then((response) => {
@@ -99,9 +115,14 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
           })
           .catch((error) => {
             console.error('Error sending data:', error);
+            if (error.response && error.response.status === 400) {
+              alert("문서관리번호는 중복이 불가합니다"); 
+            } else {
+              alert('데이터 전송 중 오류가 발생했습니다.');
+            }
           });
       };
-            reader.readAsArrayBuffer(file);
+      reader.readAsArrayBuffer(file);
     } else if (activeTab === 'text') {
       const {
         teamNm,
@@ -162,8 +183,18 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
         })
         .catch(error => {
           console.error('There was an error saving the data!', error);
+          if (error.response && error.response.status === 400) {
+            alert("문서관리번호는 중복이 불가합니다");
+          } else {
+            alert('데이터 저장 중 오류가 발생했습니다.');
+          }
         });
     }
+  };
+
+  const handleClose = () => {
+    resetFormData();
+    onClose();
   };
 
   if (!show) return null;
@@ -173,7 +204,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
       <div className="docstorage-modal-container">
         <div className="modal-header">
           <h3>문서보관 항목 추가</h3>
-          <button className="docstorage-close-button" onClick={onClose}>
+          <button className="docstorage-close-button" onClick={handleClose}>
             X
           </button>
         </div>

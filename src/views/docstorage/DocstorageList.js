@@ -197,29 +197,33 @@ function DocstorageList() {
 
   const handleUpdate = async (updatedData, isFileUpload = false) => {
     try {
-      if (isFileUpload) {
-        const response = await axios.post('/api/docstorage/update', updatedData);
-        if (response.status === 200) {
-          alert('수정이 완료되었습니다.');
-          setShowEditModal(false);
-          fetchDocstorageData(selectedDeptCd); 
-          setSelectedRows([]);
+        if (isFileUpload) {
+            const response = await axios.post('/api/docstorage/update', updatedData);
+            if (response.status === 200) {
+                alert('수정이 완료되었습니다.');
+                setShowEditModal(false);
+                fetchDocstorageData(selectedDeptCd); 
+                setSelectedRows([]);
+            }
+        } else {
+            const { detailId } = selectedDoc; 
+            const response = await axios.put('/api/docstorage/', updatedData, {
+                params: { detailId } 
+            });
+            if (response.status === 200) {
+                alert('수정이 완료되었습니다.');
+                setShowEditModal(false);
+                fetchDocstorageData(selectedDeptCd); 
+                setSelectedRows([]);
+            }
         }
-      } else {
-        const { detailId } = selectedDoc; 
-        const response = await axios.put('/api/docstorage/', updatedData, {
-          params: { detailId } 
-        });
-        if (response.status === 200) {
-          alert('수정이 완료되었습니다.');
-          setShowEditModal(false);
-          fetchDocstorageData(selectedDeptCd); 
-          setSelectedRows([]);
-        }
-      }
     } catch (error) {
-      console.error('문서보관 정보를 수정하는 중 에러 발생:', error);
-      alert('수정에 실패했습니다.');
+        if (error.response && error.response.status === 400) {
+            alert("존재하지 않는 문서관리번호가 존재합니다"); 
+        } else {
+            console.error('문서보관 정보를 수정하는 중 에러 발생:', error);
+            alert('수정에 실패했습니다.');
+        }
     }
   };
 
@@ -369,10 +373,12 @@ function DocstorageList() {
     { header: '신청번호', accessor: 'dpdraftNum' },
   ];
 
-  const filteredDocstorageDetails =
-  docstorageDetails.filter((doc) =>
-    selectedStatus === '전체' || doc.status === selectedStatus
-  );
+  const filteredDocstorageDetails = docstorageDetails
+    .filter((doc) => selectedStatus === '전체' || doc.status === selectedStatus)
+    .map((doc, index) => ({
+      ...doc,
+      no: index + 1, 
+    }));
 
   return (
     <div className='content'>
@@ -428,7 +434,7 @@ function DocstorageList() {
                   <Table
                     columns={detailColumns}
                     data={filteredDocstorageDetails}  
-                    onRowClick={handleRowClick}  // 행 클릭 이벤트 핸들러 추가
+                    onRowClick={handleRowClick} 
                     onRowMouseDown={handleMouseDown}  
                     onRowMouseOver={handleMouseOver}  
                     onRowMouseUp={handleMouseUp} 

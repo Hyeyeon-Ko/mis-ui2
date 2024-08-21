@@ -25,7 +25,28 @@ const DocstorageBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds })
     });
   };
 
+  const validateDateFormat = (dateStr) => {
+    return /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
+  };
+
   const handleSaveClick = () => {
+    const { createDate, transferDate, disposalDate } = formData;
+
+    if (createDate && !validateDateFormat(createDate)) {
+      alert('생성일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
+      return;
+    }
+
+    if (transferDate && !validateDateFormat(transferDate)) {
+      alert('이관일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
+      return;
+    }
+
+    if (disposalDate && !validateDateFormat(disposalDate)) {
+      alert('폐기일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
+      return;
+    }
+
     const payload = {
       detailIds: selectedDetailIds,  
       ...formData,

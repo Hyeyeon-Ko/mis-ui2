@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import CustomButton from '../../components/common/CustomButton';
@@ -10,7 +10,6 @@ import axios from 'axios';
 import fileDownload from 'js-file-download';
 import { FadeLoader } from 'react-spinners';
 
-/* 발주 페이지 */
 function BcdOrder() {
   const [applications, setApplications] = useState([]);
   const [selectedApplications, setSelectedApplications] = useState([]);
@@ -30,6 +29,11 @@ function BcdOrder() {
   const [selectedCenter, setSelectedCenter] = useState('전체');
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // 드래그 기능을 위한 ref 변수들
+  const dragStartIndex = useRef(null);
+  const dragEndIndex = useRef(null);
+  const dragMode = useRef('select');
 
   // Timestamp Parsing: "YYYY-MM-DD"
   const parseDate = (dateString) => {
@@ -89,12 +93,54 @@ function BcdOrder() {
   };
 
   // 행 클릭 시 체크박스 선택/해제 핸들러
-  const handleRowClick = (id) => {
+  const handleRowClick = (row) => {
+    const id = row.id;
     if (selectedApplications.includes(id)) {
       setSelectedApplications(selectedApplications.filter((appId) => appId !== id));
     } else {
       setSelectedApplications([...selectedApplications, id]);
     }
+  };
+
+  // 마우스 다운 시 드래그 시작 위치 설정
+  const handleMouseDown = (rowIndex) => {
+    dragStartIndex.current = rowIndex;
+
+    const appId = applications[rowIndex].id;
+    if (selectedApplications.includes(appId)) {
+      dragMode.current = 'deselect'; 
+    } else {
+      dragMode.current = 'select'; 
+    }
+  };
+
+  // 마우스 오버 시 드래그 상태에 따라 선택/해제 처리
+  const handleMouseOver = (rowIndex) => {
+    if (dragStartIndex.current !== null) {
+      dragEndIndex.current = rowIndex;
+  
+      const start = Math.min(dragStartIndex.current, dragEndIndex.current);
+      const end = Math.max(dragStartIndex.current, dragEndIndex.current);
+  
+      let newSelectedApplications = [...selectedApplications];
+  
+      for (let i = start; i <= end; i++) {
+        const appId = applications[i]?.id;
+        if (dragMode.current === 'select' && appId && !newSelectedApplications.includes(appId)) {
+          newSelectedApplications.push(appId); 
+        } else if (dragMode.current === 'deselect' && appId && newSelectedApplications.includes(appId)) {
+          newSelectedApplications = newSelectedApplications.filter(id => id !== appId); 
+        }
+      }
+  
+      setSelectedApplications(newSelectedApplications);
+    }
+  };
+  
+  // 마우스 업 시 드래그 상태 초기화
+  const handleMouseUp = () => {
+    dragStartIndex.current = null;
+    dragEndIndex.current = null;
   };
 
   // 센터 선택 핸들러
@@ -119,7 +165,7 @@ function BcdOrder() {
       const response = await axios.post('/api/bsc/order/excel', selectedApplications, {
         responseType: 'blob',
       });
-      fileDownload(response.data, 'order_details.xlsx');
+      fileDownload(response.data, '명함 발주내역.xlsx');
     } catch (error) {
       console.error('Error downloading excel: ', error);
     }
@@ -162,7 +208,7 @@ function BcdOrder() {
       header: <input type="checkbox" onChange={handleSelectAll} />,
       accessor: 'select',
       width: '3.5%',
-      Cell: ({ row }) => (
+      Cell: ({ row, index }) => (
         <input
           type="checkbox"
           className="order-checkbox"
@@ -182,61 +228,31 @@ function BcdOrder() {
       ),
       accessor: 'center',
       width: '18%',
-      Cell: ({ row }) => (
-        <div onClick={() => handleRowClick(row.id)}>
-          {row.center}
-        </div>
-      ),
     },
     { 
       header: '제목', 
       accessor: 'title', 
       width: '28%', 
-      Cell: ({ row }) => (
-        <div onClick={() => handleRowClick(row.id)}>
-          {row.title}
-        </div>
-      ),
     },
     { 
       header: '신청일자', 
       accessor: 'draftDate', 
       width: '15%', 
-      Cell: ({ row }) => (
-        <div onClick={() => handleRowClick(row.id)}>
-          {row.draftDate}
-        </div>
-      ),
     },
     { 
       header: '신청자', 
       accessor: 'drafter', 
       width: '10%', 
-      Cell: ({ row }) => (
-        <div onClick={() => handleRowClick(row.id)}>
-          {row.drafter}
-        </div>
-      ),
     },
     { 
       header: '승인일시', 
       accessor: 'respondDate', 
       width: '17%', 
-      Cell: ({ row }) => (
-        <div onClick={() => handleRowClick(row.id)}>
-          {row.respondDate}
-        </div>
-      ),
     },
     { 
       header: '수량', 
       accessor: 'quantity', 
       width: '9.5%', 
-      Cell: ({ row }) => (
-        <div onClick={() => handleRowClick(row.id)}>
-          {row.quantity}
-        </div>
-      ),
     },
   ];
 
@@ -255,7 +271,15 @@ function BcdOrder() {
             </CustomButton>
           </div>
         </div>
-        <Table columns={columns} data={filteredApplications} />
+        <Table 
+          columns={columns} 
+          data={filteredApplications} 
+          rowClassName="clickable-row"
+          onRowClick={(row, rowIndex) => handleRowClick(row)}
+          onRowMouseDown={(rowIndex) => handleMouseDown(rowIndex)}  
+          onRowMouseOver={(rowIndex) => handleMouseOver(rowIndex)}  
+          onRowMouseUp={handleMouseUp}    
+        />
       </div>
       {isLoading && (
         <div className="loading-overlay">

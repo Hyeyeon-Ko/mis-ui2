@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import StandardAddModal from '../standard/StandardAddModal';
@@ -19,6 +19,11 @@ function StandardData() {
   const [editDetailData, setEditDetailData] = useState(null);
   const [selectedDetails, setSelectedDetails] = useState([]);
   const { auth } = useContext(AuthContext);
+
+  // 드래그 선택을 위한 참조 변수들
+  const dragStartIndex = useRef(null);
+  const dragEndIndex = useRef(null);
+  const dragMode = useRef('select');
 
   const categories = [
     { categoryCode: 'A', categoryName: 'A 공통' },
@@ -158,7 +163,7 @@ function StandardData() {
           etcItem7: newRow.items[6],
           etcItem8: newRow.items[7],
         }, {
-          params: {oriDetailCd}
+          params: { oriDetailCd }
         });
         alert('상세 코드가 수정되었습니다.');
         fetchDetails(selectedSubCategory);
@@ -244,6 +249,46 @@ function StandardData() {
     } else {
       setSelectedDetails(details.map(detail => detail.detailCd));
     }
+  };
+
+  // 마우스 다운 시 드래그 시작 위치 설정
+  const handleMouseDown = (rowIndex) => {
+    dragStartIndex.current = rowIndex;
+
+    const detailCd = details[rowIndex]?.detailCd;
+    if (selectedDetails.includes(detailCd)) {
+      dragMode.current = 'deselect'; 
+    } else {
+      dragMode.current = 'select'; 
+    }
+  };
+
+  // 마우스 오버 시 드래그 상태에 따라 선택/해제 처리
+  const handleMouseOver = (rowIndex) => {
+    if (dragStartIndex.current !== null) {
+      dragEndIndex.current = rowIndex;
+      const start = Math.min(dragStartIndex.current, dragEndIndex.current);
+      const end = Math.max(dragStartIndex.current, dragEndIndex.current);
+
+      let newSelectedDetails = [...selectedDetails];
+
+      for (let i = start; i <= end; i++) {
+        const detailCd = details[i]?.detailCd;
+        if (dragMode.current === 'select' && !newSelectedDetails.includes(detailCd)) {
+          newSelectedDetails.push(detailCd); 
+        } else if (dragMode.current === 'deselect' && newSelectedDetails.includes(detailCd)) {
+          newSelectedDetails = newSelectedDetails.filter(id => id !== detailCd); 
+        }
+      }
+
+      setSelectedDetails(newSelectedDetails);
+    }
+  };
+
+  // 마우스 업 시 드래그 상태 초기화
+  const handleMouseUp = () => {
+    dragStartIndex.current = null;
+    dragEndIndex.current = null;
   };
 
   const mappedSubCategories = subCategories.map(subCategory => ({
@@ -363,13 +408,16 @@ function StandardData() {
                 <button className="data-delete-button" onClick={handleDeleteRow} disabled={!auth.hasStandardDataAuthority}>삭 제</button>
               </div>
             </div>
-              <div className="details-table">
-                <Table
-                  columns={detailColumns}
-                  data={details}
-                  onRowClick={handleRowClick}  
-                />
-              </div>
+            <div className="details-table">
+              <Table
+                columns={detailColumns}
+                data={details}
+                onRowClick={handleRowClick}  
+                onRowMouseDown={handleMouseDown}  
+                onRowMouseOver={handleMouseOver}  
+                onRowMouseUp={handleMouseUp}    
+              />
+            </div>
           </div>
         </div>
       </div>

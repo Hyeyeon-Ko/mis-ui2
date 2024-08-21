@@ -191,7 +191,7 @@ function ApplicationsList() {
       const response = await axios.post('/api/bsc/applyList/orderExcel', selectedApplications, {
         responseType: 'blob',
       });
-      fileDownload(response.data, 'order_details.xlsx');
+      fileDownload(response.data, '명함 완료내역.xlsx');
     } catch (error) {
       console.error('Error downloading excel: ', error);
     }
