@@ -353,26 +353,26 @@ function BcdApplySecond() {
   };
   
   const handlePositionChange = (e) => {
-    if (!formData.userId) {
-      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
-      return;
-    }
-  
-    const selectedPosition = e.target.value;
-    const selectedPositionInfo = bcdData.gradeInfo.find((position) => position.detailCd === selectedPosition);
-  
-    if (selectedPositionInfo) {
-      const enGradeNm = selectedPositionInfo.etcItem2 || '';  
-      setFormData({
-        ...formData,
-        position: selectedPosition,
-        gradeNm: selectedPosition === '000' ? formData.addGradeNm : selectedPositionInfo.detailNm,
-        enGradeNm: selectedPosition === '000' ? formData.enGradeNm : enGradeNm,
-      });
-    } else {
-      setFormData({ ...formData, position: '', gradeNm: '', enGradeNm: '' });  
-    }
-  };
+  if (!formData.userId) {
+    alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+    return;
+  }
+
+  const selectedPosition = e.target.value;
+  const selectedPositionInfo = bcdData.gradeInfo.find((position) => position.detailCd === selectedPosition);
+
+  if (selectedPositionInfo) {
+    const enGradeNm = selectedPositionInfo.etcItem2 || '';
+    setFormData({
+      ...formData,
+      position: selectedPosition,
+      gradeNm: selectedPosition === '000' ? '' : selectedPositionInfo.detailNm,
+      enGradeNm: selectedPosition === '000' ? '' : enGradeNm,
+    });
+  } else {
+    setFormData({ ...formData, position: '', gradeNm: '', enGradeNm: '' });
+  }
+};
   
   const fetchFilteredGradeInfo = () => {
     const selectedTeamInfo = bcdData.teamInfo.find((team) => team.detailNm === formData.team);

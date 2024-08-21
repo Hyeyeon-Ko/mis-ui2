@@ -66,10 +66,6 @@ function DetailApplication() {
     gradeInfo: [],
   });
 
-  useEffect(()=> {
-    console.log('bcdData: ', bcdData);
-  }, [bcdData]);
-
   const addressInputRef = useRef(null);
 
   const fetchAddressOptions = useCallback((centerCd, baseAddress) => {
