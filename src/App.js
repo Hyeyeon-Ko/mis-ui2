@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import './App.css';
 import './index.css';
 import Header from './components/common/Header';
@@ -53,12 +53,13 @@ function MainLayout({ children }) {
 
 function RequireAuth({ children }) {
   const { auth } = useContext(AuthContext);
+  const location = useLocation();
 
   if (!auth.isAuthenticated) {
     return <Navigate to="/api/login" />;
   }
 
-  if ((auth.role === 'ADMIN' || auth.role === 'MASTER') && window.location.pathname === '/') {
+  if ((auth.role === 'ADMIN' || auth.role === 'MASTER') && location.pathname === '/') {
     return <Navigate to="/api/std" />;
   }
 
@@ -66,6 +67,33 @@ function RequireAuth({ children }) {
 }
 
 function App() {
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+
+      if (event.key === 'F5') {
+        event.preventDefault();
+        window.location.reload();
+      }
+
+      if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
+        event.preventDefault();
+        window.location.reload();
+      }
+    };
+
+    const handleBeforeUnload = (event) => {
+      event.returnValue = '';
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
   return (
     <Router>
       <AuthProvider>
