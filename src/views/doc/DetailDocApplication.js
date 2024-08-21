@@ -45,7 +45,7 @@ function DetailDocApplication() {
         setFormData(fetchedData);
         setInitialData(fetchedData);
         setActiveTab(division === 'A' ? 'reception' : 'sending');
-        setExistingFile({ name: fileName, path: filePath }); 
+        setExistingFile(fileName && filePath ? { name: fileName, path: filePath } : null); 
       }
     } catch (error) {
       console.error('Error fetching document details:', error);
@@ -107,35 +107,41 @@ function DetailDocApplication() {
     
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (JSON.stringify(formData) === JSON.stringify(initialData) && !file) {
-      alert('수정된 사항이 없습니다.');
-      return;
+
+    const isFileDeleted = !file && !existingFile;
+
+    if (JSON.stringify(formData) === JSON.stringify(initialData) && !file && !isFileDeleted) {
+        alert('수정된 사항이 없습니다.');
+        return;
     }
+
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append('docUpdateRequest', new Blob([JSON.stringify({
-        drafter: formData.drafter,
-        division: activeTab === 'reception' ? 'A' : 'B',
-        receiver: activeTab === 'reception' ? null : formData.receiver,
-        sender: activeTab === 'reception' ? formData.sender : null,
-        docTitle: formData.title,
-        purpose: formData.purpose,
-      })], { type: 'application/json' }));
-      if (file) {
-        formDataToSend.append('file', file);
-      }
+        const formDataToSend = new FormData();
 
-      await axios.post(`/api/doc/update?draftId=${draftId}`, formDataToSend, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+        formDataToSend.append('docUpdateRequest', new Blob([JSON.stringify({
+            drafter: formData.drafter,
+            division: activeTab === 'reception' ? 'A' : 'B',
+            receiver: activeTab === 'reception' ? null : formData.receiver,
+            sender: activeTab === 'reception' ? formData.sender : null,
+            docTitle: formData.title,
+            purpose: formData.purpose,
+        })], { type: 'application/json' }));
 
-      alert('문서 수정이 완료되었습니다');
-      navigate('/api/MyPendingList');
+        if (file) {
+            formDataToSend.append('file', file);
+        }
+
+        await axios.post(`/api/doc/update?draftId=${draftId}&isFileDeleted=${isFileDeleted}`, formDataToSend, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        alert('문서 수정이 완료되었습니다');
+        navigate('/api/MyPendingList');
     } catch (error) {
-      console.error('Error submitting document:', error);
-      alert('문서 수정 중 오류가 발생했습니다.');
+        console.error('Error submitting document:', error);
+        alert('문서 수정 중 오류가 발생했습니다.');
     }
   };
 
@@ -208,49 +214,36 @@ function DetailDocApplication() {
                 />
               </div>
               <div className="doc-form-group file-group">
-              <label>첨부 파일</label>
-              {existingFile ? (
-                <div className="file-display">
-                  <span className="file-name">{existingFile.name}</span>
-                  <div className="file-actions">
-                    <button
-                      type="button"
-                      className="download-button"
-                      onClick={handleFileDownload}
-                    >
-                      <img src={downloadIcon} alt="다운로드" />
-                    </button>
-                    <button
-                      type="button"
-                      className="file-delete-button"
-                      onClick={handleFileDelete}
-                    >
-                      <img src={deleteIcon} alt="삭제" />
-                    </button>
-                  </div>
-                </div>
-              ) : file ? (
-                <div className="file-display">
-                  <span className="file-name">{file.name}</span>
-                  <div className="file-actions">
-                    <button
-                      type="button"
-                      className="file-delete-button"
-                      onClick={handleFileDelete}
-                    >
-                      <img src={deleteIcon} alt="삭제" />
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <input
-                  type="file"
-                  name="file"
-                  className="file-input"
-                  onChange={handleFileChange}
-                />
-              )}
-            </div>
+                <label>첨부 파일</label>
+                {existingFile ? (
+                    <div className="file-display">
+                        <span className="file-name">{existingFile.name}</span>
+                        <div className="file-actions">
+                            <button
+                                type="button"
+                                className="download-button"
+                                onClick={handleFileDownload}
+                            >
+                                <img src={downloadIcon} alt="다운로드" />
+                            </button>
+                            <button
+                                type="button"
+                                className="file-delete-button"
+                                onClick={handleFileDelete}
+                            >
+                                <img src={deleteIcon} alt="삭제" />
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <input
+                        type="file"
+                        name="file"
+                        className="file-input"
+                        onChange={handleFileChange}
+                    />
+                )}
+              </div>
               <div className="doc-apply-button-container">
                 <CustomButton className="apply-request-button" type="submit">
                   {isEdit ? '문서 수정하기' : '문서 신청하기'}

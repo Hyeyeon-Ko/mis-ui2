@@ -43,6 +43,10 @@
   border-bottom: 1px solid rgb(153, 153, 153);
 }
 
+.status-pending:hover {
+  color: #2789FE;
+}
+
 .center-header {
   position: relative;
   display: inline-block;

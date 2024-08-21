@@ -11,6 +11,7 @@ const ConditionFilter = ({
   onSearch,
   onReset,
   filters,
+  setFilters, 
   onFilterChange,
   showStatusFilters,
   showSearchCondition,
@@ -23,12 +24,8 @@ const ConditionFilter = ({
   
   useEffect(() => {
     resetFilters();
-  }, []);
-
-  const formatDate = (date) => {
-    return date.toISOString().split('T')[0];
-  };
-
+  }, [documentType]);
+  
   const resetFilters = () => {
     const defaultStartDate = new Date();
     defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
@@ -37,6 +34,16 @@ const ConditionFilter = ({
     setSearchType('전체');
     setKeyword('');
     if (onReset) onReset();
+    setFilters({
+      statusApproved: false,
+      statusRejected: false,
+      statusOrdered: false,
+      statusClosed: false,
+    });
+  };
+  
+  const formatDate = (date) => {
+    return date.toISOString().split('T')[0];
   };
 
   const handleReset = () => {
@@ -158,6 +165,7 @@ ConditionFilter.propTypes = {
   onSearch: PropTypes.func.isRequired,
   onReset: PropTypes.func.isRequired,
   filters: PropTypes.object,
+  setFilters: PropTypes.func.isRequired, 
   onFilterChange: PropTypes.func,
   showStatusFilters: PropTypes.bool,
   showSearchCondition: PropTypes.bool,

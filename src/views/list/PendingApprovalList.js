@@ -22,7 +22,12 @@ function PendingApprovalList() {
   const [error, setError] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState({
+    statusApproved: false,
+    statusRejected: false,
+    statusOrdered: false,
+    statusClosed: false,
+  });
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState(null);
 
@@ -122,18 +127,24 @@ function PendingApprovalList() {
   };
 
   const handleSearch = () => {
-    setFilters({
+    setFilters((prevFilters) => ({
+      ...prevFilters,
       startDate: startDate ? startDate.toISOString().split('T')[0] : '',
       endDate: endDate ? endDate.toISOString().split('T')[0] : '',
       selectedCenter,
-    });
+    }));
   };
 
   const handleReset = () => {
     setStartDate(null);
     setEndDate(null);
     setSelectedCenter('전체');
-    setFilters({});
+    setFilters({
+      statusApproved: false,
+      statusRejected: false,
+      statusOrdered: false,
+      statusClosed: false,
+    });
   };
 
   const closeModal = () => {
@@ -195,8 +206,8 @@ function PendingApprovalList() {
           setStartDate={setStartDate}
           endDate={endDate}
           setEndDate={setEndDate}
-          documentType={documentType}
-          setDocumentType={() => {}}
+          filters={filters}
+          setFilters={setFilters}
           onSearch={handleSearch}
           onReset={handleReset}
           showDocumentType={false}

@@ -284,12 +284,12 @@ function ApplicationsList() {
           setStartDate={(date) => setFilterInputs(prev => ({ ...prev, startDate: date }))}
           endDate={filterInputs.endDate}
           setEndDate={(date) => setFilterInputs(prev => ({ ...prev, endDate: date }))}
-          documentType={filterInputs.documentType}
-          setDocumentType={(type) => setFilterInputs(prev => ({ ...prev, documentType: type }))}
+          documentType={documentTypeFromUrl}
+          filters={filters}
+          setFilters={setFilters}  
+          onFilterChange={handleFilterChange}
           onSearch={handleSearch}
           onReset={handleReset}
-          filters={filters}
-          onFilterChange={handleFilterChange}
           showStatusFilters={true}
           showDocumentType={true}
         />
