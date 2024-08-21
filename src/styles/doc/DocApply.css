@@ -114,3 +114,59 @@ h2 {
   flex-direction: column;
   align-items: center;
 }
+
+.file-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.file-display {
+  display: flex;
+  align-items: center;
+  width: 81%;
+  background-color: #f9f9f9;
+  border: 1px solid #e4e1e1;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 10px;
+  justify-content: space-between; 
+}
+
+.file-name {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+  padding-right: 10px;
+}
+
+.file-actions {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.download-button,
+.file-delete-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.download-button img{
+  width: 28px;
+  height: 28px;
+}
+
+.file-delete-button img {
+  width: 21px;
+  height: 19px;
+}
+
+.download-button:hover img,
+.file-delete-button:hover img {
+  filter: brightness(0.8);
+}

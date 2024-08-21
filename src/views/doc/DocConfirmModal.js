@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import '../../styles/doc/DocConfirmModal.css';
+import downloadIcon from '../../assets/images/download.png';
 
 const DocConfirmModal = ({ show, documentId, onClose, onApprove }) => {
   const [formData, setFormData] = useState({
@@ -11,7 +12,9 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove }) => {
     sender: '',
     title: '',
     purpose: '',
-    division: ''
+    division: '',
+    fileName: '',
+    fileUrl: '' 
   });
 
   const fetchDocumentData = useCallback(async (id) => {
@@ -26,7 +29,9 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove }) => {
           sender: data.sender,
           title: data.docTitle,
           purpose: data.purpose,
-          division: data.division
+          division: data.division,
+          fileName: data.fileName,
+          fileUrl: data.filePath ? `/api/doc/download/${encodeURIComponent(data.fileName)}` : ''
         });
       }
     } catch (error) {
@@ -47,6 +52,27 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove }) => {
 
   const handleApprove = () => {
     onApprove(documentId);
+  };
+
+  const handleFileDownload = async () => {
+    if (formData.fileUrl) {
+      try {
+        const response = await axios.get(formData.fileUrl, {
+          responseType: 'blob',
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', formData.fileName); 
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+      } catch (error) {
+        console.error('Error downloading the file:', error);
+        alert('파일 다운로드에 실패했습니다.');
+      }
+    }
   };
 
   if (!show) return null;
@@ -85,6 +111,17 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove }) => {
           <label>사용 용도</label>
           <textarea value={formData.purpose} readOnly className="doc-confirm-textarea" />
         </div>
+        {formData.fileUrl && (
+          <div className="doc-confirm-form-group">
+            <label>첨부 파일</label>
+            <div className="doc-confirm-file-download">
+              <a onClick={handleFileDownload} style={{ cursor: 'pointer' }}>
+                <span>{formData.fileName}</span>
+                <img src={downloadIcon} alt="다운로드" />
+              </a>
+            </div>
+          </div>
+        )}
         <div className="doc-confirm-modal-buttons">
           <button className="doc-confirm-button confirm" onClick={handleApprove}>
             <span>승인</span>
