@@ -135,7 +135,7 @@ const PreviewModal = ({ show, onClose, formData }) => {
 
         ctx.font = 'bold 26.4px Arial';
         ctx.fillStyle = black;
-        drawTextWithMaxWidth(ctx, `${formData.lastName} ${formData.firstName}`, 624, 176, 0.4, 170, 26.4, true);
+        drawTextWithMaxWidth(ctx, `${formData.lastName} ${formData.firstName}`, 624, 176, 0.4, 150, 26.4, true);
 
         ctx.font = '13.6px Arial';
         ctx.fillStyle = black;

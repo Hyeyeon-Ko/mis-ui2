@@ -66,6 +66,10 @@ function DetailApplication() {
     gradeInfo: [],
   });
 
+  useEffect(()=> {
+    console.log('bcdData: ', bcdData);
+  }, [bcdData]);
+
   const addressInputRef = useRef(null);
 
   const fetchAddressOptions = useCallback((centerCd, baseAddress) => {
@@ -181,6 +185,10 @@ function DetailApplication() {
     }
   };
 
+  useEffect(()=> {
+    console.log('formData: ', formData);
+  }, [formData]);
+
   const fetchBcdStd = async () => {
     try {
       const response = await axios.get('/api/std/bcd');
@@ -252,11 +260,10 @@ function DetailApplication() {
       deptCd: formData.department,
       teamCd: formData.team,
       teamNm: formData.team === '000' ? formData.addTeamNm : formData.teamNm,
-      engTeamNm: formData.team === '000' ? formData.addEngTeamNm : "",
+      engTeamNm: formData.team === '000' ? formData.addEngTeamNm : null,
       gradeCd: formData.position,
-      gradeNm: formData.gradeNm,
-      addGradeNm: formData.addGradenM,
-      enGradeNm: formData.enGradeNm,
+      gradeNm: formData.position === '000' ? formData.addGradeNm : formData.gradeNm,
+      enGradeNm: formData.position === '000' ? formData.enGradeNm : null,
       extTel: `${formData.phone1}-${formData.phone2}-${formData.phone3}`,
       faxTel: `${formData.fax1}-${formData.fax2}-${formData.fax3}`,
       phoneTel: `${formData.mobile1}-${formData.mobile2}-${formData.mobile3}`,
@@ -349,13 +356,12 @@ function DetailApplication() {
   const handlePositionChange = (e) => {
     const selectedPosition = e.target.value;
     const selectedPositionInfo = bcdData.gradeInfo.find((position) => position.detailCd === selectedPosition);
-    const gradNm = selectedPositionInfo ? selectedPositionInfo.etcItem2: '';
     const enGradeNm = selectedPositionInfo ? selectedPositionInfo.etcItem2 : '';
-    setFormData((prevFormData) => ({
-      ...prevFormData,
+    setFormData(() => ({
+      ...formData,
       position: selectedPosition,
-      gradeNm: selectedPosition === '000' ? prevFormData.addGradeNm : null,
-      enGradeNm: selectedPosition === '000' ? enGradeNm : null,
+      gradeNm: selectedPosition === '000' ? formData.addGradeNm : selectedPositionInfo.detailNm,
+      enGradeNm: selectedPosition === '000' ? enGradeNm : '',
     }));
   };
 

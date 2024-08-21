@@ -28,6 +28,7 @@ function BcdApplySecond() {
     teamNm: '',
     position: '',
     gradeNm: '',
+    addGradeNm: '',
     phone1: '',
     phone2: '',
     phone3: '',
@@ -137,8 +138,6 @@ function BcdApplySecond() {
       alert('기준자료를 불러오는 중 오류가 발생했습니다.');
     }
   };
-
-  console.log("bcdData: ", bcdData);
 
   const handleInputClick = (e) => {
     if (!formData.userId) {
@@ -256,10 +255,10 @@ function BcdApplySecond() {
       deptCd: mappings.deptMap[formData.department],
       teamCd: teamCd,
       teamNm: teamNm, 
-      engTeamNm: isCustomTeam ? formData.engTeam : undefined,
+      engTeamNm: isCustomTeam ? formData.engTeam : null,
       gradeCd: formData.position,
-      gradeNm: formData.gradeNm,
-      enGradeNm: formData.enGradeNm,
+      gradeNm: formData.position === '000' ? formData.addGradeNm : formData.gradeNm,
+      enGradeNm: formData.position === '000' ? formData.enGradeNm : null,
       extTel: `${formData.phone1}-${formData.phone2}-${formData.phone3}`,
       faxTel: `${formData.fax1}-${formData.fax2}-${formData.fax3}`,
       phoneTel: `${formData.mobile1}-${formData.mobile2}-${formData.mobile3}`,
@@ -282,6 +281,10 @@ function BcdApplySecond() {
       alert('명함 신청 중 오류가 발생했습니다.');
     }
   };
+
+  useEffect(() => {
+    console.log('formData: ', formData);
+  }, [formData]);
 
   const handleCenterChange = (e) => {
     if (!formData.userId) {
@@ -331,10 +334,10 @@ function BcdApplySecond() {
       return;
     }
     const selectedTeam = e.target.value;
-    const selectedTeamInfo = bcdData.teamInfo.find((team) => team.detailNm === selectedTeam);
-    const engTeam = selectedTeamInfo ? selectedTeamInfo.etcItem1 : '';
+    const selectedTeamInfo = bcdData.teamInfo.find((team) => team.detailCd === selectedTeam);
+    const engTeam = selectedTeamInfo ? selectedTeamInfo.etcItem2 : '';
 
-    setFormData({ ...formData, team: selectedTeam, engTeam });
+    setFormData({ ...formData, team: selectedTeam, teamNm: selectedTeamInfo.detailNm, engTeam });
   };
 
   const handlePositionChange = (e) => {
@@ -344,10 +347,14 @@ function BcdApplySecond() {
     }
 
     const selectedPosition = e.target.value;
-    const selectedPositionInfo = bcdData.gradeInfo.find((position) => position.detailNm === selectedPosition);
-    const enGradeNm = selectedPositionInfo ? selectedPositionInfo.etcItem1 : '';
+    const selectedPositionInfo = bcdData.gradeInfo.find((position) => position.detailCd === selectedPosition);
+    const enGradeNm = selectedPositionInfo ? selectedPositionInfo.etcItem2 : '';
 
-    setFormData({ ...formData, position: selectedPosition, enGradeNm });
+    setFormData({ ...formData,
+      position: selectedPosition,
+      gradeNm: selectedPosition === '000' ? formData.addGradeNm : selectedPositionInfo.detailNm,
+      enGradeNm: selectedPosition === '000' ? enGradeNm : '',
+    });
   };
 
   const fetchFilteredGradeInfo = () => {
