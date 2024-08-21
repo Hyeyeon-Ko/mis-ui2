@@ -45,14 +45,14 @@ function DocstorageList() {
         params: { instCd: auth.instCd },
       });
       setDeptResponses(response.data.data);
-      if (response.data.data.length > 0) {
-        handleDeptClick(response.data.data[0].detailCd);
-      }
+      
+      setSelectedDeptCd(null);
+      setDocstorageDetails([]); 
     } catch (error) {
       console.error('부서 리스트를 불러오는데 실패했습니다.', error);
     }
   };
-
+  
   const fetchPendingApprovalList = async () => {
     try {
       const response = await axios.get('/api/docstorageList/pending', {
@@ -153,6 +153,12 @@ function DocstorageList() {
   };
 
   const handleEdit = async () => {
+
+    if (!selectedDeptCd) {
+      alert('부서를 선택하세요.');
+      return;
+    }
+  
     if (selectedRows.length === 0) {
       setSelectedDoc(null);
       setShowEditModal(true);
@@ -179,7 +185,7 @@ function DocstorageList() {
       setShowBulkEditModal(true); 
     }
   };
-
+  
   const handleBulkUpdate = async (payload) => {
     try {
       const response = await axios.put('/api/docstorage/bulkUpdate', payload);
@@ -308,19 +314,22 @@ function DocstorageList() {
       width: '100%',
       Cell: ({ row }) => {
         const { detailCd } = row;
+        const isSelected = detailCd === selectedDeptCd; 
         return (
           <div
             className="docstorage-details-table"
             style={{ cursor: 'pointer' }}
             onClick={() => handleDeptClick(detailCd)}
           >
-            <span>{row.detailNm}</span>
+            <span className={isSelected ? 'selected-sub-category-text' : ''}>
+              {row.detailNm}
+            </span>
           </div>
         );
       }
     },
   ];
-
+  
   const detailColumns = [
     ...(selectedCategory === 'B' ? [
       {

@@ -61,8 +61,8 @@
 }
 
 .add-standard-detail-row input:focus {
-    border-color: #2789FE;
-    box-shadow: 0 0 5px rgba(39, 137, 254, 0.5);
+    border-color: #b1cef1;
+    box-shadow: 0 0 2px rgba(0, 123, 255, 0.5);
     outline: none;
 }
 

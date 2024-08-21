@@ -144,19 +144,22 @@ function TotalDocstorageList() {
       width: '100%',
       Cell: ({ row }) => {
         const { detailCd } = row;
+        const isSelected = detailCd === selectedCenterCode; 
         return (
           <div
             className="totalDocstorage-details-table"
             style={{ cursor: 'pointer' }}
             onClick={() => handleCenterClick(detailCd)}
           >
-            <span>{row.detailNm}</span>
+            <span className={isSelected ? 'selected-sub-category-text' : ''}>
+              {row.detailNm}
+            </span>
           </div>
         );
       }
     },
   ];
-
+  
   const detailColumns = [
     {
       header: (

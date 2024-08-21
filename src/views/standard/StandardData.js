@@ -20,7 +20,6 @@ function StandardData() {
   const [selectedDetails, setSelectedDetails] = useState([]);
   const { auth } = useContext(AuthContext);
 
-  // 드래그 선택을 위한 참조 변수들
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
   const dragMode = useRef('select');
@@ -251,7 +250,6 @@ function StandardData() {
     }
   };
 
-  // 마우스 다운 시 드래그 시작 위치 설정
   const handleMouseDown = (rowIndex) => {
     dragStartIndex.current = rowIndex;
 
@@ -263,7 +261,6 @@ function StandardData() {
     }
   };
 
-  // 마우스 오버 시 드래그 상태에 따라 선택/해제 처리
   const handleMouseOver = (rowIndex) => {
     if (dragStartIndex.current !== null) {
       dragEndIndex.current = rowIndex;
@@ -285,7 +282,6 @@ function StandardData() {
     }
   };
 
-  // 마우스 업 시 드래그 상태 초기화
   const handleMouseUp = () => {
     dragStartIndex.current = null;
     dragEndIndex.current = null;

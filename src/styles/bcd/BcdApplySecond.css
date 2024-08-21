@@ -133,8 +133,8 @@ input[type="text2"] {
   }
 
   .apply-content input:focus {
-    border-color: #a1c0e6; 
-    box-shadow: 0 0 3px rgba(39, 137, 254, 0.5); 
+    border-color: #b1cef1;
+    box-shadow: 0 0 2px rgba(0, 123, 255, 0.5);
     outline: none;
 }  
 
@@ -191,8 +191,8 @@ input[type="text2"] {
 
 .apply-content select:focus{
     outline: none;
-    border: 1px solid #a1c0e6;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    border-color: #b1cef1;
+    box-shadow: 0 0 2px rgba(0, 123, 255, 0.5);
 }
 
 .name-inputs {
