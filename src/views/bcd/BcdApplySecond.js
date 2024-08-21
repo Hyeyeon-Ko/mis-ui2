@@ -257,7 +257,7 @@ function BcdApplySecond() {
       teamNm: teamNm, 
       engTeamNm: isCustomTeam ? formData.engTeam : null,
       gradeCd: formData.position,
-      gradeNm: formData.position === '000' ? formData.addGradeNm : formData.gradeNm,
+      gradeNm: formData.position === '000' ? formData.gradeNm : formData.gradeNm,
       enGradeNm: formData.position === '000' ? formData.enGradeNm : null,
       extTel: `${formData.phone1}-${formData.phone2}-${formData.phone3}`,
       faxTel: `${formData.fax1}-${formData.fax2}-${formData.fax3}`,
