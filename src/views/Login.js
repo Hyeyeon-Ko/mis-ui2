@@ -20,18 +20,6 @@ const Login = () => {
         navigate('/');
       }
     }
-
-    const handlePopState = (event) => {
-      if (auth.isAuthenticated) {
-        navigate(1);
-      }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
   }, [auth, navigate]);
 
   const handleLogin = async (e) => {
