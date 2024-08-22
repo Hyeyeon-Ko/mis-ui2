@@ -150,29 +150,42 @@ function RentalManage() {
         alert("최종 업데이트할 항목을 선택하세요.");
         return;
     }
-  
+
+    // "완료" 상태인 항목이 포함되어 있는지 확인
+    const completedItems = selectedRows.filter(rowId => {
+        const selectedItem = rentalDetails.find(item => item.detailId === rowId);
+        return selectedItem && selectedItem.status === '완료';
+    });
+
+    if (completedItems.length > 0) {
+        alert("이미 완료된 항목이 선택되었습니다. 완료된 항목은 업데이트할 수 없습니다.");
+        return;
+    }
+
     try {
-      await axios.put('/api/rental/finish', selectedRows);
+        await axios.put('/api/rental/finish', selectedRows);
 
-      alert('선택된 항목이 최종 업데이트되었습니다.');
+        alert('선택된 항목이 최종 업데이트되었습니다.');
 
-      setRentalDetails(prevDetails => {
-          const updatedDetails = prevDetails
-              .filter(item => !selectedRows.includes(item.detailId))
-              .map((item, index) => ({
-                  ...item,
-                  no: index + 1 
-              }));
-          
-          return updatedDetails;
-      });
+        setRentalDetails(prevDetails => {
+            const updatedDetails = prevDetails.map(item => {
+                if (selectedRows.includes(item.detailId)) {
+                    return {
+                        ...item,
+                        status: '완료', // 완료된 항목의 상태만 업데이트
+                    };
+                }
+                return item;
+            });
+            return updatedDetails;
+        });
 
-      setSelectedRows([]); 
+        setSelectedRows([]);
     } catch (error) {
         console.error('렌탈현황 정보를 최종 업데이트하는 중 에러 발생:', error);
         alert('최종 업데이트에 실패했습니다.');
     }
-  };
+};
 
   const handleModifyButtonClick = () => {
     if (selectedRows.length === 1) {

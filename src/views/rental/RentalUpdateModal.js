@@ -236,6 +236,7 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
                   name="installDate"
                   value={formData.installDate}
                   onChange={handleChange}
+                  placeholder="YYYY-MM-DD"
                 />
               </div>
               <div className="rental-add-detail-row">
@@ -245,6 +246,7 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
                   name="expiryDate"
                   value={formData.expiryDate}
                   onChange={handleChange}
+                  placeholder="YYYY-MM-DD"
                 />
               </div>
               <div className="rental-add-detail-row">
