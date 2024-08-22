@@ -240,7 +240,7 @@ function RentalManage() {
         <input
           type="checkbox"
           name="detailSelect"
-          onChange={(e) => handleRowClick(row, index)}
+          onChange={() => handleRowClick(row, index)}
           checked={selectedRows.includes(row.detailId)}
         />
       ),

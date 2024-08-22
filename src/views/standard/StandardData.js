@@ -334,6 +334,7 @@ function StandardData() {
             type="checkbox"
             name="detailSelect"
             checked={selectedDetails.includes(detailCd)}
+            onClick={(e) => e.stopPropagation()}
             onChange={() => handleDetailSelect(detailCd)}
           />
         );
@@ -349,7 +350,7 @@ function StandardData() {
     { header: headerData.etcItem7 || '', accessor: 'etcItem6' },
     { header: headerData.etcItem8 || '', accessor: 'etcItem7' },
   ];
-
+    
   const getModalTitle = () => {
     if (modalMode === 'detail') {
       return `${subCategoryName} 추가`;
