@@ -114,15 +114,17 @@ input:disabled {
 }
 
 .rental-add-detail-row label {
+    padding-left: 5px;
     font-size: 15px;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
 }
 
 .rental-add-detail-row input {
-    padding: 6px;
+    padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 14px;
+    height: 20px;
 }
 
 .rental-add-detail-row input:focus {
