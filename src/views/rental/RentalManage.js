@@ -98,6 +98,36 @@ function RentalDetailTable() {
     fetchRentalData();  // Re-fetch data after save
   };
 
+  const handleDeleteButtonClick = async () => {
+    if (selectedRows.length === 0) {
+        alert("삭제할 항목을 선택하세요.");
+        return;
+    }
+  
+    try {
+        for (const detailId of selectedRows) {
+            await axios.delete('/api/rental/', { params: { detailId } });
+        }
+        alert('선택된 항목이 삭제되었습니다.');
+  
+        setRentalDetails(prevDetails => {
+            const updatedDetails = prevDetails
+                .filter(item => !selectedRows.includes(item.detailId))
+                .map((item, index) => ({
+                    ...item,
+                    no: index + 1 
+                }));
+            
+            return updatedDetails;
+        });
+  
+        setSelectedRows([]); 
+    } catch (error) {
+        console.error('렌탈현황 정보를 삭제하는 중 에러 발생:', error);
+        alert('삭제에 실패했습니다.');
+    }
+  };
+
   const handleRowSelect = (selectedRows) => {
     setSelectedRows(selectedRows);
   };
@@ -127,7 +157,7 @@ function RentalDetailTable() {
                 <div className="rental-detail-buttons">
                   <button className="rental-add-button" onClick={handleAddButtonClick}>추 가</button>
                   <button className="rental-modify-button" onClick={handleModifyButtonClick}>수 정</button>
-                  <button className="rental-delete-button">삭 제</button>
+                  <button className="rental-delete-button" onClick={handleDeleteButtonClick}>삭 제</button>
                   <button className="rental-excel-button">엑 셀</button>
                   <button className="rental-apply-button">완 료</button>
                 </div>

@@ -144,7 +144,6 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         specialNote,
       };
   
-      // PUT 요청 보내기
       axios.put(`/api/rental/?detailId=${rentalData.detailId}`, payload)
         .then(response => {
           console.log('Data successfully saved:', response.data);
@@ -160,7 +159,6 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
             alert('데이터 수정 중 오류가 발생했습니다.');
           }
         });
-
     }
   };
   
