@@ -55,7 +55,7 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
     return /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
   };
 
-  const handleSaveClick = () => {
+  const handleSaveClick = async () => {
     if (!rentalData) {
       if (!file) {
         alert('파일을 첨부해주세요.');
@@ -67,17 +67,21 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         const data = new Uint8Array(event.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
-        const worksheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+        const worksheet = workbook.Sheets[sheetName];
+
+        const jsonOptions = {
           header: 1,
           defval: '',
-        });
+          raw: false,
+          dateNF: 'yyyy-mm-dd',
+        };
 
-        const extractedData = worksheet
-          .slice(4)
-          .filter((row) => row[0])
+        const worksheetData = XLSX.utils.sheet_to_json(worksheet, jsonOptions);
+
+        const extractedData = worksheetData
+          .slice(5)
+          .filter((row) => row[1])
           .map((row) => ({
-            no: row[0],
-            instCd: auth.instCd,
             category: row[1] !== undefined ? row[1].toString() : '',
             companyNm: row[2] !== undefined ? row[2].toString() : '',
             contractNum: row[3] !== undefined ? row[3].toString() : '',
@@ -90,8 +94,15 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
             specialNote: row[10] !== undefined ? row[10].toString() : '',
           }));
 
-        onSave(extractedData, true);
-        onClose();
+        try {
+          axios.post('/api/rental/update', extractedData);
+          alert('수정이 완료되었습니다.');
+          onSave(extractedData, true);
+          onClose();
+        } catch (error) {
+          console.error('업데이트 중 오류 발생:', error);
+          alert('수정 중 오류가 발생했습니다.');
+        }
       };
       reader.readAsArrayBuffer(file);
     } else {
@@ -119,7 +130,8 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         alert('모든 필수 항목을 입력해 주세요.');
         return;
       }
-  
+
+        
       if (!validateDateFormat(installDate)) {
         alert('설치일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
         return;
@@ -129,7 +141,7 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         alert('만료일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
         return;
       }
-  
+
       const payload = {
         instCd: auth.instCd,
         category,
@@ -143,7 +155,7 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         installationSite,
         specialNote,
       };
-  
+
       axios.put(`/api/rental/?detailId=${rentalData.detailId}`, payload)
         .then(response => {
           console.log('Data successfully saved:', response.data);

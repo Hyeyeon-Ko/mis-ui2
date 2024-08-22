@@ -101,14 +101,18 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
           }));
 
         axios.post('/api/rental/data', extractedData)
-          .then(response => {
+        .then((response) => {
             console.log('Data successfully sent:', response.data);
-            onSave(response.data);
+            onSave(response.data); 
             onClose();
           })
-          .catch(error => {
+          .catch((error) => {
             console.error('Error sending data:', error);
-            alert('데이터 전송 중 오류가 발생했습니다.');
+            if (error.response && error.response.status === 400) {
+              alert("계약번호는 중복이 불가합니다"); 
+            } else {
+              alert('데이터 전송 중 오류가 발생했습니다.');
+            }
           });
       };
       reader.readAsArrayBuffer(file);

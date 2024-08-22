@@ -8,13 +8,13 @@ import { AuthContext } from '../../components/AuthContext';
 import '../../styles/common/Page.css';
 import '../../styles/rental/RentalManage.css';
 
-function RentalDetailTable() {
+function RentalManage() {
   const { auth } = useContext(AuthContext);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]); 
   const [selectedRental, setSelectedRental] = useState(null); 
-  const [rentalDetails, setRentalDetails] = useState([]);  // State to store fetched data
+  const [rentalDetails, setRentalDetails] = useState([]);  
 
   const getStatusText = (status) => {
     switch (status) {
@@ -26,7 +26,6 @@ function RentalDetailTable() {
         return status;
     }
   };
-
   const handleRowClick = (row) => {
     const detailId = row.detailId;
     if (selectedRows.includes(detailId)) {
@@ -78,7 +77,6 @@ function RentalDetailTable() {
       const response = await axios.get('/api/rentalList/center', {
         params: { instCd: auth.instCd },
       });
-
       const transformedData = response.data.data.map((item) => ({
         ...item,
         status: getStatusText(item.status),
@@ -114,7 +112,7 @@ function RentalDetailTable() {
     setIsAddModalVisible(false);
     setIsUpdateModalVisible(false);
     setSelectedRental(null);
-    fetchRentalData();  // Re-fetch data after save
+    fetchRentalData(); 
   };
 
   const handleDeleteButtonClick = async () => {
@@ -187,9 +185,33 @@ function RentalDetailTable() {
       setSelectedRental(rentalData);
       setIsUpdateModalVisible(true);
     } else if (selectedRows.length === 0) {
-      alert("수정할 항목을 선택해주세요.");
+      setSelectedRental(null);
+      setIsUpdateModalVisible(true);
     } else {
       alert("하나의 항목만 선택하여 수정할 수 있습니다.");
+    }
+  };
+
+  const handleExcelDownload = async () => {
+    if (selectedRows.length === 0) {
+      alert("엑셀 파일로 내보낼 항목을 선택하세요.");
+      return;
+    }
+
+    try {
+      const response = await axios.post('/api/rental/excel', selectedRows, {
+        responseType: 'blob', 
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', '렌탈현황 관리표.xlsx'); 
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("엑셀 다운로드 실패:", error);
     }
   };
 
@@ -207,7 +229,7 @@ function RentalDetailTable() {
                   <button className="rental-add-button" onClick={handleAddButtonClick}>추 가</button>
                   <button className="rental-modify-button" onClick={handleModifyButtonClick}>수 정</button>
                   <button className="rental-delete-button" onClick={handleDeleteButtonClick}>삭 제</button>
-                  <button className="rental-excel-button">엑 셀</button>
+                  <button className="rental-excel-button" onClick={handleExcelDownload}>엑 셀</button>
                   <button className="rental-apply-button" onClick={handleFinishButtonClick}>완 료</button>
                 </div>
               </div>
@@ -238,4 +260,4 @@ function RentalDetailTable() {
   );
 }
 
-export default RentalDetailTable;
+export default RentalManage;
