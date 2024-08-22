@@ -16,6 +16,17 @@ function RentalDetailTable() {
   const [selectedRental, setSelectedRental] = useState(null); 
   const [rentalDetails, setRentalDetails] = useState([]);  // State to store fetched data
 
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'A':
+        return '';
+      case 'E':
+        return '완료';
+      default:
+        return status;
+    }
+  };
+
   const handleRowClick = (row) => {
     const detailId = row.detailId;
     if (selectedRows.includes(detailId)) {
@@ -58,6 +69,8 @@ function RentalDetailTable() {
     { header: '위치분류', accessor: 'location' },
     { header: '설치위치', accessor: 'installationSite' },
     { header: '특이사항', accessor: 'specialNote' },
+    { header: '상태', accessor: 'status' },
+    
   ];
 
   const fetchRentalData = async () => {
@@ -65,7 +78,13 @@ function RentalDetailTable() {
       const response = await axios.get('/api/rentalList/center', {
         params: { instCd: auth.instCd },
       });
-      setRentalDetails(response.data.data);  // Correctly setting the rental details
+
+      const transformedData = response.data.data.map((item) => ({
+        ...item,
+        status: getStatusText(item.status),
+      }));
+
+      setRentalDetails(transformedData);
       setSelectedRows([]);
     } catch (error) {
       console.error('센터 렌탈현황을 불러오는데 실패했습니다.', error);
@@ -73,7 +92,7 @@ function RentalDetailTable() {
   }
 
   useEffect(() => {
-    fetchRentalData();  // Fetch data when the component mounts
+    fetchRentalData();
   }, []);
 
   useEffect(() => {
