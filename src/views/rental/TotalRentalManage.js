@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
@@ -9,20 +9,25 @@ function TotalRentalManage() {
   const [selectedCenter, setSelectedCenter] = useState(null);
   const [selectedRows, setSelectedRows] = useState([]);
   const [centerData, setCenterData] = useState([]);
-  const [filteredDetails, setFilteredDetails] = useState([]);
+  const [rentalDetails, setRentalDetails] = useState([]);
+  const [centerRentalResponses, setCenterRentalResponses] = useState(null);
+
+  const dragStartIndex = useRef(null);
+  const dragEndIndex = useRef(null);
+  const dragMode = useRef('select');
 
   useEffect(() => {
     const fetchRentalData = async () => {
       try {
         const response = await axios.get('/api/rentalList/total');
-        const data = response.data.data;
+        const { centerResponses, centerRentalResponses } = response.data.data;
 
-        setCenterData(data.centerResponses);
+        const sortedCenterData = [...centerResponses].sort((a, b) => {
+          return a.detailNm.localeCompare(b.detailNm, 'ko-KR');
+        });
 
-        if (data.centerRentalResponses.length > 0) {
-          const firstCenterRentalData = data.centerRentalResponses[0].foundationResponses;
-          setFilteredDetails(firstCenterRentalData);
-        }
+        setCenterData(sortedCenterData);
+        setCenterRentalResponses(centerRentalResponses[0]); 
       } catch (error) {
         console.error("렌탈 데이터를 불러오는 중 오류 발생:", error);
       }
@@ -32,20 +37,36 @@ function TotalRentalManage() {
   }, []);
 
   const handleCenterClick = (detailCd) => {
-    setSelectedCenter(detailCd);
     setSelectedRows([]);
+    setSelectedCenter(detailCd);
 
-    const centerRentalData = centerData.find(center => center.detailCd === detailCd);
-    if (centerRentalData) {
-      const rentalData = centerRentalData.foundationResponses || [];
-      setFilteredDetails(rentalData);
-    } else {
-      setFilteredDetails([]);
-    }
+    if (!centerRentalResponses) return;
+
+    const centerMapping = {
+      "100": centerRentalResponses.foundationResponses,
+      "111": centerRentalResponses.gwanghwamunResponses,
+      "112": centerRentalResponses.yeouidoResponses,
+      "113": centerRentalResponses.gangnamResponses,
+      "211": centerRentalResponses.suwonResponses,
+      "611": centerRentalResponses.daeguResponses,
+      "612": centerRentalResponses.busanResponses,
+      "711": centerRentalResponses.gwangjuResponses,
+      "811": centerRentalResponses.jejuResponses,
+    };
+
+    const selectedDetails = centerMapping[detailCd] || [];
+
+    const numberedDetails = selectedDetails.map((item, index) => ({
+      ...item,
+      no: index + 1,
+      detailId: item.detailId || `id-${index}`, 
+    }));
+
+    setRentalDetails(numberedDetails);
   };
 
-  const handleRowClick = (row) => {
-    const detailId = row.detailId;
+  const handleRowClick = (rowIndex) => {
+    const detailId = rentalDetails[rowIndex].detailId;
     if (selectedRows.includes(detailId)) {
       setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== detailId));
     } else {
@@ -53,6 +74,65 @@ function TotalRentalManage() {
     }
   };
 
+  const handleMouseDown = (index) => {
+    dragStartIndex.current = index;
+    const detailId = rentalDetails[index].detailId;
+    if (selectedRows.includes(detailId)) {
+      dragMode.current = 'deselect';
+    } else {
+      dragMode.current = 'select';
+    }
+  };
+
+  const handleMouseOver = (index) => {
+    if (dragStartIndex.current !== null) {
+      dragEndIndex.current = index;
+      const start = Math.min(dragStartIndex.current, dragEndIndex.current);
+      const end = Math.max(dragStartIndex.current, dragEndIndex.current);
+
+      let newSelectedRows = [...selectedRows];
+
+      for (let i = start; i <= end; i++) {
+        const detailId = rentalDetails[i].detailId;
+        if (dragMode.current === 'select' && !newSelectedRows.includes(detailId)) {
+          newSelectedRows.push(detailId);
+        } else if (dragMode.current === 'deselect' && newSelectedRows.includes(detailId)) {
+          newSelectedRows = newSelectedRows.filter(id => id !== detailId);
+        }
+      }
+
+      setSelectedRows(newSelectedRows);
+    }
+  };
+
+  const handleMouseUp = () => {
+    dragStartIndex.current = null;
+    dragEndIndex.current = null;
+  };
+
+  const handleExcelDownload = async () => {
+    if (!selectedCenter || selectedRows.length === 0) {
+      alert("엑셀 파일로 내보낼 항목을 선택하세요.");
+      return;
+    }
+  
+    try {
+      const response = await axios.post('/api/rental/excel', selectedRows, {
+        responseType: 'blob',
+      });
+  
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', '렌탈현황 관리표.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("엑셀 다운로드 실패:", error);
+    }
+  };
+  
   const detailColumns = [
     {
       header: (
@@ -60,7 +140,7 @@ function TotalRentalManage() {
           type="checkbox"
           onChange={(e) => {
             const isChecked = e.target.checked;
-            setSelectedRows(isChecked ? filteredDetails.map(d => d.detailId) : []);
+            setSelectedRows(isChecked ? rentalDetails.map(d => d.detailId) : []);
           }}
         />
       ),
@@ -70,12 +150,12 @@ function TotalRentalManage() {
         <input
           type="checkbox"
           name="detailSelect"
-          onChange={() => handleRowClick(row)}
+          onChange={() => handleRowClick(row.index)}
           checked={selectedRows.includes(row.detailId)}
         />
       ),
     },
-    { header: 'NO', accessor: 'detailId' },
+    { header: 'NO', accessor: 'no' },
     { header: '제품군', accessor: 'category' },
     { header: '업체명', accessor: 'companyNm' },
     { header: '계약번호', accessor: 'contractNum' },
@@ -95,44 +175,21 @@ function TotalRentalManage() {
       width: '100%',
       Cell: ({ row }) => {
         const { detailCd } = row;
+        const isSelected = detailCd === selectedCenter; 
         return (
           <div
             className="totalRentalManage-details-table"
             style={{ cursor: 'pointer' }}
             onClick={() => handleCenterClick(detailCd)}
           >
-            <span>{row.detailNm}</span>
+            <span className={isSelected ? 'selected-sub-category-text' : ''}>
+              {row.detailNm}
+            </span>
           </div>
         );
       }
     },
   ];
-
-  const handleExcelDownload = async () => {
-    if (!selectedCenter || selectedRows.length === 0) {
-      alert("엑셀 파일로 내보낼 항목을 선택하세요.");
-      return;
-    }
-
-    try {
-      const response = await axios.post('/api/rental/excel/total', {
-        centerId: selectedCenter,
-        rentalIds: selectedRows,
-      }, {
-        responseType: 'blob', 
-      });
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', '전국_렌탈현황_관리표.xlsx'); 
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (error) {
-      console.error("엑셀 다운로드 실패:", error);
-    }
-  };
 
   return (
     <div className='content'>
@@ -167,7 +224,13 @@ function TotalRentalManage() {
               <div className="totalRentalManage-details-table">
                 <Table
                   columns={detailColumns}
-                  data={filteredDetails}
+                  data={rentalDetails}
+                  selectedRows={selectedRows}
+                  onRowSelect={setSelectedRows} 
+                  onRowMouseDown={handleMouseDown}
+                  onRowMouseOver={handleMouseOver}
+                  onRowMouseUp={handleMouseUp}
+                  onRowClick={(_, rowIndex) => handleRowClick(rowIndex)}
                 />
               </div>
             </div>

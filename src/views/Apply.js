@@ -14,7 +14,7 @@ function Apply() {
       </div>
       <div className="button-container">
         <CircleButton to="/api/doc" label="문서수발신" />
-        <CircleButton to="/api/docstorage" label="문서보관신청" />
+        <CircleButton to="/api/docstorage" label="문서이관/파쇄" />
       </div>
     </div>
   );

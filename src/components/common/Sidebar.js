@@ -84,11 +84,14 @@ function Sidebar() {
   ];
 
   const assetItems = [
-    { label: '렌탈현황 관리표', url: '/api/rentalList' },
     { label: '문서보관 목록표', url: '/api/docstorageList' },
-    { label: '전국 렌탈현황 관리표', url: '/api/totalRentalList' },
     { label: '전국 문서보관 목록표', url: '/api/totalDocstorageList' },
   ];
+  
+  const rentalItems = [
+    { label: '렌탈현황 관리표', url: '/api/rentalList' },
+    { label: '전국 렌탈현황 관리표', url: '/api/totalRentalList' },
+  ]
 
   const sections = {
     'A': [{ title: '명함 관리', items: bcdItems }],
@@ -105,7 +108,8 @@ function Sidebar() {
       { title: '문서수발신 관리', items: docItems },
       { title: '문서수발신 대장', items: docManageItems }
     ],
-    'F': [{ title: '자산 및 문서 관리', items: assetItems }],
+    'F': [{ title: '문서 관리', items: assetItems }],
+    'G': [{ title: '자산 관리', items: rentalItems }]
   };
 
   return (
