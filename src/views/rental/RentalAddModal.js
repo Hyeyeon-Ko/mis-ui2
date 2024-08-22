@@ -56,6 +56,10 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
     });
   };
 
+  const validateDateFormat = (dateStr) => {
+    return /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
+  };
+
   const handleSaveClick = () => {
     if (activeTab === 'file') {
       if (!file) {
@@ -109,20 +113,71 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
       };
       reader.readAsArrayBuffer(file);
     } else if (activeTab === 'text') {
-      const dataToSend = {
-        ...formData,
-        instCd: auth.instCd, 
-      };
-
-      axios.post('/api/rental/data', [dataToSend])
+        const {
+          category,
+          companyNm,
+          contractNum,
+          modelNm,
+          installDate,
+          expiryDate,
+          rentalFee,
+          location,
+          installationSite,
+          specialNote,
+        } = formData;
+      
+        if (
+          !category ||
+          !companyNm ||
+          !contractNum ||
+          !modelNm ||
+          !installDate ||
+          !expiryDate ||
+          !rentalFee ||
+          !location ||
+          !installationSite
+        ) {
+          alert('모든 항목을 입력해 주세요.');
+          return;
+        }
+      
+        if (!validateDateFormat(installDate)) {
+          alert('설치일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
+          return;
+        }
+      
+        if (!validateDateFormat(expiryDate)) {
+          alert('만료일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
+          return;
+        }
+      
+        const payload = {
+          category,
+          companyNm,
+          contractNum,
+          modelNm,
+          installDate,
+          expiryDate,
+          rentalFee,
+          location,
+          installationSite,
+          specialNote,
+        };
+      
+      axios.post('/api/rental/', payload)
         .then(response => {
-          console.log('Data successfully sent:', response.data);
-          onSave(response.data);
+          console.log('Data successfully save:', response.data);
+          onSave([payload]);
+          alert('항목이 성공적으로 추가되었습니다.');
           onClose();
         })
         .catch(error => {
           console.error('Error sending data:', error);
-          alert('데이터 전송 중 오류가 발생했습니다.');
+          if (error.response && error.response.status === 400) {
+            alert("계약번호는 중복이 불가합니다");
+          } else {
+            alert('데이터 저장 중 오류가 발생했습니다.');
+          }
         });
     }
   };
