@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 import * as XLSX from 'xlsx';
 import '../../styles/rental/RentalAddModal.css';
 import { AuthContext } from '../../components/AuthContext';
@@ -48,6 +49,10 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
       ...formData,
       [name]: value,
     });
+  };
+
+  const validateDateFormat = (dateStr) => {
+    return /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
   };
 
   const handleSaveClick = () => {
@@ -114,7 +119,17 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         alert('모든 필수 항목을 입력해 주세요.');
         return;
       }
-
+  
+      if (!validateDateFormat(installDate)) {
+        alert('설치일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
+        return;
+      }
+    
+      if (!validateDateFormat(expiryDate)) {
+        alert('만료일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
+        return;
+      }
+  
       const payload = {
         instCd: auth.instCd,
         category,
@@ -128,12 +143,27 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         installationSite,
         specialNote,
       };
+  
+      // PUT 요청 보내기
+      axios.put(`/api/rental/?detailId=${rentalData.detailId}`, payload)
+        .then(response => {
+          console.log('Data successfully saved:', response.data);
+          onSave([payload]);
+          alert('항목이 성공적으로 수정되었습니다.');
+          onClose();
+        })
+        .catch(error => {
+          console.error('Error sending data:', error);
+          if (error.response && error.response.status === 400) {
+            alert("계약번호는 중복이 불가합니다");
+          } else {
+            alert('데이터 수정 중 오류가 발생했습니다.');
+          }
+        });
 
-      onSave(payload, false);
-      onClose();
     }
   };
-
+  
   if (!show) return null;
 
   return (
