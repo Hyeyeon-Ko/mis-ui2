@@ -87,10 +87,14 @@ function Docstorage() {
 
   const handleRowClick = (row, index) => {
     const isChecked = !selectedRows.includes(row.detailId);
-    handleRowSelect({ target: { checked: isChecked } }, row, index);
+    handleRowSelect({ target: { checked: isChecked }, stopPropagation: () => {} }, row, index);
   };
 
   const handleRowSelect = (e, row, index) => {
+    // Ensure stopPropagation only runs if it's a function (i.e., e is an event object)
+    if (typeof e.stopPropagation === 'function') {
+      e.stopPropagation(); 
+    }
     const isChecked = e.target.checked;
     if (isChecked) {
       setSelectedRows(prevSelectedRows => [...prevSelectedRows, row.detailId]);
@@ -332,6 +336,7 @@ function Docstorage() {
         <input
           type="checkbox"
           name="detailSelect"
+          onClick={(e) => e.stopPropagation()} // Prevent row click propagation
           onChange={(e) => handleRowSelect(e, row, index)}
           checked={selectedRows.includes(row.detailId)}
         />

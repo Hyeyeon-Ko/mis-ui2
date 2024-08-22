@@ -348,6 +348,7 @@ function DocstorageList() {
           <input
             type="checkbox"
             name="detailSelect"
+            onClick={(e) => e.stopPropagation()} 
             onChange={() => handleRowClick(row)}
             checked={selectedRows.includes(row.detailId)}
           />

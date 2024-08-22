@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
@@ -10,24 +10,28 @@ function TotalRentalManage() {
   const [centerData, setCenterData] = useState([]);
   const [rentalDetails, setRentalDetails] = useState([]);
   const [centerRentalResponses, setCenterRentalResponses] = useState(null);
-  const [detailColumns, setDetailColumns] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]); 
+
+  const dragStartIndex = useRef(null);
+  const dragEndIndex = useRef(null);
+  const dragMode = useRef('select'); 
 
   useEffect(() => {
     const fetchRentalData = async () => {
       try {
         const response = await axios.get('/api/rentalList/total');
         const { centerResponses, centerRentalResponses } = response.data.data;
-        console.log('data: ', centerRentalResponses);
 
         const nationwideCenter = { detailNm: '전국센터', detailCd: 'all' };
-        const sortedCenterData = [nationwideCenter, ...centerResponses.sort((a, b) => 
-          a.detailNm.localeCompare(b.detailNm, 'ko-KR')
-        )];
+        const sortedCenterData = [
+          nationwideCenter, 
+          ...centerResponses.sort((a, b) => a.detailNm.localeCompare(b.detailNm, 'ko-KR'))
+        ];
 
         setCenterData(sortedCenterData);
         setCenterRentalResponses(centerRentalResponses[0]);
 
-        handleCenterClick('all');
+        handleCenterClick('all'); 
       } catch (error) {
         console.error("렌탈 데이터를 불러오는 중 오류 발생:", error);
       }
@@ -37,6 +41,33 @@ function TotalRentalManage() {
   }, []);
 
   const getDefaultColumns = () => [
+    {
+        header: (
+            <input
+                type="checkbox"
+                onChange={(e) => {
+                    const isChecked = e.target.checked;
+                    setSelectedRows(isChecked ? rentalDetails.map(d => d.detailId) : []);
+                }}
+                disabled={selectedCenter === 'all'} 
+            />
+        ),
+        accessor: 'select',
+        width: '5%',
+        Cell: ({ row }) => {
+            const detailId = row?.detailId || row?.original?.detailId; 
+            return (
+                <input
+                    type="checkbox"
+                    name="detailSelect"
+                    onClick={(e) => e.stopPropagation()} 
+                    onChange={() => handleRowClick(row)}
+                    checked={detailId && selectedRows.includes(detailId)}
+                    disabled={selectedCenter === 'all'} 
+                />
+            );
+        },
+    },
     { header: 'NO', accessor: 'no' },
     { header: '제품군', accessor: 'category' },
     { header: '업체명', accessor: 'companyNm' },
@@ -60,10 +91,10 @@ function TotalRentalManage() {
 
   const handleCenterClick = (detailCd) => {
     setSelectedCenter(detailCd);
+    setSelectedRows([]);
 
     if (detailCd === 'all') {
       setRentalDetails([]);
-      setDetailColumns(getNationwideColumns());
       return;
     }
 
@@ -90,39 +121,69 @@ function TotalRentalManage() {
     }));
 
     setRentalDetails(numberedDetails);
-    setDetailColumns(getDefaultColumns());
+  };
+
+  const handleRowClick = (row) => {
+    const detailId = row.detailId;
+    if (selectedRows.includes(detailId)) {
+      setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== detailId));
+    } else {
+      setSelectedRows(prevSelectedRows => [...prevSelectedRows, detailId]);
+    }
+  };
+
+  const handleMouseDown = (index) => {
+    dragStartIndex.current = index;
+
+    const detailId = rentalDetails[index].detailId;
+    if (selectedRows.includes(detailId)) {
+      dragMode.current = 'deselect'; 
+    } else {
+      dragMode.current = 'select'; 
+    }
+  };
+
+  const handleMouseOver = (index) => {
+    if (dragStartIndex.current !== null) {
+      dragEndIndex.current = index;
+      const start = Math.min(dragStartIndex.current, dragEndIndex.current);
+      const end = Math.max(dragStartIndex.current, dragEndIndex.current);
+
+      let newSelectedRows = [...selectedRows];
+
+      for (let i = start; i <= end; i++) {
+        const detailId = rentalDetails[i].detailId;
+        if (dragMode.current === 'select' && !newSelectedRows.includes(detailId)) {
+          newSelectedRows.push(detailId); 
+        } else if (dragMode.current === 'deselect' && newSelectedRows.includes(detailId)) {
+          newSelectedRows = newSelectedRows.filter(id => id !== detailId); 
+        }
+      }
+
+      setSelectedRows(newSelectedRows);
+    }
+  };
+
+  const handleMouseUp = () => {
+    dragStartIndex.current = null;
+    dragEndIndex.current = null;
   };
 
   const handleExcelDownload = async () => {
-    if (selectedCenter === 'all') {
-      try {
-        const response = await axios.get('/api/rental/totalExcel', {
+    try {
+      let response;
+      if (selectedCenter === 'all') {
+        response = await axios.get('/api/rental/totalExcel', {
           responseType: 'blob',
         });
-
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', '전국센터 렌탈현황 관리표.xlsx');
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-      } catch (error) {
-        console.error("엑셀 다운로드 실패:", error);
+      } else {
+        const detailIds = selectedRows;
+        
+        response = await axios.post('/api/rental/excel', detailIds, {
+          responseType: 'blob',
+        });
       }
-      return;
-    }
-
-    if (!selectedCenter) {
-      alert("엑셀 파일로 내보낼 항목을 선택하세요.");
-      return;
-    }
-
-    try {
-      const response = await axios.post('/api/rental/excel', rentalDetails, {
-        responseType: 'blob',
-      });
-
+  
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -134,7 +195,7 @@ function TotalRentalManage() {
       console.error("엑셀 다운로드 실패:", error);
     }
   };
-
+    
   const subCategoryColumns = [
     {
       header: '센터명',
@@ -190,8 +251,12 @@ function TotalRentalManage() {
               </div>
               <div className="totalRentalManage-details-table">
                 <Table
-                  columns={detailColumns}
+                  columns={selectedCenter === 'all' ? getNationwideColumns() : getDefaultColumns()}
                   data={rentalDetails}
+                  onRowClick={handleRowClick}
+                  onRowMouseDown={handleMouseDown}
+                  onRowMouseOver={handleMouseOver}
+                  onRowMouseUp={handleMouseUp}
                 />
               </div>
             </div>

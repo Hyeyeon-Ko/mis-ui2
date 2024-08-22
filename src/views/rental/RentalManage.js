@@ -18,7 +18,7 @@ function RentalManage() {
 
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
-  const dragMode = useRef('select');
+  const dragMode = useRef('select'); 
 
   const getStatusText = (status) => {
     switch (status) {
@@ -36,6 +36,7 @@ function RentalManage() {
       const response = await axios.get('/api/rentalList/center', {
         params: { instCd: auth.instCd },
       });
+  
       const transformedData = response.data.data.map((item, index) => ({
         ...item,
         no: index + 1, 
@@ -48,17 +49,27 @@ function RentalManage() {
       console.error('센터 렌탈현황을 불러오는데 실패했습니다.', error);
     }
   };
-  
+      
   useEffect(() => {
     fetchRentalData();
   }, []);
 
   const handleRowClick = (row, index) => {
-    const detailId = row.detailId;
-    if (selectedRows.includes(detailId)) {
-      setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== detailId));
+    const isChecked = !selectedRows.includes(row.detailId);
+    if (isChecked) {
+      setSelectedRows(prevSelectedRows => [...prevSelectedRows, row.detailId]);
     } else {
-      setSelectedRows(prevSelectedRows => [...prevSelectedRows, detailId]);
+      setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== row.detailId));
+    }
+  };
+
+  const handleRowSelect = (e, row, index) => {
+    e.stopPropagation(); 
+    const isChecked = e.target.checked;
+    if (isChecked) {
+      setSelectedRows(prevSelectedRows => [...prevSelectedRows, row.detailId]);
+    } else {
+      setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== row.detailId));
     }
   };
 
@@ -66,9 +77,9 @@ function RentalManage() {
     dragStartIndex.current = index;
     const detailId = rentalDetails[index].detailId;
     if (selectedRows.includes(detailId)) {
-      dragMode.current = 'deselect';
+      dragMode.current = 'deselect'; 
     } else {
-      dragMode.current = 'select';
+      dragMode.current = 'select'; 
     }
   };
 
@@ -83,9 +94,9 @@ function RentalManage() {
       for (let i = start; i <= end; i++) {
         const detailId = rentalDetails[i].detailId;
         if (dragMode.current === 'select' && !newSelectedRows.includes(detailId)) {
-          newSelectedRows.push(detailId);
+          newSelectedRows.push(detailId); 
         } else if (dragMode.current === 'deselect' && newSelectedRows.includes(detailId)) {
-          newSelectedRows = newSelectedRows.filter(id => id !== detailId);
+          newSelectedRows = newSelectedRows.filter(id => id !== detailId); 
         }
       }
 
@@ -151,7 +162,6 @@ function RentalManage() {
         return;
     }
 
-    // "완료" 상태인 항목이 포함되어 있는지 확인
     const completedItems = selectedRows.filter(rowId => {
         const selectedItem = rentalDetails.find(item => item.detailId === rowId);
         return selectedItem && selectedItem.status === '완료';
@@ -172,7 +182,7 @@ function RentalManage() {
                 if (selectedRows.includes(item.detailId)) {
                     return {
                         ...item,
-                        status: '완료', // 완료된 항목의 상태만 업데이트
+                        status: '완료', 
                     };
                 }
                 return item;
@@ -185,7 +195,7 @@ function RentalManage() {
         console.error('렌탈현황 정보를 최종 업데이트하는 중 에러 발생:', error);
         alert('최종 업데이트에 실패했습니다.');
     }
-};
+  };
 
   const handleModifyButtonClick = () => {
     if (selectedRows.length === 1) {
@@ -225,25 +235,29 @@ function RentalManage() {
 
   const detailColumns = [
     {
-      header: (
-        <input
-          type="checkbox"
-          onChange={(e) => {
-            const isChecked = e.target.checked;
-            setSelectedRows(isChecked ? rentalDetails.map(d => d.detailId) : []);
-          }}
-        />
-      ),
-      accessor: 'select',
-      width: '5%',
-      Cell: ({ row, index }) => (
-        <input
-          type="checkbox"
-          name="detailSelect"
-          onChange={() => handleRowClick(row, index)}
-          checked={selectedRows.includes(row.detailId)}
-        />
-      ),
+        header: (
+            <input
+                type="checkbox"
+                onChange={(e) => {
+                    const isChecked = e.target.checked;
+                    setSelectedRows(isChecked ? rentalDetails.map(d => d.detailId) : []);
+                }}
+            />
+        ),
+        accessor: 'select',
+        width: '5%',
+        Cell: ({ row }) => {
+            const detailId = row?.detailId || row?.original?.detailId; 
+            return (
+                <input
+                    type="checkbox"
+                    name="detailSelect"
+                    onClick={(e) => e.stopPropagation()} 
+                    onChange={(e) => handleRowSelect(e, row)}
+                    checked={detailId && selectedRows.includes(detailId)}
+                />
+            );
+        },
     },
     { header: 'NO', accessor: 'no' },
     { header: '제품군', accessor: 'category' },
@@ -257,8 +271,8 @@ function RentalManage() {
     { header: '설치위치', accessor: 'installationSite' },
     { header: '특이사항', accessor: 'specialNote' },
     { header: '상태', accessor: 'status' },
-  ];
-
+];
+  
   return (
     <div className='content'>
       <div className='rental-content'>
@@ -284,7 +298,7 @@ function RentalManage() {
                   onRowClick={handleRowClick}  
                   onRowMouseDown={handleMouseDown}  
                   onRowMouseOver={handleMouseOver}  
-                  onRowMouseUp={handleMouseUp}  
+                  onRowMouseUp={handleMouseUp}    
                 />
               </div>
             </div>

@@ -119,21 +119,20 @@ function TotalDocstorageList() {
 
   const downloadExcel = async () => {
     try {
-      const detailIds = selectedRows.map(row => row.detailId);
-      const response = await axios.post('/api/docstorage/excel', detailIds, {
-        responseType: 'blob', 
-      });
-  
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', '문서보관 목록표.xlsx'); 
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
-  
+        const response = await axios.post('/api/docstorage/excel', selectedRows, {
+            responseType: 'blob',
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', '문서보관 목록표.xlsx'); 
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+
     } catch (error) {
-      console.error('엑셀 파일 다운로드 중 오류 발생:', error);
+        console.error('엑셀 파일 다운로드 중 오류 발생:', error);
     }
   };
     
