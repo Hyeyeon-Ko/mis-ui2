@@ -52,7 +52,6 @@ function TotalRentalManage() {
     { header: '렌탈료', accessor: 'rentalFee' },
     { header: '위치분류', accessor: 'locationCategory' },
     { header: '설치위치', accessor: 'installationLocation' },
-    { header: '신청번호', accessor: 'applicationNumber' },
     { header: '특이사항', accessor: 'remarks' },
   ];
 
@@ -69,7 +68,6 @@ function TotalRentalManage() {
           rentalFee: '₩100,000',
           locationCategory: '사무실',
           installationLocation: '서울',
-          applicationNumber: '98765',
           remarks: '특이사항 없음',
         },
         {
@@ -83,7 +81,6 @@ function TotalRentalManage() {
           rentalFee: '₩50,000',
           locationCategory: '사무실',
           installationLocation: '부산',
-          applicationNumber: '54321',
           remarks: '특이사항 있음',
         },
       ]

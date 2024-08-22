@@ -10,15 +10,20 @@ const ConditionFilter = ({
   setEndDate,
   onSearch,
   onReset,
-  filters,
-  setFilters, 
+  filters = {
+    statusApproved: false,
+    statusRejected: false,
+    statusOrdered: false,
+    statusClosed: false,
+  }, 
+  setFilters = () => {}, 
   onFilterChange,
   showStatusFilters,
   showSearchCondition,
   excludeRecipient,
   excludeSender,
   documentType, 
-}) => {
+  }) => {
   const [searchType, setSearchType] = useState('전체');
   const [keyword, setKeyword] = useState('');
   
