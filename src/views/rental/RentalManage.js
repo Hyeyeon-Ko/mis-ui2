@@ -128,6 +128,36 @@ function RentalDetailTable() {
     }
   };
 
+  const handleFinishButtonClick = async () => {
+    if (selectedRows.length === 0) {
+        alert("최종 업데이트할 항목을 선택하세요.");
+        return;
+    }
+  
+    try {
+      // PUT 요청을 한 번만 보내고, 선택된 detailIds를 리스트로 전달
+      await axios.put('/api/rental/finish', selectedRows);
+
+      alert('선택된 항목이 최종 업데이트되었습니다.');
+
+      setRentalDetails(prevDetails => {
+          const updatedDetails = prevDetails
+              .filter(item => !selectedRows.includes(item.detailId))
+              .map((item, index) => ({
+                  ...item,
+                  no: index + 1 
+              }));
+          
+          return updatedDetails;
+      });
+
+      setSelectedRows([]); 
+    } catch (error) {
+        console.error('렌탈현황 정보를 최종 업데이트하는 중 에러 발생:', error);
+        alert('최종 업데이트에 실패했습니다.');
+    }
+  };
+
   const handleRowSelect = (selectedRows) => {
     setSelectedRows(selectedRows);
   };
@@ -159,7 +189,7 @@ function RentalDetailTable() {
                   <button className="rental-modify-button" onClick={handleModifyButtonClick}>수 정</button>
                   <button className="rental-delete-button" onClick={handleDeleteButtonClick}>삭 제</button>
                   <button className="rental-excel-button">엑 셀</button>
-                  <button className="rental-apply-button">완 료</button>
+                  <button className="rental-apply-button" onClick={handleFinishButtonClick}>완 료</button>
                 </div>
               </div>
               <div className="rental-details-table">
