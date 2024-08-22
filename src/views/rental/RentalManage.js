@@ -1,33 +1,84 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import RentalAddModal from './RentalAddModal'; 
 import RentalUpdateModal from './RentalUpdateModal'; 
+import { AuthContext } from '../../components/AuthContext';
 import '../../styles/common/Page.css';
 import '../../styles/rental/RentalManage.css';
 
-function RentalManage() {
+function RentalDetailTable() {
+  const { auth } = useContext(AuthContext);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]); 
   const [selectedRental, setSelectedRental] = useState(null); 
+  const [rentalDetails, setRentalDetails] = useState([]);  // State to store fetched data
+
+  const handleRowClick = (row) => {
+    const detailId = row.detailId;
+    if (selectedRows.includes(detailId)) {
+      setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== detailId));
+    } else {
+      setSelectedRows(prevSelectedRows => [...prevSelectedRows, detailId]);
+    }
+  };
 
   const detailColumns = [
-    { header: 'NO' },
-    { header: '제품군' },
-    { header: '업체명' },
-    { header: '계약번호' },
-    { header: '모델명' },
-    { header: '설치일자' },
-    { header: '만료일자' },
-    { header: '렌탈료' },
-    { header: '위치분류' },
-    { header: '설치위치' },
-    { header: '특이사항' },
+    {
+      header: (
+        <input
+          type="checkbox"
+          onChange={(e) => {
+            const isChecked = e.target.checked;
+            setSelectedRows(isChecked ? rentalDetails.map(d => d.detailId) : []);
+          }}
+        />
+      ),
+      accessor: 'select',
+      width: '5%',
+      Cell: ({ row }) => (
+        <input
+          type="checkbox"
+          name="detailSelect"
+          onChange={() => handleRowClick(row)}
+          checked={selectedRows.includes(row.detailId)}
+        />
+      ),
+    },
+    { header: 'NO', accessor: 'detailId' },
+    { header: '제품군', accessor: 'category' },
+    { header: '업체명', accessor: 'companyNm' },
+    { header: '계약번호', accessor: 'contractNum' },
+    { header: '모델명', accessor: 'modelNm' },
+    { header: '설치일자', accessor: 'installDate' },
+    { header: '만료일자', accessor: 'expiryDate' },
+    { header: '렌탈료', accessor: 'rentalFee' },
+    { header: '위치분류', accessor: 'location' },
+    { header: '설치위치', accessor: 'installationSite' },
+    { header: '특이사항', accessor: 'specialNote' },
   ];
 
-  const filteredDetails = [
-  ];
+  const fetchRentalData = async () => {
+    try {
+      const response = await axios.get('/api/rentalList/center', {
+        params: { instCd: auth.instCd },
+      });
+      setRentalDetails(response.data.data);  // Correctly setting the rental details
+      setSelectedRows([]);
+    } catch (error) {
+      console.error('센터 렌탈현황을 불러오는데 실패했습니다.', error);
+    }
+  }
+
+  useEffect(() => {
+    fetchRentalData();  // Fetch data when the component mounts
+  }, []);
+
+  useEffect(() => {
+    console.log("rentalDetails: ", rentalDetails);
+  })
 
   const handleAddButtonClick = () => {
     setIsAddModalVisible(true);
@@ -44,6 +95,7 @@ function RentalManage() {
     setIsAddModalVisible(false);
     setIsUpdateModalVisible(false);
     setSelectedRental(null);
+    fetchRentalData();  // Re-fetch data after save
   };
 
   const handleRowSelect = (selectedRows) => {
@@ -52,11 +104,11 @@ function RentalManage() {
 
   const handleModifyButtonClick = () => {
     if (selectedRows.length === 1) {
-      const rentalData = filteredDetails.find(detail => detail.id === selectedRows[0]);
+      const rentalData = rentalDetails.find(detail => detail.detailId === selectedRows[0]);
       setSelectedRental(rentalData);
       setIsUpdateModalVisible(true);
     } else if (selectedRows.length === 0) {
-      setIsUpdateModalVisible(true);
+      alert("수정할 항목을 선택해주세요.");
     } else {
       alert("하나의 항목만 선택하여 수정할 수 있습니다.");
     }
@@ -83,7 +135,7 @@ function RentalManage() {
               <div className="rental-details-table">
                 <Table
                   columns={detailColumns}
-                  data={filteredDetails}
+                  data={rentalDetails}
                   selectedRows={selectedRows}
                   onRowSelect={handleRowSelect}
                 />
@@ -107,4 +159,4 @@ function RentalManage() {
   );
 }
 
-export default RentalManage;
+export default RentalDetailTable;
