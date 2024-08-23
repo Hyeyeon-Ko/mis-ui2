@@ -160,12 +160,14 @@ function PendingApprovalList() {
       alert('승인이 완료되었습니다.');
       closeModal();
       fetchPendingList(filters);
+      
+      navigate(`/api/pendingList?documentType=${documentType}`);
     } catch (error) {
       console.error('Error approving document:', error);
       alert('Error approving document.');
     }
   };
-
+  
   const filteredApplications = applications.filter((app) => {
     if (filters.selectedCenter && filters.selectedCenter !== '전체' && app.center !== filters.selectedCenter) return false;
     if (filters.startDate && new Date(app.draftDate) < new Date(filters.startDate)) return false;

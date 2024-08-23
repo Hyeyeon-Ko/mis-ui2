@@ -283,12 +283,20 @@ function DetailApplication() {
     }
   };
 
+  const handleReject = () => {
+    setShowRejectModal(true);
+  };
+  
+  const handleRejectClose = () => {
+    setShowRejectModal(false);
+  };  
+
   const handleApprove = async () => {
     try {
       const response = await axios.post(`/api/bcd/applyList/${draftId}`);
       if (response.data.code === 200) {
         alert('명함이 승인되었습니다.');
-        navigate('/api/pendingList');
+        navigate(`/api/pendingList?documentType=명함신청`);  
       } else {
         alert('명함 승인 중 오류가 발생했습니다.');
       }
@@ -296,15 +304,7 @@ function DetailApplication() {
       alert('명함 승인 중 오류가 발생했습니다.');
     }
   };
-
-  const handleReject = () => {
-    setShowRejectModal(true);
-  };
-
-  const handleRejectClose = () => {
-    setShowRejectModal(false);
-  };
-
+  
   const handleRejectConfirm = async (reason) => {
     try {
       const response = await axios.post(`/api/bcd/applyList/return/${draftId}`, reason, {
@@ -314,7 +314,7 @@ function DetailApplication() {
       });
       if (response.data.code === 200) {
         alert('명함이 반려되었습니다.');
-        navigate('/api/pendingList');
+        navigate(`/api/pendingList?documentType=명함신청`);  
       } else {
         alert('명함 반려 중 오류가 발생했습니다.');
       }
@@ -322,7 +322,7 @@ function DetailApplication() {
       alert('명함 반려 중 오류가 발생했습니다.');
     }
   };
-
+  
   const handleHistoryClick = () => {
     setShowHistoryModal(true);
   };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom'; // useNavigate 훅 추가
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import CustomButton from '../../components/common/CustomButton';
@@ -29,6 +30,8 @@ function BcdOrder() {
   const [selectedCenter, setSelectedCenter] = useState('전체');
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate(); // navigate 함수 가져오기
 
   // 드래그 기능을 위한 ref 변수들
   const dragStartIndex = useRef(null);
@@ -180,7 +183,6 @@ function BcdOrder() {
     setShowEmailModal(true);
   };
 
-  // 이메일 전송 핸들러
   const handleSendEmail = async (emailData) => {
     setIsLoading(true);
     try {
@@ -192,8 +194,16 @@ function BcdOrder() {
         fromEmail: emailData.fromEmail,
         toEmail: emailData.toEmail,
       });
-      fetchBcdOrderList();
+  
+      const updatedApplications = applications.filter(app => !selectedApplications.includes(app.id));
+      setApplications(updatedApplications);
+      setSelectedApplications([]); 
+  
       setShowEmailModal(false);
+      alert('발주 요청이 성공적으로 완료되었습니다.');
+      
+      navigate('/api/applyList?documentType=명함신청', { replace: true });
+      
     } catch (error) {
       console.error('Error sending order request: ', error);
       alert('발주 요청 중 오류가 발생했습니다.');
@@ -201,7 +211,7 @@ function BcdOrder() {
       setIsLoading(false);
     }
   };
-
+  
   // 테이블 컬럼 정의
   const columns = [
     {
