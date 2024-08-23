@@ -173,6 +173,7 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
           console.log('Data successfully save:', response.data);
           onSave([payload]);
           alert('항목이 성공적으로 추가되었습니다.');
+          resetFormData();
           onClose();
         })
         .catch(error => {

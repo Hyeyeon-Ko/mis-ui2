@@ -4,6 +4,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import RentalAddModal from './RentalAddModal'; 
 import RentalUpdateModal from './RentalUpdateModal'; 
+import RentalBulkUpdateModal from './RentalBulkUpdateModal';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/common/Page.css';
 import '../../styles/rental/RentalManage.css';
@@ -12,6 +13,7 @@ function RentalManage() {
   const { auth } = useContext(AuthContext);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
+  const [isBulkUpdateModalVisible, setIsBulkUpdateModalVisible] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]); 
   const [selectedRental, setSelectedRental] = useState(null); 
   const [rentalDetails, setRentalDetails] = useState([]);  
@@ -116,12 +118,14 @@ function RentalManage() {
   const handleModalClose = () => {
     setIsAddModalVisible(false);
     setIsUpdateModalVisible(false);
+    setIsBulkUpdateModalVisible(false);
     setSelectedRental(null);
   };
 
   const handleSave = (data) => {
     setIsAddModalVisible(false);
     setIsUpdateModalVisible(false);
+    setIsBulkUpdateModalVisible(false);
     setSelectedRental(null);
     fetchRentalData(); 
   };
@@ -182,7 +186,7 @@ function RentalManage() {
                 if (selectedRows.includes(item.detailId)) {
                     return {
                         ...item,
-                        status: '완료', 
+                        status: '완료',
                     };
                 }
                 return item;
@@ -206,7 +210,7 @@ function RentalManage() {
       setSelectedRental(null);
       setIsUpdateModalVisible(true);
     } else {
-      alert("하나의 항목만 선택하여 수정할 수 있습니다.");
+      setIsBulkUpdateModalVisible(true);
     }
   };
 
@@ -315,6 +319,12 @@ function RentalManage() {
         onClose={handleModalClose}
         onSave={handleSave}
         rentalData={selectedRental} 
+      />
+      <RentalBulkUpdateModal
+        show={isBulkUpdateModalVisible}
+        onClose={handleModalClose}
+        onSave={handleSave}
+        selectedDetailIds={selectedRows}
       />
     </div>
   );
