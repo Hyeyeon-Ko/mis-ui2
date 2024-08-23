@@ -24,11 +24,7 @@ function TotalDocstorageList() {
         const response = await axios.get('/api/docstorageList/total');
         const { centerResponses, centerDocstorageResponses } = response.data.data;
 
-        const sortedCenterData = [...centerResponses].sort((a, b) => {
-          return a.detailNm.localeCompare(b.detailNm, 'ko-KR');
-        });
-
-        setCenterData([...sortedCenterData]); 
+        setCenterData([...centerResponses]); 
         setCenterDocstorageResponses(centerDocstorageResponses[0]); 
 
       } catch (error) {
