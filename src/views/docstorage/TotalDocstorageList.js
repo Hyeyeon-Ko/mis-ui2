@@ -197,7 +197,7 @@ function TotalDocstorageList() {
       <div className="totalDocstorage-content">
         <div className='totalDocstorage-content-inner'>
             <h2>전국 문서보관 목록표</h2>
-            <Breadcrumb items={['자산 및 문서 관리', '전국 문서보관 목록표']} />
+            <Breadcrumb items={['문서 관리', '전국 문서보관 목록표']} />
             <div className="totalDocstorage-tables-section">
             <div className="totalDocstorage-sub-category-section">
                 <div className="totalDocstorage-header-buttons">

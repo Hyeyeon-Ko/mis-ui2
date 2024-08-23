@@ -33,7 +33,7 @@ function TotalRentalManage() {
                 setCenterRentalResponses(centerRentalResponses[0]);
                 setNationwideSummary(summaryResponses); 
 
-                handleCenterClick('all');
+                setRentalDetails(summaryResponses);
             } catch (error) {
                 console.error("렌탈 데이터를 불러오는 중 오류 발생:", error);
             }
@@ -226,7 +226,7 @@ function TotalRentalManage() {
             <div className="totalRentalManage-content">
                 <div className='totalRentalManage-content-inner'>
                     <h2>전국 렌탈현황 관리표</h2>
-                    <Breadcrumb items={['자산 및 대여 관리', '전국 렌탈현황 관리표']} />
+                    <Breadcrumb items={['자산 관리', '전국 렌탈현황 관리표']} />
                     <div className="totalRentalManage-tables-section">
                         <div className="totalRentalManage-sub-category-section">
                             <div className="totalRentalManage-header-buttons">

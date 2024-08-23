@@ -91,7 +91,6 @@ function Docstorage() {
   };
 
   const handleRowSelect = (e, row, index) => {
-    // Ensure stopPropagation only runs if it's a function (i.e., e is an event object)
     if (typeof e.stopPropagation === 'function') {
       e.stopPropagation(); 
     }
@@ -336,7 +335,7 @@ function Docstorage() {
         <input
           type="checkbox"
           name="detailSelect"
-          onClick={(e) => e.stopPropagation()} // Prevent row click propagation
+          onClick={(e) => e.stopPropagation()}
           onChange={(e) => handleRowSelect(e, row, index)}
           checked={selectedRows.includes(row.detailId)}
         />

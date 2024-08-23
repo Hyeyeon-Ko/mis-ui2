@@ -278,7 +278,7 @@ function RentalManage() {
       <div className='rental-content'>
         <div className="rental-content-inner">
           <h2>렌탈현황 관리표</h2>
-          <Breadcrumb items={['신청하기', '렌탈현황 관리표']} />
+          <Breadcrumb items={['자산 관리', '렌탈현황 관리표']} />
           <div className="rental-tables-section">
             <div className="rental-details-content">
               <div className="rental-header-buttons">

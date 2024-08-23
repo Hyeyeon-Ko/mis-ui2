@@ -395,7 +395,7 @@ function DocstorageList() {
       <div className="docstorage-content">
         <div className='docstorage-content-inner'>
             <h2>문서보관 목록표</h2>
-            <Breadcrumb items={['자산 및 문서 관리', '문서보관 목록표']} />
+            <Breadcrumb items={['문서 관리', '문서보관 목록표']} />
             <div className="docstorage-category-section">
               <div className="docstorage-category">
                 <label htmlFor="category" className="docstorage-category-label">내 역&gt;&gt;</label>
