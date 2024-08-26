@@ -396,7 +396,7 @@ function DocstorageList() {
                       value={selectedDeptCd || ''}
                       onChange={handleDeptChange}
                     >
-                      <option value="">부서 선택</option>
+                      <option value="">전체</option>
                       {deptResponses.map(dept => (
                         <option key={dept.detailCd} value={dept.detailCd}>
                           {dept.detailNm}

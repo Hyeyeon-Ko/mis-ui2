@@ -26,7 +26,7 @@ const Table = ({ columns, data, onRowClick = () => {}, onRowMouseDown = () => {}
             {columns.map((col, colIndex) => (
               <td key={colIndex}>
                 {col.Cell ? (
-                  <div className={`icon-cell ${row.status === '신청취소' ? 'disabled' : ''}`}>
+                  <div className="icon-cell">
                     {col.Cell({ row: row.original || row })}
                   </div>
                 ) : (
