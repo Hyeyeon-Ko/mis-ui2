@@ -10,14 +10,14 @@ import axios from 'axios';
 
 /* 나의 전체 신청내역 페이지 */
 function MyApplyList() {
-  const [applications, setApplications] = useState([]);                   
-  const [startDate, setStartDate] = useState(null);                       
-  const [endDate, setEndDate] = useState(null);                           
-  const [documentType, setDocumentType] = useState('');                   
-  const [showModal, setShowModal] = useState(false);                      
-  const [selectedApplication, setSelectedApplication] = useState(null);   
-  const [showRejectionModal, setShowRejectionModal] = useState(false);    
-  const [rejectionReason, setRejectionReason] = useState('');             
+  const [applications, setApplications] = useState([]);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [documentType, setDocumentType] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [selectedApplication, setSelectedApplication] = useState(null);
+  const [showRejectionModal, setShowRejectionModal] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState('');
   const [viewedRejections, setViewedRejections] = useState(new Set(JSON.parse(localStorage.getItem('viewedRejections')) || []));
 
   const fetchApplications = useCallback(async (filterParams = {}) => {
@@ -45,14 +45,18 @@ function MyApplyList() {
         }
       }, []);
 
-      const transformedData = uniqueData.map(application => ({
+      const filteredData = documentType
+        ? uniqueData.filter(application => application.docType === documentType)
+        : uniqueData;
+
+      const transformedData = filteredData.map(application => ({
         ...application,
         draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
         approvalDate: application.respondDate ? parseDateTime(application.respondDate) : '',
         drafter: application.drafter,
         applyStatus: getStatusText(application.applyStatus),
         rejectionReason: application.rejectReason,
-        manager: application.approver || application.disapprover || '', 
+        manager: application.approver || application.disapprover || '',
       }));
   
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
@@ -61,11 +65,11 @@ function MyApplyList() {
     } catch (error) {
       console.error('Error fetching applications:', error.response?.data || error.message);
     }
-  }, []);
+  }, [documentType]);
 
   useEffect(() => {
     fetchApplications();
-  }, [fetchApplications]);
+  }, [fetchApplications, documentType]);
 
   // Timestamp Parsing: "YYYY-MM-DD HH:MM"
   const parseDateTime = (dateString) => {
@@ -78,7 +82,7 @@ function MyApplyList() {
     const minutes = String(date.getMinutes()).padStart(2, '0');
 
     return `${year}-${month}-${day} ${hours}:${minutes}`;
-  }; 
+  };
 
   // applyStatus 매핑
   const getStatusText = (status) => {
@@ -164,28 +168,28 @@ function MyApplyList() {
   };
 
   const applicationColumns = [
-    { header: '문서분류', accessor: 'docType', width: '11%' }, 
+    { header: '문서분류', accessor: 'docType', width: '11%' },
     { header: '제목', accessor: 'title', width: '30%' },
     { header: '신청일시', accessor: 'draftDate', width: '14%' },
     { header: '신청자', accessor: 'drafter', width: '9%' },
     { header: '승인/반려일시', accessor: 'approvalDate', width: '14%' },
-    { header: '담당자', accessor: 'manager', width: '9%' }, 
+    { header: '담당자', accessor: 'manager', width: '9%' },
     {
       header: '신청상태',
       accessor: 'applyStatus',
       width: '12%',
       Cell: ({ row }) => (
         row.applyStatus === '발주완료' ? (
-          <button 
-            className="status-button" 
+          <button
+            className="status-button"
             onClick={() => handleButtonClick(row)}
           >
             수령확인
           </button>
-        ):
+        ) :
         row.applyStatus === '반려' ? (
-          <button 
-            className="status-button" 
+          <button
+            className="status-button"
             style={
               viewedRejections.has(row.draftId)
                 ? { color: "black", textDecoration: 'underline' }
@@ -201,20 +205,20 @@ function MyApplyList() {
       ),
     },
   ];
-  
+
   return (
     <div className="content">
       <div className="user-applications">
         <h2>전체 신청내역</h2>
         <Breadcrumb items={['나의 신청내역', '전체 신청내역']} />
-        <DateFilter 
-          startDate={startDate} 
-          setStartDate={setStartDate} 
-          endDate={endDate} 
-          setEndDate={setEndDate} 
-          documentType={documentType} 
+        <DateFilter
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+          documentType={documentType}
           setDocumentType={setDocumentType} 
-          onSearch={handleSearch} 
+          onSearch={handleSearch}
           onReset={handleReset}
         />
         <Table columns={applicationColumns} data={applications} />
@@ -230,7 +234,7 @@ function MyApplyList() {
         <RejectReasonModal
           show={showRejectionModal}
           onClose={handleCloseRejectionModal}
-          onConfirm={() => {}} 
+          onConfirm={() => {}}
           reason={rejectionReason}
           isViewOnly={true}
         />

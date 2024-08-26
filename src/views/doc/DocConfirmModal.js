@@ -4,7 +4,7 @@ import axios from 'axios';
 import '../../styles/doc/DocConfirmModal.css';
 import downloadIcon from '../../assets/images/download.png';
 
-const DocConfirmModal = ({ show, documentId, onClose, onApprove }) => {
+const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus }) => {
   const [formData, setFormData] = useState({
     receptionDate: '',
     drafter: '',
@@ -122,11 +122,13 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove }) => {
             </div>
           </div>
         )}
-        <div className="doc-confirm-modal-buttons">
-          <button className="doc-confirm-button confirm" onClick={handleApprove}>
-            <span>승인</span>
-          </button>
-        </div>
+        {applyStatus === '승인대기' && ( 
+          <div className="doc-confirm-modal-buttons">
+            <button className="doc-confirm-button confirm" onClick={handleApprove}>
+              <span>승인</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -136,7 +138,8 @@ DocConfirmModal.propTypes = {
   show: PropTypes.bool.isRequired,
   documentId: PropTypes.number.isRequired,
   onClose: PropTypes.func.isRequired,
-  onApprove: PropTypes.func.isRequired
+  onApprove: PropTypes.func.isRequired,
+  applyStatus: PropTypes.string.isRequired, 
 };
 
 export default DocConfirmModal;

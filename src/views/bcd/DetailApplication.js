@@ -19,6 +19,8 @@ function DetailApplication() {
   const { draftId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const applyStatus = queryParams.get('applyStatus'); 
   const [formData, setFormData] = useState({
     name: '',
     firstName: '',
@@ -648,13 +650,15 @@ function DetailApplication() {
           </form>
         </div>
         <div className="apply-buttons-container">
-          {!isReadOnly ? (
-            <CustomButton className="apply-request-button" onClick={handleApplyRequest}>수정완료</CustomButton>
-          ) : (
+          {applyStatus === '승인대기' && isReadOnly ? (
             <div className="approval-buttons">
               <CustomButton className="approve-button" onClick={handleApprove}>승인</CustomButton>
               <CustomButton className="reject-button" onClick={handleReject}>반려</CustomButton>
             </div>
+          ) : (
+            !isReadOnly && (
+              <CustomButton className="apply-request-button" onClick={handleApplyRequest}>수정완료</CustomButton>
+            )
           )}
         </div>
       </div>

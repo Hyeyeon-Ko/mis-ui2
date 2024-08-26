@@ -122,14 +122,14 @@ function PendingApprovalList() {
     }));
   };
 
-  const handleRowClick = (draftId, docType) => {
+const handleRowClick = (draftId, docType) => {
     if (docType === '문서수신' || docType === '문서발신') {
       setSelectedDocumentId(draftId);
       setModalVisible(true);
     } else if (docType === '명함신청') {
-      navigate(`/api/bcd/applyList/${draftId}?readonly=true`);
+      navigate(`/api/bcd/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
     }
-  };
+};
 
   const handleSearch = () => {
     setFilters((prevFilters) => ({
@@ -233,6 +233,7 @@ function PendingApprovalList() {
           documentId={selectedDocumentId}
           onClose={closeModal}
           onApprove={approveDocument}
+          applyStatus="승인대기" 
         />
       )}
     </div>

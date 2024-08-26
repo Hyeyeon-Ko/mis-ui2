@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import Button from '../common/Button'; 
+import Button from '../common/Button';
 import '../../styles/common/ConditionFilter.css';
 
 const ConditionFilter = ({
@@ -15,21 +15,23 @@ const ConditionFilter = ({
     statusRejected: false,
     statusOrdered: false,
     statusClosed: false,
-  }, 
-  setFilters = () => {}, 
+  },
+  setFilters = () => {},
   onFilterChange,
   showStatusFilters,
   showSearchCondition,
+  showDocumentType = true, 
   excludeRecipient,
   excludeSender,
-  documentType, 
-  }) => {
+  documentType,
+  setDocumentType,
+}) => {
   const [searchType, setSearchType] = useState('전체');
   const [keyword, setKeyword] = useState('');
-  
+
   useEffect(() => {
     resetFilters();
-  }, [documentType]);
+  }, []); 
   
   const resetFilters = () => {
     const defaultStartDate = new Date();
@@ -46,7 +48,7 @@ const ConditionFilter = ({
       statusClosed: false,
     });
   };
-  
+
   const formatDate = (date) => {
     return date.toISOString().split('T')[0];
   };
@@ -56,14 +58,7 @@ const ConditionFilter = ({
   };
 
   const handleSearch = () => {
-    const adjustedEndDate = new Date(endDate);
-    adjustedEndDate.setDate(adjustedEndDate.getDate() + 1);
-    onSearch({
-      searchType,
-      keyword,
-      startDate: startDate ? formatDate(startDate) : '',
-      endDate: endDate ? formatDate(adjustedEndDate) : '',
-    });
+    onSearch();
   };
 
   const handleStartDateChange = (event) => {
@@ -72,6 +67,10 @@ const ConditionFilter = ({
 
   const handleEndDateChange = (event) => {
     setEndDate(event.target.value ? new Date(event.target.value) : null);
+  };
+
+  const handleDocumentTypeChange = (event) => {
+    setDocumentType(event.target.value); 
   };
 
   return (
@@ -91,6 +90,22 @@ const ConditionFilter = ({
           onChange={handleEndDateChange}
           className="custom-datepicker"
         />
+        {showDocumentType && ( 
+          <>
+            <label>문서분류</label>
+            <select
+              value={documentType}
+              onChange={handleDocumentTypeChange}
+            >
+              <option value="">전체</option>
+              <option value="명함신청">명함신청</option>
+              <option value="문서수신">문서수신</option>
+              <option value="문서발신">문서발신</option>
+              <option value="인장관리">인장관리</option>
+              <option value="법인서류">법인서류</option>
+            </select>
+          </>
+        )}
         {showSearchCondition && (
           <>
             <label>검색 조건</label>
@@ -112,19 +127,21 @@ const ConditionFilter = ({
         <button className="reset-button" onClick={handleReset}>
           <span className="reset-text">↻ 초기화</span>
         </button>
-        <Button onClick={handleSearch} className="search-button">조  회</Button>
+        <Button onClick={handleSearch} className="search-button">조 회</Button>
       </div>
       {showStatusFilters && (
         <div className="status-filters">
-          <label>
-            <input
-              type="checkbox"
-              name="statusApproved"
-              checked={filters.statusApproved}
-              onChange={onFilterChange}
-            />
-            승인완료
-          </label>
+          {documentType !== '문서수발신' && (
+            <label>
+              <input
+                type="checkbox"
+                name="statusApproved"
+                checked={filters.statusApproved}
+                onChange={onFilterChange}
+              />
+              승인완료
+            </label>
+          )}
           {documentType !== '문서수발신' && (
             <label>
               <input
@@ -170,11 +187,13 @@ ConditionFilter.propTypes = {
   onSearch: PropTypes.func.isRequired,
   onReset: PropTypes.func.isRequired,
   filters: PropTypes.object,
-  setFilters: PropTypes.func.isRequired, 
+  setFilters: PropTypes.func.isRequired,
   onFilterChange: PropTypes.func,
   showStatusFilters: PropTypes.bool,
   showSearchCondition: PropTypes.bool,
-  documentType: PropTypes.string,  
+  showDocumentType: PropTypes.bool,  
+  documentType: PropTypes.string,
+  setDocumentType: PropTypes.func.isRequired, 
 };
 
 export default ConditionFilter;

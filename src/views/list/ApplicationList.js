@@ -9,15 +9,15 @@ import '../../styles/list/ApplicationsList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 import fileDownload from 'js-file-download';
-import { AuthContext } from '../../components/AuthContext'; 
+import { AuthContext } from '../../components/AuthContext';
 
 function ApplicationsList() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const documentTypeFromUrl = queryParams.get('documentType');
 
-  const { auth } = useContext(AuthContext); 
-  const instCd = auth.instCd; 
+  const { auth } = useContext(AuthContext);
+  const instCd = auth.instCd;
 
   const [applications, setApplications] = useState([]);
   const [filterInputs, setFilterInputs] = useState({
@@ -35,6 +35,7 @@ function ApplicationsList() {
   const [error, setError] = useState(null);
   const [showCheckboxColumn, setShowCheckboxColumn] = useState(false);
   const [selectedApplications, setSelectedApplications] = useState([]);
+  const [selectedApplyStatus, setSelectedApplyStatus] = useState(null);
   const [showExcelButton, setShowExcelButton] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState(null);
@@ -110,7 +111,7 @@ function ApplicationsList() {
       setShowExcelButton(false);
     }
   }, [filters, selectedApplications, documentTypeFromUrl]);
-  
+
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
@@ -221,15 +222,16 @@ function ApplicationsList() {
     }
   };
 
-  const handleRowClick = (draftId, docType) => {
+  const handleRowClick = (draftId, docType, applyStatus) => {
     if (docType === '문서수신' || docType === '문서발신') {
       setSelectedDocumentId(draftId);
       setModalVisible(true);
+      setSelectedApplyStatus(applyStatus); 
     } else if (docType === '명함신청') {
-      navigate(`/api/bcd/applyList/${draftId}?readonly=true`);
+      navigate(`/api/bcd/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`);
     }
   };
-
+  
   const columns = [
     ...(showCheckboxColumn && documentTypeFromUrl === '명함신청' ? [{
       header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
@@ -251,7 +253,7 @@ function ApplicationsList() {
       Cell: ({ row }) => (
         <span
           className="status-pending clickable"
-          onClick={() => handleRowClick(row.draftId, row.docType)}
+          onClick={() => handleRowClick(row.draftId, row.docType, row.applyStatus)}
         >
           {row.title}
         </span>
@@ -269,20 +271,20 @@ function ApplicationsList() {
     ]),
     { header: '문서상태', accessor: 'applyStatus', width: '10%' },
   ];
-    
+  
   return (
     <div className="content">
       <div className='all-applications'>
         <h2>전체 신청내역</h2>
         <div className="application-header-row">
-          <Breadcrumb items={getBreadcrumbItems()} /> 
+          <Breadcrumb items={getBreadcrumbItems()} />
           <div className="application-button-container">
-          {showExcelButton && documentTypeFromUrl === '명함신청' && (
-            <CustomButton className="excel-button2" onClick={handleExcelDownload}>
-              엑셀변환
-            </CustomButton>
-          )}
-        </div>
+            {showExcelButton && documentTypeFromUrl === '명함신청' && (
+              <CustomButton className="excel-button2" onClick={handleExcelDownload}>
+                엑셀변환
+              </CustomButton>
+            )}
+          </div>
         </div>
         <ConditionFilter
           startDate={filterInputs.startDate}
@@ -296,7 +298,7 @@ function ApplicationsList() {
           onSearch={handleSearch}
           onReset={handleReset}
           showStatusFilters={true}
-          showDocumentType={true}
+          showDocumentType={false}  
         />
         {loading ? (
           <p>로딩 중...</p>
@@ -307,14 +309,15 @@ function ApplicationsList() {
         )}
       </div>
       {modalVisible && selectedDocumentId && (
-      <DocConfirmModal
-        show={modalVisible}
-        documentId={selectedDocumentId}
-        onClose={closeModal}
-        onApprove={approveDocument}
-      />
-    )}
-    </div>
+        <DocConfirmModal
+          show={modalVisible}
+          documentId={selectedDocumentId}
+          onClose={closeModal}
+          onApprove={approveDocument}
+          applyStatus={selectedApplyStatus} 
+        />
+      )}
+     </div>
   );
 }
 
