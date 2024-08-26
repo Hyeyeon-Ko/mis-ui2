@@ -16,26 +16,26 @@ function Sidebar() {
     const currentQueryParams = new URLSearchParams(location.search);
     const itemPath = url.split('?')[0];
     const itemQueryParams = new URLSearchParams(url.split('?')[1]);
-  
+
     if (currentPath !== itemPath) {
       return '';
     }
-  
+
     for (const [key, value] of itemQueryParams.entries()) {
       if (currentQueryParams.get(key) !== value) {
         return '';
       }
     }
-  
+
     return 'active';
   };
-    
+
   const applyItems = [
     { label: '명함신청', url: '/api/bcd' },
     { label: '인장신청', url: '/api/seal' },
     { label: '법인서류', url: '/api/corpDoc' },
     { label: '문서수발신', url: '/api/doc' },
-    { label: '문서보관 신청', url: '/api/docstorage' },
+    { label: '문서이관/파쇄', url: '/api/docstorage' },
   ];
 
   const myApplyItems = [
@@ -46,9 +46,6 @@ function Sidebar() {
   const bcdItems = [
     { label: '전체 신청내역', url: '/api/applyList?documentType=명함신청' },
     { label: '승인대기 내역', url: '/api/pendingList?documentType=명함신청' },
-  ];
-
-  const orderItems = [
     { label: '명함 발주', url: '/api/bcd/orderList' },
   ];
 
@@ -83,33 +80,47 @@ function Sidebar() {
     { label: '문서 발신 대장', url: '/api/doc/sendList' },
   ];
 
-  const assetItems = [
-    { label: '문서보관 목록표', url: '/api/docstorageList' },
-    { label: '전국 문서보관 목록표', url: '/api/totalDocstorageList' },
-  ];
-  
-  const rentalItems = [
-    { label: '렌탈현황 관리표', url: '/api/rentalList' },
-    { label: '전국 렌탈현황 관리표', url: '/api/totalRentalList' },
-  ]
-
   const sections = {
     'A': [{ title: '명함 관리', items: bcdItems }],
-    'B': [{ title: '발주 관리', items: orderItems }],
-    'C': [
+    'B': [
       { title: '인장 관리', items: sealItems },
       { title: '인장 대장', items: sealManageItems }
     ],
-    'D': [
+    'C': [
       { title: '법인서류 관리', items: corpDocItems },
       { title: '법인서류 대장', items: corpDocManageItems }
     ],
-    'E': [
+    'D': [
       { title: '문서수발신 관리', items: docItems },
       { title: '문서수발신 대장', items: docManageItems }
     ],
-    'F': [{ title: '문서 관리', items: assetItems }],
-    'G': [{ title: '자산 관리', items: rentalItems }]
+    'E': [
+      { title: '문서 관리', items: [
+        { label: '문서보관 목록표', url: '/api/docstorageList', subIndex: 'E-1' },
+        { label: '전국 문서보관 목록표', url: '/api/totalDocstorageList', subIndex: 'E-2' },
+      ]}
+    ],
+    'F': [
+      { title: '자산 관리', items: [
+        { label: '렌탈현황 목록표', url: '/api/rentalList', subIndex: 'F-1' },
+        { label: '전국 렌탈현황 목록표', url: '/api/totalRentalList', subIndex: 'F-2' },
+      ]}
+    ]
+  };
+
+  const filterItemsByPermission = (sectionKey, permissions) => {
+    const section = sections[sectionKey];
+    if (!section) return [];
+
+    return section.map(sectionItem => ({
+      ...sectionItem,
+      items: sectionItem.items.filter(item => {
+        if (item.subIndex) {
+          return permissions.includes(item.subIndex);
+        }
+        return permissions.includes(sectionKey);
+      })
+    })).filter(sectionItem => sectionItem.items.length > 0);
   };
 
   return (
@@ -136,18 +147,19 @@ function Sidebar() {
         </>
       ) : (
         <>
-          {auth.sidebarPermissions && auth.sidebarPermissions.map((perm, index) => (
-            sections[perm] && sections[perm].map((section, subIndex) => (
+          {auth.sidebarPermissions && Object.keys(sections).map((sectionKey) => {
+            const filteredSections = filterItemsByPermission(sectionKey, auth.sidebarPermissions);
+            return filteredSections.map((sectionItem, index) => (
               <SidebarSection
-                key={`${index}-${subIndex}`}
-                title={section.title}
-                items={section.items}
+                key={`${sectionKey}-${index}`}
+                title={sectionItem.title}
+                items={sectionItem.items}
                 isActive={isActive}
                 location={location}
                 defaultOpen={false}
               />
-            ))
-          ))}
+            ));
+          })}
           {(auth.role === 'MASTER' || auth.role === 'ADMIN') && (
             <div className="sidebar-section">
               <h2>

@@ -240,7 +240,7 @@ input[type="text2"] {
 .quantity-group {
     display: flex;
     align-items: center;
-    gap: 16px;
+    margin-top: 50px;
 }
 
 .quantity-selector {
@@ -279,11 +279,14 @@ input[type="text2"] {
 }
 
 .card-preview {
-    max-width: 105%;
-    margin-top: 20px;
-    margin-left: 90px;
+    max-width: 103%;
+    margin-top: 60px;
+    margin-left: 20px;
     margin-bottom: 30px;
     height: auto;
+    border: 2px solid #ccc; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .image-preview {
@@ -291,8 +294,8 @@ input[type="text2"] {
     justify-content: center;
     align-items: center;
     margin-bottom: -40px;
-    width: 320px;
-    height: 224px;
+    width: 340px;
+    height: 220px;
 }
 
 .apply-buttons-container {

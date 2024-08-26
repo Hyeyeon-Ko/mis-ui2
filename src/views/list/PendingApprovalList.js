@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
@@ -8,10 +8,14 @@ import DocConfirmModal from '../doc/DocConfirmModal';
 import '../../styles/list/ApplicationsList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
+import { AuthContext } from '../../components/AuthContext';
 
 function PendingApprovalList() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { auth } = useContext(AuthContext); 
+  const instCd = auth.instCd;
+
   const [applications, setApplications] = useState([]);
   const [centers] = useState([
     '전체', '재단본부', '광화문', '여의도센터', '강남센터',
@@ -58,6 +62,7 @@ function PendingApprovalList() {
           documentType,
           startDate: filterParams.startDate || '',
           endDate: filterParams.endDate || '',
+          instCd: instCd || '', 
         },
       });
 
@@ -93,7 +98,7 @@ function PendingApprovalList() {
     } finally {
       setLoading(false);
     }
-  }, [documentType]);
+  }, [documentType, instCd]);
 
   useEffect(() => {
     fetchPendingList(filters);

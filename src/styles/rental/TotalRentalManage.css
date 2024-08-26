@@ -7,17 +7,29 @@
     margin-bottom: 16px;
 }
 
-.totalRentalManage-tables-section {
-    display: flex;
+.totalRentalManage-category-section {
+    margin-top: 25px;
+    margin-bottom: 30px;
+    font-size: 16px;
 }
 
-.totalRentalManage-sub-category-section {
-    width: 200px;
+.totalRentalManage-category-label {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.totalRentalManage-category-dropdown {
+    padding: 6px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 165px;
+    margin-left: 10px;
+    margin-right: 20px;
 }
 
 .totalRentalManage-details-content {
-    flex: 7;
-    margin-left: 20px;
+    flex: 1;
     overflow-x: auto;
 }
 
@@ -28,43 +40,10 @@
     margin-bottom: 8px;
 }
 
-.totalRentalManage-sub-category-label {
-    font-size: 14px;
-    font-weight: bold;
-    margin-top: 6px;
-    margin-right: 10px;
-    margin-bottom: 4px;
-}
-
 .totalRentalManage-detail-content-label {
     font-size: 14px;
     font-weight: bold;
     margin-right: 10px;
-    padding-left: 5px;
-}
-
-.totalRentalManage-sub-category-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.totalRentalManage-sub-category-table th {
-    background-color: white;
-    border: 1px solid #ddd;
-    padding: 8px 20px;
-    text-align: center;
-    font-size: 13px;
-}
-
-.totalRentalManage-sub-category-table td {
-    border: 1px solid #ddd;
-    padding: 8px 20px;
-    text-align: left;
-    font-size: 13px;
-}
-
-.totalRentalManage-sub-category-table td:hover {
-    background-color: #edf7ff;
 }
 
 .totalRentalManage-details-table {

@@ -16,7 +16,6 @@
 .docstorage-category-label {
     font-size: 14px;
     font-weight: bold;
-    margin-right: 15px;
 }
 
 .docstorage-category-dropdown {
@@ -25,16 +24,12 @@
     border-radius: 5px;
     border: 1px solid #ccc;
     width: 165px;
-    margin-left: 44px;
+    margin-left: -3px;
+    margin-right: 20px;
 }
 
 .docstorage-tables-section {
     display: flex;
-}
-
-.docstorage-sub-category-section {
-    width: 200px;
-    margin-right: 20px;
 }
 
 .docstorage-details-content {
@@ -49,14 +44,6 @@
     margin-bottom: 8px;
 }
 
-.docstorage-sub-category-label {
-    font-size: 14px;
-    font-weight: bold;
-    margin-top: 6px;
-    margin-right: 10px;
-    margin-bottom: 4px;
-}
-
 .docstorage-detail-content-label {
     font-size: 14px;
     font-weight: bold;
@@ -64,30 +51,6 @@
     margin-right: 10px;
     margin-bottom: 4px;
     padding-left: 0px;
-}
-
-.docstorage-sub-category-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.docstorage-sub-category-table th {
-    background-color: white;
-    border: 1px solid #ddd;
-    padding: 8px 20px;
-    text-align: center;
-    font-size: 13px;
-}
-
-.docstorage-sub-category-table td {
-    border: 1px solid #ddd;
-    padding: 8px 20px;
-    text-align: left;
-    font-size: 13px;
-}
-
-.docstorage-sub-category-table td:hover {
-    background-color: #edf7ff;
 }
 
 .docstorage-details-table {
@@ -156,4 +119,4 @@
     display: flex;
     justify-content: center;
     margin-top: 20px; 
-  }
+}

@@ -91,7 +91,8 @@ function TotalRentalManage() {
         { header: '월 렌탈금액', accessor: 'monthlyRentalFee' },
     ];
 
-    const handleCenterClick = (detailCd) => {
+    const handleCenterChange = (e) => {
+        const detailCd = e.target.value;
         setSelectedCenter(detailCd);
         setSelectedRows([]);
 
@@ -197,70 +198,51 @@ function TotalRentalManage() {
         console.error("엑셀 다운로드 실패:", error);
       }
     };
-      
-    const subCategoryColumns = [
-      {
-        header: '센터명',
-        accessor: 'detailNm',
-        width: '100%',
-        Cell: ({ row }) => {
-          const { detailCd } = row;
-          const isSelected = detailCd === selectedCenter;
-          return (
-            <div
-              className="totalRentalManage-details-table"
-              style={{ cursor: 'pointer' }}
-              onClick={() => handleCenterClick(detailCd)}
-            >
-              <span className={isSelected ? 'selected-sub-category-text' : ''}>
-                {row.detailNm}
-              </span>
-            </div>
-          );
-        }
-      },
-    ];
-  
+
     return (
         <div className='content'>
             <div className="totalRentalManage-content">
                 <div className='totalRentalManage-content-inner'>
                     <h2>전국 렌탈현황 관리표</h2>
                     <Breadcrumb items={['자산 관리', '전국 렌탈현황 관리표']} />
-                    <div className="totalRentalManage-tables-section">
-                        <div className="totalRentalManage-sub-category-section">
-                            <div className="totalRentalManage-header-buttons">
-                                <label className='totalRentalManage-sub-category-label'>센 터&gt;&gt;</label>
-                            </div>
-                            <div className="totalRentalManage-sub-category-table">
-                                <Table
-                                    columns={subCategoryColumns}
-                                    data={centerData}
-                                />
+                    <div className="totalRentalManage-category-section">
+                        <div className="totalRentalManage-category">
+                            <label htmlFor="center" className="totalRentalManage-category-label">센 터&gt;&gt;</label>
+                            <select
+                                id="center"
+                                className="totalRentalManage-category-dropdown"
+                                value={selectedCenter}
+                                onChange={handleCenterChange}
+                            >
+                                {centerData.map(center => (
+                                    <option key={center.detailCd} value={center.detailCd}>
+                                        {center.detailNm}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                    <div className="totalRentalManage-details-content">
+                        <div className="totalRentalManage-header-buttons">
+                            <label className='totalRentalManage-detail-content-label'>렌탈 현황&gt;&gt;</label>
+                            <div className="totalRentalManage-detail-buttons">
+                                <button
+                                    className="totalRentalManage-excel-button"
+                                    onClick={handleExcelDownload}
+                                >
+                                    엑 셀
+                                </button>
                             </div>
                         </div>
-                        <div className="totalRentalManage-details-content">
-                            <div className="totalRentalManage-header-buttons">
-                                <label className='totalRentalManage-detail-content-label'>렌탈 현황&gt;&gt;</label>
-                                <div className="totalRentalManage-detail-buttons">
-                                    <button
-                                        className="totalRentalManage-excel-button"
-                                        onClick={handleExcelDownload}
-                                    >
-                                        엑 셀
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="totalRentalManage-details-table">
-                                <Table
-                                    columns={selectedCenter === 'all' ? getNationwideColumns() : getDefaultColumns()}
-                                    data={rentalDetails}
-                                    onRowClick={handleRowClick}
-                                    onRowMouseDown={handleMouseDown}
-                                    onRowMouseOver={handleMouseOver}
-                                    onRowMouseUp={handleMouseUp}
-                                />
-                            </div>
+                        <div className="totalRentalManage-details-table">
+                            <Table
+                                columns={selectedCenter === 'all' ? getNationwideColumns() : getDefaultColumns()}
+                                data={rentalDetails}
+                                onRowClick={handleRowClick}
+                                onRowMouseDown={handleMouseDown}
+                                onRowMouseOver={handleMouseOver}
+                                onRowMouseUp={handleMouseUp}
+                            />
                         </div>
                     </div>
                 </div>

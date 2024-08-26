@@ -115,10 +115,10 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove }) => {
           <div className="doc-confirm-form-group">
             <label>첨부 파일</label>
             <div className="doc-confirm-file-download">
-              <a onClick={handleFileDownload} style={{ cursor: 'pointer' }}>
+              <button onClick={handleFileDownload} style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}>
                 <span>{formData.fileName}</span>
                 <img src={downloadIcon} alt="다운로드" />
-              </a>
+              </button>
             </div>
           </div>
         )}

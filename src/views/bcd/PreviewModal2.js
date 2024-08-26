@@ -164,10 +164,10 @@ const PreviewModal = ({ show, onClose, formData }) => {
         if (engAddressParts.length >= 3) {
           const mainEngAddress = engAddressParts.slice(0, 3).join(',').trim();
           const nextLineEngAddress = engAddressParts.slice(3).join(',').trim();
-          drawTextWithMaxWidth(ctx, mainEngAddress, 904, 284.8, -0.56, 240, 14.6);
+          drawTextWithMaxWidth(ctx, mainEngAddress, 904, 284.8, -0.56, 220, 14.6);
           drawTextWithMaxWidth(ctx, nextLineEngAddress, 840, 304.8, -0.08, 270, 14.6);
             } else {
-              drawTextWithMaxWidth(ctx, formData.engAddress, 904, 284.8, -0.56, 240, 14.6);
+              drawTextWithMaxWidth(ctx, formData.engAddress, 904, 284.8, -0.56, 220, 14.6);
             }
       }
     };
@@ -193,7 +193,6 @@ const PreviewModal = ({ show, onClose, formData }) => {
 
   useEffect(() => {
     if (show) {
-      console.log('FormData in Preview:', formData); // formData 로그 출력
       drawBusinessCard();
     }
   }, [show, formData, drawBusinessCard]);

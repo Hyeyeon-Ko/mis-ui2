@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useRef } from 'react';
+import React, { useEffect, useState, useContext, useRef, useCallback } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import ConfirmModal from '../../components/common/ConfirmModal';
@@ -39,21 +39,20 @@ function DocstorageList() {
     { label: '처리완료', value: '처리완료' },
   ];
 
-  const fetchDeptList = async () => {
+  const fetchDeptList = useCallback(async () => {
     try {
       const response = await axios.get('/api/docstorageList/deptList', {
         params: { instCd: auth.instCd },
       });
       setDeptResponses(response.data.data);
-      
       setSelectedDeptCd(null);
       setDocstorageDetails([]); 
     } catch (error) {
       console.error('부서 리스트를 불러오는데 실패했습니다.', error);
     }
-  };
-  
-  const fetchPendingApprovalList = async () => {
+  }, [auth.instCd]);
+
+  const fetchPendingApprovalList = useCallback(async () => {
     try {
       const response = await axios.get('/api/docstorageList/pending', {
         params: { instCd: auth.instCd },
@@ -70,7 +69,7 @@ function DocstorageList() {
     } catch (error) {
       console.error('승인대기 내역을 불러오는데 실패했습니다.', error);
     }
-  };
+  }, [auth.instCd]);
   
   const fetchDocstorageData = async (deptCd) => {
     try {
@@ -98,12 +97,13 @@ function DocstorageList() {
         fetchDeptList(); 
       }
     }
-  }, [auth.instCd, selectedCategory]);
+  }, [auth.instCd, selectedCategory, fetchDeptList, fetchPendingApprovalList]);
 
-  const handleDeptClick = (detailCd) => {
-    setSelectedDeptCd(detailCd);
+  const handleDeptChange = (e) => {
+    const deptCd = e.target.value;
+    setSelectedDeptCd(deptCd);
     setSelectedRows([]);
-    fetchDocstorageData(detailCd);
+    fetchDocstorageData(deptCd);
   };
 
   const handleRowClick = (row) => {
@@ -153,7 +153,6 @@ function DocstorageList() {
   };
 
   const handleEdit = async () => {
-
     if (!selectedDeptCd) {
       alert('부서를 선택하세요.');
       return;
@@ -307,29 +306,6 @@ function DocstorageList() {
     setPendingApproval(null); 
   };
 
-  const subCategoryColumns = [
-    {
-      header: '부서명',
-      accessor: 'detailNm',
-      width: '100%',
-      Cell: ({ row }) => {
-        const { detailCd } = row;
-        const isSelected = detailCd === selectedDeptCd; 
-        return (
-          <div
-            className="docstorage-details-table"
-            style={{ cursor: 'pointer' }}
-            onClick={() => handleDeptClick(detailCd)}
-          >
-            <span className={isSelected ? 'selected-sub-category-text' : ''}>
-              {row.detailNm}
-            </span>
-          </div>
-        );
-      }
-    },
-  ];
-  
   const detailColumns = [
     ...(selectedCategory === 'B' ? [
       {
@@ -411,22 +387,27 @@ function DocstorageList() {
                     </option>
                   ))}
                 </select>
+                {selectedCategory !== 'A' && (
+                  <>
+                    <label htmlFor="dept" className="docstorage-category-label" style={{ marginLeft: '20px' }}>부 서&gt;&gt;</label>
+                    <select
+                      id="dept"
+                      className="docstorage-category-dropdown"
+                      value={selectedDeptCd || ''}
+                      onChange={handleDeptChange}
+                    >
+                      <option value="">부서 선택</option>
+                      {deptResponses.map(dept => (
+                        <option key={dept.detailCd} value={dept.detailCd}>
+                          {dept.detailNm}
+                        </option>
+                      ))}
+                    </select>
+                  </>
+                )}
               </div>
             </div>
             <div className="docstorage-tables-section">
-              {selectedCategory !== 'A' && (
-                <div className="docstorage-sub-category-section">
-                  <div className="docstorage-header-buttons">
-                    <label className='docstorage-sub-category-label'>부 서&gt;&gt;</label>
-                  </div>
-                  <div className="docstorage-sub-category-table">
-                    <Table
-                      columns={subCategoryColumns}
-                      data={deptResponses}
-                    />
-                  </div>
-                </div>
-              )}
               <div className="docstorage-details-content">
                 <div className="docstorage-header-buttons">
                   <label className='docstorage-detail-content-label'>

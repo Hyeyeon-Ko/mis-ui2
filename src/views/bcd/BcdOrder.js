@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom'; // useNavigate 훅 추가
+import React, { useState, useEffect, useCallback, useRef, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import CustomButton from '../../components/common/CustomButton';
@@ -10,8 +10,10 @@ import '../../styles/common/Page.css';
 import axios from 'axios';
 import fileDownload from 'js-file-download';
 import { FadeLoader } from 'react-spinners';
+import { AuthContext } from '../../components/AuthContext'; 
 
 function BcdOrder() {
+  const { auth } = useContext(AuthContext); 
   const [applications, setApplications] = useState([]);
   const [selectedApplications, setSelectedApplications] = useState([]);
   const [centers] = useState([
@@ -31,7 +33,7 @@ function BcdOrder() {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useNavigate(); // navigate 함수 가져오기
+  const navigate = useNavigate();
 
   // 드래그 기능을 위한 ref 변수들
   const dragStartIndex = useRef(null);
@@ -55,7 +57,11 @@ function BcdOrder() {
   // 발주 리스트 가져오기
   const fetchBcdOrderList = useCallback(async () => {
     try {
-      const response = await axios.get('/api/bsc/order');
+      const response = await axios.get('/api/bsc/order', {
+        params: {
+          instCd: auth.instCd,
+        },
+      });
       const data = response.data.data || response.data;
       const transformedData = data.map((item) => ({
         id: item.draftId,
@@ -70,7 +76,7 @@ function BcdOrder() {
     } catch (error) {
       console.error('Error fetching bcdOrder list: ', error);
     }
-  }, []);
+  }, [auth.instCd]);
 
   // 컴포넌트 마운트 시 발주 리스트 가져오기
   useEffect(() => {
@@ -202,7 +208,7 @@ function BcdOrder() {
       setShowEmailModal(false);
       alert('발주 요청이 성공적으로 완료되었습니다.');
       
-      navigate('/api/applyList?documentType=명함신청', { replace: true });
+      navigate('/api/std', { replace: true });
       
     } catch (error) {
       console.error('Error sending order request: ', error);

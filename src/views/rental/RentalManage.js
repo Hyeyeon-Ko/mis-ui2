@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
@@ -33,7 +33,7 @@ function RentalManage() {
     }
   };
 
-  const fetchRentalData = async () => {
+  const fetchRentalData = useCallback(async () => {
     try {
       const response = await axios.get('/api/rentalList/center', {
         params: { instCd: auth.instCd },
@@ -50,11 +50,11 @@ function RentalManage() {
     } catch (error) {
       console.error('센터 렌탈현황을 불러오는데 실패했습니다.', error);
     }
-  };
-      
+  }, [auth.instCd]);
+
   useEffect(() => {
     fetchRentalData();
-  }, []);
+  }, [fetchRentalData]);
 
   const handleRowClick = (row, index) => {
     const isChecked = !selectedRows.includes(row.detailId);

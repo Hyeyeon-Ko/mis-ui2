@@ -34,12 +34,13 @@ function TotalDocstorageList() {
     fetchData();
   }, []);
 
-  const handleCenterClick = (detailCd) => {
+  const handleCenterChange = (e) => {
+    const detailCd = e.target.value;
     setSelectedRows([]); 
     setSelectedCenterCode(detailCd);
-  
+
     if (!centerDocstorageResponses) return;
-  
+
     const centerMapping = {
       "100": centerDocstorageResponses.foundationResponses,
       "111": centerDocstorageResponses.gwanghwamunResponses,
@@ -51,9 +52,9 @@ function TotalDocstorageList() {
       "711": centerDocstorageResponses.gwangjuResponses,
       "811": centerDocstorageResponses.jejuResponses,
     };
-  
+
     const selectedDetails = centerMapping[detailCd] || [];
-  
+
     const numberedDetails = selectedDetails.map((item, index) => ({
       ...item,
       no: index + 1,
@@ -131,29 +132,6 @@ function TotalDocstorageList() {
         console.error('엑셀 파일 다운로드 중 오류 발생:', error);
     }
   };
-    
-  const subCategoryColumns = [
-    {
-      header: '센터명',
-      accessor: 'detailNm',
-      width: '100%',
-      Cell: ({ row }) => {
-        const { detailCd } = row;
-        const isSelected = detailCd === selectedCenterCode; 
-        return (
-          <div
-            className="totalDocstorage-details-table"
-            style={{ cursor: 'pointer' }}
-            onClick={() => handleCenterClick(detailCd)}
-          >
-            <span className={isSelected ? 'selected-sub-category-text' : ''}>
-              {row.detailNm}
-            </span>
-          </div>
-        );
-      }
-    },
-  ];
   
   const detailColumns = [
     {
@@ -198,19 +176,26 @@ function TotalDocstorageList() {
         <div className='totalDocstorage-content-inner'>
             <h2>전국 문서보관 목록표</h2>
             <Breadcrumb items={['문서 관리', '전국 문서보관 목록표']} />
-            <div className="totalDocstorage-tables-section">
-            <div className="totalDocstorage-sub-category-section">
-                <div className="totalDocstorage-header-buttons">
-                <label className='totalDocstorage-sub-category-label'>센 터&gt;&gt;</label>
-                </div>
-                <div className="totalDocstorage-sub-category-table">
-                <Table
-                    columns={subCategoryColumns}
-                    data={centerData}
-                />
-                </div>
+            <div className="totalDocstorage-category-section">
+              <div className="totalDocstorage-category">
+                <label htmlFor="center" className="totalDocstorage-category-label">센 터&gt;&gt;</label>
+                <select
+                  id="center"
+                  className="totalDocstorage-category-dropdown"
+                  value={selectedCenterCode || ''}
+                  onChange={handleCenterChange}
+                >
+                  <option value="">센터 선택</option>
+                  {centerData.map(center => (
+                    <option key={center.detailCd} value={center.detailCd}>
+                      {center.detailNm}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-            <div className="totalDocstorage-details-content">
+            <div className="totalDocstorage-tables-section">
+              <div className="totalDocstorage-details-content">
                 <div className="totalDocstorage-header-buttons">
                 <label className='totalDocstorage-detail-content-label'>문서보관 내역&gt;&gt;</label>
                 <div className="totalDocstorage-detail-buttons">
@@ -227,8 +212,8 @@ function TotalDocstorageList() {
                     onRowMouseUp={handleMouseUp} 
                     />
                 </div>
+              </div>
             </div>
-          </div>
         </div>
       </div>
       <DocstorageAddModal

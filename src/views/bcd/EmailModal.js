@@ -66,7 +66,7 @@ const EmailModal = ({ show, onClose, onSend }) => {
             type="text"
             placeholder="발신자 이메일을 입력하세요"
             value={fromEmail}
-            readOnly
+            onChange={(e) => setFromEmail(e.target.value)} // Allow editing of fromEmail
           />
         </div>
         <div className="email-input-group">

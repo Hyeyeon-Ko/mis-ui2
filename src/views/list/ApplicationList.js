@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
@@ -9,11 +9,15 @@ import '../../styles/list/ApplicationsList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 import fileDownload from 'js-file-download';
+import { AuthContext } from '../../components/AuthContext'; 
 
 function ApplicationsList() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const documentTypeFromUrl = queryParams.get('documentType');
+
+  const { auth } = useContext(AuthContext); 
+  const instCd = auth.instCd; 
 
   const [applications, setApplications] = useState([]);
   const [filterInputs, setFilterInputs] = useState({
@@ -60,6 +64,7 @@ function ApplicationsList() {
           documentType: filterParams.documentType || documentTypeFromUrl || null,
           startDate: filterParams.startDate || '',
           endDate: filterParams.endDate || '',
+          instCd: instCd || '',
         },
       });
 
@@ -89,7 +94,7 @@ function ApplicationsList() {
     } finally {
       setLoading(false);
     }
-  }, [documentTypeFromUrl]);
+  }, [documentTypeFromUrl, instCd]);
 
   useEffect(() => {
     fetchApplications();
