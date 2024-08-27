@@ -45,8 +45,6 @@ function DocstorageList() {
         params: { instCd: auth.instCd },
       });
       setDeptResponses(response.data.data);
-      setSelectedDeptCd(null);
-      setDocstorageDetails([]); 
     } catch (error) {
       console.error('부서 리스트를 불러오는데 실패했습니다.', error);
     }
@@ -71,7 +69,7 @@ function DocstorageList() {
     }
   }, [auth.instCd]);
   
-  const fetchDocstorageData = async (deptCd) => {
+  const fetchDocstorageData = useCallback(async (deptCd) => {
     try {
       const response = await axios.get('/api/docstorageList/center', {
         params: { deptCd },
@@ -87,23 +85,49 @@ function DocstorageList() {
     } catch (error) {
       console.error('문서보관 내역을 불러오는데 실패했습니다.', error);
     }
-  };
+  }, []);
+
+  const fetchTotalDeptData = useCallback(async () => {
+    try {
+      const response = await axios.get('/api/docstorageList/totalDept', {
+        params: { instCd: auth.instCd }, 
+      });
+      const totalDeptData = response.data.data.map((item, index) => ({
+        ...item,
+        no: index + 1,
+        typeDisplay: item.type === 'A' ? '이관' : item.type === 'B' ? '파쇄' : '',
+        status: item.status === 'B' ? '승인완료' : item.status === 'E' ? '처리완료' : item.status,
+      }));
+      setDocstorageDetails(totalDeptData);
+      setSelectedRows([]);
+    } catch (error) {
+      console.error('전체 부서 데이터를 불러오는데 실패했습니다.', error);
+    }
+  }, [auth.instCd]);
 
   useEffect(() => {
     if (auth.instCd) {
       if (selectedCategory === 'A') {
         fetchPendingApprovalList();
+      } else if (selectedDeptCd) {
+        fetchDocstorageData(selectedDeptCd);
       } else {
-        fetchDeptList(); 
+        fetchTotalDeptData(); 
+        fetchDeptList();      
       }
     }
-  }, [auth.instCd, selectedCategory, fetchDeptList, fetchPendingApprovalList]);
+  }, [auth.instCd, selectedCategory, selectedDeptCd, fetchDocstorageData, fetchDeptList, fetchPendingApprovalList, fetchTotalDeptData]);
 
   const handleDeptChange = (e) => {
     const deptCd = e.target.value;
     setSelectedDeptCd(deptCd);
     setSelectedRows([]);
-    fetchDocstorageData(deptCd);
+
+    if (deptCd) {
+      fetchDocstorageData(deptCd); 
+    } else {
+      fetchTotalDeptData(); 
+    }
   };
 
   const handleRowClick = (row) => {

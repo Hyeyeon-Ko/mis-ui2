@@ -58,7 +58,6 @@ function DocApply() {
     e.preventDefault();
     const payload = new FormData();  
 
-    // JSON 데이터를 Blob 형태로 변환하여 추가
     payload.append('docRequest', new Blob([JSON.stringify({
       drafterId: formData.userId,
       drafter: formData.drafter,
@@ -68,6 +67,7 @@ function DocApply() {
       docTitle: formData.title,
       purpose: formData.purpose,
       instCd: auth.instCd,
+      deptCd: auth.deptCd,  
     })], {
       type: 'application/json'
     }));

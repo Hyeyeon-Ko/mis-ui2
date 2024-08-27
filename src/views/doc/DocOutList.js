@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
 import ConfirmModal from '../../components/common/ConfirmModal';
-import deleteIcon from '../../assets/images/delete.png';
+import deleteIcon from '../../assets/images/delete2.png';
+import downloadIcon from '../../assets/images/download.png'; 
 import '../../styles/doc/DocOutList.css';
 import axios from 'axios';
+import { AuthContext } from '../../components/AuthContext'; 
 
 function DocOutList() {
+  const { auth } = useContext(AuthContext); 
   const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -21,10 +24,13 @@ function DocOutList() {
     fetchDocOutList();
   }, []);
 
-  const fetchDocOutList = async () => {
+  const fetchDocOutList = async (deptCd = null) => {
     try {
-      const response = await axios.get('/api/doc/sendList');
-
+      const params = {
+        instCd: auth.instCd,  
+        ...(deptCd && { deptCd }) 
+      };
+      const response = await axios.get('/api/doc/sendList', { params });
       if (response.data && response.data.data) {
         const formattedData = response.data.data.map(item => ({
           draftId: item.draftId,
@@ -34,6 +40,8 @@ function DocOutList() {
           title: item.title,
           drafter: item.drafter,
           status: item.status,
+          fileName: item.fileName, 
+          fileUrl: item.fileUrl,    
         }));
         setApplications(formattedData);
         setFilteredApplications(formattedData);
@@ -43,8 +51,26 @@ function DocOutList() {
     }
   };
 
+  const handleFileDownload = async (fileName) => {
+    try {
+      const response = await axios.get(`/api/doc/download/${encodeURIComponent(fileName)}`, {
+        responseType: 'blob',
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName); 
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      console.error('Error downloading the file:', error);
+      alert('파일 다운로드에 실패했습니다.');
+    }
+  };
+
   const handleDeleteClick = (draftId, status) => {
-    console.log(`Clicked on draftId: ${draftId} with status: ${status}`);
     if (draftId) {
       setSelectedDraftId(draftId);
       if (status === '신청취소') {
@@ -129,18 +155,33 @@ function DocOutList() {
     { header: '문서번호', accessor: 'docId', width: '8%' },
     { header: '수신처', accessor: 'resSender', width: '10%' },
     { header: '제목', accessor: 'title', width: '20%' },
+    {
+      header: '첨부파일',
+      accessor: 'file',
+      width: '7%',
+      Cell: ({ row }) => (
+        row.fileName ? (
+          <button
+            className="download-button"
+            onClick={() => handleFileDownload(row.fileName)}
+          >
+            <img src={downloadIcon} alt="Download" className="action-icon" />
+          </button>
+        ) : null
+      ),
+    },
     { header: '접수인', accessor: 'drafter', width: '8%' },
-    { header: '상태', accessor: 'status', width: '8%'},
+    { header: '상태', accessor: 'status', width: '8%' },
     {
       header: '신청 삭제',
       accessor: 'delete',
-      width: '10%',
+      width: '7%',
       Cell: ({ row }) => (
         <div className="icon-cell">
           <img
             src={deleteIcon}
             alt="Delete"
-            className="action-icon"
+            className="doc-out-action-icon"
             onClick={() => handleDeleteClick(row.draftId, row.status)}
           />
         </div>

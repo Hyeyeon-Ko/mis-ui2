@@ -26,7 +26,7 @@ const Table = ({ columns, data, onRowClick = () => {}, onRowMouseDown = () => {}
             {columns.map((col, colIndex) => (
               <td key={colIndex}>
                 {col.Cell ? (
-                  <div className="icon-cell">
+                  <div className={`icon-cell ${isCancelled && col.accessor === 'file' ? 'disabled' : ''}`}>
                     {col.Cell({ row: row.original || row })}
                   </div>
                 ) : (
