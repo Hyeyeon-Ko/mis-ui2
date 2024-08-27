@@ -9,7 +9,7 @@ function Apply() {
     <div className="main-content">
       <div className="button-container">
         <CircleButton to="/api/bcd" label="명함신청" />
-        <CircleButton to="/api/seal" label="인장관리" />
+        <CircleButton to="/api/seal" label="인장신청" />
         <CircleButton to="/api/corpDoc" label="법인서류" />
       </div>
       <div className="button-container">

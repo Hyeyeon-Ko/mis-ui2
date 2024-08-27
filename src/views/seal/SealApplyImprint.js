@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import '../../styles/common/Page.css';
@@ -8,6 +8,45 @@ import facsimileSeal from '../../assets/images/facsimile_seal.png';
 import companySeal from '../../assets/images/company_seal.png';
 
 function SealApplyImprint() {
+    const [sealSelections, setSealSelections] = useState({
+        corporateSeal: { selected: false, quantity: '' },
+        facsimileSeal: { selected: false, quantity: '' },
+        companySeal: { selected: false, quantity: '' },
+    });
+
+    const handleSealChange = (sealName) => {
+        setSealSelections(prevState => ({
+            ...prevState,
+            [sealName]: {
+                ...prevState[sealName],
+                selected: !prevState[sealName].selected,
+            }
+        }));
+    };
+
+    const handleQuantityChange = (e, sealName) => {
+        const value = e.target.value;
+        setSealSelections(prevState => ({
+            ...prevState,
+            [sealName]: {
+                ...prevState[sealName],
+                quantity: value
+            }
+        }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const selectedSeals = Object.keys(sealSelections)
+            .filter(seal => sealSelections[seal].selected)
+            .map(seal => ({
+                name: seal,
+                quantity: sealSelections[seal].quantity
+            }));
+        console.log('Selected Seals:', selectedSeals);
+        // Implement submission logic here
+    };
+
     return (
         <div className="content">
             <div className="seal-imprint-content">
@@ -15,29 +54,21 @@ function SealApplyImprint() {
                 <Breadcrumb items={['신청하기', '인장신청']} />
                 <div className='seal-imprint-main'>
                     <div className='seal-imprint-apply-content'>
-                        <form className='seal-imprint-form'>
+                        <form className='seal-imprint-form' onSubmit={handleSubmit}>
                             <div className='seal-imprint-bold-label'>
                                 <label>인장 날인 신청서</label>
                             </div>
                             <div className='seal-imprint-form-group'>
                                 <label>제출처</label>
-                                <input
-                                    type="text"
-                                    name="destination"
-                                />
+                                <input type="text" name="destination" />
                             </div>
                             <div className='seal-imprint-form-group'>
                                 <label>사용일자</label>
-                                <input
-                                    type="text"
-                                    name="useDate"
-                                />
+                                <input type="text" name="useDate" />
                             </div>
                             <div className='seal-imprint-form-group'>
                                 <label>사용목적</label>
-                                <textarea
-                                    name="purpose"
-                                />
+                                <textarea name="purpose" />
                             </div>
                             <div className='seal-imprint-form-group'>
                                 <label>인장구분</label>
@@ -45,54 +76,83 @@ function SealApplyImprint() {
                                     <label>
                                         <div className='seal-imprint-detail-option'>
                                             <div className='seal-imprint-detail-left'>
-                                                <input type="radio" name="seal" value="corporateSeal" />
+                                                <input
+                                                    type="checkbox"
+                                                    name="corporateSeal"
+                                                    checked={sealSelections.corporateSeal.selected}
+                                                    onChange={() => handleSealChange('corporateSeal')}
+                                                />
                                             </div>
                                             <div className='seal-imprint-detail-right'>
                                                 <img src={corporateSeal} alt="Corporate Seal" className="seal-imprint-image" />
                                                 <span>법인인감</span>
+                                                <input
+                                                    type="number"
+                                                    name="corporateSealQuantity"
+                                                    min="1"
+                                                    placeholder="부수"
+                                                    value={sealSelections.corporateSeal.quantity}
+                                                    onChange={(e) => handleQuantityChange(e, 'corporateSeal')}
+                                                    disabled={!sealSelections.corporateSeal.selected}
+                                                />
                                             </div>
                                         </div>
                                     </label>
                                     <label>
                                         <div className='seal-imprint-detail-option'>
                                             <div className='seal-imprint-detail-left'>
-                                                <input type="radio" name="seal" value="facsimileSeal" />
+                                                <input
+                                                    type="checkbox"
+                                                    name="facsimileSeal"
+                                                    checked={sealSelections.facsimileSeal.selected}
+                                                    onChange={() => handleSealChange('facsimileSeal')}
+                                                />
                                             </div>
                                             <div className='seal-imprint-detail-right'>
                                                 <img src={facsimileSeal} alt="Facsimile Seal" className="seal-imprint-image" />
                                                 <span>사용인감</span>
+                                                <input
+                                                    type="number"
+                                                    name="facsimileSealQuantity"
+                                                    min="1"
+                                                    placeholder="부수"
+                                                    value={sealSelections.facsimileSeal.quantity}
+                                                    onChange={(e) => handleQuantityChange(e, 'facsimileSeal')}
+                                                    disabled={!sealSelections.facsimileSeal.selected}
+                                                />
                                             </div>
                                         </div>
                                     </label>
                                     <label>
                                         <div className='seal-imprint-detail-option'>
                                             <div className='seal-imprint-detail-left'>
-                                                <input type="radio" name="seal" value="companySeal" />
+                                                <input
+                                                    type="checkbox"
+                                                    name="companySeal"
+                                                    checked={sealSelections.companySeal.selected}
+                                                    onChange={() => handleSealChange('companySeal')}
+                                                />
                                             </div>
                                             <div className='seal-imprint-detail-right'>
                                                 <img src={companySeal} alt="Company Seal" className="seal-imprint-image" />
                                                 <span>회사인</span>
+                                                <input
+                                                    type="number"
+                                                    name="companySealQuantity"
+                                                    min="1"
+                                                    placeholder="부수"
+                                                    value={sealSelections.companySeal.quantity}
+                                                    onChange={(e) => handleQuantityChange(e, 'companySeal')}
+                                                    disabled={!sealSelections.companySeal.selected}
+                                                />
                                             </div>
                                         </div>
                                     </label>
                                 </div>
                             </div>
                             <div className='seal-imprint-form-group'>
-                                <label>날인부수</label>
-                                <select name="quantity">
-                                    <option value="">선택하세요</option>
-                                    <option value="1">1부</option>
-                                    <option value="2">2부</option>
-                                    <option value="3">3부</option>
-                                    <option value="4">4부</option>
-                                    <option value="5">5부</option>
-                                </select>
-                            </div>
-                            <div className='seal-imprint-form-group'>
                                 <label>특이사항</label>
-                                <textarea
-                                    name="notes"
-                                />
+                                <textarea name="notes" />
                             </div>
                             <div className="seal-imprint-apply-button-container">
                                 <CustomButton className="apply-request-button" type="submit">

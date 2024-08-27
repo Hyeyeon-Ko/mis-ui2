@@ -56,6 +56,8 @@
   width: 80%;
   padding: 10px;
   padding-left: 15px;
+  margin-top: 5px;
+  margin-bottom: 5px;
   border: 1px solid #e4e1e1;
   border-radius: 6px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -100,9 +102,53 @@
   width: 80%;
 }
 
+.seal-imprint-detail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+}
+
 .seal-imprint-detail-option {
   display: flex;
   align-items: center;
+  margin-bottom: 30px;
+}
+
+.seal-imprint-detail-option input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.seal-imprint-image {
+  border: 2px solid transparent;
+  border-radius: 6px;
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  margin-bottom: 10px;
+}
+
+.seal-imprint-detail span {
+  font-size: 14px;
+  margin-bottom: 8px; 
+}
+
+.seal-imprint-detail input[type="number"] {
+  width: 50px; 
+  padding: 5px;
+  text-align: center;
+  border: 1px solid #ccc; 
+  border-radius: 4px; 
+  font-size: 12px; 
+  background-color: #f9f9f9;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1); 
+}
+
+.seal-imprint-detail input[type="number"]:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
+  outline: none;
+  background-color: #fff; 
 }
 
 .seal-imprint-detail-left {
@@ -124,20 +170,12 @@
   margin-right: 20px;
 }
 
-.seal-imprint-options input[type="radio"] {
-  margin-bottom: 2px;
-}
-
 .seal-imprint-options img {
   border: 2px solid transparent;
   border-radius: 6px;
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   object-fit: contain;
   margin-top: 15px;
   margin-bottom: 5px;
-}
-
-.seal-imprint-options input[type="radio"]:checked + img {
-  border-color: #007bff;
 }
