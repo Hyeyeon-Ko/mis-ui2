@@ -109,12 +109,24 @@ const ConditionFilter = ({
         {showSearchCondition && (
           <>
             <label>검색 조건</label>
-            <select value={searchType} onChange={(e) => setSearchType(e.target.value)}>
+            <select 
+              value={searchType} 
+              onChange={(e) => setSearchType(e.target.value)}
+            >
               <option value="전체">전체</option>
-              {!excludeSender && <option value="발신처">발신처</option>}
-              {!excludeRecipient && <option value="수신처">수신처</option>}
-              <option value="제목">제목</option>
-              <option value="접수인">접수인</option>
+              {(documentType === '명함신청' || documentType === '문서수발신') ? (
+                <>
+                  <option value="제목">제목</option>
+                  <option value="신청자">신청자</option>
+                </>
+              ) : (
+                <>
+                  {!excludeSender && <option value="발신처">발신처</option>}
+                  {!excludeRecipient && <option value="수신처">수신처</option>}
+                  <option value="제목">제목</option>
+                  <option value="접수인">접수인</option>
+                </>
+              )}
             </select>
             <input
               type="text"

@@ -24,6 +24,8 @@ function ApplicationsList() {
     startDate: null,
     endDate: null,
     documentType: documentTypeFromUrl || '',
+    searchType: '전체',
+    keyword: '',
   });
   const [filters, setFilters] = useState({
     statusApproved: false,
@@ -65,6 +67,8 @@ function ApplicationsList() {
           documentType: filterParams.documentType || documentTypeFromUrl || null,
           startDate: filterParams.startDate || '',
           endDate: filterParams.endDate || '',
+          searchType: filterParams.searchType || '전체',
+          keyword: filterParams.keyword || '', 
           instCd: instCd || '',
         },
       });
@@ -89,6 +93,7 @@ function ApplicationsList() {
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
 
       setApplications(transformedData);
+      console.log('Fetched Applications:', transformedData);
     } catch (error) {
       console.error('Error fetching applications:', error);
       setError('데이터를 불러오는 중 오류가 발생했습니다.');
@@ -145,15 +150,18 @@ function ApplicationsList() {
   };
 
   const handleSearch = () => {
+    console.log('Filter Inputs on Search:', filterInputs); // 추가
     fetchApplications({
       documentType: filterInputs.documentType,
       startDate: filterInputs.startDate ? filterInputs.startDate.toISOString().split('T')[0] : '',
       endDate: filterInputs.endDate ? filterInputs.endDate.toISOString().split('T')[0] : '',
+      searchType: filterInputs.searchType,
+      keyword: filterInputs.keyword,
     });
   };
 
   const handleReset = () => {
-    setFilterInputs({ startDate: null, endDate: null, documentType: documentTypeFromUrl || '' });
+    setFilterInputs({ startDate: null, endDate: null, documentType: documentTypeFromUrl || '', searchType: '전체', keyword: '', });
     setFilters({
       statusApproved: false,
       statusRejected: false,
@@ -173,6 +181,19 @@ function ApplicationsList() {
       if (filters.statusClosed && application.applyStatus === '처리완료') return true;
       return false;
     }
+
+    if (filterInputs.searchType !== '전체' && filterInputs.keyword) {
+      const keyword = filterInputs.keyword.toLowerCase();
+      switch (filterInputs.searchType) {
+        case '제목':
+          return application.title.toLowerCase().includes(keyword);
+        case '신청자':
+          return application.drafter.toLowerCase().includes(keyword);
+        default:
+          return false;
+      }
+    }
+
     return true;
   });
 
@@ -298,6 +319,7 @@ function ApplicationsList() {
           onSearch={handleSearch}
           onReset={handleReset}
           showStatusFilters={true}
+          showSearchCondition={true}
           showDocumentType={false}  
         />
         {loading ? (
