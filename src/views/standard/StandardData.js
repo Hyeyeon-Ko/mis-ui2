@@ -132,6 +132,9 @@ function StandardData() {
           etcItem6: newRow.items[5],
           etcItem7: newRow.items[6],
           etcItem8: newRow.items[7],
+          etcItem9: newRow.items[8],
+          etcItem10: newRow.items[9],
+          etcItem11: newRow.items[10],
         });
         alert('상세 코드가 추가되었습니다.');
         fetchDetails(selectedSubCategory);
@@ -161,6 +164,9 @@ function StandardData() {
           etcItem6: newRow.items[5],
           etcItem7: newRow.items[6],
           etcItem8: newRow.items[7],
+          etcItem9: newRow.items[8],
+          etcItem10: newRow.items[9],
+          etcItem11: newRow.items[10],
         }, {
           params: { oriDetailCd }
         });
@@ -349,7 +355,11 @@ function StandardData() {
     { header: headerData.etcItem6 || '', accessor: 'etcItem5' },
     { header: headerData.etcItem7 || '', accessor: 'etcItem6' },
     { header: headerData.etcItem8 || '', accessor: 'etcItem7' },
-  ];
+    { header: headerData.etcItem9 || '', accessor: 'etcItem8' },
+    { header: headerData.etcItem10 || '', accessor: 'etcItem9' },
+    { header: headerData.etcItem11 || '', accessor: 'etcItem10' },
+    selectedSubCategory === 'A000' && { header: '항목10', accessor: 'etcItem11' },
+  ].filter(Boolean);
     
   const getModalTitle = () => {
     if (modalMode === 'detail') {
