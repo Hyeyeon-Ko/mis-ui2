@@ -33,7 +33,8 @@ function MyApplyList() {
       const data = response.data?.data || {};
       const combinedData = [
         ...(data.myBcdResponses || []),
-        ...(data.myDocResponses || [])
+        ...(data.myDocResponses || []),
+        ...(data.myCorpDocResponses || []),
       ];
     
       const uniqueData = combinedData.reduce((acc, current) => {

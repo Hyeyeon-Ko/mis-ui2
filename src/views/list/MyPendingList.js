@@ -20,7 +20,8 @@ function MyPendingList() {
       if (response.data && response.data.data) {
         const data = [
           ...(response.data.data.bcdPendingResponses || []),
-          ...(response.data.data.docPendingResponses || [])
+          ...(response.data.data.docPendingResponses || []),
+          ...(response.data.data.corpDocPendingResponses || []),
         ];
 
         const uniqueData = data.reduce((acc, current) => {
