@@ -150,7 +150,7 @@ function ApplicationsList() {
   };
 
   const handleSearch = () => {
-    console.log('Filter Inputs on Search:', filterInputs); // 추가
+    console.log('Filter Inputs on Search:', filterInputs);
     fetchApplications({
       documentType: filterInputs.documentType,
       startDate: filterInputs.startDate ? filterInputs.startDate.toISOString().split('T')[0] : '',
@@ -287,7 +287,7 @@ function ApplicationsList() {
       accessor: 'respondDate',
       width: '13%',
     },
-    ...(documentTypeFromUrl === '문서수발신' ? [] : [
+    ...(documentTypeFromUrl === '문서수발신' || '법인서류' ? [] : [
       { header: '발주일시', accessor: 'orderDate', width: '14%' },
     ]),
     { header: '문서상태', accessor: 'applyStatus', width: '10%' },
