@@ -66,7 +66,7 @@ function PendingApprovalList() {
         },
       });
 
-      const { bcdPendingResponses, docPendingResponses, sealPendingResponses } = response.data.data;
+      const { bcdPendingResponses, docPendingResponses, corpDocPendingResponses, sealPendingResponses } = response.data.data;
 
       const transformedBcdData = (bcdPendingResponses || []).map(item => ({
         draftId: item.draftId,
@@ -88,6 +88,16 @@ function PendingApprovalList() {
         docType: item.docType || '문서수발신'
       }));
 
+      const transformedCorpDocData = (corpDocPendingResponses || []).map(item => ({
+        draftId: item.draftId,
+        title: item.title,
+        center: item.instNm || '재단본부',
+        draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
+        drafter: item.drafter,
+        status: '승인대기',
+        docType: item.docType || '법인서류'
+      }));
+
       const transformedSealData = (sealPendingResponses || []).map(item => ({
         draftId: item.draftId,
         title: item.title,
@@ -98,7 +108,7 @@ function PendingApprovalList() {
         docType: item.docType || '인장신청'
       }));
 
-      const transformedData = [...transformedBcdData, ...transformedDocData, ...transformedSealData];
+      const transformedData = [...transformedBcdData, ...transformedDocData, ...transformedCorpDocData, ...transformedSealData];
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
 
       setApplications(transformedData);
@@ -158,6 +168,8 @@ function PendingApprovalList() {
       setModalVisible(true);
     } else if (docType === '명함신청') {
       navigate(`/api/bcd/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
+    } else if (docType === '법인서류') {
+      navigate(`/api/corpDoc/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
     } else if (docType === '인장신청(날인)') {
       const sealImprintDetails = await fetchSealImprintDetail(draftId);
       navigate(`/api/seal/imprint/${draftId}`, { state: { sealImprintDetails, readOnly: true } });
