@@ -67,16 +67,18 @@ function ApplicationsList() {
           documentType: filterParams.documentType || documentTypeFromUrl || null,
           startDate: filterParams.startDate || '',
           endDate: filterParams.endDate || '',
+          searchType: filterParams.searchType || '전체',
+          keyword: filterParams.keyword || '', 
           instCd: instCd || '',
         },
       });
 
-      const { bcdMasterResponses, docMasterResponses, sealMasterResponses } = response.data.data;
-
+      const { bcdMasterResponses, docMasterResponses, corpDocMasterResponses, sealMasterResponses } = response.data.data;
       // Combine all the responses into one array
       const combinedData = [
         ...(bcdMasterResponses || []),
         ...(docMasterResponses || []),
+        ...(corpDocMasterResponses || []),
         ...(sealMasterResponses || []),
       ];
 
@@ -157,6 +159,8 @@ function ApplicationsList() {
       documentType: filterInputs.documentType,
       startDate: filterInputs.startDate ? filterInputs.startDate.toISOString().split('T')[0] : '',
       endDate: filterInputs.endDate ? filterInputs.endDate.toISOString().split('T')[0] : '',
+      searchType: filterInputs.searchType,
+      keyword: filterInputs.keyword,
     });
   };
 
@@ -250,6 +254,8 @@ function ApplicationsList() {
       setSelectedApplyStatus(applyStatus); 
     } else if (docType === '명함신청') {
       navigate(`/api/bcd/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`);
+    } else if (docType === '법인서류') {
+      navigate(`/api/corpDoc/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`);
     }
   };
   

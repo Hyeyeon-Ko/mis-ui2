@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useContext, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../components/AuthContext';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
+import RejectReasonModal from '../../components/RejectReasonModal';
 import axios from 'axios';
 import '../../styles/common/Page.css';
 import '../../styles/corpdoc/CorpDocApply.css';
@@ -12,6 +13,9 @@ import deleteIcon from '../../assets/images/delete2.png';
 function DetailCorpDocApplication() {
     const { draftId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const applyStatus = queryParams.get('applyStatus'); 
     const { auth } = useContext(AuthContext);
     const [formData, setFormData] = useState({
         submission: '',
@@ -33,6 +37,8 @@ function DetailCorpDocApplication() {
     const [existingFile, setExistingFile] = useState(null);
     const [file, setFile] = useState(null);
     const [isEdit, setIsEdit] = useState(false);
+    const [showRejectModal, setShowRejectModal] = useState(false);
+    const isReadOnly = new URLSearchParams(location.search).get('readonly') === 'true';
 
     const fetchCorpDocDetail = useCallback(async (id) => {
         try {
@@ -221,11 +227,51 @@ function DetailCorpDocApplication() {
         }
     };
 
+    const handleReject = (e) => {
+        e.preventDefault(); 
+        setShowRejectModal(true);
+      };
+      
+      const handleRejectClose = () => {
+        setShowRejectModal(false);
+      }; 
+
+    const handleApprove = async (e) => {
+        e.preventDefault(); 
+        try {
+            await axios.put(`/api/corpDoc/approve?draftId=${draftId}`);
+            alert('문서가 승인되었습니다.');
+            navigate('/api/pendingList?documentType=법인서류');
+        } catch (error) {
+            console.error('Error approving document:', error);
+            alert('문서 승인 중 오류가 발생했습니다.');
+        }
+    };
+    
+    const handleRejectConfirm = async (reason) => {
+        try {
+            const response = await axios.put(`/api/corpDoc/reject?draftId=${draftId}`, reason, {
+                headers: {
+                    'Content-Type': 'text/plain',
+                },
+            });
+            if (response.data.code === 200) {
+                alert('법인서류 신청이 반려되었습니다.');
+                navigate('/api/pendingList?documentType=법인서류');
+            } else {
+                alert('법인서류 신청 반려 중 오류가 발생하였습니다.');
+            }
+        } catch (error) {
+            alert('법인서류 신청 반려 중 오류가 발생했습니다.');
+        }
+    };
+    
+
     return (
         <div className="content">
             <div className="corpDoc-content">
-                <h2>법인서류</h2>
-                <Breadcrumb items={['신청하기', '법인서류']} />
+                <h2>{isReadOnly ? '법인서류 상세보기' : '법인서류 수정'} </h2>
+                <Breadcrumb items={['나의 신청내역', '승인대기 내역', isReadOnly ? '법인서류 상세보기' : '법인서류 수정']} />
                 <div className="corpDoc-main">
                     <div className="corpDoc-apply-content">
                         <form className="corpDoc-form" onSubmit={handleSubmit}>
@@ -239,6 +285,7 @@ function DetailCorpDocApplication() {
                                     name="submission"
                                     value={formData.submission}
                                     onChange={handleChange}
+                                    disabled={isReadOnly}
                                     required
                                 />
                             </div>
@@ -248,6 +295,7 @@ function DetailCorpDocApplication() {
                                     name="purpose"
                                     value={formData.purpose}
                                     onChange={handleChange}
+                                    disabled={isReadOnly}
                                     required
                                 />
                             </div>
@@ -259,6 +307,7 @@ function DetailCorpDocApplication() {
                                     value={formData.useDate}
                                     onChange={handleChange}
                                     placeholder="YYYY-MM-DD"
+                                    disabled={isReadOnly}
                                     required
                                 />
                             </div>
@@ -275,13 +324,15 @@ function DetailCorpDocApplication() {
                                             >
                                                 <img src={downloadIcon} alt="다운로드" />
                                             </button>
-                                            <button
-                                                type="button"
-                                                className="file-delete-button"
-                                                onClick={handleFileDelete}
-                                            >
-                                                <img src={deleteIcon} alt="삭제" />
-                                            </button>
+                                            {!isReadOnly && (
+                                                <button
+                                                    type="button"
+                                                    className="file-delete-button"
+                                                    onClick={handleFileDelete}
+                                                >
+                                                    <img src={deleteIcon} alt="삭제" />
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 ) : (
@@ -290,6 +341,7 @@ function DetailCorpDocApplication() {
                                         name="file"
                                         className="file-input"
                                         onChange={handleFileChange}
+                                        disabled={isReadOnly}
                                     />
                                 )}
                             </div>
@@ -301,6 +353,8 @@ function DetailCorpDocApplication() {
                                         name="document1"
                                         checked={formData.document1}
                                         onChange={handleChange}
+                                        disabled={isReadOnly}
+                                        
                                     />
                                     <label> 법인인감증명서</label>
                                     <div className="corpDoc-form-group-inline-num">
@@ -310,7 +364,7 @@ function DetailCorpDocApplication() {
                                             name="quantity1"
                                             value={formData.quantity1}
                                             onChange={handleChange}
-                                            disabled={!formData.document1}
+                                            disabled={!formData.document1 || isReadOnly}
                                         />
                                         <label> 부</label>
                                     </div>
@@ -321,6 +375,7 @@ function DetailCorpDocApplication() {
                                         name="document2"
                                         checked={formData.document2}
                                         onChange={handleChange}
+                                        disabled={isReadOnly}
                                     />
                                     <label> 법인등기사항전부증명서(등기부등본)</label>
                                     <div className="corpDoc-form-group-inline-num">
@@ -330,7 +385,7 @@ function DetailCorpDocApplication() {
                                             name="quantity2"
                                             value={formData.quantity2}
                                             onChange={handleChange}
-                                            disabled={!formData.document2}
+                                            disabled={!formData.document2 || isReadOnly}
                                         />
                                         <label> 부</label>
                                     </div>
@@ -341,6 +396,7 @@ function DetailCorpDocApplication() {
                                         name="document3"
                                         checked={formData.document3}
                                         onChange={handleChange}
+                                        disabled={isReadOnly}
                                     />
                                     <label> 사용인감신고증명서</label>
                                     <div className="corpDoc-form-group-inline-num">
@@ -350,7 +406,7 @@ function DetailCorpDocApplication() {
                                             name="quantity3"
                                             value={formData.quantity3}
                                             onChange={handleChange}
-                                            disabled={!formData.document3}
+                                            disabled={!formData.document3 || isReadOnly}
                                         />
                                         <label> 부</label>
                                     </div>
@@ -361,6 +417,7 @@ function DetailCorpDocApplication() {
                                         name="document4"
                                         checked={formData.document4}
                                         onChange={handleChange}
+                                        disabled={isReadOnly}
                                     />
                                     <label> 주권</label>
                                     <div className="corpDoc-form-group-inline-num">
@@ -370,7 +427,7 @@ function DetailCorpDocApplication() {
                                             name="quantity4"
                                             value={formData.quantity4}
                                             onChange={handleChange}
-                                            disabled={!formData.document4}
+                                            disabled={!formData.document4 || isReadOnly}
                                         />
                                         <label> 부</label>
                                     </div>
@@ -382,6 +439,7 @@ function DetailCorpDocApplication() {
                                     name="type"
                                     value={formData.type}
                                     onChange={handleChange}
+                                    disabled={isReadOnly}
                                     required
                                 >
                                     <option value="">선택</option>
@@ -396,17 +454,36 @@ function DetailCorpDocApplication() {
                                     name="notes"
                                     value={formData.notes}
                                     onChange={handleChange}
+                                    disabled={isReadOnly}
                                 />
                             </div>
-                            <div className="corpDoc-apply-button-container">
-                                <CustomButton className="apply-request-button" type="submit">
-                                    {isEdit ? '수정하기' : '서류 신청하기'}
-                                </CustomButton>
+                            {applyStatus === '승인대기' && 
+                                <div className="corpDoc-apply-button-container">
+                                { isReadOnly ? (
+                                        <div className="approval-buttons">
+                                        <CustomButton className="approve-button" onClick={handleApprove}>승인</CustomButton>
+                                        <CustomButton className="reject-button" onClick={handleReject}>반려</CustomButton>
+                                        </div>
+                                    ) : (
+                                    <CustomButton className="apply-request-button" type="submit">
+                                        {isEdit ? '수정하기' : '서류 신청하기'}
+                                    </CustomButton>
+                                    )
+                                }
                             </div>
+                            }
+                            {showRejectModal && (
+            <RejectReasonModal 
+                show={showRejectModal}
+                onConfirm={handleRejectConfirm}
+                onClose={handleRejectClose}
+            />
+        )}
                         </form>
                     </div>
                 </div>
             </div>
+            
         </div>
     );
 }

@@ -16,6 +16,7 @@ import BcdApplyFirst from './views/bcd/BcdApplyFirst';
 import BcdApplySecond from './views/bcd/BcdApplySecond';
 import DetailApplication from './views/bcd/DetailApplication';
 import DetailDocApplication from './views/doc/DetailDocApplication';
+import DetailCorpDocApplication from './views/corpdoc/DetailCorpDocApplication';
 import DetailSealImprintApplication from './views/seal/DetailSealImprintApplication';
 import DetailSealExportApplication from './views/seal/DetailSealExportApplication';
 import DocInList from './views/doc/DocInList';
@@ -134,9 +135,11 @@ function App() {
                 <Route path="/api/std" element={<RequireAuth><StandardData /></RequireAuth>} />
                 <Route path="/api/bcd/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
                 <Route path="/api/doc/:draftId" element={<RequireAuth><DetailDocApplication /></RequireAuth>} />
+                <Route path="/api/corpDoc/:draftId" element={<RequireAuth><DetailCorpDocApplication/></RequireAuth>}/>
                 <Route path="/api/seal/imprint/:draftId" element={<RequireAuth><DetailSealImprintApplication /></RequireAuth>} />
                 <Route path="/api/seal/export/:draftId" element={<RequireAuth><DetailSealExportApplication /></RequireAuth>} />
                 <Route path="/api/bcd/applyList/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
+                <Route path="/api/corpDoc/applyList/:draftId" element={<RequireAuth><DetailCorpDocApplication /></RequireAuth>} />
               </Routes>
             </MainLayout>
           } />
