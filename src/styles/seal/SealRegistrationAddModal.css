@@ -1,0 +1,128 @@
+.seal-regist-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+  
+.seal-regist-container {
+    background-color: #ffffff;
+    padding: 30px 75px 45px 75px;
+    border-radius: 10px;
+    width: 550px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 1001;
+}
+
+input::placeholder {
+    color: #dbd9d9;
+    font-style: italic;
+}
+
+input:disabled {
+    font-style: italic;
+    background-color: #f3f3f3;
+}
+
+.seal-regist-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 24px;
+    margin-top: 20px;
+}
+
+.seal-regist-close-button {
+    background: none;
+    border: none;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+.seal-regist-content {
+    padding: 5px 20px;
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 180px;
+}
+
+.seal-regist-section {
+    margin-bottom: 20px;
+}
+
+.seal-regist-detail-row {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.seal-regist-detail-row label {
+    padding-left: 5px;
+    font-size: 15px;
+    margin-bottom: 2px;
+}
+
+.seal-regist-detail-row input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    height: 20px;
+}
+
+.seal-regist-detail-row input:focus {
+    border-color: #b1cef1;
+    box-shadow: 0 0 2px rgba(0, 123, 255, 0.5);
+    outline: none;
+}
+
+.seal-regist-buttons {
+    text-align: center;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 5px 20px;
+}
+
+.seal-regist-button.confirm {
+    background-color: #2789FE;
+    color: #ffffff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.seal-regist-button.confirm:hover {
+    background-color: #1e6fc1;
+}
+
+.seal-regist-button.cancel {
+    background-color: #ccc;
+    color: black;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.seal-regist-button.cancel:hover {
+    background-color: #999;
+}

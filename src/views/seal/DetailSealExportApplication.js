@@ -44,7 +44,7 @@ function DetailSealExportApplication() {
                     returnDate: data.returnDate || '',
                     purpose: data.purpose || '',
                     file: data.file || null,
-                    isFileDeleted: false,  // Add flag for file deletion
+                    isFileDeleted: false, 
                 });
 
                 setSealSelections({
@@ -93,7 +93,7 @@ function DetailSealExportApplication() {
         setApplicationDetails(prevState => ({
             ...prevState,
             file: e.target.files[0],
-            isFileDeleted: false, // If a new file is uploaded, reset the deletion flag
+            isFileDeleted: false,
         }));
     };
 
@@ -101,7 +101,7 @@ function DetailSealExportApplication() {
         setApplicationDetails(prevState => ({
             ...prevState,
             file: null,
-            isFileDeleted: true,  // Set flag to indicate file deletion
+            isFileDeleted: true,  
         }));
     };
 

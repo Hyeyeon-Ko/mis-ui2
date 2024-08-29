@@ -7,50 +7,106 @@
     margin-bottom: 16px;
   }
   
+  .seal-registration-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;  /* 고정된 레이아웃 사용 */
+}
+
+.seal-registration-table th, .seal-registration-table td {
+    padding: 8px;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid #ddd;
+    overflow: hidden;
+    text-overflow: ellipsis;  /* 내용이 넘칠 경우 생략(...) 표시 */
+}
+
+  .seal-registration-table th:first-child, .seal-registration-table td:first-child {
+      width: 3%;  /* 체크박스 열의 너비를 줄임 */
+  }
+
+  .seal-registration-table th:nth-child(2), .seal-registration-table td:nth-child(2) {
+      width: 15%;  /* 인영 종류 열 */
+  }
+
+  .seal-registration-table th:nth-child(3), .seal-registration-table td:nth-child(3) {
+      width: 12%;  /* 인영 이미지 열 */
+  }
+
+  .seal-registration-table th:nth-child(4), .seal-registration-table td:nth-child(4) {
+      width: 15%;  /* 사용부서 열 */
+  }
+
+  .seal-registration-table th:nth-child(5), .seal-registration-table td:nth-child(5) {
+      width: 18%;  /* 용도 열 */
+  }
+
+  .seal-registration-table th:nth-child(6), .seal-registration-table td:nth-child(6), 
+  .seal-registration-table th:nth-child(7), .seal-registration-table td:nth-child(7) {
+      width: 14%;  /* 두 관리자 열에 동일한 너비 설정 */
+  }
+  
+  .seal-registration-table th:nth-child(8), .seal-registration-table td:nth-child(8) {
+      width: 13%;  /* 등록일 열 */
+  }
+
+  .selected-row {
+      background-color: #f9f9f9;
+  }
+
   .seal-image {
-    width: 50px;
-    height: 50px;
+      width: 50px;
+      height: 50px;
   }
-  
+
+  .seal-registration-list {
+      padding: 8px 16px;
+  }
+
+  .seal-registration-list h2 {
+      font-size: 28px;
+      margin-bottom: 16px;
+  }
+
   .seal-header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: -5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: -5px;
   }
-  
+
   .seal-header-buttons {
-    display: flex;
-    gap: 4px;
+      display: flex;
+      gap: 4px;
   }
-  
+
   .seal-add-button, .seal-modify-button, .seal-delete-button {
-    border-radius: 7px;
-    padding: 4px 8px;
-    width: 55px;
-    height: 30px;
-    font-size: 13px;
-    font-weight: bold;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    border: none;
+      border-radius: 7px;
+      padding: 4px 8px;
+      width: 55px;
+      height: 30px;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      border: none;
   }
-  
+
   .seal-add-button {
-    color: white;
-    background-color: #2789fe;
+      color: white;
+      background-color: #2789fe;
   }
-  
+
   .seal-add-button:hover {
-    background-color: #1e6fc1;
+      background-color: #1e6fc1;
   }
-  
+
   .seal-modify-button, .seal-delete-button {
-    color: black;
-    background-color: #bfc5cc;
+      color: black;
+      background-color: #bfc5cc;
   }
-  
+
   .seal-modify-button:hover, .seal-delete-button:hover {
-    background-color: #a1a9b2;
+      background-color: #a1a9b2;
   }
-  
