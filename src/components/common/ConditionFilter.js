@@ -101,7 +101,8 @@ const ConditionFilter = ({
               <option value="명함신청">명함신청</option>
               <option value="문서수신">문서수신</option>
               <option value="문서발신">문서발신</option>
-              <option value="인장관리">인장관리</option>
+              <option value="인장신청(날인)">인장신청(날인)</option>
+              <option value="인장신청(반출)">인장신청(반출)</option>
               <option value="법인서류">법인서류</option>
             </select>
           </>
@@ -143,7 +144,7 @@ const ConditionFilter = ({
       </div>
       {showStatusFilters && (
         <div className="status-filters">
-          {documentType !== '문서수발신' && (
+          {documentType === '명함신청' && (
             <label>
               <input
                 type="checkbox"

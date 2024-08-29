@@ -1,15 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import DateFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import RejectReasonModal from '../../components/RejectReasonModal'; 
+import { AuthContext } from '../../components/AuthContext'; 
 import '../../styles/list/MyApplyList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 
-/* 나의 전체 신청내역 페이지 */
 function MyApplyList() {
+  const { auth } = useContext(AuthContext); 
   const [applications, setApplications] = useState([]);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -27,14 +28,18 @@ function MyApplyList() {
           documentType: filterParams.documentType || null,
           startDate: filterParams.startDate || '',
           endDate: filterParams.endDate || '',
+          userId: auth.userId, 
         },
       });
+
+      console.log('data: ', response);
   
       const data = response.data?.data || {};
       const combinedData = [
         ...(data.myBcdResponses || []),
         ...(data.myDocResponses || []),
         ...(data.myCorpDocResponses || []),
+        ...(data.mySealResponses || []),
       ];
     
       const uniqueData = combinedData.reduce((acc, current) => {
@@ -59,6 +64,8 @@ function MyApplyList() {
         rejectionReason: application.rejectReason,
         manager: application.approver || application.disapprover || '',
       }));
+
+      console.log('transformedData: ', transformedData);
   
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
   
@@ -66,13 +73,12 @@ function MyApplyList() {
     } catch (error) {
       console.error('Error fetching applications:', error.response?.data || error.message);
     }
-  }, [documentType]);
+  }, [documentType, auth.userId]);
 
   useEffect(() => {
     fetchApplications();
   }, [fetchApplications, documentType]);
 
-  // Timestamp Parsing: "YYYY-MM-DD HH:MM"
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
 
@@ -85,7 +91,6 @@ function MyApplyList() {
     return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
 
-  // applyStatus 매핑
   const getStatusText = (status) => {
     switch (status) {
       case 'A':
@@ -105,7 +110,6 @@ function MyApplyList() {
     }
   };
 
-  // 상태 버튼 클릭 핸들러
   const handleButtonClick = (application) => {
     setSelectedApplication(application);
     if (application.applyStatus === '반려') {
@@ -116,13 +120,11 @@ function MyApplyList() {
     }
   };
 
-  // 확인 모달 닫기 핸들러
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedApplication(null);
   };
 
-  // 반려 모달 닫기 핸들러
   const handleCloseRejectionModal = () => {
     if (selectedApplication) {
       const newViewedRejections = new Set([...viewedRejections, selectedApplication.draftId]);
@@ -133,7 +135,6 @@ function MyApplyList() {
     setSelectedApplication(null);
   };
 
-  // 확인 모달 확인 버튼 클릭 핸들러
   const handleConfirmModal = async () => {
     if (selectedApplication) {
       try {
@@ -151,7 +152,6 @@ function MyApplyList() {
     }
   };
 
-  // 검색 버튼 클릭 핸들러
   const handleSearch = () => {
     fetchApplications({
       documentType: documentType || null,
@@ -160,7 +160,6 @@ function MyApplyList() {
     });
   };
 
-  // 초기화 버튼 클릭 핸들러
   const handleReset = () => {
     setStartDate(null);
     setEndDate(null);

@@ -1,14 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
 import ConfirmModal from '../../components/common/ConfirmModal';
+import { AuthContext } from '../../components/AuthContext'; 
 import '../../styles/list/MyPendingList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 
 function MyPendingList() {
+  const { auth } = useContext(AuthContext); 
   const [pendingApplications, setPendingApplications] = useState([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
@@ -16,12 +18,17 @@ function MyPendingList() {
 
   const fetchPendingApplications = useCallback(async () => {
     try {
-      const response = await axios.get('/api/myPendingList');
+      const response = await axios.get('/api/myPendingList', {
+        params: {
+          userId: auth.userId, 
+        },
+      });
       if (response.data && response.data.data) {
         const data = [
           ...(response.data.data.bcdPendingResponses || []),
           ...(response.data.data.docPendingResponses || []),
           ...(response.data.data.corpDocPendingResponses || []),
+          ...(response.data.data.sealPendingResponses || []),
         ];
 
         const uniqueData = data.reduce((acc, current) => {
@@ -52,7 +59,7 @@ function MyPendingList() {
     } catch (error) {
       console.error('Error fetching pending applications:', error.response ? error.response.data : error.message);
     }
-  }, []); // 빈 의존성 배열
+  }, [auth.userId]); 
 
   useEffect(() => {
     fetchPendingApplications();
@@ -76,20 +83,7 @@ function MyPendingList() {
 
   const handleConfirmCancel = async () => {
     try {
-      let endpoint;
-      switch(selectedApplication.docType) {
-        case '명함신청':
-          endpoint = '/api/bcd/';
-          break;
-        case '문서수발신':
-          endpoint = '/api/doc/';
-          break;
-        case '법인서류':
-          endpoint = '/api/corpDoc/';
-          break;
-        default:
-          endpoint = '/api/doc';
-      }
+      const endpoint = selectedApplication.docType === '명함신청' ? '/api/bcd/' : '/api/doc/';
       await axios.put(`${endpoint}${selectedApplication.draftId}`);
       setShowConfirmModal(false);
       setSelectedApplication(null);
@@ -101,7 +95,7 @@ function MyPendingList() {
       setSelectedApplication(null);
     }
   };
-
+  
   const handleCloseConfirmModal = () => {
     setShowConfirmModal(false);
     setSelectedApplication(null);

@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
+import { AuthContext } from '../../components/AuthContext';
 import '../../styles/common/Page.css';
 import '../../styles/seal/SealApplyExport.css';
 import corporateSeal from '../../assets/images/corporate_seal.png';
@@ -8,11 +11,16 @@ import facsimileSeal from '../../assets/images/facsimile_seal.png';
 import companySeal from '../../assets/images/company_seal.png';
 
 function SealApplyExport() {
+    const { auth } = useContext(AuthContext);
+    const navigate = useNavigate();
+    
     const [sealSelections, setSealSelections] = useState({
         corporateSeal: { selected: false, quantity: '' },
         facsimileSeal: { selected: false, quantity: '' },
         companySeal: { selected: false, quantity: '' },
     });
+
+    const [file, setFile] = useState(null);
 
     const handleSealChange = (sealName) => {
         setSealSelections(prevState => ({
@@ -20,7 +28,7 @@ function SealApplyExport() {
             [sealName]: {
                 ...prevState[sealName],
                 selected: !prevState[sealName].selected,
-                quantity: '' 
+                quantity: ''
             }
         }));
     };
@@ -36,6 +44,57 @@ function SealApplyExport() {
         }));
     };
 
+    const handleFileChange = (e) => {
+        setFile(e.target.files[0]);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const selectedSeals = {
+            corporateSeal: sealSelections.corporateSeal.selected ? sealSelections.corporateSeal.quantity : '',
+            facsimileSeal: sealSelections.facsimileSeal.selected ? sealSelections.facsimileSeal.quantity : '',
+            companySeal: sealSelections.companySeal.selected ? sealSelections.companySeal.quantity : '',
+        };
+
+        const exportRequestDTO = {
+            drafter: auth.hngNm,
+            drafterId: auth.userId,
+            submission: e.target.elements.destination.value,
+            useDept: e.target.elements.department.value,
+            expNm: e.target.elements.draftNm.value,
+            expDate: e.target.elements.exportDate.value,
+            returnDate: e.target.elements.returnDate.value,
+            corporateSeal: selectedSeals.corporateSeal,
+            facsimileSeal: selectedSeals.facsimileSeal,
+            companySeal: selectedSeals.companySeal,
+            purpose: e.target.elements.purpose.value,
+            instCd: auth.instCd,
+        };
+
+        const formData = new FormData();
+        formData.append('exportRequestDTO', new Blob([JSON.stringify(exportRequestDTO)], {
+            type: 'application/json'
+        }));
+        if (file) {
+            formData.append('file', file); // 파일이 있을 경우 추가
+        }
+
+        try {
+            const response = await axios.post('/api/seal/export', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log('Response:', response.data);
+            alert('반출 신청이 완료되었습니다.');
+            navigate('/api/myPendingList');
+        } catch (error) {
+            console.error('Error:', error);
+            alert('반출 신청 중 오류가 발생했습니다. 다시 시도해주세요.');
+        }
+    };
+
     return (
         <div className="content">
             <div className="seal-export-content">
@@ -43,7 +102,7 @@ function SealApplyExport() {
                 <Breadcrumb items={['신청하기', '인장신청']} />
                 <div className='seal-export-main'>
                     <div className='seal-export-apply-content'>
-                        <form className='seal-export-form'>
+                        <form className='seal-export-form' onSubmit={handleSubmit}>
                             <div className='seal-export-bold-label'>
                                 <label>인장 반출 신청서</label>
                             </div>
@@ -174,6 +233,7 @@ function SealApplyExport() {
                                     type="file"
                                     name="purposeFile"
                                     className="file-input"
+                                    onChange={handleFileChange}
                                 />
                             </div>
                             <div className="seal-export-apply-button-container">

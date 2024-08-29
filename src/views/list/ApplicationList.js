@@ -67,17 +67,20 @@ function ApplicationsList() {
           documentType: filterParams.documentType || documentTypeFromUrl || null,
           startDate: filterParams.startDate || '',
           endDate: filterParams.endDate || '',
-          searchType: filterParams.searchType || '전체',
-          keyword: filterParams.keyword || '', 
           instCd: instCd || '',
         },
       });
 
-      const { bcdMasterResponses, docMasterResponses } = response.data.data;
-      const bcdData = Array.isArray(bcdMasterResponses) ? bcdMasterResponses : [];
-      const docData = Array.isArray(docMasterResponses) ? docMasterResponses : [];
+      const { bcdMasterResponses, docMasterResponses, sealMasterResponses } = response.data.data;
 
-      const transformedData = [...bcdData, ...docData].map(application => ({
+      // Combine all the responses into one array
+      const combinedData = [
+        ...(bcdMasterResponses || []),
+        ...(docMasterResponses || []),
+        ...(sealMasterResponses || []),
+      ];
+
+      const transformedData = combinedData.map(application => ({
         draftId: application.draftId,
         instCd: application.instCd,
         instNm: application.instNm,
@@ -150,13 +153,10 @@ function ApplicationsList() {
   };
 
   const handleSearch = () => {
-    console.log('Filter Inputs on Search:', filterInputs);
     fetchApplications({
       documentType: filterInputs.documentType,
       startDate: filterInputs.startDate ? filterInputs.startDate.toISOString().split('T')[0] : '',
       endDate: filterInputs.endDate ? filterInputs.endDate.toISOString().split('T')[0] : '',
-      searchType: filterInputs.searchType,
-      keyword: filterInputs.keyword,
     });
   };
 

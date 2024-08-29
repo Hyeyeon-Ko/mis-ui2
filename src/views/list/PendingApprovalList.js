@@ -66,12 +66,12 @@ function PendingApprovalList() {
         },
       });
 
-      const { bcdPendingResponses, docPendingResponses } = response.data.data;
+      const { bcdPendingResponses, docPendingResponses, sealPendingResponses } = response.data.data;
 
       const transformedBcdData = (bcdPendingResponses || []).map(item => ({
         draftId: item.draftId,
         title: item.title,
-        center: item.instNm,
+        center: item.instNm || '재단본부',
         draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
         drafter: item.drafter,
         status: '승인대기',
@@ -81,14 +81,24 @@ function PendingApprovalList() {
       const transformedDocData = (docPendingResponses || []).map(item => ({
         draftId: item.draftId,
         title: item.title,
-        center: item.instNm,
+        center: item.instNm || '재단본부',
         draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
         drafter: item.drafter,
         status: '승인대기',
         docType: item.docType || '문서수발신'
       }));
 
-      const transformedData = [...transformedBcdData, ...transformedDocData];
+      const transformedSealData = (sealPendingResponses || []).map(item => ({
+        draftId: item.draftId,
+        title: item.title,
+        center: item.instNm || '재단본부',
+        draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
+        drafter: item.drafter,
+        status: '승인대기',
+        docType: item.docType || '인장신청'
+      }));
+
+      const transformedData = [...transformedBcdData, ...transformedDocData, ...transformedSealData];
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
 
       setApplications(transformedData);
@@ -122,14 +132,14 @@ function PendingApprovalList() {
     }));
   };
 
-const handleRowClick = (draftId, docType) => {
+  const handleRowClick = (draftId, docType) => {
     if (docType === '문서수신' || docType === '문서발신') {
       setSelectedDocumentId(draftId);
       setModalVisible(true);
     } else if (docType === '명함신청') {
       navigate(`/api/bcd/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
     }
-};
+  };
 
   const handleSearch = () => {
     setFilters((prevFilters) => ({
@@ -177,7 +187,6 @@ const handleRowClick = (draftId, docType) => {
     if (filters.selectedCenter && filters.selectedCenter !== '전체' && app.center !== filters.selectedCenter) return false;
     if (filters.startDate && new Date(app.draftDate) < new Date(filters.startDate)) return false;
     if (filters.endDate && new Date(app.draftDate) > new Date(filters.endDate)) return false;
-    if (filters.documentType && app.docType !== filters.documentType) return false;
     return true;
   });
 

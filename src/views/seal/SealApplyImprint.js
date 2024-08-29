@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; 
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
+import { AuthContext } from '../../components/AuthContext';
 import '../../styles/common/Page.css';
 import '../../styles/seal/SealApplyImprint.css';
 import corporateSeal from '../../assets/images/corporate_seal.png';
@@ -8,6 +11,9 @@ import facsimileSeal from '../../assets/images/facsimile_seal.png';
 import companySeal from '../../assets/images/company_seal.png';
 
 function SealApplyImprint() {
+    const { auth } = useContext(AuthContext);
+    const navigate = useNavigate(); 
+
     const [sealSelections, setSealSelections] = useState({
         corporateSeal: { selected: false, quantity: '' },
         facsimileSeal: { selected: false, quantity: '' },
@@ -37,14 +43,36 @@ function SealApplyImprint() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const selectedSeals = Object.keys(sealSelections)
-            .filter(seal => sealSelections[seal].selected)
-            .map(seal => ({
-                name: seal,
-                quantity: sealSelections[seal].quantity
-            }));
-        console.log('Selected Seals:', selectedSeals);
-        // Implement submission logic here
+
+        const selectedSeals = {
+            corporateSeal: sealSelections.corporateSeal.selected ? sealSelections.corporateSeal.quantity : '',
+            facsimileSeal: sealSelections.facsimileSeal.selected ? sealSelections.facsimileSeal.quantity : '',
+            companySeal: sealSelections.companySeal.selected ? sealSelections.companySeal.quantity : '',
+        };
+
+        const imprintRequestDTO = {
+            drafter: auth.hngNm,
+            drafterId: auth.userId,
+            submission: e.target.elements.destination.value,
+            useDate: e.target.elements.useDate.value,
+            corporateSeal: selectedSeals.corporateSeal,
+            facsimileSeal: selectedSeals.facsimileSeal,
+            companySeal: selectedSeals.companySeal,
+            purpose: e.target.elements.purpose.value,
+            notes: e.target.elements.notes.value,
+            instCd: auth.instCd,
+        };
+
+        axios.post('/api/seal/imprint', imprintRequestDTO)
+            .then(response => {
+                console.log('Response:', response.data);
+                alert('인장 신청이 완료되었습니다.'); 
+                navigate('/api/myPendingList');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('인장 신청 중 오류가 발생했습니다. 다시 시도해주세요.'); 
+            });
     };
 
     return (
@@ -90,7 +118,7 @@ function SealApplyImprint() {
                                                     type="number"
                                                     name="corporateSealQuantity"
                                                     min="1"
-                                                    placeholder="부수"
+                                                    placeholder="수량"
                                                     value={sealSelections.corporateSeal.quantity}
                                                     onChange={(e) => handleQuantityChange(e, 'corporateSeal')}
                                                     disabled={!sealSelections.corporateSeal.selected}
@@ -115,7 +143,7 @@ function SealApplyImprint() {
                                                     type="number"
                                                     name="facsimileSealQuantity"
                                                     min="1"
-                                                    placeholder="부수"
+                                                    placeholder="수량"
                                                     value={sealSelections.facsimileSeal.quantity}
                                                     onChange={(e) => handleQuantityChange(e, 'facsimileSeal')}
                                                     disabled={!sealSelections.facsimileSeal.selected}
@@ -140,7 +168,7 @@ function SealApplyImprint() {
                                                     type="number"
                                                     name="companySealQuantity"
                                                     min="1"
-                                                    placeholder="부수"
+                                                    placeholder="수량"
                                                     value={sealSelections.companySeal.quantity}
                                                     onChange={(e) => handleQuantityChange(e, 'companySeal')}
                                                     disabled={!sealSelections.companySeal.selected}
