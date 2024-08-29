@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import { AuthContext } from '../../components/AuthContext';
@@ -14,6 +14,8 @@ function DetailSealExportApplication() {
     const { auth } = useContext(AuthContext);
     const { draftId } = useParams(); 
     const navigate = useNavigate();
+    const location = useLocation();
+    const { sealExportDetails, readOnly } = location.state || {};
 
     const [sealSelections, setSealSelections] = useState({
         corporateSeal: { selected: false, quantity: '' },
@@ -29,80 +31,125 @@ function DetailSealExportApplication() {
         returnDate: '',
         purpose: '',
         file: null,
+        fileName: '',  
+        filePath: '',  
         isFileDeleted: false,
     });
 
     useEffect(() => {
-        axios.get(`/api/seal/export/${draftId}`)
-            .then(response => {
-                const data = response.data.data;
-                setApplicationDetails({
-                    submission: data.submission || '',
-                    useDept: data.useDept || '',
-                    expNm: data.expNm || '',
-                    expDate: data.expDate || '',
-                    returnDate: data.returnDate || '',
-                    purpose: data.purpose || '',
-                    file: data.file || null,
-                    isFileDeleted: false, 
-                });
-
-                setSealSelections({
-                    corporateSeal: {
-                        selected: !!data.corporateSeal,
-                        quantity: data.corporateSeal || '',
-                    },
-                    facsimileSeal: {
-                        selected: !!data.facsimileSeal,
-                        quantity: data.facsimileSeal || '',
-                    },
-                    companySeal: {
-                        selected: !!data.companySeal,
-                        quantity: data.companySeal || '',
-                    },
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching application details:', error);
-                alert('반출신청 정보를 불러오는 중 오류가 발생했습니다.');
+        if (sealExportDetails) {
+            setApplicationDetails({
+                submission: sealExportDetails.submission || '',
+                useDept: sealExportDetails.useDept || '',
+                expNm: sealExportDetails.expNm || '',
+                expDate: sealExportDetails.expDate || '',
+                returnDate: sealExportDetails.returnDate || '',
+                purpose: sealExportDetails.purpose || '',
+                file: sealExportDetails.file || null,
+                fileName: sealExportDetails.fileName || '',  
+                filePath: sealExportDetails.filePath || '',  
+                isFileDeleted: false,  
             });
-    }, [draftId]);
+
+            setSealSelections({
+                corporateSeal: {
+                    selected: !!sealExportDetails.corporateSeal,
+                    quantity: sealExportDetails.corporateSeal || '',
+                },
+                facsimileSeal: {
+                    selected: !!sealExportDetails.facsimileSeal,
+                    quantity: sealExportDetails.facsimileSeal || '',
+                },
+                companySeal: {
+                    selected: !!sealExportDetails.companySeal,
+                    quantity: sealExportDetails.companySeal || '',
+                },
+            });
+        } else {
+            axios.get(`/api/seal/export/${draftId}`)
+                .then(response => {
+                    const data = response.data.data;
+                    setApplicationDetails({
+                        submission: data.submission || '',
+                        useDept: data.useDept || '',
+                        expNm: data.expNm || '',
+                        expDate: data.expDate || '',
+                        returnDate: data.returnDate || '',
+                        purpose: data.purpose || '',
+                        file: data.file || null,
+                        fileName: data.fileName || '',  
+                        filePath: data.filePath || '',  
+                        isFileDeleted: false, 
+                    });
+
+                    setSealSelections({
+                        corporateSeal: {
+                            selected: !!data.corporateSeal,
+                            quantity: data.corporateSeal || '',
+                        },
+                        facsimileSeal: {
+                            selected: !!data.facsimileSeal,
+                            quantity: data.facsimileSeal || '',
+                        },
+                        companySeal: {
+                            selected: !!data.companySeal,
+                            quantity: data.companySeal || '',
+                        },
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching application details:', error);
+                    alert('반출신청 정보를 불러오는 중 오류가 발생했습니다.');
+                });
+        }
+    }, [draftId, sealExportDetails]);
 
     const handleSealChange = (sealName) => {
-        setSealSelections(prevState => ({
-            ...prevState,
-            [sealName]: {
-                ...prevState[sealName],
-                selected: !prevState[sealName].selected,
-            }
-        }));
+        if (!readOnly) {
+            setSealSelections(prevState => ({
+                ...prevState,
+                [sealName]: {
+                    ...prevState[sealName],
+                    selected: !prevState[sealName].selected,
+                }
+            }));
+        }
     };
 
     const handleQuantityChange = (e, sealName) => {
         const value = e.target.value;
-        setSealSelections(prevState => ({
-            ...prevState,
-            [sealName]: {
-                ...prevState[sealName],
-                quantity: value
-            }
-        }));
+        if (!readOnly) {
+            setSealSelections(prevState => ({
+                ...prevState,
+                [sealName]: {
+                    ...prevState[sealName],
+                    quantity: value
+                }
+            }));
+        }
     };
 
     const handleFileChange = (e) => {
-        setApplicationDetails(prevState => ({
-            ...prevState,
-            file: e.target.files[0],
-            isFileDeleted: false,
-        }));
+        if (!readOnly) {
+            setApplicationDetails(prevState => ({
+                ...prevState,
+                file: e.target.files[0],
+                fileName: e.target.files[0]?.name || '',  
+                isFileDeleted: false,
+            }));
+        }
     };
 
     const handleFileDelete = () => {
-        setApplicationDetails(prevState => ({
-            ...prevState,
-            file: null,
-            isFileDeleted: true,  
-        }));
+        if (!readOnly) {
+            setApplicationDetails(prevState => ({
+                ...prevState,
+                file: null,
+                fileName: '', 
+                filePath: '',
+                isFileDeleted: true,
+            }));
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -154,10 +201,12 @@ function DetailSealExportApplication() {
     };
 
     const handleChange = (e) => {
-        setApplicationDetails({
-            ...applicationDetails,
-            [e.target.name]: e.target.value,
-        });
+        if (!readOnly) {
+            setApplicationDetails({
+                ...applicationDetails,
+                [e.target.name]: e.target.value,
+            });
+        }
     };
 
     return (
@@ -178,6 +227,7 @@ function DetailSealExportApplication() {
                                     name="submission"
                                     value={applicationDetails.submission}
                                     onChange={handleChange}
+                                    disabled={readOnly}
                                 />
                             </div>
                             <div className='seal-export-form-group'>
@@ -187,6 +237,7 @@ function DetailSealExportApplication() {
                                     name="useDept"
                                     value={applicationDetails.useDept}
                                     onChange={handleChange}
+                                    disabled={readOnly}
                                 />
                             </div>
                             <div className='seal-export-form-group'>
@@ -195,6 +246,7 @@ function DetailSealExportApplication() {
                                     name="purpose"
                                     value={applicationDetails.purpose}
                                     onChange={handleChange}
+                                    disabled={readOnly}
                                 />
                             </div>
                             <div className='seal-imprint-form-group'>
@@ -208,6 +260,7 @@ function DetailSealExportApplication() {
                                                     name="corporateSeal"
                                                     checked={sealSelections.corporateSeal.selected}
                                                     onChange={() => handleSealChange('corporateSeal')}
+                                                    disabled={readOnly}
                                                 />
                                             </div>
                                             <div className='seal-imprint-detail-right'>
@@ -220,7 +273,7 @@ function DetailSealExportApplication() {
                                                     placeholder="부수"
                                                     value={sealSelections.corporateSeal.quantity}
                                                     onChange={(e) => handleQuantityChange(e, 'corporateSeal')}
-                                                    disabled={!sealSelections.corporateSeal.selected}
+                                                    disabled={!sealSelections.corporateSeal.selected || readOnly}
                                                 />
                                             </div>
                                         </div>
@@ -233,6 +286,7 @@ function DetailSealExportApplication() {
                                                     name="facsimileSeal"
                                                     checked={sealSelections.facsimileSeal.selected}
                                                     onChange={() => handleSealChange('facsimileSeal')}
+                                                    disabled={readOnly}
                                                 />
                                             </div>
                                             <div className='seal-imprint-detail-right'>
@@ -245,7 +299,7 @@ function DetailSealExportApplication() {
                                                     placeholder="부수"
                                                     value={sealSelections.facsimileSeal.quantity}
                                                     onChange={(e) => handleQuantityChange(e, 'facsimileSeal')}
-                                                    disabled={!sealSelections.facsimileSeal.selected}
+                                                    disabled={!sealSelections.facsimileSeal.selected || readOnly}
                                                 />
                                             </div>
                                         </div>
@@ -258,6 +312,7 @@ function DetailSealExportApplication() {
                                                     name="companySeal"
                                                     checked={sealSelections.companySeal.selected}
                                                     onChange={() => handleSealChange('companySeal')}
+                                                    disabled={readOnly}
                                                 />
                                             </div>
                                             <div className='seal-imprint-detail-right'>
@@ -270,7 +325,7 @@ function DetailSealExportApplication() {
                                                     placeholder="부수"
                                                     value={sealSelections.companySeal.quantity}
                                                     onChange={(e) => handleQuantityChange(e, 'companySeal')}
-                                                    disabled={!sealSelections.companySeal.selected}
+                                                    disabled={!sealSelections.companySeal.selected || readOnly}
                                                 />
                                             </div>
                                         </div>
@@ -284,6 +339,7 @@ function DetailSealExportApplication() {
                                     name="expNm"
                                     value={applicationDetails.expNm}
                                     onChange={handleChange}
+                                    disabled={readOnly}
                                 />
                             </div>
                             <div className='seal-export-form-group'>
@@ -293,6 +349,7 @@ function DetailSealExportApplication() {
                                     name="expDate"
                                     value={applicationDetails.expDate}
                                     onChange={handleChange}
+                                    disabled={readOnly}
                                 />
                             </div>
                             <div className='seal-export-form-group'>
@@ -302,29 +359,35 @@ function DetailSealExportApplication() {
                                     name="returnDate"
                                     value={applicationDetails.returnDate}
                                     onChange={handleChange}
+                                    disabled={readOnly}
                                 />
                             </div>
                             <div className='seal-export-form-group'>
                                 <label>참조자료</label>
-                                {applicationDetails.file && (
+                                {applicationDetails.fileName && applicationDetails.filePath && (
                                     <div className="file-preview">
-                                        <span>{applicationDetails.file.name}</span>
-                                        <button type="button" onClick={handleFileDelete}>삭제</button>
+                                        <a href={applicationDetails.filePath} target="_blank" rel="noopener noreferrer">
+                                            {applicationDetails.fileName}
+                                        </a>
+                                        {!readOnly && <button type="button" onClick={handleFileDelete}>삭제</button>}
                                     </div>
                                 )}
-                                <input
-                                    type="file"
-                                    name="purposeFile"
-                                    className="file-input"
-                                    onChange={handleFileChange}
-                                    disabled={applicationDetails.isFileDeleted}
-                                />
+                                {!readOnly && (
+                                    <input
+                                        type="file"
+                                        name="purposeFile"
+                                        className="file-input"
+                                        onChange={handleFileChange}
+                                    />
+                                )}
                             </div>
-                            <div className="seal-export-apply-button-container">
-                                <CustomButton className="apply-request-button" type="submit">
-                                    수정완료
-                                </CustomButton>
-                            </div>
+                            {!readOnly && (
+                              <div className="seal-export-apply-button-container">
+                                  <CustomButton className="apply-request-button" type="submit">
+                                      수정완료
+                                  </CustomButton>
+                              </div>
+                            )}
                         </form>
                     </div>
                 </div>

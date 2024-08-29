@@ -74,7 +74,7 @@ function ApplicationsList() {
       });
 
       const { bcdMasterResponses, docMasterResponses, corpDocMasterResponses, sealMasterResponses } = response.data.data;
-      // Combine all the responses into one array
+
       const combinedData = [
         ...(bcdMasterResponses || []),
         ...(docMasterResponses || []),
@@ -106,6 +106,26 @@ function ApplicationsList() {
       setLoading(false);
     }
   }, [documentTypeFromUrl, instCd]);
+
+  const fetchSealImprintDetail = async (draftId) => {
+    try {
+      const response = await axios.get(`/api/seal/imprint/${draftId}`);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching seal imprint details:', error);
+      alert('날인신청 정보를 불러오는 중 오류가 발생했습니다.');
+    }
+  };
+
+  const fetchSealExportDetail = async (draftId) => {
+    try {
+      const response = await axios.get(`/api/seal/export/${draftId}`);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching seal export details:', error);
+      alert('반출신청 정보를 불러오는 중 오류가 발생했습니다.');
+    }
+  };
 
   useEffect(() => {
     fetchApplications();
@@ -247,18 +267,24 @@ function ApplicationsList() {
     }
   };
 
-  const handleRowClick = (draftId, docType, applyStatus) => {
+  const handleRowClick = async (draftId, docType, applyStatus) => {
     if (docType === '문서수신' || docType === '문서발신') {
       setSelectedDocumentId(draftId);
       setModalVisible(true);
-      setSelectedApplyStatus(applyStatus); 
+      setSelectedApplyStatus(applyStatus);
     } else if (docType === '명함신청') {
       navigate(`/api/bcd/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`);
     } else if (docType === '법인서류') {
       navigate(`/api/corpDoc/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`);
+    } else if (docType === '인장신청(날인)') {
+      const sealImprintDetails = await fetchSealImprintDetail(draftId);
+      navigate(`/api/seal/imprint/${draftId}`, { state: { sealImprintDetails, readOnly: true } });
+    } else if (docType === '인장신청(반출)') {
+      const sealExportDetails = await fetchSealExportDetail(draftId);
+      navigate(`/api/seal/export/${draftId}`, { state: { sealExportDetails, readOnly: true } });
     }
   };
-  
+
   const columns = [
     ...(showCheckboxColumn && documentTypeFromUrl === '명함신청' ? [{
       header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
@@ -298,7 +324,7 @@ function ApplicationsList() {
     ]),
     { header: '문서상태', accessor: 'applyStatus', width: '10%' },
   ];
-  
+
   return (
     <div className="content">
       <div className='all-applications'>

@@ -133,3 +133,10 @@
 .seal-export-options input[type="radio"]:checked + img {
   border-color: #007bff;
 }
+
+.seal-export-approval-buttons {
+  width: 215px;
+  justify-content: center;
+  margin-left: 20px;
+  margin-top: 30px;
+}

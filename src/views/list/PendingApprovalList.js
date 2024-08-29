@@ -132,12 +132,38 @@ function PendingApprovalList() {
     }));
   };
 
-  const handleRowClick = (draftId, docType) => {
+  const fetchSealImprintDetail = async (draftId) => {
+    try {
+      const response = await axios.get(`/api/seal/imprint/${draftId}`);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching seal imprint details:', error);
+      alert('날인신청 정보를 불러오는 중 오류가 발생했습니다.');
+    }
+  };
+
+  const fetchSealExportDetail = async (draftId) => {
+    try {
+      const response = await axios.get(`/api/seal/export/${draftId}`);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching seal export details:', error);
+      alert('반출신청 정보를 불러오는 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleRowClick = async (draftId, docType) => {
     if (docType === '문서수신' || docType === '문서발신') {
       setSelectedDocumentId(draftId);
       setModalVisible(true);
     } else if (docType === '명함신청') {
       navigate(`/api/bcd/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
+    } else if (docType === '인장신청(날인)') {
+      const sealImprintDetails = await fetchSealImprintDetail(draftId);
+      navigate(`/api/seal/imprint/${draftId}`, { state: { sealImprintDetails, readOnly: true } });
+    } else if (docType === '인장신청(반출)') {
+      const sealExportDetails = await fetchSealExportDetail(draftId);
+      navigate(`/api/seal/export/${draftId}`, { state: { sealExportDetails, readOnly: true } });
     }
   };
 
