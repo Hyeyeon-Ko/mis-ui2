@@ -120,7 +120,7 @@ function CorpDocApply() {
         }
 
         try {
-            const response = await fetch('/api/corpdoc/', {
+            const response = await fetch('/api/corpDoc/', {
                 method: 'POST',
                 body: payload,
             });

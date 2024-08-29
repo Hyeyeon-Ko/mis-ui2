@@ -76,7 +76,20 @@ function MyPendingList() {
 
   const handleConfirmCancel = async () => {
     try {
-      const endpoint = selectedApplication.docType === '명함신청' ? '/api/bcd/' : '/api/doc/';
+      let endpoint;
+      switch(selectedApplication.docType) {
+        case '명함신청':
+          endpoint = '/api/bcd/';
+          break;
+        case '문서수발신':
+          endpoint = '/api/doc/';
+          break;
+        case '법인서류':
+          endpoint = '/api/corpDoc/';
+          break;
+        default:
+          endpoint = '/api/doc';
+      }
       await axios.put(`${endpoint}${selectedApplication.draftId}`);
       setShowConfirmModal(false);
       setSelectedApplication(null);
@@ -107,7 +120,23 @@ function MyPendingList() {
       Cell: ({ row }) => (
         <Button
           className="modify-button"
-          onClick={() => navigate(row.docType === '명함신청' ? `/api/bcd/${row.draftId}` : `/api/doc/${row.draftId}`, { state: { returnTo: '/api/myPendingList' } })}
+          onClick={() => {
+            let path;
+            switch (row.docType) {
+              case '명함신청':
+                path = `/api/bcd/${row.draftId}`;
+                break;
+              case '문서수발신':
+                path = `/api/doc/${row.draftId}`;
+                break;
+              case '법인서류':
+                path = `/api/corpDoc/${row.draftId}`;
+                break;
+              default:
+                path = `/api/doc/${row.draftId}`; // 기본루트
+            }
+            navigate(path, { state: { returnTo: '/api/myPendingList' } });
+          }}
         >
           수 정
         </Button>
