@@ -83,7 +83,30 @@ function MyPendingList() {
 
   const handleConfirmCancel = async () => {
     try {
-      const endpoint = selectedApplication.docType === '명함신청' ? '/api/bcd/' : '/api/doc/';
+      let endpoint = '';
+  
+      switch (selectedApplication.docType) {
+        case '명함신청':
+          endpoint = '/api/bcd/';
+          break;
+        case '문서발신':
+        case '문서수신': 
+          endpoint = '/api/doc/';
+          break;
+        case '법인서류':
+          endpoint = '/api/corpDoc/';
+          break;
+        case '인장신청(날인)':
+          endpoint = '/api/seal/imprint/';
+          break;
+        case '인장신청(반출)':
+          endpoint = '/api/seal/export/';
+          break;
+        default:
+          console.error('Unknown document type:', selectedApplication.docType);
+          return;
+      }
+  
       await axios.put(`${endpoint}${selectedApplication.draftId}`);
       setShowConfirmModal(false);
       setSelectedApplication(null);
@@ -126,8 +149,14 @@ function MyPendingList() {
               case '법인서류':
                 path = `/api/corpDoc/${row.draftId}`;
                 break;
+              case '인장신청(날인)':
+                path = `/api/seal/imprint/${row.draftId}`;
+                break;
+              case '인장신청(반출)':
+                path = `/api/seal/export/${row.draftId}`;
+                break;
               default:
-                path = `/api/doc/${row.draftId}`; // 기본루트
+                path = `/api/doc/${row.draftId}`; 
             }
             navigate(path, { state: { returnTo: '/api/myPendingList' } });
           }}

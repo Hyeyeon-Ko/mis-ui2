@@ -1,26 +1,72 @@
-import React, { useState, useContext } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import { AuthContext } from '../../components/AuthContext';
+import axios from 'axios';
 import '../../styles/common/Page.css';
 import '../../styles/seal/SealApplyExport.css';
 import corporateSeal from '../../assets/images/corporate_seal.png';
 import facsimileSeal from '../../assets/images/facsimile_seal.png';
 import companySeal from '../../assets/images/company_seal.png';
 
-function SealApplyExport() {
+function DetailSealExportApplication() {
     const { auth } = useContext(AuthContext);
+    const { draftId } = useParams(); 
     const navigate = useNavigate();
-    
+
     const [sealSelections, setSealSelections] = useState({
         corporateSeal: { selected: false, quantity: '' },
         facsimileSeal: { selected: false, quantity: '' },
         companySeal: { selected: false, quantity: '' },
     });
 
-    const [file, setFile] = useState(null);
+    const [applicationDetails, setApplicationDetails] = useState({
+        submission: '',
+        useDept: '',
+        expNm: '',
+        expDate: '',
+        returnDate: '',
+        purpose: '',
+        file: null,
+        isFileDeleted: false,
+    });
+
+    useEffect(() => {
+        axios.get(`/api/seal/export/${draftId}`)
+            .then(response => {
+                const data = response.data.data;
+                setApplicationDetails({
+                    submission: data.submission || '',
+                    useDept: data.useDept || '',
+                    expNm: data.expNm || '',
+                    expDate: data.expDate || '',
+                    returnDate: data.returnDate || '',
+                    purpose: data.purpose || '',
+                    file: data.file || null,
+                    isFileDeleted: false,  // Add flag for file deletion
+                });
+
+                setSealSelections({
+                    corporateSeal: {
+                        selected: !!data.corporateSeal,
+                        quantity: data.corporateSeal || '',
+                    },
+                    facsimileSeal: {
+                        selected: !!data.facsimileSeal,
+                        quantity: data.facsimileSeal || '',
+                    },
+                    companySeal: {
+                        selected: !!data.companySeal,
+                        quantity: data.companySeal || '',
+                    },
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching application details:', error);
+                alert('반출신청 정보를 불러오는 중 오류가 발생했습니다.');
+            });
+    }, [draftId]);
 
     const handleSealChange = (sealName) => {
         setSealSelections(prevState => ({
@@ -28,7 +74,6 @@ function SealApplyExport() {
             [sealName]: {
                 ...prevState[sealName],
                 selected: !prevState[sealName].selected,
-                quantity: ''
             }
         }));
     };
@@ -45,7 +90,19 @@ function SealApplyExport() {
     };
 
     const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
+        setApplicationDetails(prevState => ({
+            ...prevState,
+            file: e.target.files[0],
+            isFileDeleted: false, // If a new file is uploaded, reset the deletion flag
+        }));
+    };
+
+    const handleFileDelete = () => {
+        setApplicationDetails(prevState => ({
+            ...prevState,
+            file: null,
+            isFileDeleted: true,  // Set flag to indicate file deletion
+        }));
     };
 
     const handleSubmit = async (e) => {
@@ -57,49 +114,57 @@ function SealApplyExport() {
             companySeal: sealSelections.companySeal.selected ? sealSelections.companySeal.quantity : '',
         };
 
-        const exportRequestDTO = {
+        const updatedExportRequestDTO = {
             drafter: auth.hngNm,
             drafterId: auth.userId,
-            submission: e.target.elements.destination.value,
-            useDept: e.target.elements.department.value,
-            expNm: e.target.elements.draftNm.value,
-            expDate: e.target.elements.exportDate.value,
-            returnDate: e.target.elements.returnDate.value,
+            submission: applicationDetails.submission,
+            useDept: applicationDetails.useDept,
+            expNm: applicationDetails.expNm,
+            expDate: applicationDetails.expDate,
+            returnDate: applicationDetails.returnDate,
             corporateSeal: selectedSeals.corporateSeal,
             facsimileSeal: selectedSeals.facsimileSeal,
             companySeal: selectedSeals.companySeal,
-            purpose: e.target.elements.purpose.value,
+            purpose: applicationDetails.purpose,
             instCd: auth.instCd,
         };
 
         const formData = new FormData();
-        formData.append('exportRequestDTO', new Blob([JSON.stringify(exportRequestDTO)], {
+        formData.append('exportUpdateRequestDTO', new Blob([JSON.stringify(updatedExportRequestDTO)], {
             type: 'application/json'
         }));
-        if (file) {
-            formData.append('file', file); // 파일이 있을 경우 추가
+        if (applicationDetails.file) {
+            formData.append('file', applicationDetails.file);
         }
+        formData.append('isFileDeleted', applicationDetails.isFileDeleted);
 
         try {
-            const response = await axios.post('/api/seal/export', formData, {
+            const response = await axios.post(`/api/seal/export/update?draftId=${draftId}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
             console.log('Response:', response.data);
-            alert('반출 신청이 완료되었습니다.');
+            alert('인장 반출 신청이 성공적으로 수정되었습니다.');
             navigate('/api/myPendingList');
         } catch (error) {
-            console.error('Error:', error);
-            alert('반출 신청 중 오류가 발생했습니다. 다시 시도해주세요.');
+            console.error('Error updating application:', error);
+            alert('인장 반출 신청 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
         }
+    };
+
+    const handleChange = (e) => {
+        setApplicationDetails({
+            ...applicationDetails,
+            [e.target.name]: e.target.value,
+        });
     };
 
     return (
         <div className="content">
             <div className="seal-export-content">
-                <h2>인장신청</h2>
-                <Breadcrumb items={['신청하기', '인장신청']} />
+                <h2>인장반출 신청 상세정보</h2>
+                <Breadcrumb items={['신청하기', '인장신청', '상세정보']} />
                 <div className='seal-export-main'>
                     <div className='seal-export-apply-content'>
                         <form className='seal-export-form' onSubmit={handleSubmit}>
@@ -110,20 +175,26 @@ function SealApplyExport() {
                                 <label>제출처</label>
                                 <input
                                     type="text"
-                                    name="destination"
+                                    name="submission"
+                                    value={applicationDetails.submission}
+                                    onChange={handleChange}
                                 />
                             </div>
                             <div className='seal-export-form-group'>
                                 <label>신청부서</label>
                                 <input
                                     type="text"
-                                    name="department"
+                                    name="useDept"
+                                    value={applicationDetails.useDept}
+                                    onChange={handleChange}
                                 />
                             </div>
                             <div className='seal-export-form-group'>
                                 <label>사용용도</label>
                                 <textarea
                                     name="purpose"
+                                    value={applicationDetails.purpose}
+                                    onChange={handleChange}
                                 />
                             </div>
                             <div className='seal-imprint-form-group'>
@@ -210,14 +281,18 @@ function SealApplyExport() {
                                 <label>반출자명</label>
                                 <input
                                     type="text"
-                                    name="draftNm"
+                                    name="expNm"
+                                    value={applicationDetails.expNm}
+                                    onChange={handleChange}
                                 />
                             </div>
                             <div className='seal-export-form-group'>
                                 <label>반출일자</label>
                                 <input
                                     type="text"
-                                    name="exportDate"
+                                    name="expDate"
+                                    value={applicationDetails.expDate}
+                                    onChange={handleChange}
                                 />
                             </div>
                             <div className='seal-export-form-group'>
@@ -225,20 +300,29 @@ function SealApplyExport() {
                                 <input
                                     type="text"
                                     name="returnDate"
+                                    value={applicationDetails.returnDate}
+                                    onChange={handleChange}
                                 />
                             </div>
                             <div className='seal-export-form-group'>
                                 <label>참조자료</label>
+                                {applicationDetails.file && (
+                                    <div className="file-preview">
+                                        <span>{applicationDetails.file.name}</span>
+                                        <button type="button" onClick={handleFileDelete}>삭제</button>
+                                    </div>
+                                )}
                                 <input
                                     type="file"
                                     name="purposeFile"
                                     className="file-input"
                                     onChange={handleFileChange}
+                                    disabled={applicationDetails.isFileDeleted}
                                 />
                             </div>
                             <div className="seal-export-apply-button-container">
                                 <CustomButton className="apply-request-button" type="submit">
-                                    인장 신청하기
+                                    수정완료
                                 </CustomButton>
                             </div>
                         </form>
@@ -249,4 +333,4 @@ function SealApplyExport() {
     );
 }
 
-export default SealApplyExport;
+export default DetailSealExportApplication;

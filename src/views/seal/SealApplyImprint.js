@@ -184,7 +184,7 @@ function SealApplyImprint() {
                             </div>
                             <div className="seal-imprint-apply-button-container">
                                 <CustomButton className="apply-request-button" type="submit">
-                                    서류 신청하기
+                                    인장 신청하기
                                 </CustomButton>
                             </div>
                         </form>
