@@ -396,7 +396,7 @@ function DetailApplication() {
     <div className="content">
       <div className="apply-content">
         <h2>{isReadOnly ? '명함 상세보기' : '명함수정'}</h2>
-        <Breadcrumb items={['나의 신청내역', '승인대기 내역', isReadOnly ? '명함 상세보기' : '명함수정']} />
+        <Breadcrumb items={isReadOnly ? ['명함 관리', '명함 상세보기'] : ['나의 신청내역', '승인대기 내역', '명함수정']} />
         <div className="form-wrapper">
           <form className="business-card-form">
             <div className="form-left">

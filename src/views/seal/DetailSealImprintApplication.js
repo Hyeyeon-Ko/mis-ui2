@@ -20,6 +20,8 @@ function DetailSealImprintApplication() {
     const queryParams = new URLSearchParams(location.search);
     const applyStatus = queryParams.get('applyStatus'); 
 
+    console.log(applyStatus);
+
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [sealSelections, setSealSelections] = useState({
         corporateSeal: { selected: false, quantity: '' },
@@ -204,8 +206,8 @@ function DetailSealImprintApplication() {
     return (
         <div className="content">
             <div className="seal-imprint-content">
-                <h2>인장 상세보기</h2>
-                <Breadcrumb items={['신청하기', '인장신청', '인장 상세보기']} />
+                <h2>{readOnly ? '인장날인 상세보기': '인장날인 수정'}</h2>
+                <Breadcrumb items={readOnly ? ['인장 관리', '인장날인 상세보기'] : ['나의 신청내역', '승인대기 내역', '인장날인 수정']} />
                 <div className='seal-imprint-main'>
                     <div className='seal-imprint-apply-content'>
                         <form className='seal-imprint-form'>

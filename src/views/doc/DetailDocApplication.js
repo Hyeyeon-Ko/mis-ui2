@@ -148,8 +148,8 @@ function DetailDocApplication() {
   return (
     <div className="content">
       <div className="doc-content">
-        <h2>문서수발신</h2>
-        <Breadcrumb items={['신청하기', '문서수발신']} />
+        <h2>문서수발신 수정</h2>
+        <Breadcrumb items={['나의 신청내역', '승인대기 내역', '문서수발신 수정']} />
         <div className="doc-main">
           <div className="tab-container">
             <button

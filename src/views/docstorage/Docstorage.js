@@ -391,8 +391,8 @@ function Docstorage() {
     <div className='content'>
       <div className='docstorage-content'>
         <div className="docstorage-content-inner">
-          <h2>문서보관 신청</h2>
-          <Breadcrumb items={['신청하기', '문서보관 신청']} />
+          <h2>문서이관/파쇄</h2>
+          <Breadcrumb items={['신청하기', '문서이관/파쇄']} />
           <div className="docstorage-tables-section">
             <div className="docstorage-details-content">
               <div className="docstorage-header-buttons">

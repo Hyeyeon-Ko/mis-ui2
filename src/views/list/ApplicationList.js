@@ -289,7 +289,6 @@ function ApplicationsList() {
   };
 
   const handleRowClick = async (draftId, docType, applyStatus) => {
-    console.log("Clicked row details:", { draftId, docType, applyStatus }); // 로그 추가
   
     if (docType === '문서수신' || docType === '문서발신') {
       setSelectedDocumentId(draftId);
@@ -301,10 +300,10 @@ function ApplicationsList() {
       navigate(`/api/corpDoc/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`);
     } else if (docType === '인장신청(날인)') {
       const sealImprintDetails = await fetchSealImprintDetail(draftId);
-      navigate(`/api/seal/imprint/${draftId}`, { state: { sealImprintDetails, readOnly: true }, search: `?applyStatus=${applyStatus}` });
+      navigate(`/api/seal/imprint/${draftId}?readonly=true&applyStatus=${applyStatus}`, { state: { sealImprintDetails, readOnly: true } });
     } else if (docType === '인장신청(반출)') {
       const sealExportDetails = await fetchSealExportDetail(draftId);
-      navigate(`/api/seal/export/${draftId}`, { state: { sealExportDetails, readOnly: true }, search: `?applyStatus=${applyStatus}` });
+      navigate(`/api/seal/export/${draftId}?readonly=true&applyStatus=${applyStatus}`, { state: { sealExportDetails, readOnly: true } });
     }
   };
   
