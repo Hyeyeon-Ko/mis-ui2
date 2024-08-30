@@ -173,6 +173,8 @@ function ApplicationsList() {
         return '처리완료';
       case 'F':
         return '신청취소';
+      case 'G':
+        return '발급대기';
       default:
         return status;
     }

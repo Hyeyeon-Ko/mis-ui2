@@ -129,34 +129,31 @@ function CorpDocRnpList() {
           <table className="table">
             <thead>
               <tr>
-                <th rowSpan="2">일자</th>
+                <th rowSpan="2">수령일자</th>
+                <th rowSpan="2">신청자</th>
                 <th rowSpan="2">제출처</th>
                 <th rowSpan="2">사용목적</th>
-                <th colSpan="3">법인인감증명서</th>
-                <th colSpan="3">법인등기부등본</th>
-                <th rowSpan="2">결재</th>
+                <th colSpan="4">법인서류</th>
+                <th rowSpan="2">수령인</th>
               </tr>
               <tr>
-                <th>입고</th>
-                <th>사용</th>
-                <th>잔고</th>
-                <th>입고</th>
-                <th>사용</th>
-                <th>잔고</th>
+                <th>입감</th>
+                <th>등기</th>
+                <th>사용인감계</th>
+                <th>위임장</th>
               </tr>
             </thead>
             <tbody>
               {filteredApplications.map((app, index) => (
                 <tr key={index}>
                   <td>{app.date}</td>
+                  <td>{app.drafter}</td>
                   <td>{app.submitter}</td>
                   <td>{app.usagePurpose}</td>
-                  <td>{app.certificate.incoming}</td>
                   <td>{app.certificate.used}</td>
-                  <td>{app.certificate.left}</td>
-                  <td>{app.registry.incoming}</td>
                   <td>{app.registry.used}</td>
-                  <td>{app.registry.left}</td>
+                  <td></td>
+                  <td></td>
                   <td
                     className={`status-${app.status.replace(/\s+/g, '-').toLowerCase()} clickable ${
                       clickedRows.includes(app.id) ? 'confirmed' : ''
