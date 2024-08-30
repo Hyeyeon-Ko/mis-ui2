@@ -107,7 +107,6 @@ function ApplicationsList() {
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
 
       setApplications(transformedData);
-      console.log('Fetched Applications:', transformedData);
     } catch (error) {
       console.error('Error fetching applications:', error);
       setError('데이터를 불러오는 중 오류가 발생했습니다.');
@@ -368,6 +367,7 @@ function ApplicationsList() {
           endDate={filterInputs.endDate}
           setEndDate={(date) => setFilterInputs(prev => ({ ...prev, endDate: date }))}
           documentType={documentTypeFromUrl}
+          setDocumentType={(docType) => setFilterInputs(prev => ({ ...prev, documentType: docType }))}
           filters={filters}
           setFilters={setFilters}  
           onFilterChange={handleFilterChange}

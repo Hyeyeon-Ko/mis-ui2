@@ -144,7 +144,7 @@ const ConditionFilter = ({
       </div>
       {showStatusFilters && (
         <div className="status-filters">
-          {documentType === '명함신청' && (
+          {(documentType === '명함신청' || documentType === '법인서류') && (
             <label>
               <input
                 type="checkbox"
