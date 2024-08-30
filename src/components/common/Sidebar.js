@@ -84,12 +84,26 @@ function Sidebar() {
   const sections = {
     'A': [{ title: '명함 관리', items: bcdItems }],
     'B': [
-      { title: '인장 관리', items: sealItems },
-      { title: '인장 대장', items: sealManageItems }
+      { title: '인장 관리', items: [
+        { label: '전체 신청내역', url: '/api/applyList?documentType=인장신청', subIndex: 'B-1' },
+        { label: '승인대기 내역', url: '/api/pendingList?documentType=인장신청', subIndex: 'B-1' },      
+      ]},
+      { title: '인장 대장', items: [
+        { label: '인장 관리대장', url: '/api/seal/managementList', subIndex: 'B-1' },
+        { label: '인장 반출대장', url: '/api/seal/exportList', subIndex: 'B-1' },
+        { label: '인장 등록대장', url: '/api/seal/registrationList', subIndex: 'B-1' },
+        { label: '전국 인장 등록대장', url: '/api/seal/sealRegistrationList', subIndex: 'B-2' },
+      ]}
     ],
     'C': [
-      { title: '법인서류 관리', items: corpDocItems },
-      { title: '법인서류 대장', items: corpDocManageItems }
+      { title: '법인서류 관리', items: [
+        { label: '전체 신청내역', url: '/api/applyList?documentType=법인서류', subIndex: 'C-1' },
+        { label: '승인대기 내역', url: '/api/pendingList?documentType=법인서류', subIndex: 'C-1' },
+      ]},
+      { title: '법인서류 대장', items: [
+        { label: '서류 발급 대장', url: '/api/corpDoc/issueList', subIndex: 'C-2' },
+        { label: '서류 수불 대장', url: '/api/corpDoc/rnpList', subIndex: 'C-1' },
+      ]}
     ],
     'D': [
       { title: '문서수발신 관리', items: docItems },
@@ -112,12 +126,16 @@ function Sidebar() {
   const filterItemsByPermission = (sectionKey, permissions) => {
     const section = sections[sectionKey];
     if (!section) return [];
-
+  
     return section.map(sectionItem => ({
       ...sectionItem,
       items: sectionItem.items.filter(item => {
-        if (item.subIndex) {
-          return permissions.includes(item.subIndex);
+        const subIndex = item.subIndex;
+        if (permissions.includes(sectionKey)) {
+          return true;
+        }
+        if (subIndex) {
+          return permissions.includes(subIndex);
         }
         return permissions.includes(sectionKey);
       })

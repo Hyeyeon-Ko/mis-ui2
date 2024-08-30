@@ -162,20 +162,19 @@ function PendingApprovalList() {
     }
   };
 
-  const handleRowClick = async (draftId, docType) => {
+  const handleRowClick = async (draftId, docType, applyStatus) => {
     if (docType === '문서수신' || docType === '문서발신') {
       setSelectedDocumentId(draftId);
-      setModalVisible(true);
     } else if (docType === '명함신청') {
       navigate(`/api/bcd/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
     } else if (docType === '법인서류') {
       navigate(`/api/corpDoc/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
     } else if (docType === '인장신청(날인)') {
       const sealImprintDetails = await fetchSealImprintDetail(draftId);
-      navigate(`/api/seal/imprint/${draftId}`, { state: { sealImprintDetails, readOnly: true }, search: '?applyStatus=승인대기' });
+      navigate(`/api/seal/imprint/${draftId}?readonly=true&applyStatus=승인대기`, { state: { sealImprintDetails, readOnly: true }});
     } else if (docType === '인장신청(반출)') {
       const sealExportDetails = await fetchSealExportDetail(draftId);
-      navigate(`/api/seal/export/${draftId}`, { state: { sealExportDetails, readOnly: true }, search: '?applyStatus=승인대기' });
+      navigate(`/api/seal/export/${draftId}?readonly=true&applyStatus=승인대기`, { state: { sealExportDetails, readOnly: true }});
     }
   };
 
