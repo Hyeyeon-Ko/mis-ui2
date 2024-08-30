@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import SealApprovalModal from './SealApprovalModal';
 import SignitureImage from '../../assets/images/signiture.png';
 import '../../styles/seal/SealManagementList.css';
+import { AuthContext } from '../../components/AuthContext';
 
 function SealManagementList() {
+  const { auth } = useContext(AuthContext); 
   const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -19,45 +21,48 @@ function SealManagementList() {
 
   useEffect(() => {
     fetchSealManagementList();
-  }, []);
+  }, [startDate, endDate]);
 
-  const fetchSealManagementList = () => {
-    const fetchedData = [
-      {
-        date: '2024-08-01',
-        submitter: '재단본부',
-        purpose: '사용인감계',
-        sealType: { corporateSeal: 1, personalSeal: 0, companySeal: 0 },
-        quantity : 1,
-        applicantName: '김범수',
-        signitureImage: SignitureImage,
-        approval: [
-          { name: '나얼', approvalDate: '2024-08-08', signitureImage: SignitureImage },
-          { name: '박효신', approvalDate: '2024-08-09', signitureImage: SignitureImage },
-          { name: '이수', approvalDate: '2024-08-10', signitureImage: SignitureImage },
-        ],
-        status: '결재완료',
-      },
-      {
-        date: '2024-08-02',
-        submitter: '재단본부',
-        purpose: '00계약',
-        sealType: { corporateSeal: 0, personalSeal: 1, companySeal: 0 },
-        quantity : 3,
-        applicantName: '나얼',
-        signitureImage: SignitureImage,
-        approval: [{}],
-        status: '결재진행중',
-      },
-    ];
+  const fetchSealManagementList = async () => {
+    try {
+      const { instCd } = auth;  
 
-    setApplications(fetchedData);
-    setFilteredApplications(fetchedData);
+      const formattedStartDate = startDate ? new Date(startDate).toISOString().split('T')[0] : null;
+      const formattedEndDate = endDate ? new Date(endDate).toISOString().split('T')[0] : null;
 
-    const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
+      const response = await axios.get('/api/seal/managementList', {
+        params: {
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+          instCd,
+        },
+      });
+    
+      const fetchedData = response.data.data.map(item => ({
+        id: item.draftId,
+        date: item.useDate,
+        submitter: item.submission,
+        purpose: item.purpose,
+        sealType: {
+          corporateSeal: item.corporateSeal !== "" ? item.corporateSeal : 0,
+          facsimileSeal: item.facsimileSeal !== "" ? item.facsimileSeal : 0,
+          companySeal: item.companySeal !== "" ? item.companySeal : 0,
+        },
+        signitureImage: SignitureImage, 
+        approval: [],  
+        status: '결재진행중', 
+      }));
+  
+      setApplications(fetchedData);
+      setFilteredApplications(fetchedData);
+  
+      const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
       setClickedRows(clickedRows);
+    } catch (error) {
+      console.error('Error fetching seal management list:', error);
+    }
   };
-
+    
   const handleConfirmDelete = () => {
     setShowDeleteModal(false);
   };
@@ -71,7 +76,7 @@ function SealManagementList() {
         if (searchType === '사용목적') return app.purpose.includes(keyword);
         if (searchType === '인장구분') return (
           app.sealType.corporateSeal.includes(keyword) ||
-          app.sealType.personalSeal.includes(keyword) ||
+          app.sealType.facsimileSeal.includes(keyword) ||
           app.sealType.companySeal.includes(keyword)
         );
         if (searchType === '전체') {
@@ -79,7 +84,7 @@ function SealManagementList() {
             app.submitter.includes(keyword) ||
             app.purpose.includes(keyword) ||
             app.sealType.corporateSeal.includes(keyword) ||
-            app.sealType.personalSeal.includes(keyword) ||
+            app.sealType.facsimileSeal.includes(keyword) ||
             app.sealType.companySeal.includes(keyword)
           );
         }
@@ -121,7 +126,7 @@ function SealManagementList() {
       setModalVisible(true);
     }
   };
-
+  
   return (
     <div className="content">
       <div className="seal-management-list">
@@ -146,7 +151,6 @@ function SealManagementList() {
                 <th rowSpan="2">제출처</th>
                 <th rowSpan="2">사용목적</th>
                 <th colSpan="3">인장구분</th>
-                <th rowSpan="2">날인부수</th>
                 <th rowSpan="2">결재</th>
               </tr>
               <tr>
@@ -162,9 +166,8 @@ function SealManagementList() {
                   <td>{app.submitter}</td>
                   <td>{app.purpose}</td>
                   <td>{app.sealType.corporateSeal}</td>
-                  <td>{app.sealType.personalSeal}</td>
+                  <td>{app.sealType.facsimileSeal}</td>
                   <td>{app.sealType.companySeal}</td>
-                  <td>{app.quantity}</td>
                   <td
                     className={`status-${app.status.replace(/\s+/g, '-').toLowerCase()} clickable ${
                       clickedRows.includes(app.id) ? 'confirmed' : ''

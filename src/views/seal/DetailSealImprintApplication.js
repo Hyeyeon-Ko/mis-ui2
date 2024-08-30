@@ -9,6 +9,7 @@ import '../../styles/seal/SealApplyImprint.css';
 import corporateSeal from '../../assets/images/corporate_seal.png';
 import facsimileSeal from '../../assets/images/facsimile_seal.png';
 import companySeal from '../../assets/images/company_seal.png';
+import RejectReasonModal from '../../components/RejectReasonModal';
 
 function DetailSealImprintApplication() {
     const { auth } = useContext(AuthContext);
@@ -16,7 +17,10 @@ function DetailSealImprintApplication() {
     const navigate = useNavigate();
     const location = useLocation();
     const { sealImprintDetails, readOnly } = location.state || {}; 
+    const queryParams = new URLSearchParams(location.search);
+    const applyStatus = queryParams.get('applyStatus') || '승인대기'; 
 
+    const [showRejectModal, setShowRejectModal] = useState(false);
     const [sealSelections, setSealSelections] = useState({
         corporateSeal: { selected: false, quantity: '' },
         facsimileSeal: { selected: false, quantity: '' },
@@ -31,82 +35,82 @@ function DetailSealImprintApplication() {
 
     useEffect(() => {
         if (sealImprintDetails) {
-          setApplicationDetails({
-            submission: sealImprintDetails.submission || '',
-            useDate: sealImprintDetails.useDate || '',
-            purpose: sealImprintDetails.purpose || '',
-            notes: sealImprintDetails.notes || '',
-          });
+            setApplicationDetails({
+                submission: sealImprintDetails.submission || '',
+                useDate: sealImprintDetails.useDate || '',
+                purpose: sealImprintDetails.purpose || '',
+                notes: sealImprintDetails.notes || '',
+            });
     
-          setSealSelections({
-            corporateSeal: {
-              selected: !!sealImprintDetails.corporateSeal,
-              quantity: sealImprintDetails.corporateSeal || '',
-            },
-            facsimileSeal: {
-              selected: !!sealImprintDetails.facsimileSeal,
-              quantity: sealImprintDetails.facsimileSeal || '',
-            },
-            companySeal: {
-              selected: !!sealImprintDetails.companySeal,
-              quantity: sealImprintDetails.companySeal || '',
-            },
-          });
-        } else {
-          axios.get(`/api/seal/imprint/${draftId}`)
-            .then(response => {
-              const data = response.data.data;
-              setApplicationDetails({
-                submission: data.submission || '',
-                useDate: data.useDate || '',
-                purpose: data.purpose || '',
-                notes: data.notes || '',
-              });
-    
-              setSealSelections({
+            setSealSelections({
                 corporateSeal: {
-                  selected: !!data.corporateSeal,
-                  quantity: data.corporateSeal || '',
+                    selected: !!sealImprintDetails.corporateSeal,
+                    quantity: sealImprintDetails.corporateSeal || '',
                 },
                 facsimileSeal: {
-                  selected: !!data.facsimileSeal,
-                  quantity: data.facsimileSeal || '',
+                    selected: !!sealImprintDetails.facsimileSeal,
+                    quantity: sealImprintDetails.facsimileSeal || '',
                 },
                 companySeal: {
-                  selected: !!data.companySeal,
-                  quantity: data.companySeal || '',
+                    selected: !!sealImprintDetails.companySeal,
+                    quantity: sealImprintDetails.companySeal || '',
                 },
-              });
-            })
-            .catch(error => {
-              console.error('Error fetching application details:', error);
-              alert('날인신청 정보를 불러오는 중 오류가 발생했습니다.');
             });
+        } else {
+            axios.get(`/api/seal/imprint/${draftId}`)
+                .then(response => {
+                    const data = response.data.data;
+                    setApplicationDetails({
+                        submission: data.submission || '',
+                        useDate: data.useDate || '',
+                        purpose: data.purpose || '',
+                        notes: data.notes || '',
+                    });
+        
+                    setSealSelections({
+                        corporateSeal: {
+                            selected: !!data.corporateSeal,
+                            quantity: data.corporateSeal || '',
+                        },
+                        facsimileSeal: {
+                            selected: !!data.facsimileSeal,
+                            quantity: data.facsimileSeal || '',
+                        },
+                        companySeal: {
+                            selected: !!data.companySeal,
+                            quantity: data.companySeal || '',
+                        },
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching application details:', error);
+                    alert('날인신청 정보를 불러오는 중 오류가 발생했습니다.');
+                });
         }
     }, [draftId, sealImprintDetails]);
 
     const handleSealChange = (sealName) => {
         if (!readOnly) {
-          setSealSelections(prevState => ({
-            ...prevState,
-            [sealName]: {
-              ...prevState[sealName],
-              selected: !prevState[sealName].selected,
-            }
-          }));
+            setSealSelections(prevState => ({
+                ...prevState,
+                [sealName]: {
+                    ...prevState[sealName],
+                    selected: !prevState[sealName].selected,
+                }
+            }));
         }
     };
     
     const handleQuantityChange = (e, sealName) => {
         const value = e.target.value;
         if (!readOnly) {
-          setSealSelections(prevState => ({
-            ...prevState,
-            [sealName]: {
-              ...prevState[sealName],
-              quantity: value
-            }
-          }));
+            setSealSelections(prevState => ({
+                ...prevState,
+                [sealName]: {
+                    ...prevState[sealName],
+                    quantity: value
+                }
+            }));
         }
     };
 
@@ -145,24 +149,66 @@ function DetailSealImprintApplication() {
             alert('인장 신청 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
         });
     };
+
+    const handleApproval = (e) => {
+        e.preventDefault();  
+        axios.post(`/api/seal/${draftId}`) 
+        .then(response => {
+            console.log('Approval Response:', response.data);
+            alert('인장 신청이 성공적으로 승인되었습니다.');
+            navigate('/api/pendingList?documentType=인장신청');
+        })
+        .catch(error => {
+            console.error('Error approving application:', error);
+            alert('인장 신청 승인 중 오류가 발생했습니다. 다시 시도해주세요.');
+            navigate('/api/pendingList?documentType=인장신청');
+        });
+    };
+    
+    const handleReject = (e) => {
+        e.preventDefault();
+        setShowRejectModal(true);
+    };
+      
+    const handleRejectClose = () => {
+        setShowRejectModal(false);
+    };  
+
+    const handleRejectConfirm = async (reason) => {
+        try {
+          const response = await axios.post(`/api/seal/return/${draftId}`, reason, {
+            headers: {
+              'Content-Type': 'text/plain',
+            },
+          });
+          if (response.data.code === 200) {
+            alert('인장 신청이 반려되었습니다.');
+            navigate(`/api/pendingList?documentType=인장신청`);  
+          } else {
+            alert('인장 반려 중 오류가 발생했습니다.');
+          }
+        } catch (error) {
+          alert('인장 반려 중 오류가 발생했습니다.');
+        }
+      };    
     
     const handleChange = (e) => {
         if (!readOnly) {
-          setApplicationDetails({
-            ...applicationDetails,
-            [e.target.name]: e.target.value,
-          });
+            setApplicationDetails({
+                ...applicationDetails,
+                [e.target.name]: e.target.value,
+            });
         }
     };
 
     return (
         <div className="content">
             <div className="seal-imprint-content">
-                <h2>인장신청 상세정보</h2>
-                <Breadcrumb items={['신청하기', '인장신청', '상세정보']} />
+                <h2>인장 상세보기</h2>
+                <Breadcrumb items={['신청하기', '인장신청', '인장 상세보기']} />
                 <div className='seal-imprint-main'>
                     <div className='seal-imprint-apply-content'>
-                        <form className='seal-imprint-form' onSubmit={handleSubmit}>
+                        <form className='seal-imprint-form'>
                             <div className='seal-imprint-bold-label'>
                                 <label>인장 날인 신청서</label>
                             </div>
@@ -289,15 +335,22 @@ function DetailSealImprintApplication() {
                             </div>
                             {!readOnly && (
                               <div className="seal-imprint-apply-button-container">
-                                  <CustomButton className="apply-request-button" type="submit">
+                                  <CustomButton className="apply-request-button" onClick={handleSubmit}>
                                       수정완료
                                   </CustomButton>
                               </div>
+                            )}
+                            {applyStatus === '승인대기' && readOnly && (
+                                <div className="seal-imprint-approval-buttons">
+                                    <CustomButton className="approve-button" onClick={handleApproval}>승인</CustomButton>
+                                    <CustomButton className="reject-button" onClick={handleReject}>반려</CustomButton>
+                                </div>
                             )}
                         </form>
                     </div>
                 </div>
             </div>
+            <RejectReasonModal show={showRejectModal} onClose={handleRejectClose} onConfirm={handleRejectConfirm} />
         </div>
     );
 }

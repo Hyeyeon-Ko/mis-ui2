@@ -172,10 +172,10 @@ function PendingApprovalList() {
       navigate(`/api/corpDoc/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
     } else if (docType === '인장신청(날인)') {
       const sealImprintDetails = await fetchSealImprintDetail(draftId);
-      navigate(`/api/seal/imprint/${draftId}`, { state: { sealImprintDetails, readOnly: true } });
+      navigate(`/api/seal/imprint/${draftId}`, { state: { sealImprintDetails, readOnly: true }, search: '?applyStatus=승인대기' });
     } else if (docType === '인장신청(반출)') {
       const sealExportDetails = await fetchSealExportDetail(draftId);
-      navigate(`/api/seal/export/${draftId}`, { state: { sealExportDetails, readOnly: true } });
+      navigate(`/api/seal/export/${draftId}`, { state: { sealExportDetails, readOnly: true }, search: '?applyStatus=승인대기' });
     }
   };
 

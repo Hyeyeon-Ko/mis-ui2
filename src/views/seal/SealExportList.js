@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import SealApprovalModal from '../../views/seal/SealApprovalModal';
 import SignitureImage from '../../assets/images/signiture.png';
+import downloadIcon from '../../assets/images/download.png'; 
+import { AuthContext } from '../../components/AuthContext'; 
+import axios from 'axios';
 import '../../styles/seal/SealExportList.css';
 
 function SealExportList() {
+  const { auth } = useContext(AuthContext);
   const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [startDate, setStartDate] = useState(null);
@@ -15,48 +19,70 @@ function SealExportList() {
   const [clickedRows, setClickedRows] = useState([]);
 
   useEffect(() => {
-    fetchSealExportList();
-  }, []);
+    if (auth.instCd) {
+      fetchSealExportList(auth.instCd);
+    }
+  }, [auth.instCd, startDate, endDate]);
 
-  const fetchSealExportList = () => {
-    const fetchedData = [
-      {
-        id: 1,
-        expDate: '2024-08-01',
-        returnDate: '2024-08-02',
-        purpose: '사용인감계',
-        sealType: { corporateSeal: 1, personalSeal: 0, companySeal: 0 },
-        applicantName: '김범수',
+  const fetchSealExportList = async (instCd) => {
+    try {
+      const formattedStartDate = startDate ? new Date(startDate).toISOString().split('T')[0] : null;
+      const formattedEndDate = endDate ? new Date(endDate).toISOString().split('T')[0] : null;
+
+      const response = await axios.get('/api/seal/exportList', {
+        params: {
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+          instCd,
+        },
+      });
+
+      const fetchedData = response.data.data.map((item, index) => ({
+        id: index + 1,
+        expDate: item.expDate,
+        returnDate: item.returnDate,
+        purpose: item.purpose,
+        sealType: {
+          corporateSeal: item.corporateSeal !== "" ? item.corporateSeal : 0,
+          facsimileSeal: item.facsimileSeal !== "" ? item.facsimileSeal : 0,
+          companySeal: item.companySeal !== "" ? item.companySeal : 0,
+        },
+        applicantName: item.expNm,
         signitureImage: SignitureImage,
-        approval: [
-          { name: '나얼', approvalDate: '2024-08-08', signitureImage: SignitureImage },
-        ],
-        notes: '특이사항 없음',
+        fileName: item.fileName,
+        filePath: item.filePath,
+        fileUrl: `/api/doc/download/${encodeURIComponent(item.fileName)}`,
         status: '결재진행중',
-      },
-      {
-        id: 2,
-        expDate: '2024-08-03',
-        returnDate: '2024-08-04',
-        purpose: '00계약',
-        sealType: { corporateSeal: 0, personalSeal: 1, companySeal: 0 },
-        applicantName: '나얼',
-        signitureImage: SignitureImage,
-        approval: [
-          { name: '김범수', approvalDate: '2024-08-08', signitureImage: SignitureImage },
-          { name: '박효신', approvalDate: '2024-08-09', signitureImage: SignitureImage },
-          { name: '이수', approvalDate: '2024-08-10', signitureImage: SignitureImage },
-        ],
-        notes: '첨부파일 있음',
-        status: '결재완료',
-      },
-    ];
+      }));
 
-    setApplications(fetchedData);
-    setFilteredApplications(fetchedData);
+      setApplications(fetchedData);
+      setFilteredApplications(fetchedData);
 
-    const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
+      const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
       setClickedRows(clickedRows);
+    } catch (error) {
+      console.error('Error fetching seal export list:', error);
+      alert('데이터를 불러오는 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleFileDownload = async (fileUrl, fileName) => {
+    try {
+      const response = await axios.get(fileUrl, {
+        responseType: 'blob',
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName); 
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      console.error('Error downloading the file:', error);
+      alert('파일 다운로드에 실패했습니다.');
+    }
   };
 
   const handleSearch = ({ searchType, keyword, startDate, endDate }) => {
@@ -67,14 +93,14 @@ function SealExportList() {
         if (searchType === '사용목적') return app.purpose.includes(keyword);
         if (searchType === '인장구분') return (
           app.sealType.corporateSeal.includes(keyword) ||
-          app.sealType.personalSeal.includes(keyword) ||
+          app.sealType.facsimileSeal.includes(keyword) ||
           app.sealType.companySeal.includes(keyword)
         );
         if (searchType === '전체') {
           return (
             app.purpose.includes(keyword) ||
             app.sealType.corporateSeal.includes(keyword) ||
-            app.sealType.personalSeal.includes(keyword) ||
+            app.sealType.facsimileSeal.includes(keyword) ||
             app.sealType.companySeal.includes(keyword)
           );
         }
@@ -116,7 +142,6 @@ function SealExportList() {
       setModalVisible(true);
     }
   };
-  
 
   return (
     <div className="content">
@@ -143,7 +168,7 @@ function SealExportList() {
                 <th rowSpan="2">반납일자</th>
                 <th rowSpan="2">사용목적</th>
                 <th colSpan="3">인장구분</th>
-                <th rowSpan="2">비고</th>
+                <th rowSpan="2">첨부파일</th>
                 <th rowSpan="2">결재</th>
               </tr>
               <tr>
@@ -155,14 +180,25 @@ function SealExportList() {
             <tbody>
               {filteredApplications.map((app, index) => (
                 <tr key={index}>
-                  <td>{app.id}</td>
+                  <td>{index + 1}</td>
                   <td>{app.expDate}</td>
                   <td>{app.returnDate}</td>
                   <td>{app.purpose}</td>
                   <td>{app.sealType.corporateSeal}</td>
-                  <td>{app.sealType.personalSeal}</td>
+                  <td>{app.sealType.facsimileSeal}</td>
                   <td>{app.sealType.companySeal}</td>
-                  <td>{app.notes}</td>
+                  <td>
+                    {app.fileName && app.fileUrl ? (
+                      <button
+                        onClick={() => handleFileDownload(app.fileUrl, app.fileName)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      >
+                        <img src={downloadIcon} alt="파일 다운로드" />
+                      </button>
+                    ) : (
+                      ""
+                    )}
+                  </td>
                   <td
                     className={`status-${app.status.replace(/\s+/g, '-').toLowerCase()} clickable ${
                       clickedRows.includes(app.id) ? 'confirmed' : ''
