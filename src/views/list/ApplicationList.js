@@ -5,6 +5,7 @@ import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
 import CustomButton from '../../components/common/CustomButton';
 import DocConfirmModal from '../doc/DocConfirmModal';
+import CenterSelect from '../../components/CenterSelect';
 import '../../styles/list/ApplicationsList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
@@ -41,6 +42,13 @@ function ApplicationsList() {
   const [showExcelButton, setShowExcelButton] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState(null);
+  const [selectedCenter, setSelectedCenter] = useState('전체');
+
+  const [centers] = useState([
+    '전체', '재단본부', '광화문', '여의도센터', '강남센터',
+    '수원센터', '대구센터', '부산센터', '광주센터', '제주센터', '협력사'
+  ]);
+
   const navigate = useNavigate();
 
   const getBreadcrumbItems = () => {
@@ -70,6 +78,7 @@ function ApplicationsList() {
           searchType: filterParams.searchType || '전체',
           keyword: filterParams.keyword || '', 
           instCd: instCd || '',
+          instNm: selectedCenter || '',
         },
       });
 
@@ -105,7 +114,7 @@ function ApplicationsList() {
     } finally {
       setLoading(false);
     }
-  }, [documentTypeFromUrl, instCd]);
+  }, [documentTypeFromUrl, instCd, selectedCenter]);
 
   const fetchSealImprintDetail = async (draftId) => {
     try {
@@ -192,17 +201,18 @@ function ApplicationsList() {
       statusOrdered: false,
       statusClosed: false,
     });
+    setSelectedCenter('전체')
     fetchApplications();
   };
 
   const isAnyFilterActive = Object.values(filters).some((value) => value);
 
-  const filteredApplications = applications.filter((application) => {
+  const filteredApplications = applications.filter((app) => {
     if (isAnyFilterActive) {
-      if (filters.statusApproved && application.applyStatus === '승인완료') return true;
-      if (filters.statusRejected && application.applyStatus === '반려') return true;
-      if (filters.statusOrdered && application.applyStatus === '발주완료') return true;
-      if (filters.statusClosed && application.applyStatus === '처리완료') return true;
+      if (filters.statusApproved && app.applyStatus === '승인완료') return true;
+      if (filters.statusRejected && app.applyStatus === '반려') return true;
+      if (filters.statusOrdered && app.applyStatus === '발주완료') return true;
+      if (filters.statusClosed && app.applyStatus === '처리완료') return true;
       return false;
     }
 
@@ -210,12 +220,16 @@ function ApplicationsList() {
       const keyword = filterInputs.keyword.toLowerCase();
       switch (filterInputs.searchType) {
         case '제목':
-          return application.title.toLowerCase().includes(keyword);
+          return app.title.toLowerCase().includes(keyword);
         case '신청자':
-          return application.drafter.toLowerCase().includes(keyword);
+          return app.drafter.toLowerCase().includes(keyword);
         default:
           return false;
       }
+    }
+
+    if (selectedCenter !== '전체' && app.instNm !== selectedCenter) {
+      return false;
     }
 
     return true;
@@ -246,6 +260,10 @@ function ApplicationsList() {
     } catch (error) {
       console.error('Error downloading excel: ', error);
     }
+  };
+
+  const handleCenterChange = (e) => {
+    setSelectedCenter(e.target.value);
   };
 
   const closeModal = () => {
@@ -299,6 +317,11 @@ function ApplicationsList() {
       ),
     }] : []),
     { header: '문서분류', accessor: 'docType', width: '10%' },
+    {
+      header: <CenterSelect centers={centers} selectedCenter={selectedCenter} onCenterChange={handleCenterChange} />,
+      accessor: 'instNm',
+      width: '10%',
+    },
     {
       header: '제목',
       accessor: 'title',
