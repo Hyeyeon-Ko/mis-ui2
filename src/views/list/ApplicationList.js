@@ -105,8 +105,6 @@ function ApplicationsList() {
           docType: application.docType,
         };
       });
-        
-      console.log('transformedData: ', transformedData);
 
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
 
@@ -188,14 +186,8 @@ function ApplicationsList() {
     }));
   };
 
-  const handleSearch = () => {
-    fetchApplications({
-      documentType: filterInputs.documentType,
-      startDate: filterInputs.startDate ? filterInputs.startDate.toISOString().split('T')[0] : '',
-      endDate: filterInputs.endDate ? filterInputs.endDate.toISOString().split('T')[0] : '',
-      searchType: filterInputs.searchType,
-      keyword: filterInputs.keyword,
-    });
+  const handleSearch = (searchParams) => {
+    setFilterInputs((prev) => ({ ...prev, ...searchParams }));
   };
 
   const handleReset = () => {

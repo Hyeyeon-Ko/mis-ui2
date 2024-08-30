@@ -49,28 +49,6 @@ function Sidebar() {
     { label: '명함 발주', url: '/api/bcd/orderList' },
   ];
 
-  const corpDocItems = [
-    { label: '전체 신청내역', url: '/api/applyList?documentType=법인서류' },
-    { label: '승인대기 내역', url: '/api/pendingList?documentType=법인서류' },
-  ];
-
-  const corpDocManageItems = [
-    { label: '서류 발급 대장', url: '/api/corpDoc/issueList' },
-    { label: '서류 수불 대장', url: '/api/corpDoc/rnpList' },
-  ];
-
-  const sealItems = [
-    { label: '전체 신청내역', url: '/api/applyList?documentType=인장신청' },
-    { label: '승인대기 내역', url: '/api/pendingList?documentType=인장신청' },
-  ];
-
-  const sealManageItems = [
-    { label: '인장 관리대장', url: '/api/seal/managementList' },
-    { label: '인장 반출대장', url: '/api/seal/exportList' },
-    { label: '인장 등록대장', url: '/api/seal/registrationList' },
-    { label: '전국 인장 등록대장', url: '/api/seal/sealRegistrationList' },
-  ];
-
   const docItems = [
     { label: '전체 신청내역', url: '/api/applyList?documentType=문서수발신' },
     { label: '승인대기 내역', url: '/api/pendingList?documentType=문서수발신' },

@@ -35,7 +35,6 @@ function BcdOrder() {
 
   const navigate = useNavigate();
 
-  // 드래그 기능을 위한 ref 변수들
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
   const dragMode = useRef('select');
@@ -199,6 +198,7 @@ function BcdOrder() {
         fileName: emailData.fileName,
         fromEmail: emailData.fromEmail,
         toEmail: emailData.toEmail,
+        password: emailData.password,
       });
   
       const updatedApplications = applications.filter(app => !selectedApplications.includes(app.id));

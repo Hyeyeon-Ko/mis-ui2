@@ -6,6 +6,7 @@ import { FadeLoader } from 'react-spinners';
 /* 이메일 작성 모달 */
 const EmailModal = ({ show, onClose, onSend }) => {
   const [fromEmail, setFromEmail] = useState('');
+  const [password, setPassword] = useState(''); 
   const [toEmail, setToEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
@@ -22,11 +23,12 @@ const EmailModal = ({ show, onClose, onSend }) => {
           return response.json();
         })
         .then((data) => {
-          setFromEmail(data.data.fromEmail);
           setToEmail(data.data.toEmail);
         })
         .catch((error) => console.error('Error fetching email settings:', error));
     } else {
+      setFromEmail('');  // 모달을 닫을 때 발신자 이메일 초기화
+      setPassword('');   // 모달을 닫을 때 비밀번호 초기화
       setSubject('');
       setBody('');
       setFileName('');
@@ -39,6 +41,7 @@ const EmailModal = ({ show, onClose, onSend }) => {
     const fileToSend = fileName.trim() === '' ? '명함발주' : fileName.trim();
     const emailData = {
       fromEmail,
+      password,  
       toEmail,
       subject,
       body,
@@ -66,7 +69,17 @@ const EmailModal = ({ show, onClose, onSend }) => {
             type="text"
             placeholder="발신자 이메일을 입력하세요"
             value={fromEmail}
-            onChange={(e) => setFromEmail(e.target.value)} // Allow editing of fromEmail
+            onChange={(e) => setFromEmail(e.target.value)}
+          />
+        </div>
+        <div className="email-input-group">
+          <label htmlFor="password">발신자 비밀번호</label>
+          <input
+            id="password"
+            type="password" 
+            placeholder="발신자 비밀번호를 입력하세요"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </div>
         <div className="email-input-group">

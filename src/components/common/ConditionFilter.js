@@ -58,9 +58,13 @@ const ConditionFilter = ({
   };
 
   const handleSearch = () => {
-    onSearch();
+    const searchParams = {
+      searchType,
+      keyword,
+    };
+    onSearch(searchParams);
   };
-
+    
   const handleStartDateChange = (event) => {
     setStartDate(event.target.value ? new Date(event.target.value) : null);
   };
@@ -115,7 +119,9 @@ const ConditionFilter = ({
               onChange={(e) => setSearchType(e.target.value)}
             >
               <option value="전체">전체</option>
-              {(documentType === '명함신청' || documentType === '문서수발신') ? (
+              {(documentType === '명함신청' || documentType === '문서수발신' 
+                || documentType === '인장신청' || documentType === '법인서류'
+              ) ? (
                 <>
                   <option value="제목">제목</option>
                   <option value="신청자">신청자</option>
