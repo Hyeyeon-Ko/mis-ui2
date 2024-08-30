@@ -10,6 +10,8 @@ import corporateSeal from '../../assets/images/corporate_seal.png';
 import facsimileSeal from '../../assets/images/facsimile_seal.png';
 import companySeal from '../../assets/images/company_seal.png';
 import RejectReasonModal from '../../components/RejectReasonModal';
+import downloadIcon from '../../assets/images/download.png';
+import deleteIcon from '../../assets/images/delete2.png';
 
 function DetailSealExportApplication() {
     const { auth } = useContext(AuthContext);
@@ -18,7 +20,7 @@ function DetailSealExportApplication() {
     const location = useLocation();
     const { sealExportDetails, readOnly } = location.state || {};
     const queryParams = new URLSearchParams(location.search);
-    const applyStatus = queryParams.get('applyStatus') || '승인대기'; 
+    const applyStatus = queryParams.get('applyStatus'); 
 
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [sealSelections, setSealSelections] = useState({
@@ -153,6 +155,27 @@ function DetailSealExportApplication() {
                 filePath: '',
                 isFileDeleted: true,
             }));
+        }
+    };
+
+    const handleFileDownload = async () => {
+        if (applicationDetails.fileName && applicationDetails.filePath) {
+            try {
+                const response = await axios.get(`/api/doc/download/${encodeURIComponent(applicationDetails.fileName)}`, {
+                    responseType: 'blob',
+                });
+
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', applicationDetails.fileName);
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode.removeChild(link);
+            } catch (error) {
+                console.error('Error downloading the file:', error);
+                alert('파일 다운로드에 실패했습니다.');
+            }
         }
     };
 
@@ -410,21 +433,37 @@ function DetailSealExportApplication() {
                             </div>
                             <div className='seal-export-form-group'>
                                 <label>참조자료</label>
-                                {applicationDetails.fileName && applicationDetails.filePath && (
-                                    <div className="file-preview">
-                                        <a href={applicationDetails.filePath} target="_blank" rel="noopener noreferrer">
-                                            {applicationDetails.fileName}
-                                        </a>
-                                        {!readOnly && <button type="button" onClick={handleFileDelete}>삭제</button>}
+                                {applicationDetails.fileName && applicationDetails.filePath ? (
+                                    <div className="file-display">
+                                        <span className="file-name">{applicationDetails.fileName}</span>
+                                        <div className="file-actions">
+                                            <button
+                                                type="button"
+                                                className="download-button"
+                                                onClick={handleFileDownload}
+                                            >
+                                                <img src={downloadIcon} alt="다운로드" />
+                                            </button>
+                                            {!readOnly && (
+                                                <button
+                                                    type="button"
+                                                    className="file-delete-button"
+                                                    onClick={handleFileDelete}
+                                                >
+                                                    <img src={deleteIcon} alt="삭제" />
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
-                                )}
-                                {!readOnly && (
-                                    <input
-                                        type="file"
-                                        name="purposeFile"
-                                        className="file-input"
-                                        onChange={handleFileChange}
-                                    />
+                                ) : (
+                                    !readOnly && (
+                                        <input
+                                            type="file"
+                                            name="purposeFile"
+                                            className="file-input"
+                                            onChange={handleFileChange}
+                                        />
+                                    )
                                 )}
                             </div>
                             {!readOnly && (

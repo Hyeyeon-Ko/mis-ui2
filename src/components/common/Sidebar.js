@@ -65,9 +65,10 @@ function Sidebar() {
   ];
 
   const sealManageItems = [
-    { label: '인장 관리 대장', url: '/api/seal/managementList' },
-    { label: '인장 반출 대장', url: '/api/seal/exportList' },
-    { label: '인장 등록 대장', url: '/api/seal/registrationList' },
+    { label: '인장 관리대장', url: '/api/seal/managementList' },
+    { label: '인장 반출대장', url: '/api/seal/exportList' },
+    { label: '인장 등록대장', url: '/api/seal/registrationList' },
+    { label: '전국 인장 등록대장', url: '/api/seal/sealRegistrationList' },
   ];
 
   const docItems = [

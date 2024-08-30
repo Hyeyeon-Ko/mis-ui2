@@ -23,6 +23,7 @@ import DocInList from './views/doc/DocInList';
 import DocOutList from './views/doc/DocOutList';
 import SealManagementList from './views/seal/SealManagementList';
 import SealRegistrationList from './views/seal/SealRegistrationList';
+import SealTotalRegistrationList from './views/seal/SealTotalRegistrationList';
 import SealExportList from './views/seal/SealExportList';
 import CorpDocRnpList from './views/corpdoc/CorpDocRnpList';
 import CorpDocIssueList from './views/corpdoc/CorpDocIssueList';
@@ -117,6 +118,7 @@ function App() {
                 <Route path="/api/seal/export" element={<RequireAuth><SealApplyExport /></RequireAuth>} />
                 <Route path="/api/seal/managementList" element={<RequireAuth><SealManagementList /></RequireAuth>} />
                 <Route path="/api/seal/registrationList" element={<RequireAuth><SealRegistrationList /></RequireAuth>} />
+                <Route path="/api/seal/sealRegistrationList" element={<RequireAuth><SealTotalRegistrationList /></RequireAuth>} />
                 <Route path="/api/seal/exportList" element={<RequireAuth><SealExportList /></RequireAuth>} />
                 <Route path="/api/corpDoc/rnpList" element={<RequireAuth><CorpDocRnpList /></RequireAuth>} />
                 <Route path="/api/corpDoc/issueList" element={<RequireAuth><CorpDocIssueList /></RequireAuth>} />

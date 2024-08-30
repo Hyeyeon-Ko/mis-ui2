@@ -91,18 +91,22 @@ function ApplicationsList() {
         ...(sealMasterResponses || []),
       ];
 
-      const transformedData = combinedData.map(application => ({
-        draftId: application.draftId,
-        instCd: application.instCd,
-        instNm: application.instNm,
-        title: application.title,
-        draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
-        respondDate: application.respondDate ? parseDateTime(application.respondDate) : '',
-        orderDate: application.orderDate ? parseDateTime(application.orderDate) : '',
-        drafter: application.drafter,
-        applyStatus: getStatusText(application.applyStatus),
-        docType: application.docType,
-      }));
+      const transformedData = combinedData.map(application => {
+        return {
+          draftId: application.draftId,
+          instCd: application.instCd,
+          instNm: application.instNm,
+          title: application.title,
+          draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
+          respondDate: application.respondDate ? parseDateTime(application.respondDate) : '',
+          orderDate: application.orderDate ? parseDateTime(application.orderDate) : '',
+          drafter: application.drafter,
+          applyStatus: getStatusText(application.applyStatus),
+          docType: application.docType,
+        };
+      });
+        
+      console.log('transformedData: ', transformedData);
 
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
 
@@ -285,6 +289,8 @@ function ApplicationsList() {
   };
 
   const handleRowClick = async (draftId, docType, applyStatus) => {
+    console.log("Clicked row details:", { draftId, docType, applyStatus }); // 로그 추가
+  
     if (docType === '문서수신' || docType === '문서발신') {
       setSelectedDocumentId(draftId);
       setModalVisible(true);
@@ -301,7 +307,7 @@ function ApplicationsList() {
       navigate(`/api/seal/export/${draftId}`, { state: { sealExportDetails, readOnly: true }, search: `?applyStatus=${applyStatus}` });
     }
   };
-
+  
   const columns = [
     ...(showCheckboxColumn && documentTypeFromUrl === '명함신청' ? [{
       header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,

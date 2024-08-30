@@ -105,43 +105,43 @@ function SealRegistrationList() {
   return (
     <div className='content'>
       <div className='seal-registration-list'>
-        <h2>인장 등록 대장</h2>
+        <h2>인장 등록대장</h2>
         <div className="seal-header-row">
-          <Breadcrumb items={['인장 대장', '인장 등록 대장']} />
+          <Breadcrumb items={['인장 대장', '인장 등록대장']} />
           <div className="seal-header-buttons">
             <CustomButton className="seal-add-button" onClick={handleAddApplication}>추 가</CustomButton>
             <CustomButton className="seal-modify-button" onClick={handleModifyApplication}>수 정</CustomButton>
             <CustomButton className="seal-delete-button" onClick={handleDeleteApplication}>삭 제</CustomButton>
           </div>
         </div>
-        {filteredApplications.length > 0 ? (
-          <table className="seal-registration-table">
-            <thead>
-              <tr>
-                <th rowSpan="2">
-                  <input
-                    type="checkbox"
-                    onChange={(e) => {
-                      e.stopPropagation();
-                      handleSelectAll();
-                    }}
-                    checked={selectedApplications.length === filteredApplications.length}
-                  />
-                </th>
-                <th rowSpan="2">인영</th>
-                <th rowSpan="2">인영</th>
-                <th rowSpan="2">사용부서</th>
-                <th rowSpan="2">용도</th>
-                <th colSpan="2">관리자</th>
-                <th rowSpan="2">등록일</th>
-              </tr>
-              <tr>
-                <th>정</th>
-                <th>부</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredApplications.map((app, index) => (
+        <table className="seal-registration-table">
+          <thead>
+            <tr>
+              <th rowSpan="2">
+                <input
+                  type="checkbox"
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    handleSelectAll();
+                  }}
+                  checked={filteredApplications.length > 0 && selectedApplications.length === filteredApplications.length}
+                />
+              </th>
+              <th rowSpan="2">인영</th>
+              <th rowSpan="2">인영</th>
+              <th rowSpan="2">사용부서</th>
+              <th rowSpan="2">용도</th>
+              <th colSpan="2">관리자</th>
+              <th rowSpan="2">등록일</th>
+            </tr>
+            <tr>
+              <th>정</th>
+              <th>부</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredApplications.length > 0 ? (
+              filteredApplications.map((app, index) => (
                 <tr
                   key={index}
                   onClick={() => handleSelectApplication(index)}
@@ -168,12 +168,14 @@ function SealRegistrationList() {
                   <td>{app.subManager}</td>
                   <td>{app.draftDate}</td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div>No seal available</div>
-        )}
+              ))
+            ) : (
+              <tr>
+                <td colSpan="8">데이터가 없습니다.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
         <SealRegistrationAddModal
           isOpen={isAddModalOpen}
           onClose={() => {

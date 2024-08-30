@@ -77,7 +77,7 @@ function SealApplyExport() {
             type: 'application/json'
         }));
         if (file) {
-            formData.append('file', file); // 파일이 있을 경우 추가
+            formData.append('file', file); 
         }
 
         try {

@@ -18,7 +18,7 @@ function DetailSealImprintApplication() {
     const location = useLocation();
     const { sealImprintDetails, readOnly } = location.state || {}; 
     const queryParams = new URLSearchParams(location.search);
-    const applyStatus = queryParams.get('applyStatus') || '승인대기'; 
+    const applyStatus = queryParams.get('applyStatus'); 
 
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [sealSelections, setSealSelections] = useState({

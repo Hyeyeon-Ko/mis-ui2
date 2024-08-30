@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
-import ConditionFilter from '../../components/common/ConditionFilter';
 import SealApprovalModal from '../../views/seal/SealApprovalModal';
 import SignitureImage from '../../assets/images/signiture.png';
 import downloadIcon from '../../assets/images/download.png'; 
@@ -146,9 +145,9 @@ function SealExportList() {
   return (
     <div className="content">
       <div className="seal-export-list">
-        <h2>인장 반출 대장</h2>
-        <Breadcrumb items={['인장 대장', '인장 반출 대장']} />
-        <ConditionFilter
+        <h2>인장 반출대장</h2>
+        <Breadcrumb items={['인장 대장', '인장 반출대장']} />
+        {/* <ConditionFilter
           startDate={startDate}
           setStartDate={setStartDate}
           endDate={endDate}
@@ -158,27 +157,27 @@ function SealExportList() {
           showDocumentType={false}
           showSearchCondition={true}
           excludeRecipient={true}
-        />
-        {filteredApplications.length > 0 ? (
-          <table className="table">
-            <thead>
-              <tr>
-                <th rowSpan="2">일련번호</th>
-                <th rowSpan="2">반출일자</th>
-                <th rowSpan="2">반납일자</th>
-                <th rowSpan="2">사용목적</th>
-                <th colSpan="3">인장구분</th>
-                <th rowSpan="2">첨부파일</th>
-                <th rowSpan="2">결재</th>
-              </tr>
-              <tr>
-                <th>법인인감</th>
-                <th>사용인감</th>
-                <th>회사인</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredApplications.map((app, index) => (
+        /> */}
+        <table className="table">
+          <thead>
+            <tr>
+              <th rowSpan="2">일련번호</th>
+              <th rowSpan="2">반출일자</th>
+              <th rowSpan="2">반납일자</th>
+              <th rowSpan="2">사용목적</th>
+              <th colSpan="3">인장구분</th>
+              <th rowSpan="2">첨부파일</th>
+              <th rowSpan="2">결재</th>
+            </tr>
+            <tr>
+              <th>법인인감</th>
+              <th>사용인감</th>
+              <th>회사인</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredApplications.length > 0 ? (
+              filteredApplications.map((app, index) => (
                 <tr key={index}>
                   <td>{index + 1}</td>
                   <td>{app.expDate}</td>
@@ -208,12 +207,14 @@ function SealExportList() {
                     {app.status}
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div>No data available</div>
-        )}
+              ))
+            ) : (
+              <tr>
+                <td colSpan="9">데이터가 없습니다.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
       {modalVisible && selectedDocumentDetails && (
         <SealApprovalModal

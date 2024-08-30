@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
-import ConditionFilter from '../../components/common/ConditionFilter';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import SealApprovalModal from './SealApprovalModal';
 import SignitureImage from '../../assets/images/signiture.png';
@@ -130,9 +129,9 @@ function SealManagementList() {
   return (
     <div className="content">
       <div className="seal-management-list">
-        <h2>인장 관리 대장</h2>
-        <Breadcrumb items={['인장 대장', '인장 관리 대장']} />
-        <ConditionFilter
+        <h2>인장 관리대장</h2>
+        <Breadcrumb items={['인장 대장', '인장 관리대장']} />
+        {/* <ConditionFilter
           startDate={startDate}
           setStartDate={setStartDate}
           endDate={endDate}
@@ -142,25 +141,25 @@ function SealManagementList() {
           showDocumentType={false}
           showSearchCondition={true}
           excludeRecipient={true}
-        />
-        {filteredApplications.length > 0 ? (
-          <table className="table">
-            <thead>
-              <tr>
-                <th rowSpan="2">일자</th>
-                <th rowSpan="2">제출처</th>
-                <th rowSpan="2">사용목적</th>
-                <th colSpan="3">인장구분</th>
-                <th rowSpan="2">결재</th>
-              </tr>
-              <tr>
-                <th>법인인감</th>
-                <th>사용인감</th>
-                <th>회사인</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredApplications.map((app, index) => (
+        /> */}
+        <table className="table">
+          <thead>
+            <tr>
+              <th rowSpan="2">일자</th>
+              <th rowSpan="2">제출처</th>
+              <th rowSpan="2">사용목적</th>
+              <th colSpan="3">인장구분</th>
+              <th rowSpan="2">결재</th>
+            </tr>
+            <tr>
+              <th>법인인감</th>
+              <th>사용인감</th>
+              <th>회사인</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredApplications.length > 0 ? (
+              filteredApplications.map((app, index) => (
                 <tr key={index}>
                   <td>{app.date}</td>
                   <td>{app.submitter}</td>
@@ -177,12 +176,14 @@ function SealManagementList() {
                     {app.status}
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div>No data available</div>
-        )}
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7">데이터가 없습니다.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
         {showDeleteModal && (
           <ConfirmModal
             message="이 문서를 삭제하시겠습니까?"
