@@ -186,10 +186,6 @@ function ApplicationsList() {
     }));
   };
 
-  const handleSearch = (searchParams) => {
-    setFilterInputs((prev) => ({ ...prev, ...searchParams }));
-  };
-
   const handleReset = () => {
     setFilterInputs({ startDate: null, endDate: null, documentType: documentTypeFromUrl || '', searchType: '전체', keyword: '', });
     setFilters({
@@ -204,6 +200,10 @@ function ApplicationsList() {
 
   const isAnyFilterActive = Object.values(filters).some((value) => value);
 
+  const handleSearch = (searchParams) => {
+    setFilterInputs((prev) => ({ ...prev, ...searchParams }));
+  };
+  
   const filteredApplications = applications.filter((app) => {
     if (isAnyFilterActive) {
       if (filters.statusApproved && app.applyStatus === '승인완료') return true;
@@ -212,7 +212,15 @@ function ApplicationsList() {
       if (filters.statusClosed && app.applyStatus === '처리완료') return true;
       return false;
     }
-
+  
+    if (filterInputs.searchType === '전체' && filterInputs.keyword) {
+      const keyword = filterInputs.keyword.toLowerCase();
+      return (
+        app.title.toLowerCase().includes(keyword) ||
+        app.drafter.toLowerCase().includes(keyword)
+      );
+    }
+  
     if (filterInputs.searchType !== '전체' && filterInputs.keyword) {
       const keyword = filterInputs.keyword.toLowerCase();
       switch (filterInputs.searchType) {
@@ -224,14 +232,14 @@ function ApplicationsList() {
           return false;
       }
     }
-
+  
     if (selectedCenter !== '전체' && app.instNm !== selectedCenter) {
       return false;
     }
-
+  
     return true;
   });
-
+  
   const handleSelectAll = (isChecked) => {
     setSelectedApplications(isChecked ? filteredApplications.map(app => app.draftId) : []);
   };
