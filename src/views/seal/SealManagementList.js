@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConfirmModal from '../../components/common/ConfirmModal';
@@ -9,30 +9,18 @@ import { AuthContext } from '../../components/AuthContext';
 
 function SealManagementList() {
   const { auth } = useContext(AuthContext); 
-  const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
   const [clickedRows, setClickedRows] = useState([]);
 
-  useEffect(() => {
-    fetchSealManagementList();
-  }, [startDate, endDate]);
-
-  const fetchSealManagementList = async () => {
+  const fetchSealManagementList = useCallback(async () => {
     try {
       const { instCd } = auth;  
 
-      const formattedStartDate = startDate ? new Date(startDate).toISOString().split('T')[0] : null;
-      const formattedEndDate = endDate ? new Date(endDate).toISOString().split('T')[0] : null;
-
       const response = await axios.get('/api/seal/managementList', {
         params: {
-          startDate: formattedStartDate,
-          endDate: formattedEndDate,
           instCd,
         },
       });
@@ -52,7 +40,6 @@ function SealManagementList() {
         status: '결재진행중', 
       }));
   
-      setApplications(fetchedData);
       setFilteredApplications(fetchedData);
   
       const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
@@ -60,47 +47,14 @@ function SealManagementList() {
     } catch (error) {
       console.error('Error fetching seal management list:', error);
     }
-  };
-    
+  }, [auth]);
+
+  useEffect(() => {
+    fetchSealManagementList();
+  }, [fetchSealManagementList]);
+
   const handleConfirmDelete = () => {
     setShowDeleteModal(false);
-  };
-
-  const handleSearch = ({ searchType, keyword, startDate, endDate }) => {
-    let filtered = applications;
-
-    if (keyword) {
-      filtered = filtered.filter(app => {
-        if (searchType === '제출처') return app.submitter.includes(keyword);
-        if (searchType === '사용목적') return app.purpose.includes(keyword);
-        if (searchType === '인장구분') return (
-          app.sealType.corporateSeal.includes(keyword) ||
-          app.sealType.facsimileSeal.includes(keyword) ||
-          app.sealType.companySeal.includes(keyword)
-        );
-        if (searchType === '전체') {
-          return (
-            app.submitter.includes(keyword) ||
-            app.purpose.includes(keyword) ||
-            app.sealType.corporateSeal.includes(keyword) ||
-            app.sealType.facsimileSeal.includes(keyword) ||
-            app.sealType.companySeal.includes(keyword)
-          );
-        }
-        return true;
-      });
-    }
-
-    if (startDate && endDate) {
-      filtered = filtered.filter(app => {
-        const appDate = new Date(app.date);
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        return appDate >= start && appDate <= end;
-      });
-    }
-
-    setFilteredApplications(filtered);
   };
 
   const closeModal = () => {
@@ -131,17 +85,6 @@ function SealManagementList() {
       <div className="seal-management-list">
         <h2>인장 관리대장</h2>
         <Breadcrumb items={['인장 대장', '인장 관리대장']} />
-        {/* <ConditionFilter
-          startDate={startDate}
-          setStartDate={setStartDate}
-          endDate={endDate}
-          setEndDate={setEndDate}
-          onSearch={handleSearch}
-          onReset={() => setFilteredApplications(applications)}
-          showDocumentType={false}
-          showSearchCondition={true}
-          excludeRecipient={true}
-        /> */}
         <table className="table">
           <thead>
             <tr>

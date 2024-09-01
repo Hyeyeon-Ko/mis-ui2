@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
@@ -20,11 +20,7 @@ function DocOutList() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
-  useEffect(() => {
-    fetchDocOutList();
-  }, []);
-
-  const fetchDocOutList = async (deptCd = null) => {
+  const fetchDocOutList = useCallback(async (deptCd = null) => {
     try {
       const params = {
         instCd: auth.instCd,  
@@ -49,7 +45,11 @@ function DocOutList() {
     } catch (error) {
       console.error('Error fetching document list:', error);
     }
-  };
+  }, [auth.instCd]);
+
+  useEffect(() => {
+    fetchDocOutList();
+  }, [fetchDocOutList]);
 
   const handleFileDownload = async (fileName) => {
     try {

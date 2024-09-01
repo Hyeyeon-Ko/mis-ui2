@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import SealRegistrationAddModal from './SealRegistrationAddModal';  
@@ -13,14 +13,9 @@ function SealRegistrationList() {
   const [selectedApplications, setSelectedApplications] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false); 
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [modalData, setModalData] = useState(null); 
   const [selectedDraftId, setSelectedDraftId] = useState(null);
 
-  useEffect(() => {
-    fetchSealRegistrationList();
-  }, []);
-
-  const fetchSealRegistrationList = async () => {
+  const fetchSealRegistrationList = useCallback(async () => {
     try {
       const response = await axios.get('/api/seal/registrationList', {
         params: { instCd: auth.instCd } 
@@ -46,10 +41,13 @@ function SealRegistrationList() {
       console.error('Error fetching seal registration list:', error);
       alert('데이터를 불러오는 중 오류가 발생했습니다.');
     }
-  };
+  }, [auth.instCd]);
+
+  useEffect(() => {
+    fetchSealRegistrationList();
+  }, [fetchSealRegistrationList]);
 
   const handleAddApplication = () => {
-    setModalData(null); 
     setIsAddModalOpen(true); 
   };
 
@@ -65,7 +63,6 @@ function SealRegistrationList() {
     const selectedIndex = selectedApplications[0];
     const selectedData = filteredApplications[selectedIndex];
     setSelectedDraftId(selectedData.draftId);
-    setModalData(selectedData); 
     setIsUpdateModalOpen(true); 
   };
 

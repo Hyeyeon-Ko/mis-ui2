@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import SealApprovalModal from '../../views/seal/SealApprovalModal';
 import SignitureImage from '../../assets/images/signiture.png';
@@ -9,29 +9,15 @@ import '../../styles/seal/SealExportList.css';
 
 function SealExportList() {
   const { auth } = useContext(AuthContext);
-  const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
   const [clickedRows, setClickedRows] = useState([]);
 
-  useEffect(() => {
-    if (auth.instCd) {
-      fetchSealExportList(auth.instCd);
-    }
-  }, [auth.instCd, startDate, endDate]);
-
-  const fetchSealExportList = async (instCd) => {
+  const fetchSealExportList = useCallback(async (instCd) => {
     try {
-      const formattedStartDate = startDate ? new Date(startDate).toISOString().split('T')[0] : null;
-      const formattedEndDate = endDate ? new Date(endDate).toISOString().split('T')[0] : null;
-
       const response = await axios.get('/api/seal/exportList', {
         params: {
-          startDate: formattedStartDate,
-          endDate: formattedEndDate,
           instCd,
         },
       });
@@ -54,7 +40,6 @@ function SealExportList() {
         status: '결재진행중',
       }));
 
-      setApplications(fetchedData);
       setFilteredApplications(fetchedData);
 
       const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
@@ -63,7 +48,13 @@ function SealExportList() {
       console.error('Error fetching seal export list:', error);
       alert('데이터를 불러오는 중 오류가 발생했습니다.');
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (auth.instCd) {
+      fetchSealExportList(auth.instCd);
+    }
+  }, [auth.instCd, fetchSealExportList]);
 
   const handleFileDownload = async (fileUrl, fileName) => {
     try {
@@ -82,41 +73,6 @@ function SealExportList() {
       console.error('Error downloading the file:', error);
       alert('파일 다운로드에 실패했습니다.');
     }
-  };
-
-  const handleSearch = ({ searchType, keyword, startDate, endDate }) => {
-    let filtered = applications;
-
-    if (keyword) {
-      filtered = filtered.filter(app => {
-        if (searchType === '사용목적') return app.purpose.includes(keyword);
-        if (searchType === '인장구분') return (
-          app.sealType.corporateSeal.includes(keyword) ||
-          app.sealType.facsimileSeal.includes(keyword) ||
-          app.sealType.companySeal.includes(keyword)
-        );
-        if (searchType === '전체') {
-          return (
-            app.purpose.includes(keyword) ||
-            app.sealType.corporateSeal.includes(keyword) ||
-            app.sealType.facsimileSeal.includes(keyword) ||
-            app.sealType.companySeal.includes(keyword)
-          );
-        }
-        return true;
-      });
-    }
-
-    if (startDate && endDate) {
-      filtered = filtered.filter(app => {
-        const appDate = new Date(app.expDate);
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        return appDate >= start && appDate <= end;
-      });
-    }
-
-    setFilteredApplications(filtered);
   };
 
   const closeModal = () => {
@@ -147,17 +103,6 @@ function SealExportList() {
       <div className="seal-export-list">
         <h2>인장 반출대장</h2>
         <Breadcrumb items={['인장 대장', '인장 반출대장']} />
-        {/* <ConditionFilter
-          startDate={startDate}
-          setStartDate={setStartDate}
-          endDate={endDate}
-          setEndDate={setEndDate}
-          onSearch={handleSearch}
-          onReset={() => setFilteredApplications(applications)}
-          showDocumentType={false}
-          showSearchCondition={true}
-          excludeRecipient={true}
-        /> */}
         <table className="table">
           <thead>
             <tr>

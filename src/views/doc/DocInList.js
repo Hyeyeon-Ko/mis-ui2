@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
@@ -22,13 +22,6 @@ function DocInList() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
-  useEffect(() => {
-    if (auth.instCd) {
-      fetchDeptList(auth.instCd);
-      fetchDocInList();
-    }
-  }, [auth.instCd]);
-
   const fetchDeptList = async (instCd) => {
     try {
       const response = await axios.get('/api/doc/deptList', {
@@ -40,7 +33,7 @@ function DocInList() {
     }
   };
 
-  const fetchDocInList = async (deptCd = null) => {
+  const fetchDocInList = useCallback(async (deptCd = null) => {
     try {
       const params = {
         instCd: auth.instCd,
@@ -66,7 +59,14 @@ function DocInList() {
     } catch (error) {
       console.error('Error fetching document list:', error);
     }
-  };
+  }, [auth.instCd]);
+
+  useEffect(() => {
+    if (auth.instCd) {
+      fetchDeptList(auth.instCd);
+      fetchDocInList();
+    }
+  }, [auth.instCd, fetchDocInList]);
 
   const fetchDeptReceiveList = async (deptCd) => {
     try {
