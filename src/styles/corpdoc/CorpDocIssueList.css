@@ -64,3 +64,9 @@
 .corpDoc-issue-pending-list h3{
   margin-bottom: 10px;
 }
+
+.corpDoc-header-row {
+  display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

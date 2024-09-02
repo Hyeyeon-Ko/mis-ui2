@@ -122,3 +122,22 @@
 .reject-button:hover {
   background-color: #E84646;
 }
+
+.store-button {
+  border-radius: 7px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  background-color: #e2e5e9;
+  color: rgb(126, 125, 125);
+}
+
+.save-button {
+  background-color: #2789FE;
+  margin-top: 40px;
+  letter-spacing: 5px;
+  width: 100px;
+  height: 40px;
+  padding-left: 15px;
+}
