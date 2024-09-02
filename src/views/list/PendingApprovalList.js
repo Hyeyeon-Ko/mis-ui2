@@ -162,9 +162,10 @@ function PendingApprovalList() {
     }
   };
 
-  const handleRowClick = async (draftId, docType, applyStatus) => {
+  const handleRowClick = async (draftId, docType) => {
     if (docType === '문서수신' || docType === '문서발신') {
       setSelectedDocumentId(draftId);
+      setModalVisible(true);
     } else if (docType === '명함신청') {
       navigate(`/api/bcd/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
     } else if (docType === '법인서류') {
