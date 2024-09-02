@@ -4,7 +4,6 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import CustomButton from '../../components/common/CustomButton';
 import EmailModal from './EmailModal';
-import CenterSelect from '../../components/CenterSelect';
 import '../../styles/bcd/BcdOrder.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
@@ -16,20 +15,6 @@ function BcdOrder() {
   const { auth } = useContext(AuthContext); 
   const [applications, setApplications] = useState([]);
   const [selectedApplications, setSelectedApplications] = useState([]);
-  const [centers] = useState([
-    '전체',
-    '재단본부',
-    '광화문',
-    '여의도센터',
-    '강남센터',
-    '수원센터',
-    '대구센터',
-    '부산센터',
-    '광주센터',
-    '제주센터',
-    '협력사',
-  ]);
-  const [selectedCenter, setSelectedCenter] = useState('전체');
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -151,17 +136,6 @@ function BcdOrder() {
     dragEndIndex.current = null;
   };
 
-  // 센터 선택 핸들러
-  const handleCenterChange = (event) => {
-    setSelectedCenter(event.target.value);
-  };
-
-  // 선택된 센터에 따라 신청 내역 필터링
-  const filteredApplications =
-    selectedCenter === '전체'
-      ? applications
-      : applications.filter((app) => app.center === selectedCenter);
-
   // 엑셀 변환 버튼 클릭 핸들러
   const handleExcelDownload = async () => {
     if (selectedApplications.length === 0) {
@@ -235,13 +209,7 @@ function BcdOrder() {
       ),
     },
     {
-      header: (
-        <CenterSelect
-          centers={centers}
-          selectedCenter={selectedCenter}
-          onCenterChange={handleCenterChange}
-        />
-      ),
+      header: '센터명', 
       accessor: 'center',
       width: '18%',
     },
@@ -289,7 +257,7 @@ function BcdOrder() {
         </div>
         <Table 
           columns={columns} 
-          data={filteredApplications} 
+          data={applications} 
           rowClassName="clickable-row"
           onRowClick={(row, rowIndex) => handleRowClick(row)}
           onRowMouseDown={(rowIndex) => handleMouseDown(rowIndex)}  

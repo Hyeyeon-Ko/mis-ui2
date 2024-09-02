@@ -27,8 +27,8 @@ const EmailModal = ({ show, onClose, onSend }) => {
         })
         .catch((error) => console.error('Error fetching email settings:', error));
     } else {
-      setFromEmail('');  // 모달을 닫을 때 발신자 이메일 초기화
-      setPassword('');   // 모달을 닫을 때 비밀번호 초기화
+      setFromEmail('');  
+      setPassword('');   
       setSubject('');
       setBody('');
       setFileName('');

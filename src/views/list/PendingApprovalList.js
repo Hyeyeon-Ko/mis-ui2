@@ -230,11 +230,13 @@ function PendingApprovalList() {
   const columns = [
     { header: '문서분류', accessor: 'docType', width: '10%' },
     {
-      header: <CenterSelect centers={centers} selectedCenter={selectedCenter} onCenterChange={handleCenterChange} />,
+      header: documentType === '법인서류'
+        ? <CenterSelect centers={centers} selectedCenter={selectedCenter} onCenterChange={handleCenterChange} />
+        : '센터명',
       accessor: 'center',
-      width: '10%',
+      width: '8%',
     },
-    { header: '제목', accessor: 'title', width: '28%',
+    { header: '제목', accessor: 'title', width: '25%',
       Cell: ({ row }) => (
         <span
           className="status-pending clickable" 
