@@ -162,10 +162,9 @@ function PendingApprovalList() {
     }
   };
 
-  const handleRowClick = async (draftId, docType) => {
+  const handleRowClick = async (draftId, docType, applyStatus) => {
     if (docType === '문서수신' || docType === '문서발신') {
       setSelectedDocumentId(draftId);
-      setModalVisible(true);
     } else if (docType === '명함신청') {
       navigate(`/api/bcd/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
     } else if (docType === '법인서류') {
@@ -221,23 +220,31 @@ function PendingApprovalList() {
     }
   };
   
+  const normalizeDate = (dateString) => {
+    const date = new Date(dateString);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  };
+  
   const filteredApplications = applications.filter((app) => {
+    const draftDate = normalizeDate(app.draftDate); 
+  
     if (filters.selectedCenter && filters.selectedCenter !== '전체' && app.center !== filters.selectedCenter) return false;
-    if (filters.startDate && new Date(app.draftDate) < new Date(filters.startDate)) return false;
-    if (filters.endDate && new Date(app.draftDate) > new Date(filters.endDate)) return false;
+    if (filters.startDate && draftDate < normalizeDate(filters.startDate)) return false;
+    if (filters.endDate && draftDate > normalizeDate(filters.endDate)) return false;
     return true;
   });
-
+    
   const columns = [
     { header: '문서분류', accessor: 'docType', width: '10%' },
-    {
-      header: documentType === '법인서류'
-        ? <CenterSelect centers={centers} selectedCenter={selectedCenter} onCenterChange={handleCenterChange} />
-        : '센터명',
+    ...(documentType === '법인서류' ? [{
+      header: <CenterSelect centers={centers} selectedCenter={selectedCenter} onCenterChange={handleCenterChange} />,
       accessor: 'center',
-      width: '8%',
-    },
-    { header: '제목', accessor: 'title', width: '25%',
+      width: '10%',
+    }] : [
+      { header: '센터', accessor: 'center', width: '10%' }, 
+    ]),
+    { header: '제목', accessor: 'title', width: '28%',
       Cell: ({ row }) => (
         <span
           className="status-pending clickable" 

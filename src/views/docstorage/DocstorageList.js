@@ -177,11 +177,6 @@ function DocstorageList() {
   };
 
   const handleEdit = async () => {
-    if (!selectedDeptCd) {
-      alert('부서를 선택하세요.');
-      return;
-    }
-  
     if (selectedRows.length === 0) {
       setSelectedDoc(null);
       setShowEditModal(true);

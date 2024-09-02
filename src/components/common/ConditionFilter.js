@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../common/Button';
 import '../../styles/common/ConditionFilter.css';
@@ -10,24 +10,21 @@ const ConditionFilter = ({
   setEndDate,
   onSearch,
   onReset,
-  filters = {
-    statusApproved: false,
-    statusRejected: false,
-    statusOrdered: false,
-    statusClosed: false,
-  },
-  setFilters = () => {},
+  filters,
+  setFilters,
   onFilterChange,
   showStatusFilters,
   showSearchCondition,
-  showDocumentType = true, 
+  showDocumentType = true,  
   excludeRecipient,
   excludeSender,
   documentType,
   setDocumentType,
+  searchType, 
+  setSearchType, 
+  keyword,
+  setKeyword, 
 }) => {
-  const [searchType, setSearchType] = useState('전체');
-  const [keyword, setKeyword] = useState('');
 
   useEffect(() => {
     resetFilters();
@@ -38,14 +35,22 @@ const ConditionFilter = ({
     defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
     setStartDate(defaultStartDate);
     setEndDate(new Date());
-    setSearchType('전체');
-    setKeyword('');
+
+    if (setSearchType) {
+        setSearchType('전체');
+    }
+
+    if (setKeyword) {
+        setKeyword('');
+    }
+
     if (onReset) onReset();
+
     setFilters({
-      statusApproved: false,
-      statusRejected: false,
-      statusOrdered: false,
-      statusClosed: false,
+        statusApproved: false,
+        statusRejected: false,
+        statusOrdered: false,
+        statusClosed: false,
     });
   };
 
@@ -58,13 +63,9 @@ const ConditionFilter = ({
   };
 
   const handleSearch = () => {
-    const searchParams = {
-      searchType,
-      keyword,
-    };
-    onSearch(searchParams);
+    onSearch(); 
   };
-    
+
   const handleStartDateChange = (event) => {
     setStartDate(event.target.value ? new Date(event.target.value) : null);
   };
@@ -213,6 +214,10 @@ ConditionFilter.propTypes = {
   showDocumentType: PropTypes.bool,  
   documentType: PropTypes.string,
   setDocumentType: PropTypes.func.isRequired, 
+  searchType: PropTypes.string.isRequired, 
+  setSearchType: PropTypes.func.isRequired, 
+  keyword: PropTypes.string.isRequired, 
+  setKeyword: PropTypes.func.isRequired, 
 };
 
 export default ConditionFilter;

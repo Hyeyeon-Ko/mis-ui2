@@ -76,7 +76,7 @@ function ApplicationsList() {
           startDate: filterParams.startDate || '',
           endDate: filterParams.endDate || '',
           searchType: filterParams.searchType || '전체',
-          keyword: filterParams.keyword || '', 
+          keyword: filterParams.keyword || '',
           instCd: instCd || '',
           instNm: selectedCenter || '',
         },
@@ -186,54 +186,37 @@ function ApplicationsList() {
     }));
   };
 
-  const handleSearch = (searchParams) => {
-    setFilterInputs((prev) => ({ ...prev, ...searchParams }));
+  const handleSearch = () => {
+    fetchApplications({
+      documentType: filterInputs.documentType,
+      startDate: filterInputs.startDate ? filterInputs.startDate.toISOString().split('T')[0] : '',
+      endDate: filterInputs.endDate ? filterInputs.endDate.toISOString().split('T')[0] : '',
+      searchType: filterInputs.searchType,
+      keyword: filterInputs.keyword,
+      instCd: instCd,
+    });
   };
 
   const handleReset = () => {
-    setFilterInputs({ startDate: null, endDate: null, documentType: documentTypeFromUrl || '', searchType: '전체', keyword: '', });
+    setFilterInputs({
+      startDate: null,
+      endDate: null,
+      documentType: documentTypeFromUrl || '',
+      searchType: '전체',
+      keyword: '',
+    });
     setFilters({
       statusApproved: false,
       statusRejected: false,
       statusOrdered: false,
       statusClosed: false,
     });
-    setSelectedCenter('전체')
+    setSelectedCenter('전체');
     fetchApplications();
   };
 
-  const isAnyFilterActive = Object.values(filters).some((value) => value);
-
-  const filteredApplications = applications.filter((app) => {
-    if (isAnyFilterActive) {
-      if (filters.statusApproved && app.applyStatus === '승인완료') return true;
-      if (filters.statusRejected && app.applyStatus === '반려') return true;
-      if (filters.statusOrdered && app.applyStatus === '발주완료') return true;
-      if (filters.statusClosed && app.applyStatus === '처리완료') return true;
-      return false;
-    }
-
-    if (filterInputs.searchType !== '전체' && filterInputs.keyword) {
-      const keyword = filterInputs.keyword.toLowerCase();
-      switch (filterInputs.searchType) {
-        case '제목':
-          return app.title.toLowerCase().includes(keyword);
-        case '신청자':
-          return app.drafter.toLowerCase().includes(keyword);
-        default:
-          return false;
-      }
-    }
-
-    if (selectedCenter !== '전체' && app.instNm !== selectedCenter) {
-      return false;
-    }
-
-    return true;
-  });
-
   const handleSelectAll = (isChecked) => {
-    setSelectedApplications(isChecked ? filteredApplications.map(app => app.draftId) : []);
+    setSelectedApplications(isChecked ? applications.map(app => app.draftId) : []);
   };
 
   const handleSelect = (isChecked, id) => {
@@ -283,7 +266,6 @@ function ApplicationsList() {
   };
 
   const handleRowClick = async (draftId, docType, applyStatus) => {
-  
     if (docType === '문서수신' || docType === '문서발신') {
       setSelectedDocumentId(draftId);
       setModalVisible(true);
@@ -300,12 +282,12 @@ function ApplicationsList() {
       navigate(`/api/seal/export/${draftId}?readonly=true&applyStatus=${applyStatus}`, { state: { sealExportDetails, readOnly: true } });
     }
   };
-  
+
   const columns = [
     ...(showCheckboxColumn && documentTypeFromUrl === '명함신청' ? [{
       header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
       accessor: 'select',
-      width: '10%',
+      width: '5%',
       Cell: ({ row }) => (
         <input
           type="checkbox"
@@ -314,18 +296,18 @@ function ApplicationsList() {
         />
       ),
     }] : []),
-    { header: '문서분류', accessor: 'docType', width: '12%' },
-    {
-      header: documentTypeFromUrl === '법인서류'
-        ? <CenterSelect centers={centers} selectedCenter={selectedCenter} onCenterChange={handleCenterChange} />
-        : '센터명',
+    { header: '문서분류', accessor: 'docType', width: '10%' },
+    ...(documentTypeFromUrl === '법인서류' ? [{
+      header: <CenterSelect centers={centers} selectedCenter={selectedCenter} onCenterChange={handleCenterChange} />,
       accessor: 'instNm',
-      width: '8%',
-    },
+      width: '10%',
+    }] : [
+      { header: '센터', accessor: 'instNm', width: '10%' }, 
+    ]),
     {
       header: '제목',
       accessor: 'title',
-      width: '23%',
+      width: '24%',
       Cell: ({ row }) => (
         <span
           className="status-pending clickable"
@@ -343,7 +325,7 @@ function ApplicationsList() {
       width: '13%',
     },
     ...(documentTypeFromUrl === '문서수발신' || documentTypeFromUrl === '법인서류' ? [] : [
-      { header: '발주일시', accessor: 'orderDate', width: '13%' },
+      { header: '발주일시', accessor: 'orderDate', width: '14%' },
     ]),
     { header: '문서상태', accessor: 'applyStatus', width: '10%' },
   ];
@@ -367,23 +349,27 @@ function ApplicationsList() {
           setStartDate={(date) => setFilterInputs(prev => ({ ...prev, startDate: date }))}
           endDate={filterInputs.endDate}
           setEndDate={(date) => setFilterInputs(prev => ({ ...prev, endDate: date }))}
-          documentType={documentTypeFromUrl}
+          documentType={filterInputs.documentType}
           setDocumentType={(docType) => setFilterInputs(prev => ({ ...prev, documentType: docType }))}
           filters={filters}
-          setFilters={setFilters}  
+          setFilters={setFilters}
           onFilterChange={handleFilterChange}
           onSearch={handleSearch}
           onReset={handleReset}
           showStatusFilters={true}
           showSearchCondition={true}
-          showDocumentType={false}  
+          showDocumentType={false}
+          searchType={filterInputs.searchType}
+          setSearchType={(searchType) => setFilterInputs(prev => ({ ...prev, searchType }))}
+          keyword={filterInputs.keyword}
+          setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
         />
         {loading ? (
           <p>로딩 중...</p>
         ) : error ? (
           <p>{error}</p>
         ) : (
-          <Table columns={columns} data={filteredApplications} onSelect={handleSelect} selectedItems={selectedApplications} />
+          <Table columns={columns} data={applications} onSelect={handleSelect} selectedItems={selectedApplications} />
         )}
       </div>
       {modalVisible && selectedDocumentId && (
@@ -392,10 +378,10 @@ function ApplicationsList() {
           documentId={selectedDocumentId}
           onClose={closeModal}
           onApprove={approveDocument}
-          applyStatus={selectedApplyStatus} 
+          applyStatus={selectedApplyStatus}
         />
       )}
-     </div>
+    </div>
   );
 }
 

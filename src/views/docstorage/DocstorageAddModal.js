@@ -23,6 +23,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
     disposalDate: '',
     dpdNum: '',
   });
+
   const resetFormData = () => {
     setFormData({
       teamNm: '',
@@ -315,6 +316,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
                   name="createDate"
                   value={formData.createDate}
                   onChange={handleChange}
+                  placeholder="yyyy-mm-dd"
                 />
               </div>
               <div className="docstorage-add-detail-row">
@@ -346,6 +348,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
                   name="disposalDate"
                   value={formData.disposalDate}
                   onChange={handleChange}
+                  placeholder="yyyy-mm-dd"
                 />
               </div>
               <div className="docstorage-add-detail-row">
