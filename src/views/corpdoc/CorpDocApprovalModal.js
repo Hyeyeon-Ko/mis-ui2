@@ -6,17 +6,17 @@ import BlankImage from '../../assets/images/blank.png';
 const CorpDocApprovalModal = ({ show, onClose, documentDetails = { signitureImage: BlankImage, approvers: [] } }) => {
   if (!show) return null;
 
-  const renderApproverInfo = (approver, index) => (
-    <td key={index}>
-      <div className="approver-info">
-        <div className="approver-image">
-          <img src={approver?.signitureImage || BlankImage} alt="Approver" />
-        </div>
-        <div>{approver?.approvalDate || ''}</div>
-        <div>{approver?.name || ''}</div>
-      </div>
-    </td>
-  );
+  // const renderApproverInfo = (approver, index) => (
+  //   <td key={index}>
+  //     <div className="approver-info">
+  //       <div className="approver-image">
+  //         <img src={approver?.signitureImage || BlankImage} alt="Approver" />
+  //       </div>
+  //       <div>{approver?.approvalDate || ''}</div>
+  //       <div>{approver?.name || ''}</div>
+  //     </div>
+  //   </td>
+  // );
 
   return (
     <div className="corpdoc-approval-modal-overlay">
@@ -29,8 +29,8 @@ const CorpDocApprovalModal = ({ show, onClose, documentDetails = { signitureImag
           <thead>
             <tr>
               <th>신청자</th>
-              <th>담당자</th>
-              <th>부서장</th>
+              {/* <th>담당자</th>
+              <th>부서장</th> */}
             </tr>
           </thead>
           <tbody>
@@ -46,9 +46,9 @@ const CorpDocApprovalModal = ({ show, onClose, documentDetails = { signitureImag
                   </div>
                 </div>
               </td>
-              {Array.from({ length: 2 }).map((_, index) =>
+              {/* {Array.from({ length: 2 }).map((_, index) =>
                 renderApproverInfo(documentDetails.approvers[index], index)
-              )}
+              )} */}
             </tr>
           </tbody>
         </table>

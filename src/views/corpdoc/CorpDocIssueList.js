@@ -38,6 +38,7 @@ function CorpDocIssueList() {
       if (response.data) {
         const issueListData = response.data.data.issueList.map(item => ({
           id: item.draftId,
+          date: item.draftDate,
           issueDate: item.issueDate.split("T")[0],
           submission: item.submission,
           purpose: item.purpose,
@@ -52,13 +53,13 @@ function CorpDocIssueList() {
           applicantName: item.drafter,
           center: item.instNm,
           approveStatus: '결재진행중',
+          status: item.status,
           approvers: [],
           signitureImage: SignitureImage,
         }));
 
         const issuePendingListData = response.data.data.issuePendingList.map(item => ({
           id: item.draftId,
-          date: item.draftDate,
           useDate: item.useDate,
           submission: item.submission,
           purpose: item.purpose,
@@ -79,7 +80,6 @@ function CorpDocIssueList() {
         setFilteredPendingApplications(issuePendingListData);
 
         const totalValues = extractTotalValues(issueListData);
-        console.log("total: ", totalValues.totalCorpseal, totalValues.totalCoregister);
 
         setTotalCorpseal(totalValues.totalCorpseal);
         setTotalCoregister(totalValues.totalCoregister);
@@ -98,12 +98,13 @@ function CorpDocIssueList() {
     const lastRow = data[data.length - 1];
     const totalCorpseal = lastRow?.corpSeal?.left ?? 0;
     const totalCoregister = lastRow?.registry?.left ?? 0;
-    
-    console.log("total: ", totalCorpseal, totalCoregister);
   
     return { totalCorpseal, totalCoregister };
   };
   
+  useEffect(() => {
+    console.log("filtered: ", filteredApplications);
+  }, [filteredApplications]);
 
   const handleSearch = ({ searchType, keyword, startDate, endDate }, listType = 'applications') => {
     let filtered = listType === 'applications' ? applications : pendingApplications;
@@ -272,7 +273,7 @@ function CorpDocIssueList() {
                   <td>{index + 1}</td>
                   <td>{app.issueDate}</td>
                   <td>{app.center}</td>
-                  <td>{app.applicantName}</td>
+                  <td>{app.status === "X" ? '' : app.applicantName}</td>
                   <td>{app.submission}</td>
                   <td>{app.purpose}</td>
                   <td>{app.corpSeal.incoming}</td>
@@ -281,7 +282,12 @@ function CorpDocIssueList() {
                   <td>{app.registry.incoming}</td>
                   <td>{app.registry.used}</td>
                   <td>{app.registry.left}</td>
-                  <td>{app.approveStatus}</td>
+                  <td
+                    className={`status-${app.approveStatus.replace(/\s+/g, '-').toLowerCase()} clickable ${
+                      clickedRows.includes(app.id) ? 'confirmed' : ''}`}
+                    onClick={() => handleRowClick(app.approveStatus, app)}>
+                    {app.approveStatus}
+                  </td>
                 </tr>
               ))}
             </tbody>
