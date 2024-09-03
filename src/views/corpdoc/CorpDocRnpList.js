@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { AuthContext } from '../../components/AuthContext';
 import Breadcrumb from '../../components/common/Breadcrumb';
-import ConditionFilter from '../../components/common/ConditionFilter';
 import CorpDocApprovalModal from '../../views/corpdoc/CorpDocApprovalModal';
 import SignitureImage from '../../assets/images/signiture.png';
 import axios from 'axios';
@@ -9,19 +8,13 @@ import '../../styles/corpdoc/CorpDocRnpList.css';
 
 function CorpDocRnpList() {
   const { auth } = useContext(AuthContext);
-  const [applications, setApplications] = useState([]);
+
   const [filteredApplications, setFilteredApplications] = useState([]);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
   const [clickedRows, setClickedRows] = useState([]);
 
-  useEffect(() => {
-    fetchRnpData();
-  }, []);
-
-  const fetchRnpData = async () => {
+  const fetchRnpData = useCallback(async () => {
     try {
       const response = await axios.get('/api/corpDoc/rnpList', {
         params: {instCd: auth.instCd},
@@ -38,12 +31,11 @@ function CorpDocRnpList() {
           registry: item.certCoregister,
           usesignet: item.certUsesignet,
           warrant: item.warrant,
-          status: '결재진행중', // Assuming status is always in progress
+          status: '결재진행중',
           signitureImage: SignitureImage,
           approvers: [],
         }));
 
-        setApplications(rnpListData);
         setFilteredApplications(rnpListData);
 
         const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
@@ -52,38 +44,11 @@ function CorpDocRnpList() {
     } catch (error) {
       console.error("Error fetching RNP data:", error);
     }
-  };
+  }, [auth.instCd]);
 
-  const handleSearch = ({ searchType, keyword, startDate, endDate }) => {
-    let filtered = applications;
-
-    if (keyword) {
-      filtered = filtered.filter(app => {
-        if (searchType === '제출처') return app.submission.includes(keyword);
-        if (searchType === '사용목적') return app.purpose.includes(keyword);
-        if (searchType === '인장구분') return app.status.includes(keyword);
-        if (searchType === '전체') {
-          return (
-            app.submission.includes(keyword) ||
-            app.purpose.includes(keyword) ||
-            app.status.includes(keyword)
-          );
-        }
-        return true;
-      });
-    }
-
-    if (startDate && endDate) {
-      filtered = filtered.filter(app => {
-        const appDate = new Date(app.date);
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        return appDate >= start && appDate <= end;
-      });
-    }
-
-    setFilteredApplications(filtered);
-  };
+  useEffect(() => {
+    fetchRnpData();
+  }, [fetchRnpData]);
 
   const closeModal = () => {
     setModalVisible(false);
