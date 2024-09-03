@@ -18,31 +18,38 @@ function TotalRentalManage() {
     const dragMode = useRef('select'); 
 
     useEffect(() => {
-        const fetchRentalData = async () => {
-            try {
-                const response = await axios.get('/api/rentalList/total');
-                const { centerResponses, centerRentalResponses, summaryResponses } = response.data.data;
+      const fetchRentalData = async () => {
+          try {
+              const response = await axios.get('/api/rentalList/total');
+              const { centerResponses, centerRentalResponses, summaryResponses } = response.data.data;
+              console.log(response);
+  
+              const nationwideCenter = { detailNm: '전국센터', detailCd: 'all' };
+              const sortedCenterData = [
+                  nationwideCenter, 
+                  ...centerResponses
+              ];
+  
+              const formattedSummaryResponses = summaryResponses.map(summary => ({
+                  ...summary,
+                  monthlyRentalFee: summary.monthlyRentalFee.toLocaleString() 
+              }));
+  
+              setNationwideSummary(formattedSummaryResponses); 
+              setRentalDetails(formattedSummaryResponses);
+  
+              setCenterData(sortedCenterData);
+              setCenterRentalResponses(centerRentalResponses[0]);
+  
+          } catch (error) {
+              console.error("렌탈 데이터를 불러오는 중 오류 발생:", error);
+          }
+      };
+  
+      fetchRentalData();
+  }, []);
 
-                const nationwideCenter = { detailNm: '전국센터', detailCd: 'all' };
-                const sortedCenterData = [
-                    nationwideCenter, 
-                    ...centerResponses
-                ];
-
-                setCenterData(sortedCenterData);
-                setCenterRentalResponses(centerRentalResponses[0]);
-                setNationwideSummary(summaryResponses); 
-
-                setRentalDetails(summaryResponses);
-            } catch (error) {
-                console.error("렌탈 데이터를 불러오는 중 오류 발생:", error);
-            }
-        };
-
-        fetchRentalData();
-    }, []);
-
-    const getDefaultColumns = () => [
+  const getDefaultColumns = () => [
       {
           header: (
               <input

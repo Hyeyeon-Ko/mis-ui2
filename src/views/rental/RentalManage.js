@@ -264,6 +264,7 @@ function RentalManage() {
         },
     },
     { header: 'NO', accessor: 'no' },
+    { header: '상태', accessor: 'status' },
     { header: '제품군', accessor: 'category' },
     { header: '업체명', accessor: 'companyNm' },
     { header: '계약번호', accessor: 'contractNum' },
@@ -274,7 +275,6 @@ function RentalManage() {
     { header: '위치분류', accessor: 'location' },
     { header: '설치위치', accessor: 'installationSite' },
     { header: '특이사항', accessor: 'specialNote' },
-    { header: '상태', accessor: 'status' },
 ];
   
   return (
