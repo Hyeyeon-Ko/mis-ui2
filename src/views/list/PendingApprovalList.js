@@ -176,6 +176,7 @@ function PendingApprovalList() {
     } else if (docType === '인장신청(반출)') {
       const sealExportDetails = await fetchSealExportDetail(draftId);
       navigate(`/api/seal/export/${draftId}?readonly=true&applyStatus=승인대기`, { state: { sealExportDetails, readOnly: true }});
+    }
   };
 
   const handleSearch = () => {
@@ -295,7 +296,5 @@ function PendingApprovalList() {
     </div>
     );
   }
-}
 
 export default PendingApprovalList;
-

@@ -14,7 +14,7 @@ function MyApplyList() {
   const [applications, setApplications] = useState([]);
   const [startDate, setStartDate] = useState(() => {
     const date = new Date();
-    date.setMonth(date.getMonth() - 1); // 한 달 전
+    date.setMonth(date.getMonth() - 1); 
     return date;
   });
   const [endDate, setEndDate] = useState(new Date());
@@ -29,9 +29,9 @@ function MyApplyList() {
     try {
       const response = await axios.get('/api/myApplyList', {
         params: {
-          documentType: filterParams.documentType || null,
-          startDate: filterParams.startDate || '',
-          endDate: filterParams.endDate || '',
+          documentType: filterParams.documentType || documentType || null,
+          startDate: filterParams.startDate || startDate.toISOString().split('T')[0],
+          endDate: filterParams.endDate || endDate.toISOString().split('T')[0],
           userId: auth.userId, 
         },
       });
@@ -75,18 +75,11 @@ function MyApplyList() {
     } catch (error) {
       console.error('Error fetching applications:', error.response?.data || error.message);
     }
-  }, [documentType, auth.userId]);
+  }, [documentType, startDate, endDate, auth.userId]);
 
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
-
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
   };
 
   const getStatusText = (status) => {
@@ -162,7 +155,7 @@ function MyApplyList() {
 
   const handleReset = () => {
     const defaultStartDate = new Date();
-    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1); // 한 달 전
+    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
     setStartDate(defaultStartDate);
     setEndDate(new Date());
     setDocumentType('');
