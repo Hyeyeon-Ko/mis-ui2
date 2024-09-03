@@ -109,6 +109,7 @@ function ApplicationsList() {
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
 
       setApplications(transformedData);
+      resetFilters();  
     } catch (error) {
       console.error('Error fetching applications:', error);
       setError('데이터를 불러오는 중 오류가 발생했습니다.');
@@ -135,6 +136,15 @@ function ApplicationsList() {
       console.error('Error fetching seal export details:', error);
       alert('반출신청 정보를 불러오는 중 오류가 발생했습니다.');
     }
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      statusApproved: false,
+      statusRejected: false,
+      statusOrdered: false,
+      statusClosed: false,
+    });
   };
 
   useEffect(() => {
@@ -205,18 +215,21 @@ function ApplicationsList() {
       searchType: '전체',
       keyword: '',
     });
-    setFilters({
-      statusApproved: false,
-      statusRejected: false,
-      statusOrdered: false,
-      statusClosed: false,
-    });
+    resetFilters();
     setSelectedCenter('전체');
     fetchApplications();
   };
 
+  const filteredApplications = applications.filter((app) => {
+    if (filters.statusApproved && app.applyStatus === '승인완료') return true;
+    if (filters.statusRejected && app.applyStatus === '반려') return true;
+    if (filters.statusOrdered && app.applyStatus === '발주완료') return true;
+    if (filters.statusClosed && app.applyStatus === '처리완료') return true;
+    return !Object.values(filters).some(Boolean); 
+  });
+
   const handleSelectAll = (isChecked) => {
-    setSelectedApplications(isChecked ? applications.map(app => app.draftId) : []);
+    setSelectedApplications(isChecked ? filteredApplications.map(app => app.draftId) : []);
   };
 
   const handleSelect = (isChecked, id) => {
@@ -369,7 +382,7 @@ function ApplicationsList() {
         ) : error ? (
           <p>{error}</p>
         ) : (
-          <Table columns={columns} data={applications} onSelect={handleSelect} selectedItems={selectedApplications} />
+          <Table columns={columns} data={filteredApplications} onSelect={handleSelect} selectedItems={selectedApplications} />
         )}
       </div>
       {modalVisible && selectedDocumentId && (

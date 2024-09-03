@@ -19,27 +19,37 @@ function DocInList() {
   const [deptResponses, setDeptResponses] = useState([]);
   const [selectedDeptCd, setSelectedDeptCd] = useState(null);
 
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [filterInputs, setFilterInputs] = useState({
+    startDate: null,
+    endDate: null,
+    searchType: '전체',
+    keyword: '',
+  });
 
-  const fetchDeptList = async (instCd) => {
+  const [filters, setFilters] = useState({
+    statusApproved: false,
+    statusRejected: false,
+    statusOrdered: false,
+    statusClosed: false,
+  });
+
+  // 부서 목록을 가져오는 함수
+  const fetchDocInList = useCallback(async (params = {}) => {
     try {
-      const response = await axios.get('/api/doc/deptList', {
-        params: { instCd },
+      const formatDate = (date) => date ? date.toISOString().split('T')[0] : null;
+  
+      const response = await axios.get('/api/doc/receiveList', {
+        params: {
+          instCd: auth.instCd,
+          startDate: formatDate(params.startDate),
+          endDate: formatDate(params.endDate),
+          searchType: params.searchType || null,
+          keyword: params.keyword || null,
+        },
       });
-      setDeptResponses(response.data.data);
-    } catch (error) {
-      console.error('부서 리스트를 불러오는데 실패했습니다.', error);
-    }
-  };
-
-  const fetchDocInList = useCallback(async (deptCd = null) => {
-    try {
-      const params = {
-        instCd: auth.instCd,
-        ...(deptCd && { deptCd }),
-      };
-      const response = await axios.get('/api/doc/receiveList', { params });
+    
+      console.log('response: ', response);
+  
       if (response.data && response.data.data) {
         const formattedData = response.data.data.map((item) => ({
           draftId: item.draftId,
@@ -49,24 +59,29 @@ function DocInList() {
           title: item.title,
           drafter: item.drafter,
           status: item.status,
-          fileName: item.fileName, 
-          fileUrl: item.fileUrl,   
+          fileName: item.fileName,
+          fileUrl: item.fileUrl,
           deleted: item.status === '신청취소',
         }));
         setApplications(formattedData);
         setFilteredApplications(formattedData);
       }
     } catch (error) {
-      console.error('Error fetching document list:', error);
+      console.error('문서 목록을 불러오는 중 오류가 발생했습니다:', error);
     }
   }, [auth.instCd]);
+  
+  // 부서 변경 시 문서 목록 갱신
+  const handleDeptChange = (e) => {
+    const deptCd = e.target.value;
+    setSelectedDeptCd(deptCd);
 
-  useEffect(() => {
-    if (auth.instCd) {
-      fetchDeptList(auth.instCd);
+    if (deptCd) {
+      fetchDeptReceiveList(deptCd);
+    } else {
       fetchDocInList();
     }
-  }, [auth.instCd, fetchDocInList]);
+  };
 
   const fetchDeptReceiveList = async (deptCd) => {
     try {
@@ -82,29 +97,19 @@ function DocInList() {
           title: item.title,
           drafter: item.drafter,
           status: item.status,
-          fileName: item.fileName, 
-          fileUrl: item.fileUrl,   
+          fileName: item.fileName,
+          fileUrl: item.fileUrl,
           deleted: item.status === '신청취소',
         }));
         setApplications(formattedData);
         setFilteredApplications(formattedData);
       }
     } catch (error) {
-      console.error('부서별 문서 수신 목록을 불러오는데 실패했습니다.', error);
+      console.error('부서별 문서 수신 목록을 불러오는 중 오류가 발생했습니다.', error);
     }
   };
 
-  const handleDeptChange = (e) => {
-    const deptCd = e.target.value;
-    setSelectedDeptCd(deptCd);
-
-    if (deptCd) {
-      fetchDeptReceiveList(deptCd);
-    } else {
-      fetchDocInList();
-    }
-  };
-
+  // 파일 다운로드 핸들러
   const handleFileDownload = async (fileName) => {
     try {
       const response = await axios.get(`/api/doc/download/${encodeURIComponent(fileName)}`, {
@@ -114,16 +119,17 @@ function DocInList() {
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', fileName); 
+      link.setAttribute('download', fileName);
       document.body.appendChild(link);
       link.click();
       link.parentNode.removeChild(link);
     } catch (error) {
-      console.error('Error downloading the file:', error);
+      console.error('파일 다운로드 중 오류가 발생했습니다:', error);
       alert('파일 다운로드에 실패했습니다.');
     }
   };
 
+  // 문서 삭제 핸들러
   const handleDeleteClick = (draftId, status) => {
     if (draftId) {
       setSelectedDraftId(draftId);
@@ -133,7 +139,7 @@ function DocInList() {
         setShowDeleteModal(true);
       }
     } else {
-      console.error('Invalid draftId:', draftId);
+      console.error('잘못된 draftId:', draftId);
     }
   };
 
@@ -155,7 +161,7 @@ function DocInList() {
 
       setShowDeleteModal(false);
     } catch (error) {
-      console.error('Error deleting document:', error);
+      console.error('문서 삭제 중 오류가 발생했습니다:', error);
     }
   };
 
@@ -177,40 +183,50 @@ function DocInList() {
 
       setShowRevertModal(false);
     } catch (error) {
-      console.error('Error reverting document:', error);
+      console.error('문서 되돌리기 중 오류가 발생했습니다:', error);
     }
   };
 
-  const handleSearch = ({ searchType, keyword, startDate, endDate }) => {
-    let filtered = applications;
-
-    if (keyword) {
-      filtered = filtered.filter((app) => {
-        if (searchType === '발신처') return app.resSender.includes(keyword);
-        if (searchType === '제목') return app.title.includes(keyword);
-        if (searchType === '접수인') return app.drafter.includes(keyword);
-        if (searchType === '전체') {
-          return (
-            app.resSender.includes(keyword) ||
-            app.title.includes(keyword) ||
-            app.drafter.includes(keyword)
-          );
-        }
-        return true;
-      });
-    }
-
-    if (startDate && endDate) {
-      filtered = filtered.filter((app) => {
-        const appDate = new Date(app.draftDate);
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        return appDate >= start && appDate <= end;
-      });
-    }
-
-    setFilteredApplications(filtered);
+  // 검색 핸들러
+  const handleSearch = () => {
+    fetchDocInList({
+      startDate: filterInputs.startDate,
+      endDate: filterInputs.endDate,
+      searchType: filterInputs.searchType,
+      keyword: filterInputs.keyword,
+    });
   };
+
+  // 필터 초기화 핸들러
+  const handleReset = () => {
+    setFilterInputs({
+      startDate: null,
+      endDate: null,
+      searchType: '전체',
+      keyword: '',
+    });
+    setFilters({
+      statusApproved: false,
+      statusRejected: false,
+      statusOrdered: false,
+      statusClosed: false,
+    });
+    fetchDocInList();
+  };
+
+  const applyStatusFilters = (applications) => {
+    return applications.filter((app) => {
+      if (filters.statusApproved && app.status === '승인완료') return true;
+      if (filters.statusRejected && app.status === '반려') return true;
+      if (filters.statusOrdered && app.status === '발주완료') return true;
+      if (filters.statusClosed && app.status === '처리완료') return true;
+      return !Object.values(filters).some(Boolean);
+    });
+  };
+
+  useEffect(() => {
+    setFilteredApplications(applyStatusFilters(applications));
+  }, [filters, applications]);
 
   const columns = [
     { header: '접수일자', accessor: 'draftDate', width: '8%' },
@@ -275,15 +291,23 @@ function DocInList() {
         </div>
 
         <ConditionFilter
-          startDate={startDate}
-          setStartDate={setStartDate}
-          endDate={endDate}
-          setEndDate={setEndDate}
+          startDate={filterInputs.startDate}
+          setStartDate={(date) => setFilterInputs(prev => ({ ...prev, startDate: date }))}
+          endDate={filterInputs.endDate}
+          setEndDate={(date) => setFilterInputs(prev => ({ ...prev, endDate: date }))}
           onSearch={handleSearch}
-          onReset={() => setFilteredApplications(applications)}
+          onReset={handleReset}
           showDocumentType={false}
           showSearchCondition={true}
           excludeRecipient={true}
+          searchType={filterInputs.searchType}
+          setSearchType={(searchType) => setFilterInputs(prev => ({ ...prev, searchType }))}
+          keyword={filterInputs.keyword}
+          setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
+          filters={filters}
+          setFilters={setFilters}
+          onFilterChange={() => {}}
+          showStatusFilters={true}
         />
         <div className="doc-in-content">
           <Table columns={columns} data={filteredApplications} />

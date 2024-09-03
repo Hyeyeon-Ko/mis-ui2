@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import DateFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
@@ -12,8 +12,12 @@ import axios from 'axios';
 function MyApplyList() {
   const { auth } = useContext(AuthContext); 
   const [applications, setApplications] = useState([]);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [startDate, setStartDate] = useState(() => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - 1); // 한 달 전
+    return date;
+  });
+  const [endDate, setEndDate] = useState(new Date());
   const [documentType, setDocumentType] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
@@ -32,8 +36,6 @@ function MyApplyList() {
         },
       });
 
-      console.log('data: ', response);
-  
       const data = response.data?.data || {};
       const combinedData = [
         ...(data.myBcdResponses || []),
@@ -65,8 +67,6 @@ function MyApplyList() {
         manager: application.approver || application.disapprover || '',
       }));
 
-      console.log('transformedData: ', transformedData);
-  
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
   
       setApplications(transformedData);
@@ -74,10 +74,6 @@ function MyApplyList() {
       console.error('Error fetching applications:', error.response?.data || error.message);
     }
   }, [documentType, auth.userId]);
-
-  useEffect(() => {
-    fetchApplications();
-  }, [fetchApplications, documentType]);
 
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
@@ -163,8 +159,10 @@ function MyApplyList() {
   };
 
   const handleReset = () => {
-    setStartDate(null);
-    setEndDate(null);
+    const defaultStartDate = new Date();
+    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1); // 한 달 전
+    setStartDate(defaultStartDate);
+    setEndDate(new Date());
     setDocumentType('');
     fetchApplications();
   };
@@ -222,6 +220,7 @@ function MyApplyList() {
           setDocumentType={setDocumentType} 
           onSearch={handleSearch}
           onReset={handleReset}
+          setFilters={() => {}} 
         />
         <Table columns={applicationColumns} data={applications} />
       </div>
