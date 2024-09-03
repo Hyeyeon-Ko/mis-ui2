@@ -265,6 +265,10 @@ function DetailCorpDocApplication() {
             alert('법인서류 신청 반려 중 오류가 발생했습니다.');
         }
     };
+
+    useEffect(() => {
+        console.log('isEdit:', isEdit);
+    }, [isEdit]);
     
 
     return (
@@ -457,29 +461,29 @@ function DetailCorpDocApplication() {
                                     disabled={isReadOnly}
                                 />
                             </div>
-                            {applyStatus === '승인대기' && 
+                            { !isReadOnly && (
+                              <div className="edit-buttons">
+                                <CustomButton className="apply-request-button" onClick={handleSubmit}>
+                                    수정하기
+                                </CustomButton>
+                                </div>
+                            )}
+                            {applyStatus === '승인대기' && isReadOnly && (
                                 <div className="corpDoc-apply-button-container">
-                                { isReadOnly ? (
-                                        <div className="approval-buttons">
+                                    <div className="approval-buttons">
                                         <CustomButton className="approve-button" onClick={handleApprove}>승인</CustomButton>
                                         <CustomButton className="reject-button" onClick={handleReject}>반려</CustomButton>
-                                        </div>
-                                    ) : (
-                                    <CustomButton className="apply-request-button" type="submit">
-                                        {isEdit ? '수정하기' : '서류 신청하기'}
-                                    </CustomButton>
-                                    )
-                                }
-                            </div>
-                            }
-                            {showRejectModal && (
-            <RejectReasonModal 
-                show={showRejectModal}
-                onConfirm={handleRejectConfirm}
-                onClose={handleRejectClose}
-            />
-        )}
-                        </form>
+                                    </div>
+                                </div>
+                            )}
+                        </form>    
+                        {showRejectModal && (
+                            <RejectReasonModal 
+                                show={showRejectModal}
+                                onConfirm={handleRejectConfirm}
+                                onClose={handleRejectClose}
+                            />
+                        )}
                     </div>
                 </div>
             </div>

@@ -91,6 +91,7 @@ function ApplicationsList() {
         ...(sealMasterResponses || []),
       ];
 
+      // '신청상태 없음'인 데이터 (ex. 법인서류 입고) 는 화면에 보이지 않도록
       const filteredData = combinedData.filter(application => application.applyStatus !== 'X');
 
       const transformedData = filteredData.map(application => {
@@ -111,7 +112,6 @@ function ApplicationsList() {
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
 
       setApplications(transformedData);
-      resetFilters();  
     } catch (error) {
       console.error('Error fetching applications:', error);
       setError('데이터를 불러오는 중 오류가 발생했습니다.');
@@ -148,16 +148,17 @@ function ApplicationsList() {
       statusClosed: false,
     });
   };
-useEffect(() => {
-  setFilterInputs((prev) => ({
-    ...prev,
-    documentType: documentTypeFromUrl || ''
-  }));
-}, [documentTypeFromUrl]);
 
-useEffect(() => {
-  fetchApplications();
-}, [fetchApplications, documentTypeFromUrl]); 
+  useEffect(() => {
+    setFilterInputs((prev) => ({
+      ...prev,
+      documentType: documentTypeFromUrl || ''
+    }));
+  }, [documentTypeFromUrl]);
+
+  useEffect(() => {
+    fetchApplications();
+  }, [fetchApplications, documentTypeFromUrl]); 
 
   useEffect(() => {
     if (documentTypeFromUrl === '명함신청') {
@@ -225,21 +226,18 @@ useEffect(() => {
       searchType: '전체',
       keyword: '',
     });
-    resetFilters();
+    setFilters({
+      statusApproved: false,
+      statusRejected: false,
+      statusOrdered: false,
+      statusClosed: false,
+    });
     setSelectedCenter('전체');
     fetchApplications();
   };
 
-  const filteredApplications = applications.filter((app) => {
-    if (filters.statusApproved && app.applyStatus === '승인완료') return true;
-    if (filters.statusRejected && app.applyStatus === '반려') return true;
-    if (filters.statusOrdered && app.applyStatus === '발주완료') return true;
-    if (filters.statusClosed && app.applyStatus === '처리완료') return true;
-    return !Object.values(filters).some(Boolean); 
-  });
-
   const handleSelectAll = (isChecked) => {
-    setSelectedApplications(isChecked ? filteredApplications.map(app => app.draftId) : []);
+    setSelectedApplications(isChecked ? applications.map(app => app.draftId) : []);
   };
 
   const handleSelect = (isChecked, id) => {
@@ -400,7 +398,7 @@ useEffect(() => {
         ) : error ? (
           <p>{error}</p>
         ) : (
-          <Table columns={columns} data={filteredApplications} onSelect={handleSelect} selectedItems={selectedApplications} />
+          <Table columns={columns} data={applications} onSelect={handleSelect} selectedItems={selectedApplications} />
         )}
       </div>
       {modalVisible && selectedDocumentId && (

@@ -57,15 +57,17 @@ function MyApplyList() {
         ? uniqueData.filter(application => application.docType === documentType)
         : uniqueData;
 
-      const transformedData = filteredData.map(application => ({
-        ...application,
-        draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
-        approvalDate: application.respondDate ? parseDateTime(application.respondDate) : '',
-        drafter: application.drafter,
-        applyStatus: getStatusText(application.applyStatus),
-        rejectionReason: application.rejectReason,
-        manager: application.approver || application.disapprover || '',
-      }));
+      const transformedData = filteredData
+        .filter(application => application.applyStatus !== 'X')
+        .map(application => ({
+          ...application,
+          draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
+          approvalDate: application.respondDate ? parseDateTime(application.respondDate) : '',
+          drafter: application.drafter,
+          applyStatus: getStatusText(application.applyStatus),
+          rejectionReason: application.rejectReason,
+          manager: application.approver || application.disapprover || '',
+        }));
 
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
   
