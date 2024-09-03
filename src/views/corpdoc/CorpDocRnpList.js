@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../../components/AuthContext';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import CorpDocApprovalModal from '../../views/corpdoc/CorpDocApprovalModal';
@@ -7,6 +8,7 @@ import axios from 'axios';
 import '../../styles/corpdoc/CorpDocRnpList.css';
 
 function CorpDocRnpList() {
+  const { auth } = useContext(AuthContext);
   const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [startDate, setStartDate] = useState(null);
@@ -21,8 +23,9 @@ function CorpDocRnpList() {
 
   const fetchRnpData = async () => {
     try {
-      const response = await axios.get('/api/corpDoc/rnpList');
-      console.log("response: ", response);
+      const response = await axios.get('/api/corpDoc/rnpList', {
+        params: {instCd: auth.instCd},
+      });
 
       if (response.data) {
         const rnpListData = response.data.data.map(item => ({
