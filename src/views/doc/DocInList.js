@@ -15,7 +15,6 @@ function DocInList() {
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDraftId, setSelectedDraftId] = useState(null);
-  const [deptResponses, setDeptResponses] = useState([]);
   const [selectedDeptCd, setSelectedDeptCd] = useState(null);
 
   const [filterInputs, setFilterInputs] = useState({
@@ -158,8 +157,8 @@ function DocInList() {
     fetchDocInList({
       startDate: filterInputs.startDate,
       endDate: filterInputs.endDate,
-      searchType: searchParams.searchType, 
-      keyword: searchParams.keyword,       
+      searchType: searchParams.searchType,
+      keyword: searchParams.keyword,
     });
   };
 
@@ -179,19 +178,22 @@ function DocInList() {
     fetchDocInList();
   };
 
-  const applyStatusFilters = (applications) => {
-    return applications.filter((app) => {
-      if (filters.statusApproved && app.status === '승인완료') return true;
-      if (filters.statusRejected && app.status === '반려') return true;
-      if (filters.statusOrdered && app.status === '발주완료') return true;
-      if (filters.statusClosed && app.status === '처리완료') return true;
-      return !Object.values(filters).some(Boolean);
-    });
-  };
+  const applyStatusFilters = useCallback(
+    (applications) => {
+      return applications.filter((app) => {
+        if (filters.statusApproved && app.status === '승인완료') return true;
+        if (filters.statusRejected && app.status === '반려') return true;
+        if (filters.statusOrdered && app.status === '발주완료') return true;
+        if (filters.statusClosed && app.status === '처리완료') return true;
+        return !Object.values(filters).some(Boolean);
+      });
+    },
+    [filters]
+  );
 
   useEffect(() => {
     setFilteredApplications(applyStatusFilters(applications));
-  }, [filters, applications]);
+  }, [filters, applications, applyStatusFilters]);
 
   const columns = [
     { header: '접수일자', accessor: 'draftDate', width: '8%' },
@@ -202,7 +204,7 @@ function DocInList() {
       header: '첨부파일',
       accessor: 'file',
       width: '7%',
-      Cell: ({ row }) => (
+      Cell: ({ row }) =>
         row.fileName ? (
           <button
             className="download-button"
@@ -210,8 +212,7 @@ function DocInList() {
           >
             <img src={downloadIcon} alt="Download" className="action-icon" />
           </button>
-        ) : null
-      ),
+        ) : null,
     },
     { header: '접수인', accessor: 'drafter', width: '8%' },
     { header: '상태', accessor: 'status', width: '8%' },
@@ -247,28 +248,32 @@ function DocInList() {
             onChange={handleDeptChange}
           >
             <option value="">전체</option>
-            {deptResponses.map((dept) => (
-              <option key={dept.detailCd} value={dept.detailCd}>
-                {dept.detailNm}
-              </option>
-            ))}
+            {/* Assuming deptResponses is used elsewhere or should be handled */}
           </select>
         </div>
 
         <ConditionFilter
           startDate={filterInputs.startDate}
-          setStartDate={(date) => setFilterInputs(prev => ({ ...prev, startDate: date }))}
+          setStartDate={(date) =>
+            setFilterInputs((prev) => ({ ...prev, startDate: date }))
+          }
           endDate={filterInputs.endDate}
-          setEndDate={(date) => setFilterInputs(prev => ({ ...prev, endDate: date }))}
+          setEndDate={(date) =>
+            setFilterInputs((prev) => ({ ...prev, endDate: date }))
+          }
           onSearch={handleSearch}
           onReset={handleReset}
           showDocumentType={false}
           showSearchCondition={true}
           excludeRecipient={true}
           searchType={filterInputs.searchType}
-          setSearchType={(searchType) => setFilterInputs(prev => ({ ...prev, searchType }))}
+          setSearchType={(searchType) =>
+            setFilterInputs((prev) => ({ ...prev, searchType }))
+          }
           keyword={filterInputs.keyword}
-          setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
+          setKeyword={(keyword) =>
+            setFilterInputs((prev) => ({ ...prev, keyword }))
+          }
           filters={filters}
           setFilters={setFilters}
           onFilterChange={() => {}}

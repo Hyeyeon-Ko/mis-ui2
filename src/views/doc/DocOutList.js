@@ -30,39 +30,42 @@ function DocOutList() {
     statusClosed: false,
   });
 
-  const formatDate = (date) => date ? date.toISOString().split('T')[0] : null;
+  const formatDate = (date) => (date ? date.toISOString().split('T')[0] : null);
 
-  const fetchDocOutList = useCallback(async (params = {}) => {
-    try {
-      const response = await axios.get('/api/doc/sendList', {
-        params: {
-          instCd: auth.instCd,
-          startDate: formatDate(params.startDate),
-          endDate: formatDate(params.endDate),
-          searchType: params.searchType || null,
-          keyword: params.keyword || null,
-        },
-      });
+  const fetchDocOutList = useCallback(
+    async (params = {}) => {
+      try {
+        const response = await axios.get('/api/doc/sendList', {
+          params: {
+            instCd: auth.instCd,
+            startDate: formatDate(params.startDate),
+            endDate: formatDate(params.endDate),
+            searchType: params.searchType || null,
+            keyword: params.keyword || null,
+          },
+        });
 
-      if (response.data && response.data.data) {
-        const formattedData = response.data.data.map((item) => ({
-          draftId: item.draftId,
-          draftDate: item.draftDate,
-          docId: item.docId,
-          resSender: item.resSender,
-          title: item.title,
-          drafter: item.drafter,
-          status: item.status,
-          fileName: item.fileName,
-          fileUrl: item.fileUrl,
-        }));
-        setApplications(formattedData);
-        setFilteredApplications(formattedData);
+        if (response.data && response.data.data) {
+          const formattedData = response.data.data.map((item) => ({
+            draftId: item.draftId,
+            draftDate: item.draftDate,
+            docId: item.docId,
+            resSender: item.resSender,
+            title: item.title,
+            drafter: item.drafter,
+            status: item.status,
+            fileName: item.fileName,
+            fileUrl: item.fileUrl,
+          }));
+          setApplications(formattedData);
+          setFilteredApplications(formattedData);
+        }
+      } catch (error) {
+        console.error('Error fetching document list:', error);
       }
-    } catch (error) {
-      console.error('Error fetching document list:', error);
-    }
-  }, [auth.instCd]);
+    },
+    [auth.instCd]
+  );
 
   useEffect(() => {
     fetchDocOutList();
@@ -117,8 +120,8 @@ function DocOutList() {
     fetchDocOutList({
       startDate: filterInputs.startDate,
       endDate: filterInputs.endDate,
-      searchType: searchParams.searchType, 
-      keyword: searchParams.keyword,       
+      searchType: searchParams.searchType,
+      keyword: searchParams.keyword,
     });
   };
 
@@ -138,19 +141,22 @@ function DocOutList() {
     fetchDocOutList();
   };
 
-  const applyStatusFilters = (applications) => {
-    return applications.filter((app) => {
-      if (filters.statusApproved && app.status === '승인완료') return true;
-      if (filters.statusRejected && app.status === '반려') return true;
-      if (filters.statusOrdered && app.status === '발주완료') return true;
-      if (filters.statusClosed && app.status === '처리완료') return true;
-      return !Object.values(filters).some(Boolean);
-    });
-  };
+  const applyStatusFilters = useCallback(
+    (applications) => {
+      return applications.filter((app) => {
+        if (filters.statusApproved && app.status === '승인완료') return true;
+        if (filters.statusRejected && app.status === '반려') return true;
+        if (filters.statusOrdered && app.status === '발주완료') return true;
+        if (filters.statusClosed && app.status === '처리완료') return true;
+        return !Object.values(filters).some(Boolean);
+      });
+    },
+    [filters]
+  );
 
   useEffect(() => {
     setFilteredApplications(applyStatusFilters(applications));
-  }, [filters, applications]);
+  }, [filters, applications, applyStatusFilters]);
 
   const columns = [
     { header: '접수일자', accessor: 'draftDate', width: '8%' },
@@ -161,16 +167,12 @@ function DocOutList() {
       header: '첨부파일',
       accessor: 'file',
       width: '7%',
-      Cell: ({ row }) => (
+      Cell: ({ row }) =>
         row.fileName ? (
-          <button
-            className="download-button"
-            onClick={() => handleFileDownload(row.fileName)}
-          >
+          <button className="download-button" onClick={() => handleFileDownload(row.fileName)}>
             <img src={downloadIcon} alt="Download" className="action-icon" />
           </button>
-        ) : null
-      ),
+        ) : null,
     },
     { header: '접수인', accessor: 'drafter', width: '8%' },
     { header: '상태', accessor: 'status', width: '8%' },
@@ -198,18 +200,18 @@ function DocOutList() {
         <Breadcrumb items={['문서수발신 대장', '문서 발신 대장']} />
         <ConditionFilter
           startDate={filterInputs.startDate}
-          setStartDate={(date) => setFilterInputs(prev => ({ ...prev, startDate: date }))}
+          setStartDate={(date) => setFilterInputs((prev) => ({ ...prev, startDate: date }))}
           endDate={filterInputs.endDate}
-          setEndDate={(date) => setFilterInputs(prev => ({ ...prev, endDate: date }))}
+          setEndDate={(date) => setFilterInputs((prev) => ({ ...prev, endDate: date }))}
           onSearch={handleSearch}
           onReset={handleReset}
           showDocumentType={false}
           showSearchCondition={true}
           excludeSender={true}
           searchType={filterInputs.searchType}
-          setSearchType={(searchType) => setFilterInputs(prev => ({ ...prev, searchType }))}
+          setSearchType={(searchType) => setFilterInputs((prev) => ({ ...prev, searchType }))}
           keyword={filterInputs.keyword}
-          setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
+          setKeyword={(keyword) => setFilterInputs((prev) => ({ ...prev, keyword }))}
           filters={filters}
           setFilters={setFilters}
           onFilterChange={() => {}}

@@ -109,7 +109,6 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
           .catch((error) => {
             console.error('Error sending data:', error);
             if (error.response && error.response.status === 400) {
-              const errorMessage = error.response.data.message || '데이터 전송 중 오류가 발생했습니다.';
               alert("모든 항목을 입력하세요."); 
             } else {
               alert('데이터 전송 중 오류가 발생했습니다.');

@@ -21,6 +21,7 @@ function ApplicationsList() {
   const instCd = auth.instCd;
 
   const [applications, setApplications] = useState([]);
+  const [filteredApplications, setFilteredApplications] = useState([]); 
   const [filterInputs, setFilterInputs] = useState({
     startDate: null,
     endDate: null,
@@ -66,121 +67,6 @@ function ApplicationsList() {
     }
   };
 
-  const fetchApplications = useCallback(async (filterParams = {}) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axios.get('/api/applyList', {
-        params: {
-          documentType: filterParams.documentType || documentTypeFromUrl || null,
-          startDate: filterParams.startDate || '',
-          endDate: filterParams.endDate || '',
-          searchType: filterParams.searchType || '전체',
-          keyword: filterParams.keyword || '',
-          instCd: instCd || '',
-          instNm: selectedCenter || '',
-        },
-      });
-
-      const { bcdMasterResponses, docMasterResponses, corpDocMasterResponses, sealMasterResponses } = response.data.data;
-
-      const combinedData = [
-        ...(bcdMasterResponses || []),
-        ...(docMasterResponses || []),
-        ...(corpDocMasterResponses || []),
-        ...(sealMasterResponses || []),
-      ];
-
-      const filteredData = combinedData.filter(application => application.applyStatus !== 'X');
-
-      const transformedData = filteredData.map(application => {
-        return {
-          draftId: application.draftId,
-          instCd: application.instCd,
-          instNm: application.instNm,
-          title: application.title,
-          draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
-          respondDate: application.respondDate ? parseDateTime(application.respondDate) : '',
-          orderDate: application.orderDate ? parseDateTime(application.orderDate) : '',
-          drafter: application.drafter,
-          applyStatus: getStatusText(application.applyStatus),
-          docType: application.docType,
-        };
-      });
-
-      transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
-
-      setApplications(transformedData);
-    } catch (error) {
-      console.error('Error fetching applications:', error);
-      setError('데이터를 불러오는 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  }, [documentTypeFromUrl, instCd, selectedCenter]);
-
-  const fetchSealImprintDetail = async (draftId) => {
-    try {
-      const response = await axios.get(`/api/seal/imprint/${draftId}`);
-      return response.data.data;
-    } catch (error) {
-      console.error('Error fetching seal imprint details:', error);
-      alert('날인신청 정보를 불러오는 중 오류가 발생했습니다.');
-    }
-  };
-
-  const fetchSealExportDetail = async (draftId) => {
-    try {
-      const response = await axios.get(`/api/seal/export/${draftId}`);
-      return response.data.data;
-    } catch (error) {
-      console.error('Error fetching seal export details:', error);
-      alert('반출신청 정보를 불러오는 중 오류가 발생했습니다.');
-    }
-  };
-
-  const resetFilters = () => {
-    const defaultStartDate = new Date();
-    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
-    setFilterInputs({
-      startDate: defaultStartDate,
-      endDate: new Date(),
-      documentType: documentTypeFromUrl || '',
-      searchType: '전체',
-      keyword: '',
-    });
-    setFilters({
-      statusApproved: false,
-      statusRejected: false,
-      statusOrdered: false,
-      statusClosed: false,
-    });
-    setSelectedCenter('전체');
-  };
-  
-  useEffect(() => {
-    setFilterInputs((prev) => ({
-      ...prev,
-      documentType: documentTypeFromUrl || ''
-    }));
-  }, [documentTypeFromUrl]);
-
-  useEffect(() => {
-    resetFilters(); 
-    fetchApplications(); 
-  }, [documentTypeFromUrl, fetchApplications]);
-  
-  useEffect(() => {
-    if (documentTypeFromUrl === '명함신청') {
-      const isShowExcelButton = filters.statusClosed && selectedApplications.length > 0;
-      setShowCheckboxColumn(filters.statusClosed);
-      setShowExcelButton(isShowExcelButton);
-    } else {
-      setShowCheckboxColumn(false);
-      setShowExcelButton(false);
-    }
-  }, [filters, selectedApplications, documentTypeFromUrl]);
-
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
@@ -209,6 +95,128 @@ function ApplicationsList() {
     }
   };
 
+  const fetchApplications = async (filterParams = {}) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get('/api/applyList', {
+        params: {
+          documentType: filterParams.documentType || documentTypeFromUrl || null,
+          startDate: filterParams.startDate || '',
+          endDate: filterParams.endDate || '',
+          searchType: filterParams.searchType || '전체',
+          keyword: filterParams.keyword || '',
+          instCd: instCd || '',
+          instNm: selectedCenter || '',
+        },
+      });
+
+      const { bcdMasterResponses, docMasterResponses, corpDocMasterResponses, sealMasterResponses } = response.data.data;
+
+      const combinedData = [
+        ...(bcdMasterResponses || []),
+        ...(docMasterResponses || []),
+        ...(corpDocMasterResponses || []),
+        ...(sealMasterResponses || []),
+      ];
+
+      const filteredData = combinedData.filter(application => application.applyStatus !== 'X');
+
+      const transformedData = filteredData.map(application => ({
+        draftId: application.draftId,
+        instCd: application.instCd,
+        instNm: application.instNm,
+        title: application.title,
+        draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
+        respondDate: application.respondDate ? parseDateTime(application.respondDate) : '',
+        orderDate: application.orderDate ? parseDateTime(application.orderDate) : '',
+        drafter: application.drafter,
+        applyStatus: getStatusText(application.applyStatus),
+        docType: application.docType,
+      }));
+
+      transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
+
+      setApplications(transformedData);
+      applyStatusFilters(transformedData);
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+      setError('데이터를 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSealImprintDetail = async (draftId) => {
+    try {
+      const response = await axios.get(`/api/seal/imprint/${draftId}`);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching seal imprint details:', error);
+      alert('날인신청 정보를 불러오는 중 오류가 발생했습니다.');
+    }
+  };
+
+  const fetchSealExportDetail = async (draftId) => {
+    try {
+      const response = await axios.get(`/api/seal/export/${draftId}`);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching seal export details:', error);
+      alert('반출신청 정보를 불러오는 중 오류가 발생했습니다.');
+    }
+  };
+
+  const applyStatusFilters = useCallback((data) => {
+    const filtered = data.filter((app) => {
+      if (filters.statusApproved && app.applyStatus === '승인완료') return true;
+      if (filters.statusRejected && app.applyStatus === '반려') return true;
+      if (filters.statusOrdered && app.applyStatus === '발주완료') return true;
+      if (filters.statusClosed && app.applyStatus === '처리완료') return true;
+      return !Object.values(filters).some(Boolean); 
+    });
+    setFilteredApplications(filtered);
+  }, [filters]);
+
+  useEffect(() => {
+    applyStatusFilters(applications);
+  }, [filters, applications, applyStatusFilters]);
+
+  useEffect(() => {
+    resetFilters();
+    fetchApplications();
+  }, [documentTypeFromUrl]);
+
+  const resetFilters = useCallback(() => {
+    const defaultStartDate = new Date();
+    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
+    setFilterInputs({
+      startDate: defaultStartDate,
+      endDate: new Date(),
+      documentType: documentTypeFromUrl || '',
+      searchType: '전체',
+      keyword: '',
+    });
+    setFilters({
+      statusApproved: false,
+      statusRejected: false,
+      statusOrdered: false,
+      statusClosed: false,
+    });
+    setSelectedCenter('전체');
+  }, [documentTypeFromUrl]);
+
+  useEffect(() => {
+    if (documentTypeFromUrl === '명함신청') {
+      const isShowExcelButton = filters.statusClosed && selectedApplications.length > 0;
+      setShowCheckboxColumn(filters.statusClosed);
+      setShowExcelButton(isShowExcelButton);
+    } else {
+      setShowCheckboxColumn(false);
+      setShowExcelButton(false);
+    }
+  }, [filters, selectedApplications, documentTypeFromUrl]);
+
   const handleFilterChange = (e) => {
     const { name } = e.target;
     setFilters((prevFilters) => ({
@@ -222,8 +230,8 @@ function ApplicationsList() {
       documentType: filterInputs.documentType,
       startDate: filterInputs.startDate ? filterInputs.startDate.toISOString().split('T')[0] : '',
       endDate: filterInputs.endDate ? filterInputs.endDate.toISOString().split('T')[0] : '',
-      searchType: searchParams.searchType, 
-      keyword: searchParams.keyword,       
+      searchType: searchParams.searchType,
+      keyword: searchParams.keyword,
       instCd: instCd,
     });
   };
@@ -234,7 +242,7 @@ function ApplicationsList() {
   };
 
   const handleSelectAll = (isChecked) => {
-    setSelectedApplications(isChecked ? applications.map(app => app.draftId) : []);
+    setSelectedApplications(isChecked ? filteredApplications.map(app => app.draftId) : []);
   };
 
   const handleSelect = (isChecked, id) => {
@@ -249,23 +257,23 @@ function ApplicationsList() {
       alert('엑셀변환 할 명함 신청 목록을 선택하세요.');
       return;
     }
-  
+
     try {
       const requestData = {
-        instCd: auth.instCd, 
-        selectedApplications, 
+        instCd: auth.instCd,
+        selectedApplications,
       };
-  
+
       const response = await axios.post('/api/bsc/applyList/orderExcel', requestData, {
         responseType: 'blob',
       });
-  
+
       fileDownload(response.data, '명함 완료내역.xlsx');
     } catch (error) {
       console.error('Error downloading excel: ', error);
     }
   };
-  
+
   const handleCenterChange = (e) => {
     setSelectedCenter(e.target.value);
   };
@@ -326,7 +334,7 @@ function ApplicationsList() {
       accessor: 'instNm',
       width: '10%',
     }] : [
-      { header: '센터', accessor: 'instNm', width: '10%' }, 
+      { header: '센터', accessor: 'instNm', width: '10%' },
     ]),
     {
       header: '제목',
@@ -348,14 +356,14 @@ function ApplicationsList() {
       accessor: 'respondDate',
       width: '13%',
     },
-    ...(documentTypeFromUrl === '문서수발신' || documentTypeFromUrl === '법인서류'  || documentTypeFromUrl === '인장신청' ? [] : [
+    ...(documentTypeFromUrl === '문서수발신' || documentTypeFromUrl === '법인서류' || documentTypeFromUrl === '인장신청' ? [] : [
       { header: '발주일시', accessor: 'orderDate', width: '14%' },
     ]),
     { header: '문서상태', accessor: 'applyStatus', width: '10%' },
   ];
-  
+
   const showStatusFilters = documentTypeFromUrl === '명함신청' || documentTypeFromUrl === '법인서류' || documentTypeFromUrl === '문서수발신' || documentTypeFromUrl === '인장신청';
-  
+
   return (
     <div className="content">
       <div className='all-applications'>
@@ -395,7 +403,7 @@ function ApplicationsList() {
         ) : error ? (
           <p>{error}</p>
         ) : (
-          <Table columns={columns} data={applications} onSelect={handleSelect} selectedItems={selectedApplications} />
+          <Table columns={columns} data={filteredApplications} onSelect={handleSelect} selectedItems={selectedApplications} />
         )}
       </div>
       {modalVisible && selectedDocumentId && (
