@@ -21,7 +21,7 @@ function SealExportList() {
           instCd,
         },
       });
-
+  
       const fetchedData = response.data.data.map((item, index) => ({
         id: index + 1,
         expDate: item.expDate,
@@ -32,16 +32,16 @@ function SealExportList() {
           facsimileSeal: item.facsimileSeal !== "" ? item.facsimileSeal : 0,
           companySeal: item.companySeal !== "" ? item.companySeal : 0,
         },
-        applicantName: item.expNm,
+        applicantName: item.drafter, 
         signitureImage: SignitureImage,
         fileName: item.fileName,
         filePath: item.filePath,
         fileUrl: `/api/doc/download/${encodeURIComponent(item.fileName)}`,
         status: '결재진행중',
       }));
-
+  
       setFilteredApplications(fetchedData);
-
+  
       const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
       setClickedRows(clickedRows);
     } catch (error) {
@@ -49,7 +49,7 @@ function SealExportList() {
       alert('데이터를 불러오는 중 오류가 발생했습니다.');
     }
   }, []);
-
+  
   useEffect(() => {
     if (auth.instCd) {
       fetchSealExportList(auth.instCd);
@@ -97,7 +97,7 @@ function SealExportList() {
       setModalVisible(true);
     }
   };
-
+  
   return (
     <div className="content">
       <div className="seal-export-list">
@@ -166,7 +166,7 @@ function SealExportList() {
           show={modalVisible}
           onClose={closeModal}
           documentDetails={{
-            date: selectedDocumentDetails.date,
+            date: selectedDocumentDetails.expDate,
             applicantName: selectedDocumentDetails.applicantName,
             approvers: selectedDocumentDetails.approvers,
             signitureImage: selectedDocumentDetails.signitureImage,

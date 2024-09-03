@@ -1,10 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import '../../styles/seal/SealApprovalModal.css';
 import BlankImage from '../../assets/images/blank.png';
 
 const SealApprovalModal = ({ show, onClose, documentDetails = { signitureImage: BlankImage, approvers: [] } }) => {
   if (!show) return null;
+
+  console.log("모달에 전달된 documentDetails:", documentDetails);
 
   const renderApproverInfo = (approver, index) => (
     <td key={index}>
@@ -22,32 +23,29 @@ const SealApprovalModal = ({ show, onClose, documentDetails = { signitureImage: 
     <div className="seal-approval-modal-overlay">
       <div className="seal-approval-modal-container">
         <div className="seal-approval-modal-header">
-          <h3>인장반출 결재 상세정보</h3>
+          <h3>결재 상세정보</h3>
           <button className="doc-confirm-close-button" onClick={onClose}>X</button>
         </div>
         <table>
           <thead>
             <tr>
               <th>신청자</th>
-              <th>담당자</th>
-              <th>팀장</th>
-              <th>본부장</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>
                 <div className="applicant-info">
-                  <div className="applicant-image">
+                  {/* <div className="applicant-image">
                     <img src={documentDetails.signitureImage || BlankImage} alt="Applicant" />
-                  </div>
+                  </div> */}
                   <div>
-                    <div>{documentDetails.date}</div>
                     <div>{documentDetails.applicantName}</div>
+                    <div>{documentDetails.date}</div>
                   </div>
                 </div>
               </td>
-              {Array.from({ length: 3 }).map((_, index) =>
+              {Array.from({ length: 0 }).map((_, index) =>
                 renderApproverInfo(documentDetails.approvers[index] || {}, index)
               )}
             </tr>
@@ -56,23 +54,6 @@ const SealApprovalModal = ({ show, onClose, documentDetails = { signitureImage: 
       </div>
     </div>
   );
-};
-
-SealApprovalModal.propTypes = {
-  show: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  documentDetails: PropTypes.shape({
-    date: PropTypes.string.isRequired,
-    applicantName: PropTypes.string.isRequired,
-    signitureImage: PropTypes.string,
-    approvers: PropTypes.arrayOf(
-      PropTypes.shape({
-        name: PropTypes.string,
-        approvalDate: PropTypes.string,
-        signitureImage: PropTypes.string,
-      })
-    ),
-  }).isRequired,
 };
 
 export default SealApprovalModal;

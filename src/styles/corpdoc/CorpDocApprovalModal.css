@@ -13,11 +13,11 @@
   
   .corpdoc-approval-modal-container {
     background: #fff;
-    padding: 30px 75px 45px 75px;
+    padding: 30px 55px 45px 55px;
     border-radius: 10px;
     text-align: left;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 550px;
+    width: 300px;
     position: relative;
   }
   
@@ -31,15 +31,15 @@
   }
   
   table {
-    width: 100%;
     border-collapse: collapse;
+    margin: auto; 
   }
   
   th, td {
     border: 1px solid #e6edf3;
     padding: 8px;
     text-align: center;
-    width: 150px;
+    width: 170px;
     height: 30px;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -30,6 +30,7 @@ function SealManagementList() {
         date: item.useDate,
         submitter: item.submission,
         purpose: item.purpose,
+        drafter: item.drafter, 
         sealType: {
           corporateSeal: item.corporateSeal !== "" ? item.corporateSeal : 0,
           facsimileSeal: item.facsimileSeal !== "" ? item.facsimileSeal : 0,
@@ -73,6 +74,7 @@ function SealManagementList() {
       }
       setSelectedDocumentDetails({
         ...document,
+        applicantName: document.drafter,
         approvers: document.approval || [],
         signitureImage: document.signitureImage || SignitureImage,
       });
