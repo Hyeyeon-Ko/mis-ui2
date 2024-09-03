@@ -112,11 +112,6 @@
 .seal-imprint-detail-option {
   display: flex;
   align-items: center;
-  margin-bottom: 30px;
-}
-
-.seal-imprint-detail-option input[type="checkbox"] {
-  margin-right: 10px;
 }
 
 .seal-imprint-image {
@@ -192,4 +187,14 @@
   justify-content: center;
   margin-left: 20px;
   margin-top: 20px;
+}
+
+.seal-imprint-disclaimer {
+  font-size: 0.7em;
+  color: #888;
+  text-align: right;
+  width: 80%;
+  margin-top: 10px;
+  margin-right: 35px; 
+  align-self: flex-end; 
 }

@@ -14,7 +14,6 @@ function DocOutList() {
   const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showRevertModal, setShowRevertModal] = useState(false);
   const [selectedDraftId, setSelectedDraftId] = useState(null);
 
   const [filterInputs, setFilterInputs] = useState({
@@ -91,11 +90,7 @@ function DocOutList() {
   const handleDeleteClick = (draftId, status) => {
     if (draftId) {
       setSelectedDraftId(draftId);
-      if (status === '신청취소') {
-        setShowRevertModal(true);
-      } else {
-        setShowDeleteModal(true);
-      }
+      setShowDeleteModal(true);
     } else {
       console.error('Invalid draftId:', draftId);
     }
@@ -115,23 +110,6 @@ function DocOutList() {
       setShowDeleteModal(false);
     } catch (error) {
       console.error('Error deleting document:', error);
-    }
-  };
-
-  const handleConfirmRevert = async () => {
-    if (selectedDraftId === null) return;
-
-    try {
-      await axios.put('/api/doc/revert', null, {
-        params: {
-          draftId: selectedDraftId,
-        },
-      });
-
-      fetchDocOutList();
-      setShowRevertModal(false);
-    } catch (error) {
-      console.error('Error reverting document:', error);
     }
   };
 
@@ -245,13 +223,6 @@ function DocOutList() {
             message="이 문서를 삭제하시겠습니까?"
             onConfirm={handleConfirmDelete}
             onCancel={() => setShowDeleteModal(false)}
-          />
-        )}
-        {showRevertModal && (
-          <ConfirmModal
-            message="이 문서를 되돌리시겠습니까?"
-            onConfirm={handleConfirmRevert}
-            onCancel={() => setShowRevertModal(false)}
           />
         )}
       </div>

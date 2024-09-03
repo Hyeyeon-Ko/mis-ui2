@@ -148,10 +148,16 @@ function ApplicationsList() {
       statusClosed: false,
     });
   };
+useEffect(() => {
+  setFilterInputs((prev) => ({
+    ...prev,
+    documentType: documentTypeFromUrl || ''
+  }));
+}, [documentTypeFromUrl]);
 
-  useEffect(() => {
-    fetchApplications();
-  }, [fetchApplications]);
+useEffect(() => {
+  fetchApplications();
+}, [fetchApplications, documentTypeFromUrl]); 
 
   useEffect(() => {
     if (documentTypeFromUrl === '명함신청') {
@@ -200,13 +206,13 @@ function ApplicationsList() {
     }));
   };
 
-  const handleSearch = () => {
+  const handleSearch = (searchParams) => {
     fetchApplications({
       documentType: filterInputs.documentType,
       startDate: filterInputs.startDate ? filterInputs.startDate.toISOString().split('T')[0] : '',
       endDate: filterInputs.endDate ? filterInputs.endDate.toISOString().split('T')[0] : '',
-      searchType: filterInputs.searchType,
-      keyword: filterInputs.keyword,
+      searchType: searchParams.searchType, 
+      keyword: searchParams.keyword,       
       instCd: instCd,
     });
   };
@@ -248,17 +254,23 @@ function ApplicationsList() {
       alert('엑셀변환 할 명함 신청 목록을 선택하세요.');
       return;
     }
-
+  
     try {
-      const response = await axios.post('/api/bsc/applyList/orderExcel', selectedApplications, {
+      const requestData = {
+        instCd: auth.instCd, 
+        selectedApplications, 
+      };
+  
+      const response = await axios.post('/api/bsc/applyList/orderExcel', requestData, {
         responseType: 'blob',
       });
+  
       fileDownload(response.data, '명함 완료내역.xlsx');
     } catch (error) {
       console.error('Error downloading excel: ', error);
     }
   };
-
+  
   const handleCenterChange = (e) => {
     setSelectedCenter(e.target.value);
   };
@@ -304,7 +316,7 @@ function ApplicationsList() {
     ...(showCheckboxColumn && documentTypeFromUrl === '명함신청' ? [{
       header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
       accessor: 'select',
-      width: '5%',
+      width: '4%',
       Cell: ({ row }) => (
         <input
           type="checkbox"
@@ -347,6 +359,8 @@ function ApplicationsList() {
     { header: '문서상태', accessor: 'applyStatus', width: '10%' },
   ];
   
+  const showStatusFilters = documentTypeFromUrl === '명함신청' || documentTypeFromUrl === '법인서류' || documentTypeFromUrl === '문서수발신' || documentTypeFromUrl === '인장신청';
+  
   return (
     <div className="content">
       <div className='all-applications'>
@@ -355,7 +369,7 @@ function ApplicationsList() {
           <Breadcrumb items={getBreadcrumbItems()} />
           <div className="application-button-container">
             {showExcelButton && documentTypeFromUrl === '명함신청' && (
-              <CustomButton className="excel-button2" onClick={handleExcelDownload}>
+              <CustomButton className="finish-excel-button" onClick={handleExcelDownload}>
                 엑셀변환
               </CustomButton>
             )}
@@ -373,7 +387,7 @@ function ApplicationsList() {
           onFilterChange={handleFilterChange}
           onSearch={handleSearch}
           onReset={handleReset}
-          showStatusFilters={true}
+          showStatusFilters={showStatusFilters}
           showSearchCondition={true}
           showDocumentType={false}
           searchType={filterInputs.searchType}

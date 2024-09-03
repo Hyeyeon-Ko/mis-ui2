@@ -146,7 +146,7 @@ function SealApplyExport() {
                                                     type="number"
                                                     name="corporateSealQuantity"
                                                     min="1"
-                                                    placeholder="부수"
+                                                    placeholder="수량"
                                                     value={sealSelections.corporateSeal.quantity}
                                                     onChange={(e) => handleQuantityChange(e, 'corporateSeal')}
                                                     disabled={!sealSelections.corporateSeal.selected}
@@ -171,7 +171,7 @@ function SealApplyExport() {
                                                     type="number"
                                                     name="facsimileSealQuantity"
                                                     min="1"
-                                                    placeholder="부수"
+                                                    placeholder="수량"
                                                     value={sealSelections.facsimileSeal.quantity}
                                                     onChange={(e) => handleQuantityChange(e, 'facsimileSeal')}
                                                     disabled={!sealSelections.facsimileSeal.selected}
@@ -196,7 +196,7 @@ function SealApplyExport() {
                                                     type="number"
                                                     name="companySealQuantity"
                                                     min="1"
-                                                    placeholder="부수"
+                                                    placeholder="수량"
                                                     value={sealSelections.companySeal.quantity}
                                                     onChange={(e) => handleQuantityChange(e, 'companySeal')}
                                                     disabled={!sealSelections.companySeal.selected}
@@ -204,6 +204,9 @@ function SealApplyExport() {
                                             </div>
                                         </div>
                                     </label>
+                                </div>
+                                <div className="seal-export-disclaimer">
+                                    *실제 인감이 아닙니다.
                                 </div>
                             </div>
                             <div className='seal-export-form-group'>

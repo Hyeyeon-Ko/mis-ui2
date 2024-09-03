@@ -140,3 +140,13 @@
   margin-left: 20px;
   margin-top: 30px;
 }
+
+.seal-export-disclaimer {
+  font-size: 0.7em;
+  color: #888;
+  text-align: right;
+  width: 80%;
+  margin-top: 10px;
+  margin-right: 35px; 
+  align-self: flex-end; 
+}

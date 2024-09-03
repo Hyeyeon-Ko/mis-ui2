@@ -14,7 +14,6 @@ function DocInList() {
   const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showRevertModal, setShowRevertModal] = useState(false);
   const [selectedDraftId, setSelectedDraftId] = useState(null);
   const [deptResponses, setDeptResponses] = useState([]);
   const [selectedDeptCd, setSelectedDeptCd] = useState(null);
@@ -33,11 +32,10 @@ function DocInList() {
     statusClosed: false,
   });
 
-  // 부서 목록을 가져오는 함수
   const fetchDocInList = useCallback(async (params = {}) => {
     try {
       const formatDate = (date) => date ? date.toISOString().split('T')[0] : null;
-  
+
       const response = await axios.get('/api/doc/receiveList', {
         params: {
           instCd: auth.instCd,
@@ -47,9 +45,7 @@ function DocInList() {
           keyword: params.keyword || null,
         },
       });
-    
-      console.log('response: ', response);
-  
+
       if (response.data && response.data.data) {
         const formattedData = response.data.data.map((item) => ({
           draftId: item.draftId,
@@ -70,8 +66,7 @@ function DocInList() {
       console.error('문서 목록을 불러오는 중 오류가 발생했습니다:', error);
     }
   }, [auth.instCd]);
-  
-  // 부서 변경 시 문서 목록 갱신
+
   const handleDeptChange = (e) => {
     const deptCd = e.target.value;
     setSelectedDeptCd(deptCd);
@@ -109,7 +104,6 @@ function DocInList() {
     }
   };
 
-  // 파일 다운로드 핸들러
   const handleFileDownload = async (fileName) => {
     try {
       const response = await axios.get(`/api/doc/download/${encodeURIComponent(fileName)}`, {
@@ -129,15 +123,10 @@ function DocInList() {
     }
   };
 
-  // 문서 삭제 핸들러
   const handleDeleteClick = (draftId, status) => {
     if (draftId) {
       setSelectedDraftId(draftId);
-      if (status === '신청취소') {
-        setShowRevertModal(true);
-      } else {
-        setShowDeleteModal(true);
-      }
+      setShowDeleteModal(true);
     } else {
       console.error('잘못된 draftId:', draftId);
     }
@@ -165,39 +154,15 @@ function DocInList() {
     }
   };
 
-  const handleConfirmRevert = async () => {
-    if (selectedDraftId === null) return;
-
-    try {
-      await axios.put('/api/doc/revert', null, {
-        params: {
-          draftId: selectedDraftId,
-        },
-      });
-
-      if (selectedDeptCd) {
-        fetchDeptReceiveList(selectedDeptCd);
-      } else {
-        fetchDocInList();
-      }
-
-      setShowRevertModal(false);
-    } catch (error) {
-      console.error('문서 되돌리기 중 오류가 발생했습니다:', error);
-    }
-  };
-
-  // 검색 핸들러
-  const handleSearch = () => {
+  const handleSearch = (searchParams) => {
     fetchDocInList({
       startDate: filterInputs.startDate,
       endDate: filterInputs.endDate,
-      searchType: filterInputs.searchType,
-      keyword: filterInputs.keyword,
+      searchType: searchParams.searchType, 
+      keyword: searchParams.keyword,       
     });
   };
 
-  // 필터 초기화 핸들러
   const handleReset = () => {
     setFilterInputs({
       startDate: null,
@@ -317,13 +282,6 @@ function DocInList() {
             message="이 문서를 삭제하시겠습니까?"
             onConfirm={handleConfirmDelete}
             onCancel={() => setShowDeleteModal(false)}
-          />
-        )}
-        {showRevertModal && (
-          <ConfirmModal
-            message="이 문서를 되돌리시겠습니까?"
-            onConfirm={handleConfirmRevert}
-            onCancel={() => setShowRevertModal(false)}
           />
         )}
       </div>

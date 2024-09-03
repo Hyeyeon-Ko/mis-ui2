@@ -17,12 +17,12 @@
   background-color: #068c4e;
 }
 
-.excel-button2 {
+.finish-excel-button {
   background-color: #d7dde4;
   color: rgb(85, 84, 84)
 }
 
-.excel-button2:hover {
+.finish-excel-button:hover {
   background-color: #07AF5A;
   color: white
 }

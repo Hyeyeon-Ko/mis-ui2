@@ -177,6 +177,9 @@ function SealApplyImprint() {
                                         </div>
                                     </label>
                                 </div>
+                                <div className="seal-imprint-disclaimer">
+                                    *실제 인감이 아닙니다.
+                                </div>
                             </div>
                             <div className='seal-imprint-form-group'>
                                 <label>특이사항</label>
