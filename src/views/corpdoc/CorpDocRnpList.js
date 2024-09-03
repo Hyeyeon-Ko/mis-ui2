@@ -3,6 +3,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import CorpDocApprovalModal from '../../views/corpdoc/CorpDocApprovalModal';
 import SignitureImage from '../../assets/images/signiture.png';
+import axios from 'axios';
 import '../../styles/corpdoc/CorpDocRnpList.css';
 
 function CorpDocRnpList() {
@@ -15,59 +16,53 @@ function CorpDocRnpList() {
   const [clickedRows, setClickedRows] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const fetchedData = [
-        {
-          id: 1,
-          date: '2024-05-02',
-          submitter: '현대로보틱스',
-          usagePurpose: '결제계좌등록',
-          corpseal: { incoming: 3, used: 0, left: 18 },
-          registry: { incoming: 0, used: 1, left: 20 },
-          status: '결재완료',
-          applicantName: '홍길동',
-          signitureImage: SignitureImage,
-          approvers: [
-            { name: '김철수', approvalDate: '2024-08-08', signitureImage: SignitureImage },
-            { name: '박영희', approvalDate: '2024-08-10', signitureImage: SignitureImage },
-          ],
-        },
-        {
-          id: 2,
-          date: '2024-05-03',
-          submitter: '재단본부',
-          usagePurpose: '결제계좌등록',
-          corpseal: { incoming: 5, used: 0, left: 20 },
-          registry: { incoming: 0, used: 9, left: 3 },
-          status: '결재진행중',
-          applicantName: '이영희', // Added applicant name
-          approvers: [
-            {},
-          ],
-        },
-      ];
-      setApplications(fetchedData);
-      setFilteredApplications(fetchedData);
-
-      const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
-      setClickedRows(clickedRows);
-    };
-    fetchData();
+    fetchRnpData();
   }, []);
-  
+
+  const fetchRnpData = async () => {
+    try {
+      const response = await axios.get('/api/corpDoc/rnpList');
+      console.log("response: ", response);
+
+      if (response.data) {
+        const rnpListData = response.data.data.map(item => ({
+          id: item.draftId,
+          date: item.draftDate,
+          drafter: item.drafter,
+          submission: item.submission,
+          purpose: item.purpose,
+          corpSeal: item.certCorpseal,
+          registry: item.certCoregister,
+          usesignet: item.certUsesignet,
+          warrant: item.warrant,
+          status: '결재진행중', // Assuming status is always in progress
+          signitureImage: SignitureImage,
+          approvers: [],
+        }));
+
+        setApplications(rnpListData);
+        setFilteredApplications(rnpListData);
+
+        const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
+        setClickedRows(clickedRows);
+      }
+    } catch (error) {
+      console.error("Error fetching RNP data:", error);
+    }
+  };
 
   const handleSearch = ({ searchType, keyword, startDate, endDate }) => {
     let filtered = applications;
 
     if (keyword) {
       filtered = filtered.filter(app => {
-        if (searchType === '제출처') return app.submitter.includes(keyword);
-        if (searchType === '사용목적') return app.usagePurpose.includes(keyword);
+        if (searchType === '제출처') return app.submission.includes(keyword);
+        if (searchType === '사용목적') return app.purpose.includes(keyword);
         if (searchType === '인장구분') return app.status.includes(keyword);
         if (searchType === '전체') {
           return (
-            app.submitter.includes(keyword) ||
-            app.usagePurpose.includes(keyword) ||
+            app.submission.includes(keyword) ||
+            app.purpose.includes(keyword) ||
             app.status.includes(keyword)
           );
         }
@@ -114,17 +109,6 @@ function CorpDocRnpList() {
       <div className='corpDoc-rnp-list'>
         <h2>서류 수불 대장</h2>
         <Breadcrumb items={['법인서류 대장', '서류 수불 대장']} />
-        {/* <ConditionFilter
-          startDate={startDate}
-          setStartDate={setStartDate}
-          endDate={endDate}
-          setEndDate={setEndDate}
-          onSearch={handleSearch}
-          onReset={() => setFilteredApplications(applications)}
-          showDocumentType={false}
-          showSearchCondition={true}
-          excludeRecipient={true}
-        /> */}
         {filteredApplications.length > 0 ? (
           <table className="table">
             <thead>
@@ -137,8 +121,8 @@ function CorpDocRnpList() {
                 <th rowSpan="2">수령인</th>
               </tr>
               <tr>
-                <th>입감</th>
-                <th>등기</th>
+                <th>법인인감증명서</th>
+                <th>법인등기사항전부증명서</th>
                 <th>사용인감계</th>
                 <th>위임장</th>
               </tr>
@@ -148,12 +132,12 @@ function CorpDocRnpList() {
                 <tr key={index}>
                   <td>{app.date}</td>
                   <td>{app.drafter}</td>
-                  <td>{app.submitter}</td>
-                  <td>{app.usagePurpose}</td>
-                  <td>{app.corpseal.used}</td>
-                  <td>{app.registry.used}</td>
-                  <td></td>
-                  <td></td>
+                  <td>{app.submission}</td>
+                  <td>{app.purpose}</td>
+                  <td>{app.corpSeal}</td>
+                  <td>{app.registry}</td>
+                  <td>{app.usesignet}</td>
+                  <td>{app.warrant}</td>
                   <td
                     className={`status-${app.status.replace(/\s+/g, '-').toLowerCase()} clickable ${
                       clickedRows.includes(app.id) ? 'confirmed' : ''

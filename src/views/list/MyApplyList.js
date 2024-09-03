@@ -97,7 +97,7 @@ function MyApplyList() {
       case 'F':
         return '신청취소';
       case 'G':
-        return '발급대기';
+        return '발급완료';
       default:
         return status;
     }
@@ -131,10 +131,19 @@ function MyApplyList() {
   const handleConfirmModal = async () => {
     if (selectedApplication) {
       try {
-        await axios.put('/api/bcd/completeApply', null, {
+        const apiUrl = selectedApplication.applyStatus === '발급완료' ? 
+        '/api/corpDoc/completeApply' : 
+        '/api/bcd/completeApply';
+
+        await axios.put(apiUrl, null, {
           params: { draftId: selectedApplication.draftId }
         });
-        alert('명함 수령이 확인되었습니다.');
+
+        const successMessage = selectedApplication.applyStatus === '발급완료' ? 
+        '법인서류 수령이 확인되었습니다.' : 
+        '명함 수령이 확인되었습니다.';
+
+        alert(successMessage);
         fetchApplications();
       } catch (error) {
         console.error('Error completing application:', error.response?.data || error.message);
@@ -174,7 +183,7 @@ function MyApplyList() {
       accessor: 'applyStatus',
       width: '12%',
       Cell: ({ row }) => (
-        row.applyStatus === '발주완료' ? (
+        row.applyStatus === '발주완료' || row.applyStatus === '발급완료' ? (
           <button
             className="status-button"
             onClick={() => handleButtonClick(row)}
@@ -221,7 +230,7 @@ function MyApplyList() {
       </div>
       {showModal && (
         <ConfirmModal
-          message="명함을 수령하셨습니까?"
+          message={selectedApplication.applyStatus === '발급완료' ? "법인서류를 수령하셨습니까?" : "명함을 수령하셨습니까?"}
           onConfirm={handleConfirmModal}
           onCancel={handleCloseModal}
         />
