@@ -7,34 +7,41 @@ import CustomButton from '../../components/common/CustomButton';
 
 const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregister }) => {
   const { auth } = useContext(AuthContext);
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     storeDate: '',
     purpose: '법인서류 입고',
-    certificateIncoming: '',
-    certificateLeft: '',
-    registryIncoming: '',
-    registryLeft: '',
+    certCorpseal: '',
+    totalCorpseal: '',
+    certCoregister: '',
+    totalCoregister: '',
     userId: '',
     userNm: '',
     instCd: ''
-  });
+  };
+
+  const [formData, setFormData] = useState(initialFormData);
 
   useEffect(() => { 
-    const today = new Date().toISOString().split('T')[0];
-    setFormData(prevFormData => ({
-      ...prevFormData,
-      storeDate: today,
-      userId: auth.userId,
-      userNm: auth.hngNm,
-      instCd: auth.instCd,
-      certificateLeft: totalCorpseal,
-      registryLeft: totalCoregister,
-    }));
-  }, [auth.userId, auth.hngNm, auth.instCd]);
+    if (show) {
+      const today = new Date().toISOString().split('T')[0];
+      setFormData({
+        storeDate: today,
+        purpose: '법인서류 입고',
+        certCorpseal: '',
+        totalCorpseal: totalCorpseal,
+        certCoregister: '',
+        totalCoregister: totalCoregister,
+        userId: auth.userId,
+        userNm: auth.hngNm,
+        instCd: auth.instCd
+      });
+      console.log("hahah");
+    }
+  }, [show, auth.userId, auth.hngNm, auth.instCd, totalCorpseal, totalCoregister]);
 
   useEffect(() => {
-    console.log("form: ", formData);
-  })
+    console.log("formData: ", formData);
+  }, [formData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -60,8 +67,8 @@ const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregist
 
     const requestData = {
       ...formData,
-      certCorpseal: parseInt(formData.certificateIncoming, 10),
-      certCoregister: parseInt(formData.registryIncoming, 10)
+      certCorpseal: parseInt(formData.certCorpseal, 10),
+      certCoregister: parseInt(formData.certCoregister, 10)
     };
 
     try {
@@ -101,6 +108,7 @@ const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregist
             value={formData.storeDate}
             onChange={handleChange}
             placeholder='yyyy-MM-dd'
+            readOnly
           />
         </div>
         <div className="corpDoc-store-form-group">
@@ -116,8 +124,8 @@ const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregist
           <label>법인인감 증명서</label>
           <input
             type="number"
-            name="certificateIncoming"
-            value={formData.certificateIncoming}
+            name="certCorpseal"
+            value={formData.certCorpseal}
             onChange={handleChange}
             min="0"
           />
@@ -126,8 +134,8 @@ const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregist
           <label>법인등기사항전부증명서</label>
           <input
             type="number"
-            name="registryIncoming"
-            value={formData.registryIncoming}
+            name="certCoregister"
+            value={formData.certCoregister}
             onChange={handleChange}
             min="0"
           />

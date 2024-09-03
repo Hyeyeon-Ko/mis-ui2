@@ -165,9 +165,10 @@ function PendingApprovalList() {
   const handleRowClick = async (draftId, docType, applyStatus) => {
     if (docType === '문서수신' || docType === '문서발신') {
       setSelectedDocumentId(draftId);
+      setModalVisible(true);
     } else if (docType === '명함신청') {
       navigate(`/api/bcd/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
-    } else if (docType === '법인서류') {
+    }  else if (docType === '법인서류') {
       navigate(`/api/corpDoc/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
     } else if (docType === '인장신청(날인)') {
       const sealImprintDetails = await fetchSealImprintDetail(draftId);
@@ -175,7 +176,6 @@ function PendingApprovalList() {
     } else if (docType === '인장신청(반출)') {
       const sealExportDetails = await fetchSealExportDetail(draftId);
       navigate(`/api/seal/export/${draftId}?readonly=true&applyStatus=승인대기`, { state: { sealExportDetails, readOnly: true }});
-    }
   };
 
   const handleSearch = () => {
@@ -293,7 +293,8 @@ function PendingApprovalList() {
         />
       )}
     </div>
-  );
+    );
+  }
 }
 
 export default PendingApprovalList;

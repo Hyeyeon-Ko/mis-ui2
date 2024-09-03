@@ -23,11 +23,8 @@ function CorpDocIssueList() {
   const [showStoreModal, setShowStoreModal] = useState(false);
   const [showIssueModal, setShowIssueModal] = useState(false);
   const [selectedPendingApp, setSelectedPendingApp] = useState(null);
-  const [storeModalTotals, setStoreModalTotals] = useState({
-    totalCorpseal: 0,
-    totalCoregister: 0
-  });
-  
+  const [totalCorpseal, setTotalCorpseal] = useState(0);
+  const [totalCoregister, setTotalCoregister] = useState(0);
 
   useEffect(() => {
     fetchIssueData();
@@ -41,10 +38,10 @@ function CorpDocIssueList() {
       if (response.data) {
         const issueListData = response.data.data.issueList.map(item => ({
           id: item.draftId,
-          issueDate: item.issueDate,
+          issueDate: item.issueDate.split("T")[0],
           submission: item.submission,
           purpose: item.purpose,
-          certificate: {
+          corpSeal: {
             incoming: item.status === "X" ? item.certCorpseal : 0,
             used: item.status === "X" ? 0 : item.certCorpseal,
             left: item.totalCorpseal },
@@ -65,8 +62,10 @@ function CorpDocIssueList() {
           useDate: item.useDate,
           submission: item.submission,
           purpose: item.purpose,
-          certificate: { incoming: 0, used: item.certCorpseal, left: item.totalCorpseal },
+          corpSeal: { incoming: 0, used: item.certCorpseal, left: item.totalCorpseal },
           registry: { incoming: 0, used: item.certCoregister, left: item.totalCoregister },
+          usesignet : {used: item.certUsesignet},
+          warrant : {used: item.warrant},
           status: item.status,
           applicantName: item.drafter,
           center: item.instNm,
@@ -78,6 +77,12 @@ function CorpDocIssueList() {
         setFilteredApplications(issueListData);
         setPendingApplications(issuePendingListData);
         setFilteredPendingApplications(issuePendingListData);
+
+        const totalValues = extractTotalValues(issueListData);
+        console.log("total: ", totalValues.totalCorpseal, totalValues.totalCoregister);
+
+        setTotalCorpseal(totalValues.totalCorpseal);
+        setTotalCoregister(totalValues.totalCoregister);
       }
     } catch (error) {
       console.error("Error fetching issue data:", error);
@@ -91,8 +96,10 @@ function CorpDocIssueList() {
     }
     
     const lastRow = data[data.length - 1];
-    const totalCorpseal = lastRow.certificate?.left ?? 0;
-    const totalCoregister = lastRow.registry?.left ?? 0;
+    const totalCorpseal = lastRow?.corpSeal?.left ?? 0;
+    const totalCoregister = lastRow?.registry?.left ?? 0;
+    
+    console.log("total: ", totalCorpseal, totalCoregister);
   
     return { totalCorpseal, totalCoregister };
   };
@@ -162,7 +169,8 @@ function CorpDocIssueList() {
   
   const handleconfirmIssue = async () => {
     if (filteredApplications.length === 0) {
-      alert('No rows available to confirm.');
+      alert('입고된 서류가 없습니다. 먼저 서류 입고를 해주세요.');
+      setShowIssueModal(false);
       return;
     }
 
@@ -196,20 +204,13 @@ function CorpDocIssueList() {
   const handleOpenStoreModal = () => {
     if (filteredApplications && Array.isArray(filteredApplications)) {
       const { totalCorpseal, totalCoregister } = extractTotalValues(filteredApplications);
+      setTotalCorpseal(totalCorpseal);
+      setTotalCoregister(totalCoregister);
       setShowStoreModal(true);
-      setStoreModalTotalValues(totalCorpseal, totalCoregister);
     } else {
       console.error('Filtered applications data is invalid or not available.');
       alert('서류 목록을 불러오는 데 문제가 발생했습니다.');
     }
-  };
-  
-  const setStoreModalTotalValues = (totalCorpseal, totalCoregister) => {
-    setShowStoreModal(true);
-    setStoreModalTotals({
-      totalCorpseal,
-      totalCoregister
-    });
   };
   
   const handleCloseStoreModal = () => {
@@ -230,7 +231,7 @@ function CorpDocIssueList() {
             입고 등록하기
           </CustomButton>
         </div>
-        <ConditionFilter
+        {/* <ConditionFilter
           startDate={startDate}
           setStartDate={setStartDate}
           endDate={endDate}
@@ -240,7 +241,7 @@ function CorpDocIssueList() {
           showDocumentType={false}
           showSearchCondition={true}
           excludeRecipient={true}
-        />
+        /> */}
         {filteredApplications.length > 0 ? (
           <table className="corpDoc-issue-table">
             <thead>
@@ -274,9 +275,9 @@ function CorpDocIssueList() {
                   <td>{app.applicantName}</td>
                   <td>{app.submission}</td>
                   <td>{app.purpose}</td>
-                  <td>{app.certificate.incoming}</td>
-                  <td>{app.certificate.used}</td>
-                  <td>{app.certificate.left}</td>
+                  <td>{app.corpSeal.incoming}</td>
+                  <td>{app.corpSeal.used}</td>
+                  <td>{app.corpSeal.left}</td>
                   <td>{app.registry.incoming}</td>
                   <td>{app.registry.used}</td>
                   <td>{app.registry.left}</td>
@@ -299,7 +300,7 @@ function CorpDocIssueList() {
                   <th colSpan="2">신청자</th>
                   <th rowSpan="2">제출처</th>
                   <th rowSpan="2">사용목적</th>
-                  <th colSpan="2">필요 수량</th>
+                  <th colSpan="4">필요 수량</th>
                   <th rowSpan="2">발급</th>
                 </tr>
                 <tr>
@@ -307,6 +308,8 @@ function CorpDocIssueList() {
                   <th>이름</th>
                   <th>법인인감증명서</th>
                   <th>법인등기사항전부증명서</th>
+                  <th>사용인감계</th>
+                  <th>위임장</th>
                 </tr>
               </thead>
               <tbody>
@@ -318,8 +321,10 @@ function CorpDocIssueList() {
                     <td>{app.applicantName}</td>
                     <td>{app.submission}</td>
                     <td>{app.purpose}</td>
-                    <td>{app.certificate.used}</td>
+                    <td>{app.corpSeal.used}</td>
                     <td>{app.registry.used}</td>
+                    <td>{app.usesignet.used}</td>
+                    <td>{app.warrant.used}</td>
                     <td>
                     <Button className="confirm-issue-button" onClick={() => handleIssue(app)}>
                       발 급
@@ -359,8 +364,8 @@ function CorpDocIssueList() {
         show={showStoreModal}
         onClose={handleCloseStoreModal}
         onSave={handleStoreSave}
-        totalCorpseal={storeModalTotals.totalCorpseal}
-        totalCoregister={storeModalTotals.totalCoregister}
+        totalCorpseal={totalCorpseal}
+        totalCoregister={totalCoregister}
       />
     </div>
   );

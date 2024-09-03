@@ -22,7 +22,7 @@ function CorpDocRnpList() {
           date: '2024-05-02',
           submitter: '현대로보틱스',
           usagePurpose: '결제계좌등록',
-          certificate: { incoming: 3, used: 0, left: 18 },
+          corpseal: { incoming: 3, used: 0, left: 18 },
           registry: { incoming: 0, used: 1, left: 20 },
           status: '결재완료',
           applicantName: '홍길동',
@@ -37,7 +37,7 @@ function CorpDocRnpList() {
           date: '2024-05-03',
           submitter: '재단본부',
           usagePurpose: '결제계좌등록',
-          certificate: { incoming: 5, used: 0, left: 20 },
+          corpseal: { incoming: 5, used: 0, left: 20 },
           registry: { incoming: 0, used: 9, left: 3 },
           status: '결재진행중',
           applicantName: '이영희', // Added applicant name
@@ -114,7 +114,7 @@ function CorpDocRnpList() {
       <div className='corpDoc-rnp-list'>
         <h2>서류 수불 대장</h2>
         <Breadcrumb items={['법인서류 대장', '서류 수불 대장']} />
-        <ConditionFilter
+        {/* <ConditionFilter
           startDate={startDate}
           setStartDate={setStartDate}
           endDate={endDate}
@@ -124,7 +124,7 @@ function CorpDocRnpList() {
           showDocumentType={false}
           showSearchCondition={true}
           excludeRecipient={true}
-        />
+        /> */}
         {filteredApplications.length > 0 ? (
           <table className="table">
             <thead>
@@ -150,7 +150,7 @@ function CorpDocRnpList() {
                   <td>{app.drafter}</td>
                   <td>{app.submitter}</td>
                   <td>{app.usagePurpose}</td>
-                  <td>{app.certificate.used}</td>
+                  <td>{app.corpseal.used}</td>
                   <td>{app.registry.used}</td>
                   <td></td>
                   <td></td>

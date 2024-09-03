@@ -419,7 +419,7 @@ function DetailCorpDocApplication() {
                                         onChange={handleChange}
                                         disabled={isReadOnly}
                                     />
-                                    <label> 주권</label>
+                                    <label> 위임장</label>
                                     <div className="corpDoc-form-group-inline-num">
                                         <label> 수량:</label>
                                         <input
@@ -449,7 +449,7 @@ function DetailCorpDocApplication() {
                                 </select>
                             </div>
                             <div className="corpDoc-form-group">
-                                <label>비고</label>
+                                <label>특이사항</label>
                                 <textarea
                                     name="notes"
                                     value={formData.notes}

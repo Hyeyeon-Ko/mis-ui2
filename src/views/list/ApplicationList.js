@@ -91,7 +91,9 @@ function ApplicationsList() {
         ...(sealMasterResponses || []),
       ];
 
-      const transformedData = combinedData.map(application => {
+      const filteredData = combinedData.filter(application => application.applyStatus !== 'X');
+
+      const transformedData = filteredData.map(application => {
         return {
           draftId: application.draftId,
           instCd: application.instCd,
@@ -182,7 +184,9 @@ function ApplicationsList() {
       case 'F':
         return '신청취소';
       case 'G':
-        return '발급대기';
+        return '발급완료';
+      case 'X':
+        return '상태없음';
       default:
         return status;
     }
