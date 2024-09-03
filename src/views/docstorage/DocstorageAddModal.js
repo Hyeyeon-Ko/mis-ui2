@@ -111,7 +111,8 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
           .post('/api/docstorage/data', extractedData)
           .then((response) => {
             console.log('Data successfully sent:', response.data);
-            onSave(response.data); 
+            onSave(response.data);
+            resetFormData();
             onClose();
           })
           .catch((error) => {
@@ -178,8 +179,9 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
         .post('/api/docstorage/', payload)
         .then(response => {
           console.log('Data successfully saved:', response.data);
-          onSave([payload]); 
+          onSave([payload]);
           alert('항목이 성공적으로 추가되었습니다.');
+          resetFormData();
           onClose();
         })
         .catch(error => {
