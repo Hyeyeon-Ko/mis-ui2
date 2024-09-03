@@ -20,7 +20,7 @@ const ConditionFilter = ({
   onFilterChange,
   showStatusFilters,
   showSearchCondition,
-  showDocumentType = true, 
+  showDocumentType = true,
   excludeRecipient,
   excludeSender,
   documentType,
@@ -30,8 +30,8 @@ const ConditionFilter = ({
   const [keyword, setKeyword] = useState('');
 
   useEffect(() => {
-    resetFilters();
-  }, []); 
+    resetFilters(); 
+  }, [documentType]);  
   
   const resetFilters = () => {
     const defaultStartDate = new Date();
@@ -64,7 +64,7 @@ const ConditionFilter = ({
     };
     onSearch(searchParams);
   };
-    
+
   const handleStartDateChange = (event) => {
     setStartDate(event.target.value ? new Date(event.target.value) : null);
   };
@@ -74,7 +74,90 @@ const ConditionFilter = ({
   };
 
   const handleDocumentTypeChange = (event) => {
-    setDocumentType(event.target.value); 
+    setDocumentType(event.target.value);
+  };
+
+  const renderStatusFilters = () => {
+    switch (documentType) {
+      case '명함신청':
+        return (
+          <>
+            <label>
+              <input
+                type="checkbox"
+                name="statusApproved"
+                checked={filters.statusApproved}
+                onChange={onFilterChange}
+              />
+              승인완료
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                name="statusRejected"
+                checked={filters.statusRejected}
+                onChange={onFilterChange}
+              />
+              반려
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                name="statusOrdered"
+                checked={filters.statusOrdered}
+                onChange={onFilterChange}
+              />
+              발주완료
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                name="statusClosed"
+                checked={filters.statusClosed}
+                onChange={onFilterChange}
+              />
+              처리완료
+            </label>
+          </>
+        );
+      case '문서수발신':
+        return (
+          <label>
+            <input
+              type="checkbox"
+              name="statusClosed"
+              checked={filters.statusClosed}
+              onChange={onFilterChange}
+            />
+            처리완료
+          </label>
+        );
+      case '인장신청':
+        return (
+          <>
+            <label>
+              <input
+                type="checkbox"
+                name="statusRejected"
+                checked={filters.statusRejected}
+                onChange={onFilterChange}
+              />
+              반려
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                name="statusClosed"
+                checked={filters.statusClosed}
+                onChange={onFilterChange}
+              />
+              처리완료
+            </label>
+          </>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
@@ -94,7 +177,7 @@ const ConditionFilter = ({
           onChange={handleEndDateChange}
           className="custom-datepicker"
         />
-        {showDocumentType && ( 
+        {showDocumentType && (
           <>
             <label>문서분류</label>
             <select
@@ -114,12 +197,12 @@ const ConditionFilter = ({
         {showSearchCondition && (
           <>
             <label>검색 조건</label>
-            <select 
-              value={searchType} 
+            <select
+              value={searchType}
               onChange={(e) => setSearchType(e.target.value)}
             >
               <option value="전체">전체</option>
-              {(documentType === '명함신청' || documentType === '문서수발신' 
+              {(documentType === '명함신청' || documentType === '문서수발신'
                 || documentType === '인장신청' || documentType === '법인서류'
               ) ? (
                 <>
@@ -150,48 +233,7 @@ const ConditionFilter = ({
       </div>
       {showStatusFilters && (
         <div className="status-filters">
-          {(documentType === '명함신청' || documentType === '법인서류') && (
-            <label>
-              <input
-                type="checkbox"
-                name="statusApproved"
-                checked={filters.statusApproved}
-                onChange={onFilterChange}
-              />
-              승인완료
-            </label>
-          )}
-          {documentType !== '문서수발신' && (
-            <label>
-              <input
-                type="checkbox"
-                name="statusRejected"
-                checked={filters.statusRejected}
-                onChange={onFilterChange}
-              />
-              반려
-            </label>
-          )}
-          {documentType === '명함신청' && (
-            <label>
-              <input
-                type="checkbox"
-                name="statusOrdered"
-                checked={filters.statusOrdered}
-                onChange={onFilterChange}
-              />
-              발주완료
-            </label>
-          )}
-          <label>
-            <input
-              type="checkbox"
-              name="statusClosed"
-              checked={filters.statusClosed}
-              onChange={onFilterChange}
-            />
-            처리완료
-          </label>
+          {renderStatusFilters()}
         </div>
       )}
     </div>
@@ -210,9 +252,9 @@ ConditionFilter.propTypes = {
   onFilterChange: PropTypes.func,
   showStatusFilters: PropTypes.bool,
   showSearchCondition: PropTypes.bool,
-  showDocumentType: PropTypes.bool,  
+  showDocumentType: PropTypes.bool,
   documentType: PropTypes.string,
-  setDocumentType: PropTypes.func.isRequired, 
+  setDocumentType: PropTypes.func.isRequired,
 };
 
 export default ConditionFilter;

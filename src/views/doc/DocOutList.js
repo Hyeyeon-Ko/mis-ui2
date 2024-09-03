@@ -113,12 +113,12 @@ function DocOutList() {
     }
   };
 
-  const handleSearch = () => {
+  const handleSearch = (searchParams) => {
     fetchDocOutList({
       startDate: filterInputs.startDate,
       endDate: filterInputs.endDate,
-      searchType: filterInputs.searchType,
-      keyword: filterInputs.keyword,
+      searchType: searchParams.searchType, 
+      keyword: searchParams.keyword,       
     });
   };
 

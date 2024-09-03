@@ -91,7 +91,6 @@ function ApplicationsList() {
         ...(sealMasterResponses || []),
       ];
 
-      // '신청상태 없음'인 데이터 (ex. 법인서류 입고) 는 화면에 보이지 않도록
       const filteredData = combinedData.filter(application => application.applyStatus !== 'X');
 
       const transformedData = filteredData.map(application => {
@@ -141,14 +140,24 @@ function ApplicationsList() {
   };
 
   const resetFilters = () => {
+    const defaultStartDate = new Date();
+    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
+    setFilterInputs({
+      startDate: defaultStartDate,
+      endDate: new Date(),
+      documentType: documentTypeFromUrl || '',
+      searchType: '전체',
+      keyword: '',
+    });
     setFilters({
       statusApproved: false,
       statusRejected: false,
       statusOrdered: false,
       statusClosed: false,
     });
+    setSelectedCenter('전체');
   };
-
+  
   useEffect(() => {
     setFilterInputs((prev) => ({
       ...prev,
@@ -157,9 +166,10 @@ function ApplicationsList() {
   }, [documentTypeFromUrl]);
 
   useEffect(() => {
-    fetchApplications();
-  }, [fetchApplications, documentTypeFromUrl]); 
-
+    resetFilters(); 
+    fetchApplications(); 
+  }, [documentTypeFromUrl, fetchApplications]);
+  
   useEffect(() => {
     if (documentTypeFromUrl === '명함신청') {
       const isShowExcelButton = filters.statusClosed && selectedApplications.length > 0;
@@ -219,20 +229,7 @@ function ApplicationsList() {
   };
 
   const handleReset = () => {
-    setFilterInputs({
-      startDate: null,
-      endDate: null,
-      documentType: documentTypeFromUrl || '',
-      searchType: '전체',
-      keyword: '',
-    });
-    setFilters({
-      statusApproved: false,
-      statusRejected: false,
-      statusOrdered: false,
-      statusClosed: false,
-    });
-    setSelectedCenter('전체');
+    resetFilters();
     fetchApplications();
   };
 
@@ -351,7 +348,7 @@ function ApplicationsList() {
       accessor: 'respondDate',
       width: '13%',
     },
-    ...(documentTypeFromUrl === '문서수발신' || documentTypeFromUrl === '법인서류' ? [] : [
+    ...(documentTypeFromUrl === '문서수발신' || documentTypeFromUrl === '법인서류'  || documentTypeFromUrl === '인장신청' ? [] : [
       { header: '발주일시', accessor: 'orderDate', width: '14%' },
     ]),
     { header: '문서상태', accessor: 'applyStatus', width: '10%' },
