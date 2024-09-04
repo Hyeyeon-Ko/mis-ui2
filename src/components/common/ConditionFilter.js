@@ -29,11 +29,7 @@ const ConditionFilter = ({
   const [searchType, setSearchType] = useState('전체');
   const [keyword, setKeyword] = useState('');
 
-  useEffect(() => {
-    resetFilters(); 
-  }, [documentType]);  
-  
-  const resetFilters = () => {
+  const resetFilters = useCallback(() => {
     const defaultStartDate = new Date();
     defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
     setStartDate(defaultStartDate);
@@ -47,7 +43,12 @@ const ConditionFilter = ({
       statusOrdered: false,
       statusClosed: false,
     });
-  };
+  }, [setStartDate, setEndDate, onReset, setFilters]);
+
+  useEffect(() => {
+    resetFilters(); 
+  }, [documentType, resetFilters]);  
+  
 
   const formatDate = (date) => {
     return date.toISOString().split('T')[0];

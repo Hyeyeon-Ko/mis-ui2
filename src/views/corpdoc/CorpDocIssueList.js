@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Button from '../../components/common/Button';
 import CustomButton from '../../components/common/CustomButton';
-import ConditionFilter from '../../components/common/ConditionFilter';
+// import ConditionFilter from '../../components/common/ConditionFilter';
 import CorpDocApprovalModal from '../../views/corpdoc/CorpDocApprovalModal';
 import CorpDocStoreModal from './CorpDocStoreModal';
 import IssueModal from '../../components/common/ConfirmModal';
@@ -15,8 +15,8 @@ function CorpDocIssueList() {
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [pendingApplications, setPendingApplications] = useState([]);
   const [filteredPendingApplications, setFilteredPendingApplications] = useState([]);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  // const [startDate, setStartDate] = useState(null);
+  // const [endDate, setEndDate] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
   const [clickedRows, setClickedRows] = useState([]);
@@ -25,10 +25,6 @@ function CorpDocIssueList() {
   const [selectedPendingApp, setSelectedPendingApp] = useState(null);
   const [totalCorpseal, setTotalCorpseal] = useState(0);
   const [totalCoregister, setTotalCoregister] = useState(0);
-
-  useEffect(() => {
-    fetchIssueData();
-  }, []);
 
   const fetchIssueData = async () => {
     try {
@@ -101,10 +97,14 @@ function CorpDocIssueList() {
   
     return { totalCorpseal, totalCoregister };
   };
-  
+
   useEffect(() => {
-    console.log("filtered: ", filteredApplications);
-  }, [filteredApplications]);
+    fetchIssueData();
+  }, [fetchIssueData]);
+  
+  // useEffect(() => {
+  //   console.log("filtered: ", filteredApplications);
+  // }, [filteredApplications]);
 
   const handleSearch = ({ searchType, keyword, startDate, endDate }, listType = 'applications') => {
     let filtered = listType === 'applications' ? applications : pendingApplications;

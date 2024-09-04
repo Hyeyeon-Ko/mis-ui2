@@ -95,7 +95,7 @@ function ApplicationsList() {
     }
   };
 
-  const fetchApplications = async (filterParams = {}) => {
+  const fetchApplications = useCallback(async (filterParams = {}) => {
     setLoading(true);
     setError(null);
     try {
@@ -145,7 +145,7 @@ function ApplicationsList() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [documentTypeFromUrl, instCd, selectedCenter]);
 
   const fetchSealImprintDetail = async (draftId) => {
     try {
@@ -182,11 +182,6 @@ function ApplicationsList() {
     applyStatusFilters(applications);
   }, [filters, applications, applyStatusFilters]);
 
-  useEffect(() => {
-    resetFilters();
-    fetchApplications();
-  }, [documentTypeFromUrl]);
-
   const resetFilters = useCallback(() => {
     const defaultStartDate = new Date();
     defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
@@ -205,6 +200,13 @@ function ApplicationsList() {
     });
     setSelectedCenter('전체');
   }, [documentTypeFromUrl]);
+
+  
+  useEffect(() => {
+    resetFilters();
+    fetchApplications();
+  }, [documentTypeFromUrl, fetchApplications, resetFilters]);
+
 
   useEffect(() => {
     if (documentTypeFromUrl === '명함신청') {
