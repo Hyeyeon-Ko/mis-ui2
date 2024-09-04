@@ -176,7 +176,7 @@ function ApplicationsList() {
       return !Object.values(filters).some(Boolean); 
     });
     setFilteredApplications(filtered);
-  }, [filters, setFilteredApplications]);
+  }, [filters]);
 
   useEffect(() => {
     applyStatusFilters(applications);
