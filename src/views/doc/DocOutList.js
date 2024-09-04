@@ -9,6 +9,8 @@ import '../../styles/doc/DocOutList.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function DocOutList() {
   const { auth } = useContext(AuthContext);
   const [applications, setApplications] = useState([]);
@@ -35,7 +37,7 @@ function DocOutList() {
   const fetchDocOutList = useCallback(
     async (params = {}) => {
       try {
-        const response = await axios.get('/api/doc/sendList', {
+        const response = await axios.get(`${apiUrl}/api/doc/sendList`, {
           params: {
             instCd: auth.instCd,
             startDate: formatDate(params.startDate),
@@ -103,7 +105,7 @@ function DocOutList() {
     if (selectedDraftId === null) return;
 
     try {
-      await axios.put('/api/doc/delete', null, {
+      await axios.put(`${apiUrl}/api/doc/delete', null, {
         params: {
           draftId: selectedDraftId,
         },

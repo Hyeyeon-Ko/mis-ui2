@@ -5,6 +5,8 @@ import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
 import '../../styles/bcd/ApplicationHistoryModal.css';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 /* 신청 이력 모달 */
 const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   const [startDate, setStartDate] = useState(null);
@@ -15,7 +17,7 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
 
   const fetchHistory = useCallback(async (draftId) => {
     try {
-      const response = await axios.get(`/api/bcd/applyList/history/${draftId}`);
+      const response = await axios.get(`${apiUrl}/api/bcd/applyList/history/${draftId}`);
       const transformedData = response.data.data.map((item) => ({
         ...item,
         applyStatus: getStatusText(item.applyStatus),

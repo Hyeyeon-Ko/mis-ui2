@@ -12,6 +12,8 @@ import '../../styles/common/Page.css';
 import backImageEng from '../../assets/images/backimage_eng.png';
 import backImageCompany from '../../assets/images/backimage_company.png';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function BcdApplySecond() {
   const { auth } = useContext(AuthContext);
   const location = useLocation();
@@ -78,7 +80,7 @@ function BcdApplySecond() {
 
   const fetchUserInfo = async (userId) => {
     try {
-      const response = await axios.get(`/api/info/${userId}`);
+      const response = await axios.get(`${apiUrl}/api/info/${userId}`);
       if (response.data && response.data.data) {
         const userData = response.data.data;
         setFormData((prevFormData) => ({
@@ -103,7 +105,7 @@ function BcdApplySecond() {
 
   const fetchBcdStd = async () => {
     try {
-      const response = await axios.get('/api/std/bcd');
+      const response = await axios.get(`${apiUrl}/api/std/bcd`);
       if (response.data && response.data.data) {
         const data = response.data.data;
 
@@ -153,7 +155,7 @@ function BcdApplySecond() {
       return;
     }
     try {
-      const response = await axios.get(`/api/info/${userIdInput}`);
+      const response = await axios.get(`${apiUrl}/api/info/${userIdInput}`);
       if (response.data && response.data.data) {
         const userData = response.data.data;
 
@@ -277,7 +279,7 @@ function BcdApplySecond() {
     console.log('Final requestData:', requestData);
   
     try {
-      const response = await axios.post('/api/bcd/', requestData);
+      const response = await axios.post(`${apiUrl}/api/bcd/`, requestData);
       if (response.data.code === 200) {
         alert('명함 신청이 완료되었습니다.');
         navigate('/api/myApplyList');

@@ -6,6 +6,8 @@ import SignitureImage from '../../assets/images/signiture.png';
 import axios from 'axios';
 import '../../styles/corpdoc/CorpDocRnpList.css';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function CorpDocRnpList() {
   const { auth } = useContext(AuthContext);
 
@@ -16,7 +18,7 @@ function CorpDocRnpList() {
 
   const fetchRnpData = useCallback(async () => {
     try {
-      const response = await axios.get('/api/corpDoc/rnpList', {
+      const response = await axios.get(`${apiUrl}/api/corpDoc/rnpList`, {
         params: {instCd: auth.instCd},
       });
 

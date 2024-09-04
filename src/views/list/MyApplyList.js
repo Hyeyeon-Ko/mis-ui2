@@ -9,6 +9,8 @@ import '../../styles/list/MyApplyList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function MyApplyList() {
   const { auth } = useContext(AuthContext); 
   const [applications, setApplications] = useState([]);
@@ -27,7 +29,7 @@ function MyApplyList() {
 
   const fetchApplications = useCallback(async (filterParams = {}) => {
     try {
-      const response = await axios.get('/api/myApplyList', {
+      const response = await axios.get(`${apiUrl}/api/myApplyList`, {
         params: {
           documentType: filterParams.documentType || documentType || null,
           startDate: filterParams.startDate || startDate.toISOString().split('T')[0],

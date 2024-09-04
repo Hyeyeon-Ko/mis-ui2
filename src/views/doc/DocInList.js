@@ -9,6 +9,8 @@ import '../../styles/doc/DocInList.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function DocInList() {
   const { auth } = useContext(AuthContext);
   const [applications, setApplications] = useState([]);
@@ -35,7 +37,7 @@ function DocInList() {
     try {
       const formatDate = (date) => date ? date.toISOString().split('T')[0] : null;
 
-      const response = await axios.get('/api/doc/receiveList', {
+      const response = await axios.get(`${apiUrl}/api/doc/receiveList`, {
         params: {
           instCd: auth.instCd,
           startDate: formatDate(params.startDate),
@@ -79,7 +81,7 @@ function DocInList() {
 
   const fetchDeptReceiveList = async (deptCd) => {
     try {
-      const response = await axios.get('/api/doc/deptReceiveList', {
+      const response = await axios.get(`${apiUrl}/api/doc/deptReceiveList`, {
         params: { deptCd },
       });
       if (response.data && response.data.data) {
@@ -135,7 +137,7 @@ function DocInList() {
     if (selectedDraftId === null) return;
 
     try {
-      await axios.put('/api/doc/delete', null, {
+      await axios.put(`${apiUrl}/api/doc/delete`, null, {
         params: {
           draftId: selectedDraftId,
         },

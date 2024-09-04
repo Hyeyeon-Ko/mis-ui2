@@ -7,6 +7,8 @@ import { AuthContext } from '../../components/AuthContext';
 import axios from 'axios';
 import '../../styles/seal/SealExportList.css';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function SealExportList() {
   const { auth } = useContext(AuthContext);
   const [filteredApplications, setFilteredApplications] = useState([]);
@@ -16,7 +18,7 @@ function SealExportList() {
 
   const fetchSealExportList = useCallback(async (instCd) => {
     try {
-      const response = await axios.get('/api/seal/exportList', {
+      const response = await axios.get(`${apiUrl}/api/seal/exportList`, {
         params: {
           instCd,
         },
@@ -36,7 +38,7 @@ function SealExportList() {
         signitureImage: SignitureImage,
         fileName: item.fileName,
         filePath: item.filePath,
-        fileUrl: `/api/doc/download/${encodeURIComponent(item.fileName)}`,
+        fileUrl: `${apiUrl}/api/doc/download/${encodeURIComponent(item.fileName)}`,
         status: '결재진행중',
       }));
   

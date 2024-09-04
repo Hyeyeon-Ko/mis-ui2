@@ -9,6 +9,8 @@ import '../../styles/list/MyPendingList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function MyPendingList() {
   const { auth } = useContext(AuthContext); 
   const [pendingApplications, setPendingApplications] = useState([]);
@@ -18,7 +20,7 @@ function MyPendingList() {
 
   const fetchPendingApplications = useCallback(async () => {
     try {
-      const response = await axios.get('/api/myPendingList', {
+      const response = await axios.get(`${apiUrl}/api/myPendingList`, {
         params: {
           userId: auth.userId, 
         },

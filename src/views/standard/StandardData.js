@@ -7,6 +7,8 @@ import '../../styles/common/Page.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function StandardData() {
   const [subCategories, setSubCategories] = useState([]);
   const [details, setDetails] = useState([]);
@@ -36,7 +38,7 @@ function StandardData() {
 
   const fetchSubCategories = async (classCd) => {
     try {
-      const response = await axios.get('/api/std/groupInfo', { params: { classCd } });
+      const response = await axios.get(`${apiUrl}/api/std/groupInfo`, { params: { classCd } });
       const data = response.data.data || [];
       data.sort((a, b) => parseInt(a.groupCd, 10) - parseInt(b.groupCd, 10));
       setSubCategories(data);
@@ -118,7 +120,7 @@ function StandardData() {
   const handleSaveRow = async (newRow) => {
     if (modalMode === 'detail') {
       try {
-        await axios.post('/api/std/detailInfo', {
+        await axios.post(`${apiUrl}/api/std/detailInfo`, {
           detailCd: newRow.detailCode,
           groupCd: selectedSubCategory,
           detailNm: newRow.detailName,
@@ -150,9 +152,9 @@ function StandardData() {
     } else if (modalMode === 'edit') {
       try {
         const oriDetailCd = selectedDetails[0];
-        await axios.put('/api/std/detailInfo', {
-          groupCd: selectedSubCategory,
+        await axios.put(`${apiUrl}/api/std/detailInfo`, {
           detailCd: newRow.detailCode,
+          groupCd: selectedSubCategory,
           detailNm: newRow.detailName,
           fromDd: '',
           toDd: '',
@@ -180,7 +182,7 @@ function StandardData() {
       }
     } else if (modalMode === 'group') {
       try {
-        await axios.post('/api/std/groupInfo', {
+        await axios.post(`${apiUrl}/api/std/groupInfo`, {
           classCd: newRow.classCd,
           groupCd: newRow.groupCd,
           groupNm: newRow.groupNm,
@@ -235,7 +237,7 @@ function StandardData() {
 
     try {
       for (const detailCd of selectedDetails) {
-        await axios.put('/api/std/deleteDetailInfo', null, {
+        await axios.put(`${apiUrl}/api/std/deleteDetailInfo`, null, {
           params: { groupCd: selectedSubCategory, detailCd }
         });
       }

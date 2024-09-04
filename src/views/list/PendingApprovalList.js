@@ -10,6 +10,8 @@ import '../../styles/common/Page.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function PendingApprovalList() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -57,7 +59,7 @@ function PendingApprovalList() {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('/api/pendingList', {
+      const response = await axios.get(`${apiUrl}/api/pendingList`, {
         params: {
           documentType,
           startDate: filterParams.startDate || '',

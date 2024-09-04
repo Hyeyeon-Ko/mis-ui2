@@ -11,6 +11,8 @@ import facsimileSeal from '../../assets/images/facsimile_seal.png';
 import companySeal from '../../assets/images/company_seal.png';
 import RejectReasonModal from '../../components/RejectReasonModal';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function DetailSealImprintApplication() {
     const { auth } = useContext(AuthContext);
     const { draftId } = useParams(); 

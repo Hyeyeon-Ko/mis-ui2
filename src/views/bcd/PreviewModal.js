@@ -6,6 +6,8 @@ import frontImageBlank from '../../assets/images/frontimage_blank.png';
 import backImageEngBlank from '../../assets/images/backimage_eng_blank.png';
 import backImageCompany from '../../assets/images/backimage_company.png';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 const PreviewModal = ({ show, onClose, formData }) => {
   const canvasRef = useRef(null);
   const [bcdData, setBcdData] = useState({
@@ -18,7 +20,7 @@ const PreviewModal = ({ show, onClose, formData }) => {
   // fetchBcdStd 함수
   const fetchBcdStd = async () => {
     try {
-      const response = await axios.get('/api/std/bcd');
+      const response = await axios.get(`${apiUrl}/api/std/bcd`);
       if (response.data && response.data.data) {
         const data = response.data.data;
         setBcdData(data);

@@ -3,6 +3,8 @@ import '../../styles/seal/SealRegistrationAddModal.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
   const { auth } = useContext(AuthContext);
 
@@ -46,7 +48,7 @@ function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
     data.append('sealImage', formData.sealImage);
   
     try {
-      const response = await axios.post('/api/seal/register', data, {
+      const response = await axios.post(`${apiUrl}/api/seal/register`, data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

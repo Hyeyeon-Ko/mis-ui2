@@ -7,6 +7,8 @@ import SignitureImage from '../../assets/images/signiture.png';
 import '../../styles/seal/SealManagementList.css';
 import { AuthContext } from '../../components/AuthContext';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function SealManagementList() {
   const { auth } = useContext(AuthContext); 
   const [filteredApplications, setFilteredApplications] = useState([]);
@@ -19,7 +21,7 @@ function SealManagementList() {
     try {
       const { instCd } = auth;  
 
-      const response = await axios.get('/api/seal/managementList', {
+      const response = await axios.get(`${apiUrl}/api/seal/managementList`, {
         params: {
           instCd,
         },

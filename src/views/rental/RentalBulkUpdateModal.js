@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 const RentalBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds }) => {
   const [formData, setFormData] = useState({
     category: '',
@@ -63,7 +65,7 @@ const RentalBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds }) => 
     };
 
     try {
-        await axios.put('/api/rental/bulkUpdate', payload);
+        await axios.put(`${apiUrl}/api/rental/bulkUpdate`, payload);
         alert('렌탈 정보가 성공적으로 수정되었습니다.');
 
         setFormData({

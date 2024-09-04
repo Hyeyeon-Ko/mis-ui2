@@ -10,6 +10,8 @@ import '../../styles/corpdoc/CorpDocApply.css';
 import downloadIcon from '../../assets/images/download.png';
 import deleteIcon from '../../assets/images/delete2.png'; 
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function DetailCorpDocApplication() {
     const { draftId } = useParams();
     const navigate = useNavigate();
@@ -42,7 +44,7 @@ function DetailCorpDocApplication() {
 
     const fetchCorpDocDetail = useCallback(async (id) => {
         try {
-            const response = await axios.get(`/api/corpDoc/${id}`);
+            const response = await axios.get(`${apiUrl}/api/corpDoc/${id}`);
             if (response.data && response.data.data) {
                 const {
                     submission,
@@ -121,7 +123,7 @@ function DetailCorpDocApplication() {
     const handleFileDownload = async () => {
         if (existingFile) {
             try {
-                const response = await axios.get(`/api/corpDoc/download/${encodeURIComponent(existingFile.name)}`, {
+                const response = await axios.get(`${apiUrl}/api/corpDoc/download/${encodeURIComponent(existingFile.name)}`, {
                     responseType: 'blob',
                 });
 
@@ -213,7 +215,7 @@ function DetailCorpDocApplication() {
                 formDataToSend.append('file', file);
             }
 
-            await axios.post(`/api/corpDoc/update?draftId=${draftId}&isFileDeleted=${isFileDeleted}`, formDataToSend, {
+            await axios.post(`${apiUrl}/api/corpDoc/update?draftId=${draftId}&isFileDeleted=${isFileDeleted}`, formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -239,7 +241,7 @@ function DetailCorpDocApplication() {
     const handleApprove = async (e) => {
         e.preventDefault(); 
         try {
-            await axios.put(`/api/corpDoc/approve?draftId=${draftId}`);
+            await axios.put(`${apiUrl}/api/corpDoc/approve?draftId=${draftId}`);
             alert('문서가 승인되었습니다.');
             navigate('/api/pendingList?documentType=법인서류');
         } catch (error) {
@@ -250,7 +252,7 @@ function DetailCorpDocApplication() {
     
     const handleRejectConfirm = async (reason) => {
         try {
-            const response = await axios.put(`/api/corpDoc/reject?draftId=${draftId}`, reason, {
+            const response = await axios.put(`${apiUrl}/api/corpDoc/reject?draftId=${draftId}`, reason, {
                 headers: {
                     'Content-Type': 'text/plain',
                 },

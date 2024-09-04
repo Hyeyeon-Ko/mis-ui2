@@ -14,15 +14,31 @@ const apiClient = axios.create({
 });
 
 // POST 요청을 보내는 함수
-const postData = async () => {
-  const dataToSend = {
-    // 보낼 데이터 객체
-    id: 'clsung'
-  };
+const postData = async (url, data) => {
+  const dataToSend = data;
 
   try {
-    const response = await apiClient.post('/sample/sample', dataToSend);
+    const response = await apiClient.post(url, dataToSend);
     console.log('POST 요청 성공:', response.data);
+    return response.data; // 성공적으로 데이터를 받은 경우 데이터 반환
+  } catch (error) {
+    if (error.response) {
+      console.error('서버 응답 에러:', error.response.data);
+    } else if (error.request) {
+      console.error('응답 없음:', error.request);
+    } else {
+      console.error('요청 설정 에러:', error.message);
+    }
+    throw error; // 에러 발생 시 에러를 throw하여 처리
+  }
+};
+
+const deleteData = async (url, data) => {
+  const dataToSend = data;
+
+  try {
+    const response = await apiClient.deleteData(url, dataToSend);
+    console.log('DELETE 요청 성공:', response.data);
     return response.data; // 성공적으로 데이터를 받은 경우 데이터 반환
   } catch (error) {
     if (error.response) {

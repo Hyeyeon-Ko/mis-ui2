@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import '../../styles/docstorage/DocstorageApplyModal.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
+
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 const DocstorageApplyModal = ({ show, onClose, selectedRows, onApplySuccess }) => {
 
   const { auth } = useContext(AuthContext);
@@ -17,7 +20,7 @@ const DocstorageApplyModal = ({ show, onClose, selectedRows, onApplySuccess }) =
         detailIds: selectedRows,
       };
 
-      await axios.post('/api/docstorage/apply', applyData);
+      await axios.post(`${apiUrl}/api/docstorage/apply', applyData);
 
       alert(`문서보관 ${type === 'A' ? '이관' : '파쇄'} 신청이 완료되었습니다.`);
       onClose(); 

@@ -11,6 +11,8 @@ import fileDownload from 'js-file-download';
 import { FadeLoader } from 'react-spinners';
 import { AuthContext } from '../../components/AuthContext'; 
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function BcdOrder() {
   const { auth } = useContext(AuthContext); 
   const [applications, setApplications] = useState([]);
@@ -41,7 +43,7 @@ function BcdOrder() {
   // 발주 리스트 가져오기
   const fetchBcdOrderList = useCallback(async () => {
     try {
-      const response = await axios.get('/api/bsc/order', {
+      const response = await axios.get(`${apiUrl}/api/bsc/order`, {
         params: {
           instCd: auth.instCd,
         },
@@ -144,7 +146,7 @@ function BcdOrder() {
     }
 
     try {
-      const response = await axios.post('/api/bsc/order/excel', selectedApplications, {
+      const response = await axios.post(`${apiUrl}/api/bsc/order/excel`, selectedApplications, {
         responseType: 'blob',
       });
       fileDownload(response.data, '명함 발주내역.xlsx');
@@ -165,7 +167,7 @@ function BcdOrder() {
   const handleSendEmail = async (emailData) => {
     setIsLoading(true);
     try {
-      await axios.post('/api/bsc/order', {
+      await axios.post(`${apiUrl}/api/bsc/order`, {
         draftIds: selectedApplications,
         emailSubject: emailData.subject,
         emailBody: emailData.body,

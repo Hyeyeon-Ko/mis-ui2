@@ -12,6 +12,8 @@ import axios from 'axios';
 import fileDownload from 'js-file-download';
 import { AuthContext } from '../../components/AuthContext';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function ApplicationsList() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -99,7 +101,7 @@ function ApplicationsList() {
   //   setLoading(true);
   //   setError(null);
   //   try {
-  //     const response = await axios.get('/api/applyList', {
+  //     const response = await axios.get(`${apiUrl}/api/applyList', {
   //       params: {
   //         documentType: filterParams.documentType || documentTypeFromUrl || null,
   //         startDate: filterParams.startDate || '',
@@ -186,7 +188,7 @@ function ApplicationsList() {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('/api/applyList', {
+      const response = await axios.get(`${apiUrl}/api/applyList`, {
         params: {
           documentType: filterParams.documentType || documentTypeFromUrl || null,
           startDate: filterParams.startDate || '',
@@ -318,7 +320,7 @@ function ApplicationsList() {
         selectedApplications,
       };
 
-      const response = await axios.post('/api/bsc/applyList/orderExcel', requestData, {
+      const response = await axios.post(`${apiUrl}/api/bsc/applyList/orderExcel`, requestData, {
         responseType: 'blob',
       });
 

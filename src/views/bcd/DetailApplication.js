@@ -14,6 +14,8 @@ import '../../styles/common/Page.css';
 import backImageEng from '../../assets/images/backimage_eng.png';
 import backImageCompany from '../../assets/images/backimage_company.png';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function DetailApplication() {
   const { auth } = useContext(AuthContext);
   const { draftId } = useParams();
@@ -133,7 +135,7 @@ function DetailApplication() {
     
   const fetchApplicationDetail = async (draftId) => {
     try {
-      const response = await axios.get(`/api/bcd/applyList/${draftId}`);
+      const response = await axios.get(`${apiUrl}/api/bcd/applyList/${draftId}`);
       if (response.data && response.data.data) {
         const data = response.data.data;
         const [phone1, phone2, phone3] = data.extTel.split('-');
@@ -189,7 +191,7 @@ function DetailApplication() {
 
   const fetchBcdStd = async () => {
     try {
-      const response = await axios.get('/api/std/bcd');
+      const response = await axios.get(`${apiUrl}/api/std/bcd`);
       if (response.data && response.data.data) {
         const data = response.data.data;
         const instMap = {};
@@ -273,7 +275,7 @@ function DetailApplication() {
     };
 
     try {
-      const response = await axios.post(`/api/bcd/update?draftId=${draftId}`, requestData);
+      const response = await axios.post(`${apiUrl}/api/bcd/update?draftId=${draftId}`, requestData);
       if (response.data.code === 200) {
         alert('명함 수정이 완료되었습니다.');
         navigate('/api/myPendingList');
@@ -295,7 +297,7 @@ function DetailApplication() {
 
   const handleApprove = async () => {
     try {
-      const response = await axios.post(`/api/bcd/applyList/${draftId}`);
+      const response = await axios.post(`${apiUrl}/api/bcd/applyList/${draftId}`);
       if (response.data.code === 200) {
         alert('명함이 승인되었습니다.');
         navigate(`/api/pendingList?documentType=명함신청`);  
@@ -309,7 +311,7 @@ function DetailApplication() {
   
   const handleRejectConfirm = async (reason) => {
     try {
-      const response = await axios.post(`/api/bcd/applyList/return/${draftId}`, reason, {
+      const response = await axios.post(`${apiUrl}/api/bcd/applyList/return/${draftId}`, reason, {
         headers: {
           'Content-Type': 'text/plain',
         },

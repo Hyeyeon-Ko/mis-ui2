@@ -4,6 +4,8 @@ import axios from 'axios';
 import '../../styles/doc/DocConfirmModal.css';
 import downloadIcon from '../../assets/images/download.png';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus }) => {
   const [formData, setFormData] = useState({
     receptionDate: '',
@@ -19,7 +21,7 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus }) 
 
   const fetchDocumentData = useCallback(async (id) => {
     try {
-      const response = await axios.get(`/api/doc/${id}`);
+      const response = await axios.get(`${apiUrl}/api/doc/${id}`);
       if (response.data && response.data.data) {
         const data = response.data.data;
         setFormData({
@@ -31,7 +33,7 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus }) 
           purpose: data.purpose,
           division: data.division,
           fileName: data.fileName,
-          fileUrl: data.filePath ? `/api/doc/download/${encodeURIComponent(data.fileName)}` : ''
+          fileUrl: data.filePath ? `${apiUrl}/api/doc/download/${encodeURIComponent(data.fileName)}` : ''
         });
       }
     } catch (error) {

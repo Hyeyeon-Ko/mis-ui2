@@ -5,6 +5,8 @@ import * as XLSX from 'xlsx';
 import '../../styles/rental/RentalAddModal.css';
 import { AuthContext } from '../../components/AuthContext';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
   const { auth } = useContext(AuthContext);
   const [file, setFile] = useState(null);
@@ -95,7 +97,7 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
           }));
 
         try {
-          axios.post('/api/rental/update', extractedData);
+          axios.post(`${apiUrl}/api/rental/update`, extractedData);
           alert('수정이 완료되었습니다.');
           onSave(extractedData, true);
           onClose();

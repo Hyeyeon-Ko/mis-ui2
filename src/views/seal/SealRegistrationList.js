@@ -7,6 +7,8 @@ import '../../styles/seal/SealRegistrationList.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function SealRegistrationList() {
   const { auth } = useContext(AuthContext);
   const [filteredApplications, setFilteredApplications] = useState([]);
@@ -17,7 +19,7 @@ function SealRegistrationList() {
 
   const fetchSealRegistrationList = useCallback(async () => {
     try {
-      const response = await axios.get('/api/seal/registrationList', {
+      const response = await axios.get(`${apiUrl}/api/seal/registrationList`, {
         params: { instCd: auth.instCd } 
       });
 
@@ -26,7 +28,7 @@ function SealRegistrationList() {
           draftId: item.draftId,
           seal: item.sealNm,
           sealImage: item.sealImage, 
-          sealImageUrl: `/api/images/${encodeURIComponent(item.sealImage)}`,
+          sealImageUrl: `${apiUrl}/api/images/${encodeURIComponent(item.sealImage)}`,
           department: item.useDept,
           purpose: item.purpose,
           manager: item.manager,

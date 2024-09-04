@@ -5,6 +5,8 @@ import * as XLSX from 'xlsx';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/rental/RentalAddModal.css';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 const RentalAddModal = ({ show, onClose, onSave }) => {
   const { auth } = useContext(AuthContext); 
   const [activeTab, setActiveTab] = useState('file');
@@ -100,7 +102,7 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
             instCd: auth.instCd, 
           }));
 
-        axios.post('/api/rental/data', extractedData)
+        axios.post(`${apiUrl}/api/rental/data`, extractedData)
           .then((response) => {
             console.log('Data successfully sent:', response.data);
             onSave(response.data); 
@@ -168,7 +170,7 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
           specialNote,
         };
       
-      axios.post('/api/rental/', payload)
+      axios.post(`${apiUrl}/api/rental/`, payload)
         .then(response => {
           console.log('Data successfully save:', response.data);
           onSave([payload]);

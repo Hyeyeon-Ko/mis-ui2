@@ -10,6 +10,8 @@ import SignitureImage from '../../assets/images/signiture.png';
 import axios from 'axios';
 import '../../styles/corpdoc/CorpDocIssueList.css';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function CorpDocIssueList() {
   // const [applications, setApplications] = useState([]);
   const [setApplications] = useState([]);
@@ -31,7 +33,7 @@ function CorpDocIssueList() {
   // const fetchIssueData = async () => {
   const fetchIssueData = useCallback(async () => {
     try {
-      const response = await axios.get('/api/corpDoc/issueList');
+      const response = await axios.get(`${apiUrl}/api/corpDoc/issueList`);
       console.log("response: ", response);
 
       if (response.data) {
@@ -186,7 +188,7 @@ function CorpDocIssueList() {
     }
 
     try {
-      const response = await axios.put(`/api/corpDoc/issue?draftId=${selectedPendingApp.id}`, {
+      const response = await axios.put(`${apiUrl}/api/corpDoc/issue?draftId=${selectedPendingApp.id}`, {
         totalCorpseal,
         totalCoregister
       });

@@ -13,6 +13,8 @@ import RejectReasonModal from '../../components/RejectReasonModal';
 import downloadIcon from '../../assets/images/download.png';
 import deleteIcon from '../../assets/images/delete2.png';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function DetailSealExportApplication() {
     const { auth } = useContext(AuthContext);
     const { draftId } = useParams(); 

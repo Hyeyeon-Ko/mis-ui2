@@ -9,6 +9,8 @@ import { AuthContext } from '../../components/AuthContext';
 import downloadIcon from '../../assets/images/download.png';
 import deleteIcon from '../../assets/images/delete2.png'; 
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 function DetailDocApplication() {
   const { draftId } = useParams();
   const navigate = useNavigate();
@@ -30,7 +32,7 @@ function DetailDocApplication() {
 
   const fetchDocDetail = useCallback(async (id) => {
     try {
-      const response = await axios.get(`/api/doc/${id}`);
+      const response = await axios.get(`${apiUrl}/api/doc/${id}`);
       if (response.data && response.data.data) {
         const { draftDate, division, receiver, sender, docTitle, purpose, fileName, filePath } = response.data.data;
         const fetchedData = {
@@ -87,7 +89,7 @@ function DetailDocApplication() {
   const handleFileDownload = async () => {
     if (existingFile) {
       try {
-        const response = await axios.get(`/api/doc/download/${encodeURIComponent(existingFile.name)}`, {
+        const response = await axios.get(`${apiUrl}/api/doc/download/${encodeURIComponent(existingFile.name)}`, {
           responseType: 'blob',
         });
   
@@ -131,7 +133,7 @@ function DetailDocApplication() {
             formDataToSend.append('file', file);
         }
 
-        await axios.post(`/api/doc/update?draftId=${draftId}&isFileDeleted=${isFileDeleted}`, formDataToSend, {
+        await axios.post(`${apiUrl}/api/doc/update?draftId=${draftId}&isFileDeleted=${isFileDeleted}`, formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },

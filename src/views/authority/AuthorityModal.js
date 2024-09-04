@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import '../../styles/authority/AuthorityModal.css';
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 /* 권한 관리 모달 */
 const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) => {
   const [role, setRole] = useState('');
@@ -15,7 +17,7 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
 
   const fetchAdminData = useCallback(async (authId) => {
     try {
-      const response = await axios.get(`/api/auth/admin/${authId}`);
+      const response = await axios.get(`${apiUrl}/api/auth/admin/${authId}`);
       const data = response.data.data;
       setRole(data.userRole);
       setUserId(data.userId || '');
@@ -101,7 +103,7 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
         return;
       }
 
-      const response = await axios.post('/api/auth', null, { params: { userId: userId } });
+      const response = await axios.post(`${apiUrl}/api/auth`, null, { params: { userId: userId } });
       const userName = response.data.data;
 
       setQueryResult([{
@@ -164,10 +166,10 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
   
     try {
       if (!adminData) {
-        await axios.post('/api/auth/admin', requestData);
+        await axios.post(`${apiUrl}/api/auth/admin`, requestData);
         alert('추가 완료되었습니다');
       } else {
-        await axios.put(`/api/auth/admin/${adminData.authId}`, requestData);
+        await axios.put(`${apiUrl}/api/auth/admin/${adminData.authId}`, requestData);
         alert('수정 완료되었습니다');
       }
       onSave();
