@@ -29,3 +29,5 @@ build
 Dockerfile
 .git
 .gitignore
+
+package-lock.json
