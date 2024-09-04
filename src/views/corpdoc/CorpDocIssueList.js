@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Button from '../../components/common/Button';
 import CustomButton from '../../components/common/CustomButton';
@@ -11,9 +11,11 @@ import axios from 'axios';
 import '../../styles/corpdoc/CorpDocIssueList.css';
 
 function CorpDocIssueList() {
-  const [applications, setApplications] = useState([]);
+  // const [applications, setApplications] = useState([]);
+  const [setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
-  const [pendingApplications, setPendingApplications] = useState([]);
+  // const [pendingApplications, setPendingApplications] = useState([]);
+  const [setPendingApplications] = useState([]);
   const [filteredPendingApplications, setFilteredPendingApplications] = useState([]);
   // const [startDate, setStartDate] = useState(null);
   // const [endDate, setEndDate] = useState(null);
@@ -26,7 +28,8 @@ function CorpDocIssueList() {
   const [totalCorpseal, setTotalCorpseal] = useState(0);
   const [totalCoregister, setTotalCoregister] = useState(0);
 
-  const fetchIssueData = async () => {
+  // const fetchIssueData = async () => {
+  const fetchIssueData = useCallback(async () => {
     try {
       const response = await axios.get('/api/corpDoc/issueList');
       console.log("response: ", response);
@@ -83,7 +86,7 @@ function CorpDocIssueList() {
     } catch (error) {
       console.error("Error fetching issue data:", error);
     }
-  };
+  }, []);
 
   // IssueList의 마지막 행의 잔고 값 가져오기
   const extractTotalValues = (data) => {

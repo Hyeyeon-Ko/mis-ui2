@@ -176,10 +176,7 @@ function ApplicationsList() {
       return !Object.values(filters).some(Boolean); 
     });
     setFilteredApplications(filtered);
-  }, [filters.statusApproved,
-    filters.statusRejected,
-    filters.statusOrdered,
-    filters.statusClosed]);
+  }, [filters]);
 
   useEffect(() => {
     applyStatusFilters(applications);
