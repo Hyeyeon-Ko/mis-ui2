@@ -228,7 +228,7 @@ function Docstorage() {
   const handleUpdate = async (updatedData, isFileUpload = false) => {
     try {
         if (isFileUpload) {
-            const response = await axios.post(`${apiUrl}/api/docstorage/update', updatedData);
+            const response = await axios.post(`${apiUrl}/api/docstorage/update`, updatedData);
             if (response.status === 200) {
                 alert('수정이 완료되었습니다.');
                 setShowEditModal(false);
@@ -236,7 +236,7 @@ function Docstorage() {
             }
         } else {
             const { detailId } = selectedDoc; 
-            const response = await axios.put(`${apiUrl}/api/docstorage/', updatedData, {
+            const response = await axios.put(`${apiUrl}/api/docstorage/`, updatedData, {
                 params: { detailId } 
             });
             if (response.status === 200) {
@@ -261,7 +261,7 @@ function Docstorage() {
 
   const handleBulkUpdate = async (payload) => {
     try {
-      const response = await axios.put(`${apiUrl}/api/docstorage/bulkUpdate', payload);
+      const response = await axios.put(`${apiUrl}/api/docstorage/bulkUpdate`, payload);
       if (response.status === 200) {
         alert('일괄 수정이 완료되었습니다.');
         setShowBulkEditModal(false);
@@ -281,7 +281,7 @@ function Docstorage() {
     }
 
     try {
-      const response = await axios.post(`${apiUrl}/api/docstorage/excel', selectedRows, {
+      const response = await axios.post(`${apiUrl}/api/docstorage/excel`, selectedRows, {
         responseType: 'blob',
       });
 

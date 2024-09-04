@@ -20,7 +20,7 @@ const DocstorageApplyModal = ({ show, onClose, selectedRows, onApplySuccess }) =
         detailIds: selectedRows,
       };
 
-      await axios.post(`${apiUrl}/api/docstorage/apply', applyData);
+      await axios.post(`${apiUrl}/api/docstorage/apply`, applyData);
 
       alert(`문서보관 ${type === 'A' ? '이관' : '파쇄'} 신청이 완료되었습니다.`);
       onClose(); 
