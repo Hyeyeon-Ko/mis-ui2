@@ -61,7 +61,7 @@ function DetailSealImprintApplication() {
                 },
             });
         } else {
-            axios.get(`/api/seal/imprint/${draftId}`)
+            axios.get(`${apiUrl}/api/seal/imprint/${draftId}`)
                 .then(response => {
                     const data = response.data.data;
                     setApplicationDetails({
@@ -140,7 +140,7 @@ function DetailSealImprintApplication() {
             instCd: auth.instCd,
         };
     
-        axios.post(`/api/seal/imprint/update`, updatedImprintRequestDTO, {
+        axios.post(`${apiUrl}/api/seal/imprint/update`, updatedImprintRequestDTO, {
             params: { draftId }, 
         })
         .then(response => {
@@ -156,7 +156,7 @@ function DetailSealImprintApplication() {
 
     const handleApproval = (e) => {
         e.preventDefault();  
-        axios.post(`/api/seal/${draftId}`) 
+        axios.post(`${apiUrl}/api/seal/${draftId}`) 
         .then(response => {
             console.log('Approval Response:', response.data);
             alert('인장 신청이 성공적으로 승인되었습니다.');
@@ -180,7 +180,7 @@ function DetailSealImprintApplication() {
 
     const handleRejectConfirm = async (reason) => {
         try {
-          const response = await axios.post(`/api/seal/return/${draftId}`, reason, {
+          const response = await axios.post(`${apiUrl}/api/seal/return/${draftId}`, reason, {
             headers: {
               'Content-Type': 'text/plain',
             },

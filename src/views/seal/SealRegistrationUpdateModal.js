@@ -26,7 +26,7 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
 
   const fetchSealDetail = async (id) => {
     try {
-      const response = await axios.get(`/api/seal/register/${id}`);
+      const response = await axios.get(`${apiUrl}/api/seal/register/${id}`);
       if (response.data.code === 200) {
         const data = response.data.data;
         setFormData({
@@ -90,7 +90,7 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
     data.append('isFileDeleted', isFileDeleted);
 
     try {
-      const response = await axios.post(`/api/seal/register/update`, data, {
+      const response = await axios.post(`${apiUrl}/api/seal/register/update`, data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

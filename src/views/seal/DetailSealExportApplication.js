@@ -77,7 +77,7 @@ function DetailSealExportApplication() {
                 },
             });
         } else {
-            axios.get(`/api/seal/export/${draftId}`)
+            axios.get(`${apiUrl}/api/seal/export/${draftId}`)
                 .then(response => {
                     const data = response.data.data;
                     setApplicationDetails({
@@ -166,7 +166,7 @@ function DetailSealExportApplication() {
     const handleFileDownload = async () => {
         if (applicationDetails.fileName && applicationDetails.filePath) {
             try {
-                const response = await axios.get(`/api/doc/download/${encodeURIComponent(applicationDetails.fileName)}`, {
+                const response = await axios.get(`${apiUrl}/api/doc/download/${encodeURIComponent(applicationDetails.fileName)}`, {
                     responseType: 'blob',
                 });
 
@@ -218,7 +218,7 @@ function DetailSealExportApplication() {
         formData.append('isFileDeleted', applicationDetails.isFileDeleted);
 
         try {
-            const response = await axios.post(`/api/seal/export/update?draftId=${draftId}`, formData, {
+            const response = await axios.post(`${apiUrl}/api/seal/export/update?draftId=${draftId}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -234,7 +234,7 @@ function DetailSealExportApplication() {
 
     const handleApproval = (e) => {
         e.preventDefault();  
-        axios.post(`/api/seal/${draftId}`) 
+        axios.post(`${apiUrl}/api/seal/${draftId}`) 
         .then(response => {
             console.log('Approval Response:', response.data);
             alert('인장 신청이 성공적으로 승인되었습니다.');
@@ -258,7 +258,7 @@ function DetailSealExportApplication() {
 
     const handleRejectConfirm = async (reason) => {
         try {
-          const response = await axios.post(`/api/seal/return/${draftId}`, reason, {
+          const response = await axios.post(`${apiUrl}/api/seal/return/${draftId}`, reason, {
             headers: {
               'Content-Type': 'text/plain',
             },
