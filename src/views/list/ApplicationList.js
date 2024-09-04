@@ -180,7 +180,7 @@ function ApplicationsList() {
 
   useEffect(() => {
     applyStatusFilters(applications);
-  }, [filters, applications, applyStatusFilters]);
+  }, [filters, applications]);
 
   const resetFilters = useCallback(() => {
     const defaultStartDate = new Date();
