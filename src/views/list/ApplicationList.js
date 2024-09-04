@@ -145,7 +145,7 @@ function ApplicationsList() {
     } finally {
       setLoading(false);
     }
-  }, [documentTypeFromUrl, instCd, selectedCenter]);
+  }, [documentTypeFromUrl, instCd, selectedCenter, applyStatusFilters]);
 
   const fetchSealImprintDetail = async (draftId) => {
     try {
@@ -180,7 +180,7 @@ function ApplicationsList() {
 
   useEffect(() => {
     applyStatusFilters(applications);
-  }, [filters, applications]);
+  }, [filters, applications, applyStatusFilters]);
 
   const resetFilters = useCallback(() => {
     const defaultStartDate = new Date();
