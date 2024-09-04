@@ -106,40 +106,40 @@ function CorpDocIssueList() {
   //   console.log("filtered: ", filteredApplications);
   // }, [filteredApplications]);
 
-  const handleSearch = ({ searchType, keyword, startDate, endDate }, listType = 'applications') => {
-    let filtered = listType === 'applications' ? applications : pendingApplications;
+  // const handleSearch = ({ searchType, keyword, startDate, endDate }, listType = 'applications') => {
+  //   let filtered = listType === 'applications' ? applications : pendingApplications;
 
-    if (keyword) {
-      filtered = filtered.filter(app => {
-        if (searchType === '제출처') return app.submission.includes(keyword);
-        if (searchType === '사용목적') return app.purpose.includes(keyword);
-        if (searchType === '인장구분') return app.status.includes(keyword);
-        if (searchType === '전체') {
-          return (
-            app.submission.includes(keyword) ||
-            app.purpose.includes(keyword) ||
-            app.status.includes(keyword)
-          );
-        }
-        return true;
-      });
-    }
+  //   if (keyword) {
+  //     filtered = filtered.filter(app => {
+  //       if (searchType === '제출처') return app.submission.includes(keyword);
+  //       if (searchType === '사용목적') return app.purpose.includes(keyword);
+  //       if (searchType === '인장구분') return app.status.includes(keyword);
+  //       if (searchType === '전체') {
+  //         return (
+  //           app.submission.includes(keyword) ||
+  //           app.purpose.includes(keyword) ||
+  //           app.status.includes(keyword)
+  //         );
+  //       }
+  //       return true;
+  //     });
+  //   }
 
-    if (startDate && endDate) {
-      filtered = filtered.filter(app => {
-        const appDate = new Date(app.date);
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        return appDate >= start && appDate <= end;
-      });
-    }
+  //   if (startDate && endDate) {
+  //     filtered = filtered.filter(app => {
+  //       const appDate = new Date(app.date);
+  //       const start = new Date(startDate);
+  //       const end = new Date(endDate);
+  //       return appDate >= start && appDate <= end;
+  //     });
+  //   }
 
-    if (listType === 'applications') {
-      setFilteredApplications(filtered);
-    } else {
-      setFilteredPendingApplications(filtered);
-    }
-  };
+  //   if (listType === 'applications') {
+  //     setFilteredApplications(filtered);
+  //   } else {
+  //     setFilteredPendingApplications(filtered);
+  //   }
+  // };
 
   const closeModal = () => {
     setModalVisible(false);
