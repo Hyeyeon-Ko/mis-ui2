@@ -1,0 +1,171 @@
+.doc-content {
+  padding: 8px 16px;
+}
+
+.doc-content h2 {
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+
+.doc-apply-content {
+  background-color: #fff;
+  width: 500px;
+  padding: 50px 150px 40px 150px;
+  border-radius: 12px; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.breadcrumb {
+  margin-bottom: 20px;
+}
+
+.tab-container {
+  display: flex;
+  width: 1000px;
+  margin-top: 30px;
+  justify-content: center;
+}
+
+.tab-button {
+  padding: 12px 20px;
+  border: none;
+  background-color: #F1F4F7;
+  cursor: pointer;
+  font-size: 17.5px;
+  font-weight: bold;
+  color: black;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; 
+  width: 40%;
+  height: 50px;
+  border-radius: 8px; 
+}
+
+.tab-button.active,
+.tab-button:hover {
+  background-color: #007bff;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2); 
+}
+
+.doc-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.doc-form-group {
+  margin-bottom: 15px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.doc-form-group label {
+  font-weight: 580;
+  font-size: 14.5px;
+  color:#222121;
+  margin-bottom: 5px;
+  margin-right: 10px;
+  text-align: left;
+  width: 81%;
+}
+
+.doc-form-group input,
+.doc-form-group textarea {
+  width: 80%;
+  padding: 10px;
+  padding-left: 15px;
+  border: 1px solid #e4e1e1;
+  border-radius: 6px; 
+  font-size: 14px;
+}
+
+.doc-form-group input:focus,
+.doc-form-group textarea:focus {
+  border-color: #b1cef1;
+  box-shadow: 0 0 2px rgba(0, 123, 255, 0.5);
+outline: none;
+}
+
+.doc-form-group textarea {
+  resize: vertical;
+}
+
+.doc-apply-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  margin-right: 160px;
+  border-radius: 5px;
+  padding: 10px 0px 10px 150px;
+  font-size: 16px;
+}
+
+
+.doc-main{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.file-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.file-display {
+  display: flex;
+  align-items: center;
+  width: 81%;
+  background-color: #f9f9f9;
+  border: 1px solid #e4e1e1;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 10px;
+  justify-content: space-between; 
+}
+
+.file-name {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+  padding-right: 10px;
+}
+
+.file-actions {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.download-button,
+.file-delete-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.download-button img{
+  width: 28px;
+  height: 28px;
+}
+
+.file-delete-button img {
+  width: 21px;
+  height: 19px;
+}
+
+.download-button:hover img,
+.file-delete-button:hover img {
+  filter: brightness(0.8);
+}

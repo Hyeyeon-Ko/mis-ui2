@@ -1,0 +1,91 @@
+.totalDocstorage-content {
+    padding: 8px 16px;
+}
+
+.totalDocstorage-content-inner h2 {
+    font-size: 28px;
+    margin-bottom: 16px;
+}
+
+.totalDocstorage-category-section {
+    margin-top: 25px;
+    margin-bottom: 30px;
+    font-size: 16px;
+}
+
+.totalDocstorage-category-label {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.totalDocstorage-category-dropdown {
+    padding: 6px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 165px;
+    margin-left: 10px;
+    margin-right: 20px;
+}
+
+.totalDocstorage-tables-section {
+    display: flex;
+}
+
+.totalDocstorage-details-content {
+    flex: 1;
+    overflow-x: auto;
+}
+
+.totalDocstorage-header-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.totalDocstorage-detail-content-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.totalDocstorage-details-table {
+    border-collapse: collapse;
+    width: 100%;
+    overflow-x: auto;
+    max-width: 100%;
+    min-width: 100%;
+}
+
+.totalDocstorage-details-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.totalDocstorage-details-table th, .totalDocstorage-details-table td {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 8px 20px;
+    text-align: center;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.totalDocstorage-excel-button {
+    border-radius: 7px;
+    padding: 4px 8px;
+    width: 55px;
+    height: 30px;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border: none;
+    color: white;
+    background-color: #07AF5A;
+}
+
+.totalDocstorage-excel-button:hover {
+    background-color: #068c4e;
+}

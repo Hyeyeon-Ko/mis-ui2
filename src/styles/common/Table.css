@@ -91,7 +91,12 @@
   color: #888;
 }
 
-.icon-cell.disabled .action-icon {
-  opacity: 0.5; /* Optional: To make the icon visually distinct */
+.disabled {
   pointer-events: none;
+}
+
+.icon-cell.disabled img {
+  filter: grayscale(100%);
+  opacity: 0.5;
+  cursor: not-allowed;
 }

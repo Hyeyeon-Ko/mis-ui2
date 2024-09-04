@@ -8,7 +8,7 @@ import RejectReasonModal from '../../components/RejectReasonModal';
 import ApplicationHistoryModal from './ApplicationHistoryModal';
 import PreviewModal from './PreviewModal';
 import { AuthContext } from '../../components/AuthContext';
-import '../../styles/BcdApplySecond.css';
+import '../../styles/bcd/BcdApplySecond.css';
 import '../../styles/common/Page.css';
 
 import backImageEng from '../../assets/images/backimage_eng.png';
@@ -19,6 +19,8 @@ function DetailApplication() {
   const { draftId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const applyStatus = queryParams.get('applyStatus'); 
   const [formData, setFormData] = useState({
     name: '',
     firstName: '',
@@ -26,6 +28,9 @@ function DetailApplication() {
     center: '',
     department: '',
     team: '',
+    teamNm: '',
+    addTeamNm: '',
+    addEngTeamNm: '',
     position: '',
     engPosition: '',
     gradeNm: '',
@@ -136,6 +141,7 @@ function DetailApplication() {
         const [mobile1, mobile2, mobile3] = data.phoneTel.split('-');
         const email = data.email.split('@')[0];
         const [baseAddress, floor] = data.address.split(', ');
+        const [teamNm] = data.teamNm.split('|');
         const [gradeNm] = data.gradeNm.split('|');
 
         setFormData({
@@ -146,6 +152,9 @@ function DetailApplication() {
           department: data.deptCd,
           team: data.teamCd,
           position: data.gradeCd,
+          teamNm: teamNm.trim(),
+          addTeamNm: data.addTeamNm,
+          addEngTeamNm: data.addEngTeamNm,
           gradeNm: gradeNm.trim(),
           addGradeNm: data.addGradeNm,
           enGradeNm: data.enGradeNm,
@@ -173,6 +182,10 @@ function DetailApplication() {
       alert('신청 정보를 불러오는 중 오류가 발생했습니다.');
     }
   };
+
+  useEffect(()=> {
+    console.log('formData: ', formData);
+  }, [formData]);
 
   const fetchBcdStd = async () => {
     try {
@@ -244,10 +257,11 @@ function DetailApplication() {
       instCd: formData.center,
       deptCd: formData.department,
       teamCd: formData.team,
+      teamNm: formData.team === '000' ? formData.addTeamNm : formData.teamNm,
+      engTeamNm: formData.team === '000' ? formData.addEngTeamNm : null,
       gradeCd: formData.position,
-      gradeNm: formData.gradeNm,
-      addGradeNm: formData.addGradenM,
-      enGradeNm: formData.enGradeNm,
+      gradeNm: formData.position === '000' ? formData.addGradeNm : formData.gradeNm,
+      enGradeNm: formData.position === '000' ? formData.enGradeNm : null,
       extTel: `${formData.phone1}-${formData.phone2}-${formData.phone3}`,
       faxTel: `${formData.fax1}-${formData.fax2}-${formData.fax3}`,
       phoneTel: `${formData.mobile1}-${formData.mobile2}-${formData.mobile3}`,
@@ -271,12 +285,20 @@ function DetailApplication() {
     }
   };
 
+  const handleReject = () => {
+    setShowRejectModal(true);
+  };
+  
+  const handleRejectClose = () => {
+    setShowRejectModal(false);
+  };  
+
   const handleApprove = async () => {
     try {
       const response = await axios.post(`/api/bcd/applyList/${draftId}`);
       if (response.data.code === 200) {
         alert('명함이 승인되었습니다.');
-        navigate('/api/pendingList');
+        navigate(`/api/pendingList?documentType=명함신청`);  
       } else {
         alert('명함 승인 중 오류가 발생했습니다.');
       }
@@ -284,15 +306,7 @@ function DetailApplication() {
       alert('명함 승인 중 오류가 발생했습니다.');
     }
   };
-
-  const handleReject = () => {
-    setShowRejectModal(true);
-  };
-
-  const handleRejectClose = () => {
-    setShowRejectModal(false);
-  };
-
+  
   const handleRejectConfirm = async (reason) => {
     try {
       const response = await axios.post(`/api/bcd/applyList/return/${draftId}`, reason, {
@@ -302,7 +316,7 @@ function DetailApplication() {
       });
       if (response.data.code === 200) {
         alert('명함이 반려되었습니다.');
-        navigate('/api/pendingList');
+        navigate(`/api/pendingList?documentType=명함신청`);  
       } else {
         alert('명함 반려 중 오류가 발생했습니다.');
       }
@@ -310,7 +324,7 @@ function DetailApplication() {
       alert('명함 반려 중 오류가 발생했습니다.');
     }
   };
-
+  
   const handleHistoryClick = () => {
     setShowHistoryModal(true);
   };
@@ -332,20 +346,20 @@ function DetailApplication() {
   const handleTeamChange = (e) => {
     const selectedTeam = e.target.value;
     const selectedTeamInfo = bcdData.teamInfo.find((team) => team.detailCd === selectedTeam);
-    const engTeam = selectedTeamInfo ? selectedTeamInfo.etcItem1 : '';
+    const teamNm = selectedTeamInfo ? selectedTeamInfo.detailNm : '';
 
-    setFormData({ ...formData, team: selectedTeam, engTeam });
+    setFormData({ ...formData, team: selectedTeam, teamNm: teamNm });
   };
 
   const handlePositionChange = (e) => {
     const selectedPosition = e.target.value;
     const selectedPositionInfo = bcdData.gradeInfo.find((position) => position.detailCd === selectedPosition);
     const enGradeNm = selectedPositionInfo ? selectedPositionInfo.etcItem2 : '';
-    setFormData((prevFormData) => ({
-      ...prevFormData,
+    setFormData(() => ({
+      ...formData,
       position: selectedPosition,
-      gradeNm: selectedPosition === '999' ? prevFormData.addGradeNm : null,
-      enGradeNm: selectedPosition === '999' ? enGradeNm : null,
+      gradeNm: selectedPosition === '000' ? formData.addGradeNm : selectedPositionInfo.detailNm,
+      enGradeNm: selectedPosition === '000' ? enGradeNm : '',
     }));
   };
 
@@ -382,7 +396,7 @@ function DetailApplication() {
     <div className="content">
       <div className="apply-content">
         <h2>{isReadOnly ? '명함 상세보기' : '명함수정'}</h2>
-        <Breadcrumb items={['나의 신청내역', '승인 대기 내역', isReadOnly ? '명함 상세보기' : '명함수정']} />
+        <Breadcrumb items={isReadOnly ? ['명함 관리', '명함 상세보기'] : ['나의 신청내역', '승인대기 내역', '명함수정']} />
         <div className="form-wrapper">
           <form className="business-card-form">
             <div className="form-left">
@@ -483,43 +497,80 @@ function DetailApplication() {
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">부서</label>
-                <select name="department" value={formData.department} onChange={handleDepartmentChange} required={!isReadOnly} disabled={isReadOnly}>
+                <select 
+                  name="department" 
+                  value={formData.department} 
+                  onChange={handleDepartmentChange} 
+                  required={!isReadOnly} 
+                  disabled={isReadOnly}
+                  defaultValue={bcdData.deptInfo.find((dept) => dept.detailCd === formData.department)?.detailCd || ''}
+                >
                   <option value="">선택하세요</option>
                   {bcdData.deptInfo
                     .filter((dept) => dept.etcItem1 === formData.center)
                     .map((department) => (
-                      <option key={department.detailCd} value={department.detailCd}>{department.detailNm}</option>
-                    ))}
-                </select>
-              </div>
-              <div className="form-group-horizontal">
-                <label className="form-label">팀 명</label>
-                <select name="team" value={formData.team} onChange={handleTeamChange} required={!isReadOnly} disabled={isReadOnly}>
-                  <option value="">선택하세요</option>
-                  {bcdData.teamInfo
-                    .filter((team) => team.etcItem1 === formData.department)
-                    .map((team) => (
-                      <option key={team.detailCd} value={team.detailCd}>
-                        {`${team.detailNm} | ${team.etcItem2}`}
+                      <option key={department.detailCd} value={department.detailCd}>
+                        {department.detailNm}
                       </option>
                     ))}
                 </select>
               </div>
+              <div className="form-group-horizontal">
+                <label className="form-label">팀</label>
+                <select name="team" value={formData.team} onChange={handleTeamChange} required={!isReadOnly} disabled={isReadOnly}>
+                  <option value="">선택하세요</option>
+                  {bcdData.teamInfo
+                    .filter((team) => team.etcItem1 === formData.department || team.detailCd === '000')
+                    .map((team) => (
+                      <option key={team.detailCd} value={team.detailCd}>
+                        {team.detailCd === '000' ? team.detailNm : `${team.detailNm} | ${team.etcItem2}`}
+                      </option>
+                    ))}
+                </select>
+              </div>
+              {formData.team === '000' && (
+                <div className="additional-inputs">
+                  <div className="form-group-horizontal">
+                    <label className="form-label">팀 명</label>
+                    <input
+                      type="text"
+                      name="addTeamNm"
+                      value={formData.addTeamNm}
+                      onChange={handleChange}
+                      required
+                      placeholder="팀명"
+                      disabled={isReadOnly}
+                    />
+                  </div>
+                  <div className="form-group-horizontal">
+                    <label className="form-label">영문 팀명</label>
+                    <input
+                      type="text"
+                      name="addEngTeamNm"
+                      value={formData.addEngTeamNm}
+                      onChange={handleChange}
+                      required
+                      placeholder="영문 팀명"
+                      disabled={isReadOnly}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="form-group-horizontal">
                 <label className="form-label">직위 / 직책</label>
                 <select name="position" value={formData.position} onChange={handlePositionChange} required={!isReadOnly} disabled={isReadOnly}>
                   <option value="">선택하세요</option>
                   {bcdData.gradeInfo.map((position) => (
                     <option key={position.detailCd} value={position.detailCd}>
-                      {`${position.detailNm}  | ${position.etcItem2}`}
+                      {position.detailCd === '000' ? position.detailNm: `${position.detailNm}  | ${position.etcItem2}`}
                     </option>
                   ))}
                 </select>
               </div>
-              {formData.position === '999' && (
+              {formData.position === '000' && (
                 <div className="additional-inputs">
                 <div className="form-group-horizontal">
-                  <label className="form-label">직위</label>
+                  <label className="form-label">직위명</label>
                   <input
                     type="text"
                     name="addGradeNm"
@@ -531,7 +582,7 @@ function DetailApplication() {
                   />
                 </div>
                 <div className="form-group-horizontal">
-                  <label className="form-label">영문 직위</label>
+                  <label className="form-label">영문 직위명</label>
                   <input
                     type="text"
                     name="enGradeNm"
@@ -599,13 +650,15 @@ function DetailApplication() {
           </form>
         </div>
         <div className="apply-buttons-container">
-          {!isReadOnly ? (
-            <CustomButton className="apply-request-button" onClick={handleApplyRequest}>수정완료</CustomButton>
-          ) : (
+          {applyStatus === '승인대기' && isReadOnly ? (
             <div className="approval-buttons">
               <CustomButton className="approve-button" onClick={handleApprove}>승인</CustomButton>
               <CustomButton className="reject-button" onClick={handleReject}>반려</CustomButton>
             </div>
+          ) : (
+            !isReadOnly && (
+              <CustomButton className="apply-request-button" onClick={handleApplyRequest}>수정완료</CustomButton>
+            )
           )}
         </div>
       </div>

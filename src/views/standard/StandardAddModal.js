@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import '../../styles/StandardAddModal.css';
+import '../../styles/standard/StandardAddModal.css';
 
 const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory, detailData }) => {
   const [detailCode, setDetailCode] = useState('');
@@ -27,6 +27,9 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
         detailData?.etcItem6 || '',
         detailData?.etcItem7 || '',
         detailData?.etcItem8 || '',
+        detailData?.etcItem9 || '',
+        detailData?.etcItem10 || '',
+        detailData?.etcItem11 || '',
       ].filter(item => item !== null && item !== '');
       setItems(initialItems.map(item => ({ value: item })));
     }
@@ -39,10 +42,16 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
   };
 
   const handleAddItem = () => {
-    if (items.length < 8) {
+    console.log("items.length: ", items.length);
+    // groupCd가 A000일 때만 하나 더 추가될 수 있도록 수정
+    // if(items.length === 10) {
+    //   setItems([...items, { value: '' }]);
+    //   return;
+    // }
+    if (items.length < 10) {
       setItems([...items, { value: '' }]);
     } else {
-      alert('항목은 최대 8개까지 추가할 수 있습니다.');
+      alert('해당 기준자료 항목은 최대 10개까지 추가할 수 있습니다.');
     }
   };
 
@@ -62,7 +71,7 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
         return;
       }
   
-      const normalizedItems = Array.from({ length: 8 }, (_, index) => items[index]?.value || '');
+      const normalizedItems = Array.from({ length: 11 }, (_, index) => items[index]?.value || '');
   
       onSave({ detailCode, detailName, items: normalizedItems });
     } else {
@@ -129,7 +138,12 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
           <div className="add-standard-details">
             <div className="add-standard-detail-row">
               <label>상세코드</label>
-              <input type="text" value={detailCode} onChange={e => setDetailCode(e.target.value)} readOnly={mode === 'edit'} />
+              <input
+                type="text"
+                value={detailCode}
+                onChange={e => setDetailCode(e.target.value)}
+                disabled={detailCode === "000"}
+              />
               <hr className="detail-separator" />
             </div>
             <div className="add-standard-detail-row">
@@ -137,14 +151,16 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
               <input type="text" value={detailName} onChange={e => setDetailName(e.target.value)} />
               <hr className="detail-separator" />
             </div>
-            {items.map((item, index) => (
-              <div key={index} className="add-standard-detail-row">
-                <label>항목 {index + 1}</label>
-                <input type="text" value={item.value} onChange={e => handleItemChange(index, e.target.value)} />
-                {index <= items.length - 1 && <hr className="detail-separator" />}
-              </div>
-            ))}
-            {items.length < 8 && (
+            {items.map((item, index) => {
+              return (
+                <div key={index} className="add-standard-detail-row">
+                  <label>항목 {index + 1}</label>
+                  <input type="text" value={item.value} onChange={e => handleItemChange(index, e.target.value)} />
+                  {index <= items.length - 1 && <hr className="detail-separator" />}
+                </div>
+              );
+            })}
+            {items.length < 11 && (
               <div className="add-standard-detail-row">
                 <button className="add-item-button" onClick={handleAddItem}>+</button>
               </div>

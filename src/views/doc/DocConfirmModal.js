@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import '../../styles/DocConfirmModal.css';
+import '../../styles/doc/DocConfirmModal.css';
+import downloadIcon from '../../assets/images/download.png';
 
-const DocConfirmModal = ({ show, documentId, onClose, onApprove }) => {
+const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus }) => {
   const [formData, setFormData] = useState({
     receptionDate: '',
     drafter: '',
@@ -11,7 +12,9 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove }) => {
     sender: '',
     title: '',
     purpose: '',
-    division: ''
+    division: '',
+    fileName: '',
+    fileUrl: '' 
   });
 
   const fetchDocumentData = useCallback(async (id) => {
@@ -26,7 +29,9 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove }) => {
           sender: data.sender,
           title: data.docTitle,
           purpose: data.purpose,
-          division: data.division
+          division: data.division,
+          fileName: data.fileName,
+          fileUrl: data.filePath ? `/api/doc/download/${encodeURIComponent(data.fileName)}` : ''
         });
       }
     } catch (error) {
@@ -47,6 +52,27 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove }) => {
 
   const handleApprove = () => {
     onApprove(documentId);
+  };
+
+  const handleFileDownload = async () => {
+    if (formData.fileUrl) {
+      try {
+        const response = await axios.get(formData.fileUrl, {
+          responseType: 'blob',
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', formData.fileName); 
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+      } catch (error) {
+        console.error('Error downloading the file:', error);
+        alert('파일 다운로드에 실패했습니다.');
+      }
+    }
   };
 
   if (!show) return null;
@@ -85,11 +111,24 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove }) => {
           <label>사용 용도</label>
           <textarea value={formData.purpose} readOnly className="doc-confirm-textarea" />
         </div>
-        <div className="doc-confirm-modal-buttons">
-          <button className="doc-confirm-button confirm" onClick={handleApprove}>
-            <span>승인</span>
-          </button>
-        </div>
+        {formData.fileUrl && (
+          <div className="doc-confirm-form-group">
+            <label>첨부 파일</label>
+            <div className="doc-confirm-file-download">
+              <button onClick={handleFileDownload} style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}>
+                <span>{formData.fileName}</span>
+                <img src={downloadIcon} alt="다운로드" />
+              </button>
+            </div>
+          </div>
+        )}
+        {applyStatus === '승인대기' && ( 
+          <div className="doc-confirm-modal-buttons">
+            <button className="doc-confirm-button confirm" onClick={handleApprove}>
+              <span>승인</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -99,7 +138,8 @@ DocConfirmModal.propTypes = {
   show: PropTypes.bool.isRequired,
   documentId: PropTypes.number.isRequired,
   onClose: PropTypes.func.isRequired,
-  onApprove: PropTypes.func.isRequired
+  onApprove: PropTypes.func.isRequired,
+  applyStatus: PropTypes.string.isRequired, 
 };
 
 export default DocConfirmModal;

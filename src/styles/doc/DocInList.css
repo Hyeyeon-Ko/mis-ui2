@@ -1,0 +1,33 @@
+.doc-in-list {
+    padding: 8px 16px;
+}
+
+.doc-in-list h2{
+    font-size: 28px;
+    margin-bottom: 16px;
+}
+
+.doc-in-category-section {
+    margin-top: 25px;
+    margin-bottom: 30px;
+    font-size: 16px;
+}
+
+.doc-in-category-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 12px;
+}
+
+.doc-in-category-dropdown {
+    padding: 6px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 165px;
+}
+
+.doc-in-action-icon {
+    width: 21px;
+    height: 20px;
+}

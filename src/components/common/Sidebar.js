@@ -12,7 +12,22 @@ function Sidebar() {
   const { auth } = useContext(AuthContext);
 
   const isActive = (url) => {
-    return location.pathname === url ? 'active' : '';
+    const currentPath = location.pathname;
+    const currentQueryParams = new URLSearchParams(location.search);
+    const itemPath = url.split('?')[0];
+    const itemQueryParams = new URLSearchParams(url.split('?')[1]);
+
+    if (currentPath !== itemPath) {
+      return '';
+    }
+
+    for (const [key, value] of itemQueryParams.entries()) {
+      if (currentQueryParams.get(key) !== value) {
+        return '';
+      }
+    }
+
+    return 'active';
   };
 
   const applyItems = [
@@ -20,6 +35,7 @@ function Sidebar() {
     { label: '인장신청', url: '/api/seal' },
     { label: '법인서류', url: '/api/corpDoc' },
     { label: '문서수발신', url: '/api/doc' },
+    { label: '문서이관/파쇄', url: '/api/docstorage' },
   ];
 
   const myApplyItems = [
@@ -27,37 +43,81 @@ function Sidebar() {
     { label: '승인대기 내역', url: '/api/myPendingList' },
   ];
 
-  const manageItems = [
-    { label: '전체 신청내역', url: '/api/applyList' },
-    { label: '승인대기 내역', url: '/api/pendingList' },
+  const bcdItems = [
+    { label: '전체 신청내역', url: '/api/applyList?documentType=명함신청' },
+    { label: '승인대기 내역', url: '/api/pendingList?documentType=명함신청' },
+    { label: '명함 발주', url: '/api/bcd/orderList' },
   ];
 
-  const corpDocItems = [
-    { label: '서류 발급 대장', url: '/api/corpDoc/issueList'},
-    { label: '서류 수불 대장', url: '/api/corpDoc/rnpList'},
-  ]
-
-  const sealItems = [
-    { label: '인장 관리 대장', url: '/api/seal/managementList' },
-    { label: '인장 반출 대장', url: '/api/seal/exportList' },
-    { label: '인장 등록 대장', url: '/api/seal/registrationList' },
-  ]
-
   const docItems = [
+    { label: '전체 신청내역', url: '/api/applyList?documentType=문서수발신' },
+    { label: '승인대기 내역', url: '/api/pendingList?documentType=문서수발신' },
+  ];
+
+  const docManageItems = [
     { label: '문서 수신 대장', url: '/api/doc/receiveList' },
     { label: '문서 발신 대장', url: '/api/doc/sendList' },
   ];
 
-  const orderItems = [
-    { label: '명함 발주', url: '/api/bcd/orderList' },
-  ];
-
   const sections = {
-    'A': { title: '신청내역 관리', items: manageItems },
-    'B': { title: '발주 관리', items: orderItems },
-    'C': { title: '인장 관리', items: sealItems},
-    'D': { title: '법인서류 관리', items: corpDocItems},
-    'E': { title: '문서수발신 관리', items: docItems },
+    'A': [{ title: '명함 관리', items: bcdItems }],
+    'B': [
+      { title: '인장 관리', items: [
+        { label: '전체 신청내역', url: '/api/applyList?documentType=인장신청', subIndex: 'B-1' },
+        { label: '승인대기 내역', url: '/api/pendingList?documentType=인장신청', subIndex: 'B-1' },      
+      ]},
+      { title: '인장 대장', items: [
+        { label: '인장 관리대장', url: '/api/seal/managementList', subIndex: 'B-1' },
+        { label: '인장 반출대장', url: '/api/seal/exportList', subIndex: 'B-1' },
+        { label: '인장 등록대장', url: '/api/seal/registrationList', subIndex: 'B-1' },
+        { label: '전국 인장 등록대장', url: '/api/seal/sealRegistrationList', subIndex: 'B-2' },
+      ]}
+    ],
+    'C': [
+      { title: '법인서류 관리', items: [
+        { label: '전체 신청내역', url: '/api/applyList?documentType=법인서류', subIndex: 'C-1' },
+        { label: '승인대기 내역', url: '/api/pendingList?documentType=법인서류', subIndex: 'C-1' },
+      ]},
+      { title: '법인서류 대장', items: [
+        { label: '서류 발급 대장', url: '/api/corpDoc/issueList', subIndex: 'C-2' },
+        { label: '서류 수불 대장', url: '/api/corpDoc/rnpList', subIndex: 'C-1' },
+      ]}
+    ],
+    'D': [
+      { title: '문서수발신 관리', items: docItems },
+      { title: '문서수발신 대장', items: docManageItems }
+    ],
+    'E': [
+      { title: '문서 관리', items: [
+        { label: '문서보관 목록표', url: '/api/docstorageList', subIndex: 'E-1' },
+        { label: '전국 문서보관 목록표', url: '/api/totalDocstorageList', subIndex: 'E-2' },
+      ]}
+    ],
+    'F': [
+      { title: '자산 관리', items: [
+        { label: '렌탈현황 목록표', url: '/api/rentalList', subIndex: 'F-1' },
+        { label: '전국 렌탈현황 목록표', url: '/api/totalRentalList', subIndex: 'F-2' },
+      ]}
+    ]
+  };
+
+  const filterItemsByPermission = (sectionKey, permissions) => {
+    const section = sections[sectionKey];
+    if (!section) return [];
+  
+    return section.map(sectionItem => ({
+      ...sectionItem,
+      items: sectionItem.items.filter(item => {
+        const subIndex = item.subIndex;
+        if (permissions.includes(sectionKey)) {
+          return true;
+        }
+        if (subIndex) {
+          return permissions.includes(subIndex);
+        }
+        return permissions.includes(sectionKey);
+      })
+    })).filter(sectionItem => sectionItem.items.length > 0);
   };
 
   return (
@@ -67,33 +127,36 @@ function Sidebar() {
       </Link>
       {auth.isUserMode || auth.role === 'USER' ? (
         <>
-          <SidebarSection 
-            title="신청하기" 
-            items={applyItems} 
-            isActive={isActive} 
-            location={location} 
-            defaultOpen={false} 
+          <SidebarSection
+            title="신청하기"
+            items={applyItems}
+            isActive={isActive}
+            location={location}
+            defaultOpen={false}
           />
-          <SidebarSection 
-            title="나의 신청내역" 
-            items={myApplyItems} 
-            isActive={isActive} 
-            location={location} 
-            defaultOpen={false} 
+          <SidebarSection
+            title="나의 신청내역"
+            items={myApplyItems}
+            isActive={isActive}
+            location={location}
+            defaultOpen={false}
           />
         </>
       ) : (
         <>
-          {auth.sidebarPermissions && auth.sidebarPermissions.map((perm, index) => (
-            sections[perm] && <SidebarSection 
-              key={index} 
-              title={sections[perm].title} 
-              items={sections[perm].items} 
-              isActive={isActive} 
-              location={location} 
-              defaultOpen={false} 
-            />
-          ))}
+          {auth.sidebarPermissions && Object.keys(sections).map((sectionKey) => {
+            const filteredSections = filterItemsByPermission(sectionKey, auth.sidebarPermissions);
+            return filteredSections.map((sectionItem, index) => (
+              <SidebarSection
+                key={`${sectionKey}-${index}`}
+                title={sectionItem.title}
+                items={sectionItem.items}
+                isActive={isActive}
+                location={location}
+                defaultOpen={false}
+              />
+            ));
+          })}
           {(auth.role === 'MASTER' || auth.role === 'ADMIN') && (
             <div className="sidebar-section">
               <h2>
@@ -111,7 +174,7 @@ function Sidebar() {
         </>
       )}
       <div className="sidebar-section">
-          <h2 style={{ color: '#EDF1F5' }}>권한 관리</h2>
+        <h2 style={{ color: '#EDF1F5' }}>권한 관리</h2>
       </div>
     </div>
   );
@@ -124,13 +187,20 @@ function SidebarSection({ title, items, isActive, location, defaultOpen }) {
     setIsOpen(!isOpen);
   };
 
+  const isAnyItemActive = items.some(item => isActive(item.url) === 'active');
+
   return (
     <div className="sidebar-section">
-      <h3 onClick={toggleOpen} className={`toggle-header ${!isOpen && items.some(item => location.pathname === item.url) ? 'active-toggle' : ''}`}>
-        <img 
+      <h3 
+        onClick={toggleOpen} 
+        className={`toggle-header ${!isOpen && isAnyItemActive ? 'active-toggle' : ''}`}
+      >
+        <img
           src={isOpen ? dropdownActiveIcon : dropdownDefaultIcon}
           alt="Toggle Icon"
-          className="toggle-icon"/> {title}
+          className="toggle-icon" 
+        /> 
+        {title}
       </h3>
       {isOpen && (
         <ul>

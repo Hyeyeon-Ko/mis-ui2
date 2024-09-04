@@ -15,36 +15,49 @@ export const AuthProvider = ({ children }) => {
     sidebarPermissions: [],
     hasStandardDataAuthority: false,
     instCd: '',
+    deptCd: '',
+    teamCd: '',
     isUserMode: false,
-    originalRole: '', 
+    originalRole: '',
   });
 
+  // 앱 로드 시 세션 스토리지에서 인증 상태를 불러옴
   useEffect(() => {
-    const userId = sessionStorage.getItem('userId');
-    const hngNm = sessionStorage.getItem('hngNm');
-    const role = sessionStorage.getItem('role');
-    const sidebarPermissions = JSON.parse(sessionStorage.getItem('sidebarPermissions')) || [];
-    const hasStandardDataAuthority = sessionStorage.getItem('hasStandardDataAuthority') === 'true';
-    const instCd = sessionStorage.getItem('instCd') || '';
-    const isUserMode = sessionStorage.getItem('isUserMode') === 'true'; 
-    const originalRole = sessionStorage.getItem('originalRole') || role; 
+    const storedAuth = {
+      userId: sessionStorage.getItem('userId'),
+      hngNm: sessionStorage.getItem('hngNm'),
+      role: sessionStorage.getItem('role'),
+      isAuthenticated: sessionStorage.getItem('isAuthenticated') === 'true',
+      sidebarPermissions: JSON.parse(sessionStorage.getItem('sidebarPermissions')) || [],
+      hasStandardDataAuthority: sessionStorage.getItem('hasStandardDataAuthority') === 'true',
+      instCd: sessionStorage.getItem('instCd') || '',
+      deptCd: sessionStorage.getItem('deptCd') || '',
+      teamCd: sessionStorage.getItem('teamCd') || '',
+      isUserMode: sessionStorage.getItem('isUserMode') === 'true',
+      originalRole: sessionStorage.getItem('originalRole') || sessionStorage.getItem('role'),
+    };
 
-    if (userId && hngNm && role) {
-      setAuth({
-        userId,
-        hngNm,
-        role,
-        isAuthenticated: true,
-        sidebarPermissions,
-        hasStandardDataAuthority,
-        instCd,
-        isUserMode,
-        originalRole,
-      });
+    if (storedAuth.userId && storedAuth.hngNm && storedAuth.role) {
+      setAuth(storedAuth);
     }
   }, []);
 
-  const login = (userId, hngNm, role, sidebarPermissions, hasStandardDataAuthority, instCd) => {
+  // 인증 상태가 변경될 때마다 세션 스토리지에 저장
+  useEffect(() => {
+    sessionStorage.setItem('userId', auth.userId);
+    sessionStorage.setItem('hngNm', auth.hngNm);
+    sessionStorage.setItem('role', auth.role);
+    sessionStorage.setItem('isAuthenticated', auth.isAuthenticated.toString());
+    sessionStorage.setItem('sidebarPermissions', JSON.stringify(auth.sidebarPermissions));
+    sessionStorage.setItem('hasStandardDataAuthority', auth.hasStandardDataAuthority.toString());
+    sessionStorage.setItem('instCd', auth.instCd);
+    sessionStorage.setItem('deptCd', auth.deptCd);
+    sessionStorage.setItem('teamCd', auth.teamCd);
+    sessionStorage.setItem('isUserMode', auth.isUserMode.toString());
+    sessionStorage.setItem('originalRole', auth.originalRole);
+  }, [auth]);
+
+  const login = (userId, hngNm, role, sidebarPermissions, hasStandardDataAuthority, instCd, deptCd, teamCd) => { 
     const newAuthState = {
       userId,
       hngNm,
@@ -53,18 +66,13 @@ export const AuthProvider = ({ children }) => {
       sidebarPermissions,
       hasStandardDataAuthority,
       instCd,
-      isUserMode: false, 
-      originalRole: role, 
+      deptCd,
+      teamCd,
+      isUserMode: false,
+      originalRole: role,
     };
     setAuth(newAuthState);
-    sessionStorage.setItem('userId', userId);
-    sessionStorage.setItem('hngNm', hngNm);
-    sessionStorage.setItem('role', role);
-    sessionStorage.setItem('sidebarPermissions', JSON.stringify(sidebarPermissions));
-    sessionStorage.setItem('hasStandardDataAuthority', hasStandardDataAuthority.toString());
-    sessionStorage.setItem('instCd', instCd);
-    sessionStorage.setItem('isUserMode', 'false');
-    sessionStorage.setItem('originalRole', role); 
+    navigate('/');  
   };
 
   const logout = () => {
@@ -76,27 +84,34 @@ export const AuthProvider = ({ children }) => {
       sidebarPermissions: [],
       hasStandardDataAuthority: false,
       instCd: '',
-      isUserMode: false, 
-      originalRole: '', 
+      deptCd: '', 
+      teamCd: '',
+      isUserMode: false,
+      originalRole: '',
     });
+
     sessionStorage.removeItem('userId');
     sessionStorage.removeItem('hngNm');
     sessionStorage.removeItem('role');
     sessionStorage.removeItem('sidebarPermissions');
     sessionStorage.removeItem('hasStandardDataAuthority');
     sessionStorage.removeItem('instCd');
+    sessionStorage.removeItem('deptCd'); 
+    sessionStorage.removeItem('teamCd'); 
     sessionStorage.removeItem('isUserMode');
     sessionStorage.removeItem('originalRole');
+
+    sessionStorage.clear();
+    navigate('/api/login');
   };
 
   const toggleMode = () => {
     setAuth((prevAuth) => {
-      if (prevAuth.originalRole === 'USER') return prevAuth; 
+      if (prevAuth.originalRole === 'USER') return prevAuth;
       const newMode = !prevAuth.isUserMode;
-      sessionStorage.setItem('isUserMode', newMode.toString());
       const newRole = newMode ? 'USER' : prevAuth.originalRole;
-      navigate(newMode ? '/' : '/api/applyList'); 
-      console.log('모드 전환:', { newMode, newRole }); 
+      navigate(newMode ? '/' : '/api/std');
+
       return { ...prevAuth, isUserMode: newMode, role: newRole };
     });
   };

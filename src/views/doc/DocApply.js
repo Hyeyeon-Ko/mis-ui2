@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../components/AuthContext';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
-import '../../styles/DocApply.css';
+import '../../styles/doc/DocApply.css';
 import '../../styles/common/Page.css';
 
 function DocApply() {
@@ -21,7 +21,7 @@ function DocApply() {
     division: '', 
   });
 
-  const [attachment, setAttachment] = useState(null);  // 파일 첨부를 위한 상태 추가
+  const [attachment, setAttachment] = useState(null);  
   const [activeTab, setActiveTab] = useState('reception'); 
 
   const setDefaultValues = useCallback(() => {
@@ -56,23 +56,30 @@ function DocApply() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = new FormData();  // FormData 객체 사용
-    payload.append('drafterId', formData.userId);
-    payload.append('drafter', formData.drafter);
-    payload.append('division', formData.division);
-    payload.append('sender', activeTab === 'reception' ? formData.receiver : '');
-    payload.append('receiver', activeTab === 'sending' ? formData.sender : '');
-    payload.append('docTitle', formData.title);
-    payload.append('purpose', formData.purpose);
-    payload.append('instCd', auth.instCd);
+    const payload = new FormData();  
+
+    payload.append('docRequest', new Blob([JSON.stringify({
+      drafterId: formData.userId,
+      drafter: formData.drafter,
+      division: formData.division,
+      sender: activeTab === 'reception' ? formData.receiver : '',
+      receiver: activeTab === 'sending' ? formData.sender : '',
+      docTitle: formData.title,
+      purpose: formData.purpose,
+      instCd: auth.instCd,
+      deptCd: auth.deptCd,  
+    })], {
+      type: 'application/json'
+    }));
+
     if (attachment) {
-      payload.append('file', attachment);  // 파일 추가
+      payload.append('file', attachment);  
     }
     
     try {
       const response = await fetch('/api/doc', {
         method: 'POST',
-        body: payload,  // FormData 객체 전송
+        body: payload,  
       });
       if (response.ok) {
         alert('신청이 완료되었습니다.');
@@ -161,7 +168,7 @@ function DocApply() {
                   <input
                       type="file"
                       name="attachment"
-                      onChange={handleFileChange}  // 파일 변경 핸들러 추가
+                      onChange={handleFileChange}  
                   />
               </div>
               <div className="doc-apply-button-container">

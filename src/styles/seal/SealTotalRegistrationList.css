@@ -1,0 +1,135 @@
+.seal-total-registration-list {
+    padding: 8px 16px;
+  }
+  
+  .seal-total-registration-list h2 {
+    font-size: 28px;
+    margin-bottom: 16px;
+  }
+  
+  .seal-total-registration-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;  /* 고정된 레이아웃 사용 */
+}
+
+.seal-total-registration-table th, .seal-total-registration-table td {
+    padding: 8px;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid #ddd;
+    overflow: hidden;
+    text-overflow: ellipsis;  /* 내용이 넘칠 경우 생략(...) 표시 */
+}
+
+  .seal-total-registration-table th:nth-child(1), .seal-total-registration-table td:nth-child(2) {
+      width: 15%;  /* 인영 종류 열 */
+  }
+
+  .seal-total-registration-table th:nth-child(2), .seal-total-registration-table td:nth-child(3) {
+      width: 12%;  /* 인영 이미지 열 */
+  }
+
+  .seal-total-registration-table th:nth-child(3), .seal-total-registration-table td:nth-child(4) {
+      width: 15%;  /* 사용부서 열 */
+  }
+
+  .seal-total-registration-table th:nth-child(4), .seal-total-registration-table td:nth-child(5) {
+      width: 20%;  /* 용도 열 */
+  }
+
+  .seal-total-registration-table th:nth-child(5), .seal-total-registration-table td:nth-child(6), 
+  .seal-total-registration-table th:nth-child(6), .seal-total-registration-table td:nth-child(7) {
+      width: 14%;  /* 두 관리자 열에 동일한 너비 설정 */
+  }
+  
+  .seal-total-registration-table th:nth-child(7), .seal-total-registration-table td:nth-child(8) {
+      width: 13%;  /* 등록일 열 */
+  }
+
+  .selected-row {
+      background-color: #f9f9f9;
+  }
+
+  .seal-total-image {
+      width: 50px;
+      height: 50px;
+  }
+
+  .seal-total-registration-list {
+      padding: 8px 16px;
+  }
+
+  .seal-total-registration-list h2 {
+      font-size: 28px;
+      margin-bottom: 16px;
+  }
+
+  .seal-total-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: -5px;
+  }
+
+  .seal-total-header-buttons {
+      display: flex;
+      gap: 4px;
+  }
+
+  .seal-total-add-button, .seal-total-modify-button, .seal-total-delete-button {
+      border-radius: 7px;
+      padding: 4px 8px;
+      width: 55px;
+      height: 30px;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      border: none;
+  }
+
+  .seal-total-add-button {
+      color: white;
+      background-color: #2789fe;
+  }
+
+  .seal-total-add-button:hover {
+      background-color: #1e6fc1;
+  }
+
+  .seal-total-modify-button, .seal-total-delete-button {
+      color: black;
+      background-color: #bfc5cc;
+  }
+
+  .seal-total-modify-button:hover, .seal-total-delete-button:hover {
+      background-color: #a1a9b2;
+  }
+
+  .seal-total-category-section {
+    margin-top: 25px;
+    margin-bottom: 30px;
+    font-size: 16px;
+  }
+
+  .seal-total-category-section {
+    margin-top: 25px;
+    margin-bottom: 30px;
+    font-size: 16px;
+  }
+
+.seal-total-category-label {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.seal-total-category-dropdown {
+    padding: 6px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 165px;
+    margin-left: 10px;
+    margin-right: 20px;
+}

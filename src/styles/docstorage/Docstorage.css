@@ -1,0 +1,211 @@
+.docstorage-content {
+    padding: 8px 16px;
+}
+
+.docstorage-content-inner h2 {
+    font-size: 28px;
+    margin-bottom: 16px;
+}
+
+.docstorage-category-section {
+    margin-top: 25px;
+    margin-bottom: 30px;
+    font-size: 16px;
+}
+
+.docstorage-category-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+.docstorage-category-dropdown {
+    padding: 6px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 165px;
+    margin-left: 44px;
+}
+
+.docstorage-tables-section {
+    display: flex;
+}
+
+.docstorage-sub-category-section {
+    width: 200px;
+    margin-right: 20px;
+}
+
+.docstorage-details-content {
+    flex: 7;
+    overflow-x: auto;
+}
+
+.docstorage-header-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.docstorage-sub-category-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 6px;
+    margin-right: 10px;
+    margin-bottom: 4px;
+}
+
+.docstorage-detail-content-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 6px;
+    margin-right: 10px;
+    margin-bottom: 4px;
+    padding-left: 5px;
+}
+
+.docstorage-sub-category-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.docstorage-sub-category-table th {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 8px 20px;
+    text-align: center;
+    font-size: 13px;
+}
+
+.docstorage-sub-category-table td {
+    border: 1px solid #ddd;
+    padding: 8px 20px;
+    text-align: left;
+    font-size: 13px;
+}
+
+.docstorage-sub-category-table td:hover {
+    background-color: #edf7ff;
+}
+
+.docstorage-details-table {
+    border-collapse: collapse;
+    width: 100%;
+    overflow-x: auto;
+    max-width: 100%;
+    min-width: 100%;
+}
+
+.docstorage-details-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.docstorage-details-table th, .docstorage-details-table td {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 8px 20px;
+    text-align: center;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.docstorage-add-button, .docstorage-modify-button, .docstorage-delete-button, .docstorage-excel-button, .docstorage-apply-button {
+    border-radius: 7px;
+    padding: 4px 8px;
+    width: 55px;
+    height: 30px;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border: none;
+    margin-right: 3px;
+}
+
+.docstorage-excel-button {
+    color: white;
+    background-color: #07AF5A;
+}
+
+.docstorage-excel-button:hover {
+    background-color: #068c4e;
+}
+
+.docstorage-add-button, .docstorage-modify-button, .docstorage-delete-button {
+    color: black;
+    background-color: #bdc6cf;
+}
+
+.docstorage-add-button:hover, .docstorage-modify-button:hover, .docstorage-delete-button:hover {
+    background-color: #a1a9b2;
+}
+
+.docstorage-apply-button {
+    color: white;
+    background-color: #2789FE;
+}
+
+.docstorage-apply-button:hover {
+    background-color: #1e6fc1;
+}
+
+.type-header {
+    position: relative;
+    display: inline-block;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+  
+.type-header:hover{
+    color: #2789FE;
+}
+
+.type-header span {
+    font-size: 12px;
+}
+
+.type-select {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    font-size: 14.5px;
+  }  
+  
+  .custom-table th, td {
+    user-select: none; 
+  }
+  
+.status-header {
+    position: relative;
+    display: inline-block;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+  
+.status-header:hover{
+    color: #2789FE;
+}
+
+.status-header span {
+    font-size: 12px;
+}
+
+.status-select {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    font-size: 14px;
+  }  

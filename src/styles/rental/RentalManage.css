@@ -1,0 +1,90 @@
+.rental-content {
+    padding: 8px 16px;
+}
+
+.rental-content-inner h2 {
+    font-size: 28px;
+    margin-bottom: 16px;
+}
+
+.rental-tables-section {
+    display: flex;
+}
+
+.rental-details-content {
+    flex: 7;
+    overflow-x: auto;
+}
+
+.rental-header-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.rental-detail-content-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 6px;
+    margin-right: 10px;
+    margin-bottom: 4px;
+    padding-left: 5px;
+}
+
+.rental-details-table {
+    border-collapse: collapse;
+    width: 100%;
+    overflow-x: auto;
+    max-width: 100%;
+    min-width: 100%;
+}
+
+.rental-details-table th, .rental-details-table td {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 8px 20px;
+    text-align: center;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.rental-add-button, .rental-modify-button, .rental-delete-button, .rental-excel-button, .rental-apply-button {
+    border-radius: 7px;
+    padding: 4px 8px;
+    width: 55px;
+    height: 30px;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border: none;
+    margin-right: 3px;
+}
+
+.rental-excel-button {
+    color: white;
+    background-color: #07AF5A;
+}
+
+.rental-excel-button:hover {
+    background-color: #068c4e;
+}
+
+.rental-add-button, .rental-modify-button, .rental-delete-button {
+    color: black;
+    background-color: #bdc6cf;
+}
+
+.rental-add-button:hover, .rental-modify-button:hover, .rental-delete-button:hover {
+    background-color: #a1a9b2;
+}
+
+.rental-apply-button {
+    color: white;
+    background-color: #2789FE;
+}
+
+.rental-apply-button:hover {
+    background-color: #1e6fc1;
+}

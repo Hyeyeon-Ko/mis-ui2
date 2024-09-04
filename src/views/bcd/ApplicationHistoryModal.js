@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
-import '../../styles/ApplicationHistoryModal.css';
+import '../../styles/bcd/ApplicationHistoryModal.css';
 
 /* 신청 이력 모달 */
 const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
@@ -57,7 +57,7 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
       case 'D':
         return '발주완료';
       case 'E':
-        return '완료';
+        return '처리완료';
       case 'F':
         return '신청취소';
       default:
@@ -90,7 +90,7 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
 
   const columns = [
     { header: '제목', accessor: 'title', width: '40%' },
-    { header: '기안일시', accessor: 'draftDate', width: '20%' },
+    { header: '신청일시', accessor: 'draftDate', width: '20%' },
     { header: '수량', accessor: 'quantity', width: '10%' }, 
     { header: '문서상태', accessor: 'applyStatus', width: '18%' },
   ];

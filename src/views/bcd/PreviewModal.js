@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'; 
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import '../../styles/PreviewModal.css';
+import '../../styles/bcd/PreviewModal.css';
 import frontImageBlank from '../../assets/images/frontimage_blank.png';
 import backImageEngBlank from '../../assets/images/backimage_eng_blank.png';
 import backImageCompany from '../../assets/images/backimage_company.png';
@@ -59,11 +59,10 @@ const PreviewModal = ({ show, onClose, formData }) => {
     };
 
     const centerName = findDetailName(bcdData.instInfo, formData.center);
-    const teamName = findDetailName(bcdData.teamInfo, formData.team);
-    const positionName = formData.position === '999' ? formData.addGradeNm : findDetailName(bcdData.gradeInfo, formData.position);
-    const engPositionName = formData.position === '999' ? formData.enGradeNm : findEngName(bcdData.gradeInfo, formData.position);
-    const engTeamName = findEngName(bcdData.teamInfo, formData.team);
-    console.log('ModalData: ', formData.team);
+    const teamName = formData.team !== '000' ? findDetailName(bcdData.teamInfo, formData.team) : formData.addTeamNm;
+    const positionName = formData.position === '000' ? formData.addGradeNm : findDetailName(bcdData.gradeInfo, formData.position);
+    const engPositionName = formData.position === '000' ? formData.enGradeNm : findEngName(bcdData.gradeInfo, formData.position);
+    const engTeamName = formData.team !== '000' ? findEngName(bcdData.teamInfo, formData.team) : formData.addEngTeamNm;
 
     imageKorean.onload = () => {
       ctx.drawImage(imageKorean, 0, 0, canvas.width / 2, canvas.height);
@@ -170,7 +169,7 @@ const PreviewModal = ({ show, onClose, formData }) => {
       console.log('PreviewModal props:', formData);
       drawBusinessCard();
     }
-  }, [show, formData, drawBusinessCard]); // formData를 의존성 배열에 추가
+  }, [show, formData, drawBusinessCard]); 
 
   const formatPhoneNumber = (countryCode, number) => {
     const [part1, part2, part3] = number.split('.');

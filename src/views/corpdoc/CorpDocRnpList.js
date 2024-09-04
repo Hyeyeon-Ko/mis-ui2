@@ -1,91 +1,54 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
+import { AuthContext } from '../../components/AuthContext';
 import Breadcrumb from '../../components/common/Breadcrumb';
-import ConditionFilter from '../../components/common/ConditionFilter';
 import CorpDocApprovalModal from '../../views/corpdoc/CorpDocApprovalModal';
 import SignitureImage from '../../assets/images/signiture.png';
-import '../../styles/CorpDocRnpList.css';
+import axios from 'axios';
+import '../../styles/corpdoc/CorpDocRnpList.css';
 
 function CorpDocRnpList() {
-  const [applications, setApplications] = useState([]);
+  const { auth } = useContext(AuthContext);
+
   const [filteredApplications, setFilteredApplications] = useState([]);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
   const [clickedRows, setClickedRows] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const fetchedData = [
-        {
-          id: 1,
-          date: '2024-05-02',
-          submitter: '현대로보틱스',
-          usagePurpose: '결제계좌등록',
-          certificate: { incoming: 3, used: 0, left: 18 },
-          registry: { incoming: 0, used: 1, left: 20 },
-          status: '결재완료',
-          applicantName: '홍길동',
-          signitureImage: SignitureImage,
-          approvers: [
-            { name: '김철수', approvalDate: '2024-08-08', signitureImage: SignitureImage },
-            { name: '박영희', approvalDate: '2024-08-10', signitureImage: SignitureImage },
-          ],
-        },
-        {
-          id: 2,
-          date: '2024-05-03',
-          submitter: '재단본부',
-          usagePurpose: '결제계좌등록',
-          certificate: { incoming: 5, used: 0, left: 20 },
-          registry: { incoming: 0, used: 9, left: 3 },
+  const fetchRnpData = useCallback(async () => {
+    try {
+      const response = await axios.get('/api/corpDoc/rnpList', {
+        params: {instCd: auth.instCd},
+      });
+
+      if (response.data) {
+        const rnpListData = response.data.data.map(item => ({
+          id: item.draftId,
+          date: item.draftDate,
+          drafter: item.drafter,
+          submission: item.submission,
+          purpose: item.purpose,
+          corpSeal: item.certCorpseal,
+          registry: item.certCoregister,
+          usesignet: item.certUsesignet,
+          warrant: item.warrant,
           status: '결재진행중',
-          applicantName: '이영희', // Added applicant name
-          approvers: [
-            {},
-          ],
-        },
-      ];
-      setApplications(fetchedData);
-      setFilteredApplications(fetchedData);
+          signitureImage: SignitureImage,
+          approvers: [],
+        }));
 
-      const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
-      setClickedRows(clickedRows);
-    };
-    fetchData();
-  }, []);
-  
+        setFilteredApplications(rnpListData);
 
-  const handleSearch = ({ searchType, keyword, startDate, endDate }) => {
-    let filtered = applications;
-
-    if (keyword) {
-      filtered = filtered.filter(app => {
-        if (searchType === '제출처') return app.submitter.includes(keyword);
-        if (searchType === '사용목적') return app.usagePurpose.includes(keyword);
-        if (searchType === '인장구분') return app.status.includes(keyword);
-        if (searchType === '전체') {
-          return (
-            app.submitter.includes(keyword) ||
-            app.usagePurpose.includes(keyword) ||
-            app.status.includes(keyword)
-          );
-        }
-        return true;
-      });
+        const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
+        setClickedRows(clickedRows);
+      }
+    } catch (error) {
+      console.error("Error fetching RNP data:", error);
     }
+  }, [auth.instCd]);
 
-    if (startDate && endDate) {
-      filtered = filtered.filter(app => {
-        const appDate = new Date(app.date);
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        return appDate >= start && appDate <= end;
-      });
-    }
-
-    setFilteredApplications(filtered);
-  };
+  useEffect(() => {
+    fetchRnpData();
+  }, [fetchRnpData]);
 
   const closeModal = () => {
     setModalVisible(false);
@@ -113,50 +76,36 @@ function CorpDocRnpList() {
     <div className='content'>
       <div className='corpDoc-rnp-list'>
         <h2>서류 수불 대장</h2>
-        <Breadcrumb items={['법인서류 관리', '서류 수불 대장']} />
-        <ConditionFilter
-          startDate={startDate}
-          setStartDate={setStartDate}
-          endDate={endDate}
-          setEndDate={setEndDate}
-          onSearch={handleSearch}
-          onReset={() => setFilteredApplications(applications)}
-          showDocumentType={false}
-          showSearchCondition={true}
-          excludeRecipient={true}
-        />
+        <Breadcrumb items={['법인서류 대장', '서류 수불 대장']} />
         {filteredApplications.length > 0 ? (
           <table className="table">
             <thead>
               <tr>
-                <th rowSpan="2">일자</th>
+                <th rowSpan="2">수령일자</th>
+                <th rowSpan="2">신청자</th>
                 <th rowSpan="2">제출처</th>
                 <th rowSpan="2">사용목적</th>
-                <th colSpan="3">법인인감증명서</th>
-                <th colSpan="3">법인등기부등본</th>
-                <th rowSpan="2">결재</th>
+                <th colSpan="4">법인서류</th>
+                <th rowSpan="2">수령인</th>
               </tr>
               <tr>
-                <th>입고</th>
-                <th>사용</th>
-                <th>잔고</th>
-                <th>입고</th>
-                <th>사용</th>
-                <th>잔고</th>
+                <th>법인인감증명서</th>
+                <th>법인등기사항전부증명서</th>
+                <th>사용인감계</th>
+                <th>위임장</th>
               </tr>
             </thead>
             <tbody>
               {filteredApplications.map((app, index) => (
                 <tr key={index}>
                   <td>{app.date}</td>
-                  <td>{app.submitter}</td>
-                  <td>{app.usagePurpose}</td>
-                  <td>{app.certificate.incoming}</td>
-                  <td>{app.certificate.used}</td>
-                  <td>{app.certificate.left}</td>
-                  <td>{app.registry.incoming}</td>
-                  <td>{app.registry.used}</td>
-                  <td>{app.registry.left}</td>
+                  <td>{app.drafter}</td>
+                  <td>{app.submission}</td>
+                  <td>{app.purpose}</td>
+                  <td>{app.corpSeal}</td>
+                  <td>{app.registry}</td>
+                  <td>{app.usesignet}</td>
+                  <td>{app.warrant}</td>
                   <td
                     className={`status-${app.status.replace(/\s+/g, '-').toLowerCase()} clickable ${
                       clickedRows.includes(app.id) ? 'confirmed' : ''

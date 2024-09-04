@@ -1,0 +1,80 @@
+.docstorage-apply-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.docstorage-apply-modal-container {
+    background-color: #ffffff;
+    padding: 30px 75px 45px 75px;
+    border-radius: 10px;
+    width: 550px; 
+    height: 330px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 1001;
+}
+
+.docstorage-apply-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 20px;
+    margin-top: 20px;
+}
+
+.docstorage-apply-close-button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.docstorage-apply-instructions {
+    font-size: 14px;
+    margin-top: 0px;
+    margin-bottom: 50px;
+    color: #666;
+}
+
+.docstorage-apply-tab-container {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    width: 100%;
+}
+
+.docstorage-apply-tab {
+    flex: 1;
+    text-align: center;
+    cursor: pointer;
+    padding: 10px 0;
+    font-size: 17px;
+    background: none;
+    border: none;
+    border-radius: 7px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0px 2px 5px rgba(88, 88, 88, 0.2);
+    font-weight: 500;
+    height: 70px;
+    margin: 0px 10px;
+    letter-spacing: 2px;
+}
+
+.docstorage-apply-tab:hover {
+    background-color: #e9ecef;
+    box-shadow: 0px 3px 7px rgba(0, 0, 0, 0.2); 
+    color: #007bff;
+    border-bottom: 2px solid #007bff;
+    font-weight: bold;
+}

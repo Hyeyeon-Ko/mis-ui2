@@ -6,7 +6,7 @@ import CustomButton from '../../components/common/CustomButton';
 import FinalConfirmationModal from './FinalConfirmationModal';
 import PreviewModal2 from './PreviewModal2'; 
 import { AuthContext } from '../../components/AuthContext';
-import '../../styles/BcdApplySecond.css';
+import '../../styles/bcd/BcdApplySecond.css';
 import '../../styles/common/Page.css';
 
 import backImageEng from '../../assets/images/backimage_eng.png';
@@ -28,6 +28,7 @@ function BcdApplySecond() {
     teamNm: '',
     position: '',
     gradeNm: '',
+    addGradeNm: '',
     phone1: '',
     phone2: '',
     phone3: '',
@@ -66,6 +67,7 @@ function BcdApplySecond() {
 
   const [addressOptions, setAddressOptions] = useState([]);
   const [floor, setFloor] = useState('');
+  const [isPreviewChecked, setIsPreviewChecked] = useState(false);
 
   useEffect(() => {
     if (isOwn) {
@@ -107,8 +109,11 @@ function BcdApplySecond() {
 
         data.instInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
         data.deptInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
-        data.teamInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
-        data.gradeInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
+        data.teamInfo.sort((a, b) => {
+          if (a.detailCd === '000') return -1;
+          if (b.detailCd === '000') return 1;
+          return a.detailNm.localeCompare(b.detailNm);
+        });
 
         const instMap = {};
         const deptMap = {};
@@ -220,12 +225,31 @@ function BcdApplySecond() {
       alert('모든 명함 정보를 입력해주세요.');
       return;
     }
+    if (!isPreviewChecked) {
+      alert('명함 시안 미리보기를 확인해주세요.');
+      return;
+    }
     setShowFinalConfirmationModal(true);
   };
 
   const handleConfirmRequest = async () => {
     setShowFinalConfirmationModal(false);
-
+  
+    const isCustomTeam = formData.team === '000';
+  
+    let teamCd, teamNm;
+  
+    if (isCustomTeam) {
+      teamCd = '000';
+      teamNm = formData.teamNm;
+    } else {
+      const selectedTeam = bcdData.teamInfo.find((team) => team.detailCd === formData.team);
+      if (selectedTeam) {
+        teamCd = selectedTeam.detailCd;
+        teamNm = selectedTeam.detailNm;
+      }
+    }
+  
     const requestData = {
       drafter: auth.hngNm,
       drafterId: auth.userId,
@@ -234,11 +258,12 @@ function BcdApplySecond() {
       engNm: `${formData.lastName} ${formData.firstName}`,
       instCd: mappings.instMap[formData.center],
       deptCd: mappings.deptMap[formData.department],
-      teamCd: mappings.teamMap[formData.team] || '',
-      teamNm: formData.team,
+      teamCd: teamCd,
+      teamNm: teamNm, 
+      engTeamNm: isCustomTeam ? formData.engTeam : null,
       gradeCd: formData.position,
-      gradeNm: formData.gradeNm,
-      enGradeNm: formData.enGradeNm,
+      gradeNm: formData.position === '000' ? formData.gradeNm : formData.gradeNm,
+      enGradeNm: formData.position === '000' ? formData.enGradeNm : null,
       extTel: `${formData.phone1}-${formData.phone2}-${formData.phone3}`,
       faxTel: `${formData.fax1}-${formData.fax2}-${formData.fax3}`,
       phoneTel: `${formData.mobile1}-${formData.mobile2}-${formData.mobile3}`,
@@ -248,7 +273,9 @@ function BcdApplySecond() {
       division: formData.cardType === 'personal' ? 'B' : 'A',
       quantity: formData.quantity,
     };
-
+  
+    console.log('Final requestData:', requestData);
+  
     try {
       const response = await axios.post('/api/bcd/', requestData);
       if (response.data.code === 200) {
@@ -261,6 +288,10 @@ function BcdApplySecond() {
       alert('명함 신청 중 오류가 발생했습니다.');
     }
   };
+  
+  useEffect(() => {
+    console.log('formData: ', formData);
+  }, [formData]);
 
   const handleCenterChange = (e) => {
     if (!formData.userId) {
@@ -309,26 +340,45 @@ function BcdApplySecond() {
       alert('사번 조회를 통해 명함 대상자를 선택하세요.');
       return;
     }
+  
     const selectedTeam = e.target.value;
-    const selectedTeamInfo = bcdData.teamInfo.find((team) => team.detailNm === selectedTeam);
-    const engTeam = selectedTeamInfo ? selectedTeamInfo.etcItem1 : '';
-
-    setFormData({ ...formData, team: selectedTeam, engTeam });
-  };
-
-  const handlePositionChange = (e) => {
-    if (!formData.userId) {
-      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
-      return;
+  
+    if (selectedTeam === '000') { 
+      setFormData({ ...formData, team: selectedTeam, teamNm: '', engTeam: '' });
+    } else {
+      const selectedTeamInfo = bcdData.teamInfo.find((team) => team.detailCd === selectedTeam);
+  
+      if (selectedTeamInfo) {
+        const engTeam = selectedTeamInfo.etcItem2 || '';  
+        setFormData({ ...formData, team: selectedTeam, teamNm: selectedTeamInfo.detailNm, engTeam });
+      } else {
+        setFormData({ ...formData, team: '', teamNm: '', engTeam: '' });  
+      }
     }
-
-    const selectedPosition = e.target.value;
-    const selectedPositionInfo = bcdData.gradeInfo.find((position) => position.detailNm === selectedPosition);
-    const enGradeNm = selectedPositionInfo ? selectedPositionInfo.etcItem1 : '';
-
-    setFormData({ ...formData, position: selectedPosition, enGradeNm });
   };
+  
+  const handlePositionChange = (e) => {
+  if (!formData.userId) {
+    alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+    return;
+  }
 
+  const selectedPosition = e.target.value;
+  const selectedPositionInfo = bcdData.gradeInfo.find((position) => position.detailCd === selectedPosition);
+
+  if (selectedPositionInfo) {
+    const enGradeNm = selectedPositionInfo.etcItem2 || '';
+    setFormData({
+      ...formData,
+      position: selectedPosition,
+      gradeNm: selectedPosition === '000' ? '' : selectedPositionInfo.detailNm,
+      enGradeNm: selectedPosition === '000' ? '' : enGradeNm,
+    });
+  } else {
+    setFormData({ ...formData, position: '', gradeNm: '', enGradeNm: '' });
+  }
+};
+  
   const fetchFilteredGradeInfo = () => {
     const selectedTeamInfo = bcdData.teamInfo.find((team) => team.detailNm === formData.team);
     const selectedEtcItem1 = selectedTeamInfo ? selectedTeamInfo.etcItem1 : '';
@@ -346,6 +396,11 @@ function BcdApplySecond() {
       alert('사번 조회를 통해 명함 대상자를 선택하세요.');
       return;
     }
+    if (!validateForm()) {
+      alert('모든 명함 정보를 입력해주세요.');
+      return;
+    }
+    setIsPreviewChecked(true);
     setPreviewVisible(true);
   };
 
@@ -451,7 +506,6 @@ function BcdApplySecond() {
             <div className="form-right">
               <div className="form-group-horizontal">
                 <label className="bold-label">명함 정보 입력</label>
-                <CustomButton type="button" className="preview-button" onClick={handlePreview}>명함시안 미리보기</CustomButton>
               </div>
               <div className="form-group-horizontal">
                 <label className="form-label">이 름</label>
@@ -478,37 +532,75 @@ function BcdApplySecond() {
                 <select name="department" value={formData.department} onChange={handleDepartmentChange} required onClick={handleInputClick}>
                   <option value="">선택하세요</option>
                   {bcdData.deptInfo
-                    .filter((dept) => dept.etcItem1 === mappings.instMap[formData.center])
+                    .filter((dept) =>                       dept.etcItem1 === mappings.instMap[formData.center])
                     .map((department) => (
                       <option key={department.detailCd} value={department.detailNm}>{department.detailNm}</option>
                     ))}
                 </select>
               </div>
               <div className="form-group-horizontal">
-                <label className="form-label">팀 명</label>
-                <select name="team" value={formData.team} onChange={handleTeamChange} required onClick={handleInputClick}>
+                <label className="form-label">팀</label>
+                <select
+                  name="team"
+                  value={formData.team}
+                  onChange={handleTeamChange}
+                  required
+                  onClick={handleInputClick}
+                >
                   <option value="">선택하세요</option>
                   {bcdData.teamInfo
-                    .filter((team) => team.etcItem1 === mappings.deptMap[formData.department])
+                    .filter(
+                      (team) =>
+                        team.etcItem1 === mappings.deptMap[formData.department] ||
+                        team.detailCd === '000'
+                    )
                     .map((team) => (
-                      <option key={team.detailCd} value={team.detailNm}>
-                        {`${team.detailNm} | ${team.etcItem2}`}
+                      <option key={team.detailCd} value={team.detailCd}>
+                        {team.detailCd === '000' ? team.detailNm : `${team.detailNm} | ${team.etcItem2}`}
                       </option>
                     ))}
                 </select>
               </div>
+              {formData.team === '000' && (
+                <div className="additional-inputs">
+                  <div className="form-group-horizontal">
+                    <label className="form-label">팀 명</label>
+                    <input
+                      type="text"
+                      name="teamNm"
+                      value={formData.teamNm}
+                      onChange={handleChange}
+                      required
+                      placeholder="팀명"
+                      onClick={handleInputClick}
+                    />
+                  </div>
+                  <div className="form-group-horizontal">
+                    <label className="form-label">영문 팀명</label>
+                    <input
+                      type="text"
+                      name="engTeam"
+                      value={formData.engTeam}
+                      onChange={handleChange}
+                      required
+                      placeholder="영문 팀명"
+                      onClick={handleInputClick}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="form-group-horizontal">
                 <label className="form-label">직위 / 직책</label>
                 <select name="position" value={formData.position} onChange={handlePositionChange} required onClick={handleInputClick}>
                   <option value="">선택하세요</option>
                   {fetchFilteredGradeInfo().map((position) => (
                     <option key={position.detailCd} value={position.detailCd}>
-                      {`${position.detailNm} | ${position.etcItem2}`}
+                      {position.detailCd === '000' ? position.detailNm : `${position.detailNm} | ${position.etcItem2}`}
                     </option>
                   ))}
                 </select>
               </div>
-              {formData.position === '999' && (
+              {formData.position === '000' && (
                 <div className="additional-inputs">
                   <div className="form-group-horizontal">
                     <label className="form-label">직위</label>
@@ -580,7 +672,21 @@ function BcdApplySecond() {
           </form>
         </div>
         <div className="apply-buttons-container">
-          <CustomButton className="apply-request-button" onClick={handleApplyRequest}>명함 신청하기</CustomButton>
+          <CustomButton 
+            type="button" 
+            className="apply-preview-button" 
+            onClick={handlePreview} 
+            disabled={!validateForm()}
+          >
+            명함시안 미리보기
+          </CustomButton>
+          <CustomButton 
+            className="apply-request-button" 
+            onClick={handleApplyRequest} 
+            disabled={!isPreviewChecked}
+          >
+            명함 신청하기
+          </CustomButton>
         </div>
       </div>
       <FinalConfirmationModal 

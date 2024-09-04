@@ -17,12 +17,12 @@
   background-color: #068c4e;
 }
 
-.excel-button2 {
+.finish-excel-button {
   background-color: #d7dde4;
   color: rgb(85, 84, 84)
 }
 
-.excel-button2:hover {
+.finish-excel-button:hover {
   background-color: #07AF5A;
   color: white
 }
@@ -40,6 +40,15 @@
   margin-top: 5px;
 }
 
+.docstorage-approve-button {
+  background-color: #2789FE;
+  margin-top: 50px;
+  letter-spacing: 5px;
+  width: 100px;
+  height: 40px;
+  padding-left: 15px;
+}
+
 .authority-add-button:hover {
   background-color: #1e6fc1;
 }
@@ -54,6 +63,16 @@
 
 .apply-request-button span {
   letter-spacing: 0.4em;
+}
+
+.apply-preview-button {
+  margin-right: 5px;
+  background-color: #e2e5e9;
+  color: rgb(126, 125, 125)
+}
+
+.apply-preview-button:hover {
+  background-color: #d1d4d8;
 }
 
 .preview-button {
@@ -102,4 +121,23 @@
 
 .reject-button:hover {
   background-color: #E84646;
+}
+
+.store-button {
+  border-radius: 7px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  background-color: #e2e5e9;
+  color: rgb(126, 125, 125);
+}
+
+.save-button {
+  background-color: #2789FE;
+  margin-top: 40px;
+  letter-spacing: 5px;
+  width: 100px;
+  height: 40px;
+  padding-left: 15px;
 }

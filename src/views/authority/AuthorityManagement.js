@@ -6,7 +6,7 @@ import AuthorityModal from '../authority/AuthorityModal';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import editIcon from '../../assets/images/edit.png';
 import deleteIcon from '../../assets/images/delete.png';
-import '../../styles/AuthorityManagement.css';
+import '../../styles/authority/AuthorityManagement.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 

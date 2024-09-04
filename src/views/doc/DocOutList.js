@@ -1,48 +1,96 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
 import ConfirmModal from '../../components/common/ConfirmModal';
-import deleteIcon from '../../assets/images/delete.png';
-import '../../styles/DocOutList.css';
+import deleteIcon from '../../assets/images/delete2.png';
+import downloadIcon from '../../assets/images/download.png';
+import '../../styles/doc/DocOutList.css';
 import axios from 'axios';
+import { AuthContext } from '../../components/AuthContext';
 
 function DocOutList() {
+  const { auth } = useContext(AuthContext);
   const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDraftId, setSelectedDraftId] = useState(null);
 
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [filterInputs, setFilterInputs] = useState({
+    startDate: null,
+    endDate: null,
+    searchType: '전체',
+    keyword: '',
+  });
+
+  const [filters, setFilters] = useState({
+    statusApproved: false,
+    statusRejected: false,
+    statusOrdered: false,
+    statusClosed: false,
+  });
+
+  const formatDate = (date) => (date ? date.toISOString().split('T')[0] : null);
+
+  const fetchDocOutList = useCallback(
+    async (params = {}) => {
+      try {
+        const response = await axios.get('/api/doc/sendList', {
+          params: {
+            instCd: auth.instCd,
+            startDate: formatDate(params.startDate),
+            endDate: formatDate(params.endDate),
+            searchType: params.searchType || null,
+            keyword: params.keyword || null,
+          },
+        });
+
+        if (response.data && response.data.data) {
+          const formattedData = response.data.data.map((item) => ({
+            draftId: item.draftId,
+            draftDate: item.draftDate,
+            docId: item.docId,
+            resSender: item.resSender,
+            title: item.title,
+            drafter: item.drafter,
+            status: item.status,
+            fileName: item.fileName,
+            fileUrl: item.fileUrl,
+          }));
+          setApplications(formattedData);
+          setFilteredApplications(formattedData);
+        }
+      } catch (error) {
+        console.error('Error fetching document list:', error);
+      }
+    },
+    [auth.instCd]
+  );
 
   useEffect(() => {
     fetchDocOutList();
-  }, []);
+  }, [fetchDocOutList]);
 
-  const fetchDocOutList = async () => {
+  const handleFileDownload = async (fileName) => {
     try {
-      const response = await axios.get('/api/doc/sendList');
+      const response = await axios.get(`/api/doc/download/${encodeURIComponent(fileName)}`, {
+        responseType: 'blob',
+      });
 
-      if (response.data && response.data.data) {
-        const formattedData = response.data.data.map(item => ({
-          draftId: item.draftId,
-          draftDate: item.draftDate,
-          docId: item.docId,
-          resSender: item.resSender,
-          title: item.title,
-          drafter: item.drafter,
-          status: item.status,
-        }));
-        setApplications(formattedData);
-        setFilteredApplications(formattedData);
-      }
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
     } catch (error) {
-      console.error('Error fetching document list:', error);
+      console.error('Error downloading the file:', error);
+      alert('파일 다운로드에 실패했습니다.');
     }
   };
 
-  const handleDeleteClick = (draftId) => {
+  const handleDeleteClick = (draftId, status) => {
     if (draftId) {
       setSelectedDraftId(draftId);
       setShowDeleteModal(true);
@@ -60,62 +108,85 @@ function DocOutList() {
           draftId: selectedDraftId,
         },
       });
-      setShowDeleteModal(false);
+
       fetchDocOutList();
+      setShowDeleteModal(false);
     } catch (error) {
       console.error('Error deleting document:', error);
     }
   };
 
-  const handleSearch = ({ searchType, keyword, startDate, endDate }) => {
-    let filtered = applications;
-
-    if (keyword) {
-      filtered = filtered.filter(app => {
-        if (searchType === '수신처') return app.resSender.includes(keyword);
-        if (searchType === '제목') return app.title.includes(keyword);
-        if (searchType === '접수인') return app.drafter.includes(keyword);
-        if (searchType === '전체') {
-          return (
-            app.resSender.includes(keyword) ||
-            app.title.includes(keyword) ||
-            app.drafter.includes(keyword)
-          );
-        }
-        return true;
-      });
-    }
-
-    if (startDate && endDate) {
-      filtered = filtered.filter(app => {
-        const appDate = new Date(app.draftDate);
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        return appDate >= start && appDate <= end;
-      });
-    }
-
-    setFilteredApplications(filtered);
+  const handleSearch = (searchParams) => {
+    fetchDocOutList({
+      startDate: filterInputs.startDate,
+      endDate: filterInputs.endDate,
+      searchType: searchParams.searchType,
+      keyword: searchParams.keyword,
+    });
   };
+
+  const handleReset = () => {
+    setFilterInputs({
+      startDate: null,
+      endDate: null,
+      searchType: '전체',
+      keyword: '',
+    });
+    setFilters({
+      statusApproved: false,
+      statusRejected: false,
+      statusOrdered: false,
+      statusClosed: false,
+    });
+    fetchDocOutList();
+  };
+
+  const applyStatusFilters = useCallback(
+    (applications) => {
+      return applications.filter((app) => {
+        if (filters.statusApproved && app.status === '승인완료') return true;
+        if (filters.statusRejected && app.status === '반려') return true;
+        if (filters.statusOrdered && app.status === '발주완료') return true;
+        if (filters.statusClosed && app.status === '처리완료') return true;
+        return !Object.values(filters).some(Boolean);
+      });
+    },
+    [filters]
+  );
+
+  useEffect(() => {
+    setFilteredApplications(applyStatusFilters(applications));
+  }, [filters, applications, applyStatusFilters]);
 
   const columns = [
     { header: '접수일자', accessor: 'draftDate', width: '8%' },
     { header: '문서번호', accessor: 'docId', width: '8%' },
     { header: '수신처', accessor: 'resSender', width: '10%' },
     { header: '제목', accessor: 'title', width: '20%' },
+    {
+      header: '첨부파일',
+      accessor: 'file',
+      width: '7%',
+      Cell: ({ row }) =>
+        row.fileName ? (
+          <button className="download-button" onClick={() => handleFileDownload(row.fileName)}>
+            <img src={downloadIcon} alt="Download" className="action-icon" />
+          </button>
+        ) : null,
+    },
     { header: '접수인', accessor: 'drafter', width: '8%' },
-    { header: '상태', accessor: 'status', width: '8%'},
+    { header: '상태', accessor: 'status', width: '8%' },
     {
       header: '신청 삭제',
       accessor: 'delete',
-      width: '10%',
+      width: '7%',
       Cell: ({ row }) => (
         <div className="icon-cell">
           <img
             src={deleteIcon}
             alt="Delete"
-            className="action-icon"
-            onClick={() => handleDeleteClick(row.draftId)}
+            className="doc-out-action-icon"
+            onClick={() => handleDeleteClick(row.draftId, row.status)}
           />
         </div>
       ),
@@ -126,20 +197,28 @@ function DocOutList() {
     <div className="content">
       <div className="doc-out-list">
         <h2>문서 발신 대장</h2>
-        <Breadcrumb items={['문서수발신 관리', '문서 발신 대장']} />
+        <Breadcrumb items={['문서수발신 대장', '문서 발신 대장']} />
         <ConditionFilter
-          startDate={startDate}
-          setStartDate={setStartDate}
-          endDate={endDate}
-          setEndDate={setEndDate}
+          startDate={filterInputs.startDate}
+          setStartDate={(date) => setFilterInputs((prev) => ({ ...prev, startDate: date }))}
+          endDate={filterInputs.endDate}
+          setEndDate={(date) => setFilterInputs((prev) => ({ ...prev, endDate: date }))}
           onSearch={handleSearch}
-          onReset={() => setFilteredApplications(applications)}
+          onReset={handleReset}
           showDocumentType={false}
           showSearchCondition={true}
           excludeSender={true}
+          searchType={filterInputs.searchType}
+          setSearchType={(searchType) => setFilterInputs((prev) => ({ ...prev, searchType }))}
+          keyword={filterInputs.keyword}
+          setKeyword={(keyword) => setFilterInputs((prev) => ({ ...prev, keyword }))}
+          filters={filters}
+          setFilters={setFilters}
+          onFilterChange={() => {}}
+          showStatusFilters={true}
         />
         <div className="doc-out-content">
-            <Table columns={columns} data={filteredApplications} />
+          <Table columns={columns} data={filteredApplications} />
         </div>
         {showDeleteModal && (
           <ConfirmModal

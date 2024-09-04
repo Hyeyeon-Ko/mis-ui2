@@ -1,14 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import Button from '../../components/common/Button';
 import ConfirmModal from '../../components/common/ConfirmModal';
-import '../../styles/MyPendingList.css';
+import { AuthContext } from '../../components/AuthContext'; 
+import '../../styles/list/MyPendingList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 
 function MyPendingList() {
+  const { auth } = useContext(AuthContext); 
   const [pendingApplications, setPendingApplications] = useState([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
@@ -16,11 +18,17 @@ function MyPendingList() {
 
   const fetchPendingApplications = useCallback(async () => {
     try {
-      const response = await axios.get('/api/myPendingList');
+      const response = await axios.get('/api/myPendingList', {
+        params: {
+          userId: auth.userId, 
+        },
+      });
       if (response.data && response.data.data) {
         const data = [
           ...(response.data.data.bcdPendingResponses || []),
-          ...(response.data.data.docPendingResponses || [])
+          ...(response.data.data.docPendingResponses || []),
+          ...(response.data.data.corpDocPendingResponses || []),
+          ...(response.data.data.sealPendingResponses || []),
         ];
 
         const uniqueData = data.reduce((acc, current) => {
@@ -51,7 +59,7 @@ function MyPendingList() {
     } catch (error) {
       console.error('Error fetching pending applications:', error.response ? error.response.data : error.message);
     }
-  }, []); // 빈 의존성 배열
+  }, [auth.userId]); 
 
   useEffect(() => {
     fetchPendingApplications();
@@ -75,7 +83,30 @@ function MyPendingList() {
 
   const handleConfirmCancel = async () => {
     try {
-      const endpoint = selectedApplication.docType === '명함신청' ? '/api/bcd/' : '/api/doc/';
+      let endpoint = '';
+  
+      switch (selectedApplication.docType) {
+        case '명함신청':
+          endpoint = '/api/bcd/';
+          break;
+        case '문서발신':
+        case '문서수신': 
+          endpoint = '/api/doc/';
+          break;
+        case '법인서류':
+          endpoint = '/api/corpDoc/';
+          break;
+        case '인장신청(날인)':
+          endpoint = '/api/seal/imprint/';
+          break;
+        case '인장신청(반출)':
+          endpoint = '/api/seal/export/';
+          break;
+        default:
+          console.error('Unknown document type:', selectedApplication.docType);
+          return;
+      }
+  
       await axios.put(`${endpoint}${selectedApplication.draftId}`);
       setShowConfirmModal(false);
       setSelectedApplication(null);
@@ -87,7 +118,7 @@ function MyPendingList() {
       setSelectedApplication(null);
     }
   };
-
+  
   const handleCloseConfirmModal = () => {
     setShowConfirmModal(false);
     setSelectedApplication(null);
@@ -95,8 +126,8 @@ function MyPendingList() {
 
   const pendingColumns = [
     { header: '제목', accessor: 'title', width: '30%' },
-    { header: '기안일시', accessor: 'draftDate', width: '14%' },
-    { header: '기안자', accessor: 'drafter', width: '9%' },
+    { header: '신청일시', accessor: 'draftDate', width: '14%' },
+    { header: '신청자', accessor: 'drafter', width: '9%' },
     { header: '수정일시', accessor: 'lastUpdateDate', width: '14%' },
     { header: '최종수정자', accessor: 'lastUpdater', width: '11%' },
     {
@@ -106,7 +137,29 @@ function MyPendingList() {
       Cell: ({ row }) => (
         <Button
           className="modify-button"
-          onClick={() => navigate(row.docType === '명함신청' ? `/api/bcd/${row.draftId}` : `/api/doc/${row.draftId}`, { state: { returnTo: '/api/myPendingList' } })}
+          onClick={() => {
+            let path;
+            switch (row.docType) {
+              case '명함신청':
+                path = `/api/bcd/${row.draftId}`;
+                break;
+              case '문서수발신':
+                path = `/api/doc/${row.draftId}`;
+                break;
+              case '법인서류':
+                path = `/api/corpDoc/${row.draftId}`;
+                break;
+              case '인장신청(날인)':
+                path = `/api/seal/imprint/${row.draftId}`;
+                break;
+              case '인장신청(반출)':
+                path = `/api/seal/export/${row.draftId}`;
+                break;
+              default:
+                path = `/api/doc/${row.draftId}`; 
+            }
+            navigate(path, { state: { returnTo: '/api/myPendingList' } });
+          }}
         >
           수 정
         </Button>

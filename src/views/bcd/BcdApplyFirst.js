@@ -1,7 +1,7 @@
 import React from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CircleButton from '../../components/CircleButton';
-import '../../styles/BcdApplyFirst.css';
+import '../../styles/bcd/BcdApplyFirst.css';
 import '../../styles/common/Page.css';
 
 /* (명함 신청 중) 본인/타인 선택 페이지 */

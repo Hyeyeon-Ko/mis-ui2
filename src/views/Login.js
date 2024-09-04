@@ -15,29 +15,19 @@ const Login = () => {
   useEffect(() => {
     if (auth.isAuthenticated) {
       if (auth.role === 'ADMIN' || auth.role === 'MASTER') {
-        navigate('/api/applyList');
+        navigate('/api/std');
       } else {
         navigate('/');
       }
     }
-
-    const handlePopState = (event) => {
-      if (auth.isAuthenticated) {
-        navigate(1);
-      }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
   }, [auth, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/login`, {
+      console.log('Attempting login with:', { userId, userPw });
+
+      const response = await fetch('/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,11 +35,14 @@ const Login = () => {
         body: JSON.stringify({ userId, userPw }),
       });
 
+      console.log('Login response:', response);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('Login data received:', data);
 
         if (data && data.data) {
-          const authorityResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/standardData`, {
+          const authorityResponse = await fetch('/api/auth/standardData', {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -57,8 +50,11 @@ const Login = () => {
             },
           });
 
+          console.log('Authority response:', authorityResponse);
+
           if (authorityResponse.ok) {
             const authorityData = await authorityResponse.json();
+            console.log('Authority data received:', authorityData);
 
             login(
               userId, 
@@ -66,17 +62,21 @@ const Login = () => {
               data.data.role, 
               data.data.sidebarPermissions, 
               authorityData.data, 
-              data.data.instCd 
+              data.data.instCd, 
+              data.data.deptCd,
+              data.data.teamCd,
             );
 
+            console.log('User logged in with role:', data.data.role);
+
             if (data.data.role === 'ADMIN' || data.data.role === 'MASTER') {
-              navigate('/api/applyList');
+              navigate('/api/std');
             } else {
               navigate('/');
             }
 
           } else {
-            console.log('권한 확인 실패:', authorityResponse);
+            console.error('Failed to verify authority:', authorityResponse);
             alert('권한 확인에 실패했습니다. 다시 시도해주세요.');
           }
           
@@ -87,13 +87,14 @@ const Login = () => {
           userIdRef.current.focus(); 
         }
       } else {
+        console.error('Login failed:', response);
         alert('로그인에 실패했습니다. 다시 시도해주세요.');
         setUserId('');
         setUserPw('');
         userIdRef.current.focus(); 
       }
     } catch (error) {
-      console.error('서버 에러:', error);
+      console.error('Server error:', error);
       alert('서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.');
       setUserId('');
       setUserPw('');

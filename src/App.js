@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import './App.css';
 import './index.css';
 import Header from './components/common/Header';
 import Sidebar from './components/common/Sidebar';
 import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'react-router-dom';
-import Home from './views/Home';
+import Apply from './views/Apply';
 import Login from './views/Login';
 import MyApplyList from './views/list/MyApplyList';
 import MyPendingList from './views/list/MyPendingList';
@@ -16,10 +16,14 @@ import BcdApplyFirst from './views/bcd/BcdApplyFirst';
 import BcdApplySecond from './views/bcd/BcdApplySecond';
 import DetailApplication from './views/bcd/DetailApplication';
 import DetailDocApplication from './views/doc/DetailDocApplication';
+import DetailCorpDocApplication from './views/corpdoc/DetailCorpDocApplication';
+import DetailSealImprintApplication from './views/seal/DetailSealImprintApplication';
+import DetailSealExportApplication from './views/seal/DetailSealExportApplication';
 import DocInList from './views/doc/DocInList';
 import DocOutList from './views/doc/DocOutList';
 import SealManagementList from './views/seal/SealManagementList';
 import SealRegistrationList from './views/seal/SealRegistrationList';
+import SealTotalRegistrationList from './views/seal/SealTotalRegistrationList';
 import SealExportList from './views/seal/SealExportList';
 import CorpDocRnpList from './views/corpdoc/CorpDocRnpList';
 import CorpDocIssueList from './views/corpdoc/CorpDocIssueList';
@@ -29,6 +33,11 @@ import CorpDocApply from "./views/corpdoc/CorpDocApply";
 import SealApplyFirst from "./views/seal/SealApplyFirst";
 import SealApplyImprint from "./views/seal/SealApplyImprint";
 import SealApplyExport from "./views/seal/SealApplyExport";
+import Docstorage from "./views/docstorage/Docstorage";
+import DocstorageList from './views/docstorage/DocstorageList';
+import TotalDocstorageList from './views/docstorage/TotalDocstorageList';
+import RentalManage from './views/rental/RentalManage';
+import TotalRentalManage from './views/rental/TotalRentalManage';
 import { AuthProvider, AuthContext } from './components/AuthContext';
 
 function MainLayout({ children }) {
@@ -48,19 +57,47 @@ function MainLayout({ children }) {
 
 function RequireAuth({ children }) {
   const { auth } = useContext(AuthContext);
+  const location = useLocation();
 
   if (!auth.isAuthenticated) {
     return <Navigate to="/api/login" />;
   }
 
-  if ((auth.role === 'ADMIN' || auth.role === 'MASTER') && window.location.pathname === '/') {
-    return <Navigate to="/api/applyList" />;
+  if ((auth.role === 'ADMIN' || auth.role === 'MASTER') && location.pathname === '/') {
+    return <Navigate to="/api/std" />;
   }
 
   return children;
 }
 
 function App() {
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+
+      if (event.key === 'F5') {
+        event.preventDefault();
+        window.location.reload();
+      }
+
+      if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
+        event.preventDefault();
+        window.location.reload();
+      }
+    };
+
+    const handleBeforeUnload = (event) => {
+      event.returnValue = '';
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
   return (
     <Router>
       <AuthProvider>
@@ -69,7 +106,7 @@ function App() {
           <Route path="*" element={
             <MainLayout>
               <Routes>
-                <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
+                <Route path="/" element={<RequireAuth><Apply /></RequireAuth>} />
                 <Route path="/api/auth" element={<RequireAuth><AuthorityManagement /></RequireAuth>} />
                 <Route path="/api/bcd" element={<RequireAuth><BcdApplyFirst /></RequireAuth>} />
                 <Route path="/api/bcd/own" element={<RequireAuth><BcdApplySecond /></RequireAuth>} />
@@ -81,6 +118,7 @@ function App() {
                 <Route path="/api/seal/export" element={<RequireAuth><SealApplyExport /></RequireAuth>} />
                 <Route path="/api/seal/managementList" element={<RequireAuth><SealManagementList /></RequireAuth>} />
                 <Route path="/api/seal/registrationList" element={<RequireAuth><SealRegistrationList /></RequireAuth>} />
+                <Route path="/api/seal/sealRegistrationList" element={<RequireAuth><SealTotalRegistrationList /></RequireAuth>} />
                 <Route path="/api/seal/exportList" element={<RequireAuth><SealExportList /></RequireAuth>} />
                 <Route path="/api/corpDoc/rnpList" element={<RequireAuth><CorpDocRnpList /></RequireAuth>} />
                 <Route path="/api/corpDoc/issueList" element={<RequireAuth><CorpDocIssueList /></RequireAuth>} />
@@ -90,11 +128,20 @@ function App() {
                 <Route path="/api/pendingList" element={<RequireAuth><PendingApprovalList /></RequireAuth>} />
                 <Route path="/api/doc/receiveList" element={<RequireAuth><DocInList /></RequireAuth>} />
                 <Route path="/api/doc/sendList" element={<RequireAuth><DocOutList /></RequireAuth>} />
+                <Route path="/api/docstorage" element={<RequireAuth><Docstorage /></RequireAuth>} />
+                <Route path="/api/docstorageList" element={<RequireAuth><DocstorageList /></RequireAuth>} />
+                <Route path="/api/totalDocstorageList" element={<RequireAuth><TotalDocstorageList /></RequireAuth>} />
+                <Route path="/api/rentalList" element={<RequireAuth><RentalManage /></RequireAuth>} />
+                <Route path="/api/totalRentalList" element={<RequireAuth><TotalRentalManage /></RequireAuth>} />
                 <Route path="/api/bcd/orderList" element={<RequireAuth><BcdOrder /></RequireAuth>} />
                 <Route path="/api/std" element={<RequireAuth><StandardData /></RequireAuth>} />
                 <Route path="/api/bcd/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
                 <Route path="/api/doc/:draftId" element={<RequireAuth><DetailDocApplication /></RequireAuth>} />
+                <Route path="/api/corpDoc/:draftId" element={<RequireAuth><DetailCorpDocApplication/></RequireAuth>}/>
+                <Route path="/api/seal/imprint/:draftId" element={<RequireAuth><DetailSealImprintApplication /></RequireAuth>} />
+                <Route path="/api/seal/export/:draftId" element={<RequireAuth><DetailSealExportApplication /></RequireAuth>} />
                 <Route path="/api/bcd/applyList/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
+                <Route path="/api/corpDoc/applyList/:draftId" element={<RequireAuth><DetailCorpDocApplication /></RequireAuth>} />
               </Routes>
             </MainLayout>
           } />

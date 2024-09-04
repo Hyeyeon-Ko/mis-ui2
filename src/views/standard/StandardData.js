@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import StandardAddModal from '../standard/StandardAddModal';
-import '../../styles/StandardData.css';
+import '../../styles/standard/StandardData.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
@@ -19,6 +19,10 @@ function StandardData() {
   const [editDetailData, setEditDetailData] = useState(null);
   const [selectedDetails, setSelectedDetails] = useState([]);
   const { auth } = useContext(AuthContext);
+
+  const dragStartIndex = useRef(null);
+  const dragEndIndex = useRef(null);
+  const dragMode = useRef('select');
 
   const categories = [
     { categoryCode: 'A', categoryName: 'A 공통' },
@@ -128,6 +132,9 @@ function StandardData() {
           etcItem6: newRow.items[5],
           etcItem7: newRow.items[6],
           etcItem8: newRow.items[7],
+          etcItem9: newRow.items[8],
+          etcItem10: newRow.items[9],
+          etcItem11: newRow.items[10],
         });
         alert('상세 코드가 추가되었습니다.');
         fetchDetails(selectedSubCategory);
@@ -142,6 +149,7 @@ function StandardData() {
       }
     } else if (modalMode === 'edit') {
       try {
+        const oriDetailCd = selectedDetails[0];
         await axios.put('/api/std/detailInfo', {
           groupCd: selectedSubCategory,
           detailCd: newRow.detailCode,
@@ -156,6 +164,11 @@ function StandardData() {
           etcItem6: newRow.items[5],
           etcItem7: newRow.items[6],
           etcItem8: newRow.items[7],
+          etcItem9: newRow.items[8],
+          etcItem10: newRow.items[9],
+          etcItem11: newRow.items[10],
+        }, {
+          params: { oriDetailCd }
         });
         alert('상세 코드가 수정되었습니다.');
         fetchDetails(selectedSubCategory);
@@ -209,6 +222,11 @@ function StandardData() {
     });
   };
 
+  const handleRowClick = (row) => {
+    const detailCd = row.detailCd;
+    handleDetailSelect(detailCd);
+  };
+
   const handleDeleteRow = async () => {
     if (selectedDetails.length === 0) {
       alert('삭제할 상세 코드를 선택하세요.');
@@ -236,6 +254,43 @@ function StandardData() {
     } else {
       setSelectedDetails(details.map(detail => detail.detailCd));
     }
+  };
+
+  const handleMouseDown = (rowIndex) => {
+    dragStartIndex.current = rowIndex;
+
+    const detailCd = details[rowIndex]?.detailCd;
+    if (selectedDetails.includes(detailCd)) {
+      dragMode.current = 'deselect'; 
+    } else {
+      dragMode.current = 'select'; 
+    }
+  };
+
+  const handleMouseOver = (rowIndex) => {
+    if (dragStartIndex.current !== null) {
+      dragEndIndex.current = rowIndex;
+      const start = Math.min(dragStartIndex.current, dragEndIndex.current);
+      const end = Math.max(dragStartIndex.current, dragEndIndex.current);
+
+      let newSelectedDetails = [...selectedDetails];
+
+      for (let i = start; i <= end; i++) {
+        const detailCd = details[i]?.detailCd;
+        if (dragMode.current === 'select' && !newSelectedDetails.includes(detailCd)) {
+          newSelectedDetails.push(detailCd); 
+        } else if (dragMode.current === 'deselect' && newSelectedDetails.includes(detailCd)) {
+          newSelectedDetails = newSelectedDetails.filter(id => id !== detailCd); 
+        }
+      }
+
+      setSelectedDetails(newSelectedDetails);
+    }
+  };
+
+  const handleMouseUp = () => {
+    dragStartIndex.current = null;
+    dragEndIndex.current = null;
   };
 
   const mappedSubCategories = subCategories.map(subCategory => ({
@@ -285,6 +340,7 @@ function StandardData() {
             type="checkbox"
             name="detailSelect"
             checked={selectedDetails.includes(detailCd)}
+            onClick={(e) => e.stopPropagation()}
             onChange={() => handleDetailSelect(detailCd)}
           />
         );
@@ -299,8 +355,12 @@ function StandardData() {
     { header: headerData.etcItem6 || '', accessor: 'etcItem5' },
     { header: headerData.etcItem7 || '', accessor: 'etcItem6' },
     { header: headerData.etcItem8 || '', accessor: 'etcItem7' },
-  ];
-
+    { header: headerData.etcItem9 || '', accessor: 'etcItem8' },
+    { header: headerData.etcItem10 || '', accessor: 'etcItem9' },
+    { header: headerData.etcItem11 || '', accessor: 'etcItem10' },
+    selectedSubCategory === 'A000' && { header: '항목10', accessor: 'etcItem11' },
+  ].filter(Boolean);
+    
   const getModalTitle = () => {
     if (modalMode === 'detail') {
       return `${subCategoryName} 추가`;
@@ -355,12 +415,16 @@ function StandardData() {
                 <button className="data-delete-button" onClick={handleDeleteRow} disabled={!auth.hasStandardDataAuthority}>삭 제</button>
               </div>
             </div>
-              <div className="details-table">
-                <Table
-                  columns={detailColumns}
-                  data={details}
-                />
-              </div>
+            <div className="details-table">
+              <Table
+                columns={detailColumns}
+                data={details}
+                onRowClick={handleRowClick}  
+                onRowMouseDown={handleMouseDown}  
+                onRowMouseOver={handleMouseOver}  
+                onRowMouseUp={handleMouseUp}    
+              />
+            </div>
           </div>
         </div>
       </div>

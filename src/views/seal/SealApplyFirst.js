@@ -1,7 +1,7 @@
 import React from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CircleButton from '../../components/CircleButton';
-import '../../styles/SealApply.css';
+import '../../styles/seal/SealApply.css';
 import '../../styles/common/Page.css';
 
 /* (인장 신청 중) 날인/반출 선택 페이지 */

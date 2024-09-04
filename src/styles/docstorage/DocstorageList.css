@@ -1,0 +1,122 @@
+.docstorage-content {
+    padding: 8px 16px;
+}
+
+.docstorage-content-inner h2 {
+    font-size: 28px;
+    margin-bottom: 16px;
+}
+
+.docstorage-category-section {
+    margin-top: 25px;
+    margin-bottom: 30px;
+    font-size: 16px;
+}
+
+.docstorage-category-label {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.docstorage-category-dropdown {
+    padding: 6px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 165px;
+    margin-left: -3px;
+    margin-right: 20px;
+}
+
+.docstorage-tables-section {
+    display: flex;
+}
+
+.docstorage-details-content {
+    flex: 7;
+    overflow-x: auto;
+}
+
+.docstorage-header-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.docstorage-detail-content-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 6px;
+    margin-right: 10px;
+    margin-bottom: 4px;
+    padding-left: 0px;
+}
+
+.docstorage-details-table {
+    border-collapse: collapse;
+    width: 100%;
+    overflow-x: auto;
+    max-width: 100%;
+    min-width: 100%;
+}
+
+.docstorage-details-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.docstorage-details-table th, .docstorage-details-table td {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 8px 20px;
+    text-align: center;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.docstorage-add-button, .docstorage-modify-button, .docstorage-delete-button, .docstorage-excel-button, .docstorage-finish-button {
+    border-radius: 7px;
+    padding: 4px 8px;
+    width: 55px;
+    height: 30px;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border: none;
+    margin-right: 3px;
+}
+
+.docstorage-excel-button {
+    color: white;
+    background-color: #07AF5A;
+}
+
+.docstorage-excel-button:hover {
+    background-color: #068c4e;
+}
+
+.docstorage-add-button, .docstorage-modify-button, .docstorage-delete-button {
+    color: black;
+    background-color: #bdc6cf;
+}
+
+.docstorage-add-button:hover, .docstorage-modify-button:hover, .docstorage-delete-button:hover {
+    background-color: #a1a9b2;
+}
+
+.docstorage-finish-button {
+    color: white;
+    background-color: #2789FE;
+}
+
+.docstorage-finish-button:hover {
+    background-color: #1e6fc1;
+}
+
+.docstorage-approve-section {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px; 
+}
