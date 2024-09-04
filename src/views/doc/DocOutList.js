@@ -105,7 +105,7 @@ function DocOutList() {
     if (selectedDraftId === null) return;
 
     try {
-      await axios.put(`${apiUrl}/api/doc/delete', null, {
+      await axios.put(`${apiUrl}/api/doc/delete`, null, {
         params: {
           draftId: selectedDraftId,
         },
