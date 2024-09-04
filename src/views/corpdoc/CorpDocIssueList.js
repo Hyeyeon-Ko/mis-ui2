@@ -86,7 +86,7 @@ function CorpDocIssueList() {
     } catch (error) {
       console.error("Error fetching issue data:", error);
     }
-  }, []);
+  }, [setApplications, setPendingApplications]);
 
   // IssueList의 마지막 행의 잔고 값 가져오기
   const extractTotalValues = (data) => {
