@@ -167,20 +167,34 @@ function ApplicationsList() {
     }
   };
 
-  const applyStatusFilters = useCallback((data) => {
-    const filtered = data.filter((app) => {
-      if (filters.statusApproved && app.applyStatus === '승인완료') return true;
-      if (filters.statusRejected && app.applyStatus === '반려') return true;
-      if (filters.statusOrdered && app.applyStatus === '발주완료') return true;
-      if (filters.statusClosed && app.applyStatus === '처리완료') return true;
-      return !Object.values(filters).some(Boolean); 
-    });
-    setFilteredApplications(filtered);
-  }, [filters]);
+  // const applyStatusFilters = useCallback((data) => {
+  //   const filtered = data.filter((app) => {
+  //     if (filters.statusApproved && app.applyStatus === '승인완료') return true;
+  //     if (filters.statusRejected && app.applyStatus === '반려') return true;
+  //     if (filters.statusOrdered && app.applyStatus === '발주완료') return true;
+  //     if (filters.statusClosed && app.applyStatus === '처리완료') return true;
+  //     return !Object.values(filters).some(Boolean); 
+  //   });
+  //   setFilteredApplications(filtered);
+  // }, [filters]);
+
+  // useEffect(() => {
+  //   applyStatusFilters(applications);
+  // }, [filters, applications, applyStatusFilters]);
 
   useEffect(() => {
-    applyStatusFilters(applications);
-  }, [filters, applications, applyStatusFilters]);
+    const applyStatusFilters = (data) => {
+      return data.filter((app) => {
+        if (filters.statusApproved && app.applyStatus === '승인완료') return true;
+        if (filters.statusRejected && app.applyStatus === '반려') return true;
+        if (filters.statusOrdered && app.applyStatus === '발주완료') return true;
+        if (filters.statusClosed && app.applyStatus === '처리완료') return true;
+        return !Object.values(filters).some(Boolean); 
+      });
+    };
+  
+    setFilteredApplications(applyStatusFilters(applications));
+  }, [filters, applications]);
 
   const resetFilters = useCallback(() => {
     const defaultStartDate = new Date();
