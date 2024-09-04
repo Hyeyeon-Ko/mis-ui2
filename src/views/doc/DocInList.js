@@ -107,7 +107,7 @@ function DocInList() {
 
   const handleFileDownload = async (fileName) => {
     try {
-      const response = await axios.get(`/api/doc/download/${encodeURIComponent(fileName)}`, {
+      const response = await axios.get(`${apiUrl}/api/doc/download/${encodeURIComponent(fileName)}`, {
         responseType: 'blob',
       });
 

@@ -58,7 +58,7 @@ function StandardData() {
 
   const fetchDetails = async (groupCd) => {
     try {
-      const response = await axios.get(`/api/std/detailInfo`, { params: { groupCd } });
+      const response = await axios.get(`${apiUrl}/api/std/detailInfo`, { params: { groupCd } });
       const data = response.data.data || [];
       if (Array.isArray(data)) {
         data.sort((a, b) => parseInt(a.detailCd, 10) - parseInt(b.detailCd, 10));
@@ -77,7 +77,7 @@ function StandardData() {
 
   const fetchSelectedDetail = async (groupCd, detailCd) => {
     try {
-      const response = await axios.get(`/api/std/detailInfo/${detailCd}`, { params: { groupCd } });
+      const response = await axios.get(`${apiUrl}/api/std/detailInfo/${detailCd}`, { params: { groupCd } });
       const detailData = response.data.data;
       setEditDetailData(detailData);
       setModalMode('edit');
@@ -90,7 +90,7 @@ function StandardData() {
 
   const fetchHeaderData = async (groupCd) => {
     try {
-      const response = await axios.get(`/api/std/header`, { params: { groupCd } });
+      const response = await axios.get(`${apiUrl}/api/std/header`, { params: { groupCd } });
       const headerData = response.data.data[0] || {};
       setHeaderData(headerData);
     } catch (error) {
