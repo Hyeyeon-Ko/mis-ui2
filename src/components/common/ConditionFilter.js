@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Button from '../common/Button';
 import '../../styles/common/ConditionFilter.css';
@@ -21,25 +21,26 @@ const ConditionFilter = ({
   showStatusFilters,
   showSearchCondition,
   showDocumentType = true,
-  excludeRecipient,
-  excludeSender,
   documentType,
   setDocumentType,
+  searchType, 
+  setSearchType,
+  keyword,  
+  setKeyword,
+  searchOptions = [], // 검색 조건 옵션
+  forceShowAllStatusFilters = false,
 }) => {
-  const [searchType, setSearchType] = useState('전체');
-  const [keyword, setKeyword] = useState('');
-
-  useEffect(() => {
-    resetFilters(); 
-  }, [documentType]);  
-  
   const resetFilters = () => {
     const defaultStartDate = new Date();
     defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
     setStartDate(defaultStartDate);
     setEndDate(new Date());
-    setSearchType('전체');
-    setKeyword('');
+    
+    if (showSearchCondition) {
+      setSearchType('전체');
+      setKeyword('');
+    }
+
     if (onReset) onReset();
     setFilters({
       statusApproved: false,
@@ -58,11 +59,7 @@ const ConditionFilter = ({
   };
 
   const handleSearch = () => {
-    const searchParams = {
-      searchType,
-      keyword,
-    };
-    onSearch(searchParams);
+    onSearch();
   };
 
   const handleStartDateChange = (event) => {
@@ -78,6 +75,49 @@ const ConditionFilter = ({
   };
 
   const renderStatusFilters = () => {
+    if (forceShowAllStatusFilters) {
+      return (
+        <>
+          <label>
+            <input
+              type="checkbox"
+              name="statusApproved"
+              checked={filters.statusApproved}
+              onChange={onFilterChange}
+            />
+            승인완료
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="statusRejected"
+              checked={filters.statusRejected}
+              onChange={onFilterChange}
+            />
+            반려
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="statusOrdered"
+              checked={filters.statusOrdered}
+              onChange={onFilterChange}
+            />
+            발주완료
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="statusClosed"
+              checked={filters.statusClosed}
+              onChange={onFilterChange}
+            />
+            처리완료
+          </label>
+        </>
+      );
+    }
+
     switch (documentType) {
       case '명함신청':
         return (
@@ -198,30 +238,19 @@ const ConditionFilter = ({
           <>
             <label>검색 조건</label>
             <select
-              value={searchType}
-              onChange={(e) => setSearchType(e.target.value)}
+              value={searchType}  
+              onChange={(e) => setSearchType(e.target.value)}  
             >
-              <option value="전체">전체</option>
-              {(documentType === '명함신청' || documentType === '문서수발신'
-                || documentType === '인장신청' || documentType === '법인서류'
-              ) ? (
-                <>
-                  <option value="제목">제목</option>
-                  <option value="신청자">신청자</option>
-                </>
-              ) : (
-                <>
-                  {!excludeSender && <option value="발신처">발신처</option>}
-                  {!excludeRecipient && <option value="수신처">수신처</option>}
-                  <option value="제목">제목</option>
-                  <option value="접수인">접수인</option>
-                </>
-              )}
+              {searchOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
             </select>
             <input
               type="text"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
+              value={keyword}  
+              onChange={(e) => setKeyword(e.target.value)} 
               placeholder="검색어 입력"
             />
           </>
@@ -255,6 +284,11 @@ ConditionFilter.propTypes = {
   showDocumentType: PropTypes.bool,
   documentType: PropTypes.string,
   setDocumentType: PropTypes.func.isRequired,
+  searchType: PropTypes.string,  
+  setSearchType: PropTypes.func,  
+  keyword: PropTypes.string, 
+  setKeyword: PropTypes.func,  
+  searchOptions: PropTypes.arrayOf(PropTypes.string).isRequired, // 추가
 };
 
 export default ConditionFilter;

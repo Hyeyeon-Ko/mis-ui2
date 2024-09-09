@@ -5,7 +5,7 @@ import Table from '../../components/common/Table';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import deleteIcon from '../../assets/images/delete2.png';
 import downloadIcon from '../../assets/images/download.png';
-import '../../styles/doc/DocInList.css';
+import '../../styles/doc/DocOutList.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 
@@ -15,7 +15,6 @@ function DocInList() {
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDraftId, setSelectedDraftId] = useState(null);
-  const [selectedDeptCd, setSelectedDeptCd] = useState(null);
 
   const [filterInputs, setFilterInputs] = useState({
     startDate: null,
@@ -31,18 +30,10 @@ function DocInList() {
     statusClosed: false,
   });
 
-  const fetchDocInList = useCallback(async (params = {}) => {
+  const fetchDocInList = useCallback(async () => {
     try {
-      const formatDate = (date) => date ? date.toISOString().split('T')[0] : null;
-
       const response = await axios.get('/api/doc/receiveList', {
-        params: {
-          instCd: auth.instCd,
-          startDate: formatDate(params.startDate),
-          endDate: formatDate(params.endDate),
-          searchType: params.searchType || null,
-          keyword: params.keyword || null,
-        },
+        params: { instCd: auth.instCd },
       });
 
       if (response.data && response.data.data) {
@@ -56,52 +47,18 @@ function DocInList() {
           status: item.status,
           fileName: item.fileName,
           fileUrl: item.fileUrl,
-          deleted: item.status === '신청취소',
         }));
         setApplications(formattedData);
         setFilteredApplications(formattedData);
       }
     } catch (error) {
-      console.error('문서 목록을 불러오는 중 오류가 발생했습니다:', error);
+      console.error('Error fetching document list:', error);
     }
   }, [auth.instCd]);
 
-  const handleDeptChange = (e) => {
-    const deptCd = e.target.value;
-    setSelectedDeptCd(deptCd);
-
-    if (deptCd) {
-      fetchDeptReceiveList(deptCd);
-    } else {
-      fetchDocInList();
-    }
-  };
-
-  const fetchDeptReceiveList = async (deptCd) => {
-    try {
-      const response = await axios.get('/api/doc/deptReceiveList', {
-        params: { deptCd },
-      });
-      if (response.data && response.data.data) {
-        const formattedData = response.data.data.map((item) => ({
-          draftId: item.draftId,
-          draftDate: item.draftDate,
-          docId: item.docId,
-          resSender: item.resSender,
-          title: item.title,
-          drafter: item.drafter,
-          status: item.status,
-          fileName: item.fileName,
-          fileUrl: item.fileUrl,
-          deleted: item.status === '신청취소',
-        }));
-        setApplications(formattedData);
-        setFilteredApplications(formattedData);
-      }
-    } catch (error) {
-      console.error('부서별 문서 수신 목록을 불러오는 중 오류가 발생했습니다.', error);
-    }
-  };
+  useEffect(() => {
+    fetchDocInList();
+  }, [fetchDocInList]);
 
   const handleFileDownload = async (fileName) => {
     try {
@@ -117,17 +74,17 @@ function DocInList() {
       link.click();
       link.parentNode.removeChild(link);
     } catch (error) {
-      console.error('파일 다운로드 중 오류가 발생했습니다:', error);
+      console.error('Error downloading the file:', error);
       alert('파일 다운로드에 실패했습니다.');
     }
   };
 
-  const handleDeleteClick = (draftId, status) => {
+  const handleDeleteClick = (draftId) => {
     if (draftId) {
       setSelectedDraftId(draftId);
       setShowDeleteModal(true);
     } else {
-      console.error('잘못된 draftId:', draftId);
+      console.error('Invalid draftId:', draftId);
     }
   };
 
@@ -141,25 +98,48 @@ function DocInList() {
         },
       });
 
-      if (selectedDeptCd) {
-        fetchDeptReceiveList(selectedDeptCd);
-      } else {
-        fetchDocInList();
-      }
-
+      fetchDocInList();
       setShowDeleteModal(false);
     } catch (error) {
-      console.error('문서 삭제 중 오류가 발생했습니다:', error);
+      console.error('Error deleting document:', error);
     }
   };
 
-  const handleSearch = (searchParams) => {
-    fetchDocInList({
-      startDate: filterInputs.startDate,
-      endDate: filterInputs.endDate,
-      searchType: searchParams.searchType,
-      keyword: searchParams.keyword,
-    });
+  const handleSearch = () => {
+    const { startDate, endDate, searchType, keyword } = filterInputs;
+    let filteredData = applications;
+
+    if (startDate) {
+      filteredData = filteredData.filter((item) => new Date(item.draftDate) >= new Date(startDate));
+    }
+
+    if (endDate) {
+      filteredData = filteredData.filter((item) => new Date(item.draftDate) <= new Date(endDate));
+    }
+
+    if (keyword.trim() !== '') {
+      filteredData = filteredData.filter((item) => {
+        if (searchType === '전체') {
+          return (
+            item.title.toLowerCase().includes(keyword.toLowerCase()) ||
+            item.drafter.toLowerCase().includes(keyword.toLowerCase()) ||
+            item.resSender.toLowerCase().includes(keyword.toLowerCase())
+          );
+        }
+        if (searchType === '발신처') {
+          return item.resSender.toLowerCase().includes(keyword.toLowerCase());
+        }
+        if (searchType === '제목') {
+          return item.title.toLowerCase().includes(keyword.toLowerCase());
+        }
+        if (searchType === '접수인') {
+          return item.drafter.toLowerCase().includes(keyword.toLowerCase());
+        }
+        return false;
+      });
+    }
+
+    setFilteredApplications(filteredData);
   };
 
   const handleReset = () => {
@@ -169,13 +149,7 @@ function DocInList() {
       searchType: '전체',
       keyword: '',
     });
-    setFilters({
-      statusApproved: false,
-      statusRejected: false,
-      statusOrdered: false,
-      statusClosed: false,
-    });
-    fetchDocInList();
+    setFilteredApplications(applications);
   };
 
   const applyStatusFilters = useCallback(
@@ -206,10 +180,7 @@ function DocInList() {
       width: '7%',
       Cell: ({ row }) =>
         row.fileName ? (
-          <button
-            className="download-button"
-            onClick={() => handleFileDownload(row.fileName)}
-          >
+          <button className="download-button" onClick={() => handleFileDownload(row.fileName)}>
             <img src={downloadIcon} alt="Download" className="action-icon" />
           </button>
         ) : null,
@@ -225,8 +196,8 @@ function DocInList() {
           <img
             src={deleteIcon}
             alt="Delete"
-            className="doc-in-action-icon"
-            onClick={() => handleDeleteClick(row.draftId, row.status)}
+            className="doc-out-action-icon"
+            onClick={() => handleDeleteClick(row.draftId)}
           />
         </div>
       ),
@@ -235,51 +206,25 @@ function DocInList() {
 
   return (
     <div className="content">
-      <div className="doc-in-list">
+      <div className="doc-out-list">
         <h2>문서 수신 대장</h2>
         <Breadcrumb items={['문서수발신 대장', '문서 수신 대장']} />
-
-        <div className="doc-in-category-section">
-          <label htmlFor="dept" className="doc-in-category-label">부 서&gt;&gt;</label>
-          <select
-            id="dept"
-            className="doc-in-category-dropdown"
-            value={selectedDeptCd || ''}
-            onChange={handleDeptChange}
-          >
-            <option value="">전체</option>
-            {/* Assuming deptResponses is used elsewhere or should be handled */}
-          </select>
-        </div>
-
         <ConditionFilter
           startDate={filterInputs.startDate}
-          setStartDate={(date) =>
-            setFilterInputs((prev) => ({ ...prev, startDate: date }))
-          }
+          setStartDate={(date) => setFilterInputs((prev) => ({ ...prev, startDate: date }))}
           endDate={filterInputs.endDate}
-          setEndDate={(date) =>
-            setFilterInputs((prev) => ({ ...prev, endDate: date }))
-          }
+          setEndDate={(date) => setFilterInputs((prev) => ({ ...prev, endDate: date }))}
           onSearch={handleSearch}
           onReset={handleReset}
           showDocumentType={false}
           showSearchCondition={true}
-          excludeRecipient={true}
           searchType={filterInputs.searchType}
-          setSearchType={(searchType) =>
-            setFilterInputs((prev) => ({ ...prev, searchType }))
-          }
+          setSearchType={(searchType) => setFilterInputs((prev) => ({ ...prev, searchType }))}
           keyword={filterInputs.keyword}
-          setKeyword={(keyword) =>
-            setFilterInputs((prev) => ({ ...prev, keyword }))
-          }
-          filters={filters}
-          setFilters={setFilters}
-          onFilterChange={() => {}}
-          showStatusFilters={true}
+          setKeyword={(keyword) => setFilterInputs((prev) => ({ ...prev, keyword }))}
+          searchOptions={['전체', '발신처', '제목', '접수인']} 
         />
-        <div className="doc-in-content">
+        <div className="doc-out-content">
           <Table columns={columns} data={filteredApplications} />
         </div>
         {showDeleteModal && (

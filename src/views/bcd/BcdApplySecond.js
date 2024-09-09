@@ -280,7 +280,7 @@ function BcdApplySecond() {
       const response = await axios.post('/api/bcd/', requestData);
       if (response.data.code === 200) {
         alert('명함 신청이 완료되었습니다.');
-        navigate('/api/myApplyList');
+        navigate('/api/myPendingList');
       } else {
         alert('명함 신청 중 오류가 발생했습니다.');
       }

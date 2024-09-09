@@ -274,7 +274,8 @@ function PendingApprovalList() {
           setFilters={setFilters}
           onSearch={handleSearch}
           onReset={handleReset}
-          showDocumentType={false}
+          showDocumentType={false} // 검색 조건 없이 필터만 사용
+          showSearchCondition={false} // searchType과 keyword 전달 안 함
         />
         {loading ? (
           <p>로딩 중...</p>
@@ -294,7 +295,7 @@ function PendingApprovalList() {
         />
       )}
     </div>
-    );
-  }
+  );
+}
 
 export default PendingApprovalList;

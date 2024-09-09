@@ -93,7 +93,7 @@ const EmailModal = ({ show, onClose, onSend }) => {
           />
         </div>
         <div className="email-input-group">
-          <label htmlFor="subject">제목</label>
+          <label htmlFor="subject">이메일 제목</label>
           <input
             id="subject"
             type="text"
@@ -103,7 +103,7 @@ const EmailModal = ({ show, onClose, onSend }) => {
           />
         </div>
         <div className="email-input-group">
-          <label htmlFor="body">내용</label>
+          <label htmlFor="body">이메일 내용</label>
           <textarea
             id="body"
             placeholder="내용을 입력하세요"

@@ -95,7 +95,7 @@ function TotalRentalManage() {
         { header: '정수기', accessor: 'waterPurifier' },
         { header: '공기청정기', accessor: 'airPurifier' },
         { header: '비데', accessor: 'bidet' },
-        { header: '월 렌탈금액', accessor: 'monthlyRentalFee' },
+        { header: '렌탈금액', accessor: 'monthlyRentalFee' },
     ];
 
     const handleCenterChange = (e) => {

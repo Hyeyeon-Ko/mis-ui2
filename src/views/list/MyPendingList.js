@@ -52,6 +52,8 @@ function MyPendingList() {
 
         transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
 
+        console.log(transformedData);
+
         setPendingApplications(transformedData);
       } else {
         console.error('Unexpected response format:', response.data);

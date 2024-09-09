@@ -30,42 +30,31 @@ function DocOutList() {
     statusClosed: false,
   });
 
-  const formatDate = (date) => (date ? date.toISOString().split('T')[0] : null);
+  const fetchDocOutList = useCallback(async () => {
+    try {
+      const response = await axios.get('/api/doc/sendList', {
+        params: { instCd: auth.instCd },
+      });
 
-  const fetchDocOutList = useCallback(
-    async (params = {}) => {
-      try {
-        const response = await axios.get('/api/doc/sendList', {
-          params: {
-            instCd: auth.instCd,
-            startDate: formatDate(params.startDate),
-            endDate: formatDate(params.endDate),
-            searchType: params.searchType || null,
-            keyword: params.keyword || null,
-          },
-        });
-
-        if (response.data && response.data.data) {
-          const formattedData = response.data.data.map((item) => ({
-            draftId: item.draftId,
-            draftDate: item.draftDate,
-            docId: item.docId,
-            resSender: item.resSender,
-            title: item.title,
-            drafter: item.drafter,
-            status: item.status,
-            fileName: item.fileName,
-            fileUrl: item.fileUrl,
-          }));
-          setApplications(formattedData);
-          setFilteredApplications(formattedData);
-        }
-      } catch (error) {
-        console.error('Error fetching document list:', error);
+      if (response.data && response.data.data) {
+        const formattedData = response.data.data.map((item) => ({
+          draftId: item.draftId,
+          draftDate: item.draftDate,
+          docId: item.docId,
+          resSender: item.resSender,
+          title: item.title,
+          drafter: item.drafter,
+          status: item.status,
+          fileName: item.fileName,
+          fileUrl: item.fileUrl,
+        }));
+        setApplications(formattedData);
+        setFilteredApplications(formattedData);
       }
-    },
-    [auth.instCd]
-  );
+    } catch (error) {
+      console.error('Error fetching document list:', error);
+    }
+  }, [auth.instCd]);
 
   useEffect(() => {
     fetchDocOutList();
@@ -90,7 +79,7 @@ function DocOutList() {
     }
   };
 
-  const handleDeleteClick = (draftId, status) => {
+  const handleDeleteClick = (draftId) => {
     if (draftId) {
       setSelectedDraftId(draftId);
       setShowDeleteModal(true);
@@ -116,13 +105,41 @@ function DocOutList() {
     }
   };
 
-  const handleSearch = (searchParams) => {
-    fetchDocOutList({
-      startDate: filterInputs.startDate,
-      endDate: filterInputs.endDate,
-      searchType: searchParams.searchType,
-      keyword: searchParams.keyword,
-    });
+  const handleSearch = () => {
+    const { startDate, endDate, searchType, keyword } = filterInputs;
+    let filteredData = applications;
+
+    if (startDate) {
+      filteredData = filteredData.filter((item) => new Date(item.draftDate) >= new Date(startDate));
+    }
+
+    if (endDate) {
+      filteredData = filteredData.filter((item) => new Date(item.draftDate) <= new Date(endDate));
+    }
+
+    if (keyword.trim() !== '') {
+      filteredData = filteredData.filter((item) => {
+        if (searchType === '전체') {
+          return (
+            item.title.toLowerCase().includes(keyword.toLowerCase()) ||
+            item.drafter.toLowerCase().includes(keyword.toLowerCase()) ||
+            item.resSender.toLowerCase().includes(keyword.toLowerCase())
+          );
+        }
+        if (searchType === '수신처') {
+          return item.resSender.toLowerCase().includes(keyword.toLowerCase());
+        }
+        if (searchType === '제목') {
+          return item.title.toLowerCase().includes(keyword.toLowerCase());
+        }
+        if (searchType === '접수인') {
+          return item.drafter.toLowerCase().includes(keyword.toLowerCase());
+        }
+        return false;
+      });
+    }
+
+    setFilteredApplications(filteredData);
   };
 
   const handleReset = () => {
@@ -132,13 +149,7 @@ function DocOutList() {
       searchType: '전체',
       keyword: '',
     });
-    setFilters({
-      statusApproved: false,
-      statusRejected: false,
-      statusOrdered: false,
-      statusClosed: false,
-    });
-    fetchDocOutList();
+    setFilteredApplications(applications); 
   };
 
   const applyStatusFilters = useCallback(
@@ -186,7 +197,7 @@ function DocOutList() {
             src={deleteIcon}
             alt="Delete"
             className="doc-out-action-icon"
-            onClick={() => handleDeleteClick(row.draftId, row.status)}
+            onClick={() => handleDeleteClick(row.draftId)}
           />
         </div>
       ),
@@ -207,15 +218,11 @@ function DocOutList() {
           onReset={handleReset}
           showDocumentType={false}
           showSearchCondition={true}
-          excludeSender={true}
           searchType={filterInputs.searchType}
           setSearchType={(searchType) => setFilterInputs((prev) => ({ ...prev, searchType }))}
           keyword={filterInputs.keyword}
           setKeyword={(keyword) => setFilterInputs((prev) => ({ ...prev, keyword }))}
-          filters={filters}
-          setFilters={setFilters}
-          onFilterChange={() => {}}
-          showStatusFilters={true}
+          searchOptions={['전체', '수신처', '제목', '접수인']} 
         />
         <div className="doc-out-content">
           <Table columns={columns} data={filteredApplications} />

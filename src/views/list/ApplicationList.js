@@ -95,6 +95,56 @@ function ApplicationsList() {
     }
   };
 
+  const applyFilters = useCallback(() => {
+    console.log("필터링을 시작합니다", filterInputs, filters);
+    let filteredData = applications;
+
+    if (filterInputs.startDate) {
+      const startOfDay = new Date(filterInputs.startDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      filteredData = filteredData.filter(application => new Date(application.draftDate) >= startOfDay);
+    }
+
+    if (filterInputs.endDate) {
+      const endOfDay = new Date(filterInputs.endDate);
+      endOfDay.setHours(23, 59, 59, 999);
+      filteredData = filteredData.filter(application => new Date(application.draftDate) <= endOfDay);
+    }
+
+    const keyword = filterInputs.keyword.toLowerCase().trim();
+    if (keyword) {
+      if (filterInputs.searchType === '전체') {
+        filteredData = filteredData.filter(application =>
+          application.title.toLowerCase().includes(keyword) ||
+          application.drafter.toLowerCase().includes(keyword)
+        );
+      } else if (filterInputs.searchType === '제목') {
+        filteredData = filteredData.filter(application => 
+          application.title.toLowerCase().includes(keyword)
+        );
+      } else if (filterInputs.searchType === '신청자') {
+        filteredData = filteredData.filter(application => 
+          application.drafter.toLowerCase().includes(keyword)
+        );
+      }
+    }
+
+    const selectedStatuses = [];
+    if (filters.statusApproved) selectedStatuses.push('승인완료');
+    if (filters.statusRejected) selectedStatuses.push('반려');
+    if (filters.statusOrdered) selectedStatuses.push('발주완료');
+    if (filters.statusClosed) selectedStatuses.push('처리완료');
+
+    if (selectedStatuses.length > 0) {
+      filteredData = filteredData.filter(application =>
+        selectedStatuses.includes(application.applyStatus)
+      );
+    }
+
+    console.log("필터링 완료된 데이터:", filteredData);
+    setFilteredApplications(filteredData);
+  }, [applications, filterInputs, filters]);
+        
   const fetchApplications = async (filterParams = {}) => {
     setLoading(true);
     setError(null);
@@ -102,10 +152,6 @@ function ApplicationsList() {
       const response = await axios.get('/api/applyList', {
         params: {
           documentType: filterParams.documentType || documentTypeFromUrl || null,
-          startDate: filterParams.startDate || '',
-          endDate: filterParams.endDate || '',
-          searchType: filterParams.searchType || '전체',
-          keyword: filterParams.keyword || '',
           instCd: instCd || '',
           instNm: selectedCenter || '',
         },
@@ -179,9 +225,9 @@ function ApplicationsList() {
   }, [filters]);
 
   useEffect(() => {
-    applyStatusFilters(applications);
-  }, [filters, applications, applyStatusFilters]);
-
+    applyFilters(); 
+  }, [filters]);  
+  
   useEffect(() => {
     resetFilters();
     fetchApplications();
@@ -224,18 +270,12 @@ function ApplicationsList() {
       [name]: !prevFilters[name],
     }));
   };
-
-  const handleSearch = (searchParams) => {
-    fetchApplications({
-      documentType: filterInputs.documentType,
-      startDate: filterInputs.startDate ? filterInputs.startDate.toISOString().split('T')[0] : '',
-      endDate: filterInputs.endDate ? filterInputs.endDate.toISOString().split('T')[0] : '',
-      searchType: searchParams.searchType,
-      keyword: searchParams.keyword,
-      instCd: instCd,
-    });
+        
+  const handleSearch = () => {
+    console.log("조회 버튼이 클릭되었습니다");
+    applyFilters();
   };
-
+      
   const handleReset = () => {
     resetFilters();
     fetchApplications();
@@ -397,6 +437,7 @@ function ApplicationsList() {
           setSearchType={(searchType) => setFilterInputs(prev => ({ ...prev, searchType }))}
           keyword={filterInputs.keyword}
           setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
+          searchOptions={['전체', '제목', '신청자']} 
         />
         {loading ? (
           <p>로딩 중...</p>

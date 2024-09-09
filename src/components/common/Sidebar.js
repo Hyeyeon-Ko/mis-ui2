@@ -95,8 +95,8 @@ function Sidebar() {
     ],
     'F': [
       { title: '자산 관리', items: [
-        { label: '렌탈현황 목록표', url: '/api/rentalList', subIndex: 'F-1' },
-        { label: '전국 렌탈현황 목록표', url: '/api/totalRentalList', subIndex: 'F-2' },
+        { label: '렌탈현황 관리표', url: '/api/rentalList', subIndex: 'F-1' },
+        { label: '전국 렌탈현황 관리표', url: '/api/totalRentalList', subIndex: 'F-2' },
       ]}
     ]
   };
