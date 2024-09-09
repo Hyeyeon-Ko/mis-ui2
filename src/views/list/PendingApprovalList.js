@@ -146,7 +146,7 @@ function PendingApprovalList() {
 
   const fetchSealImprintDetail = async (draftId) => {
     try {
-      const response = await axios.get(`/api/seal/imprint/${draftId}`);
+      const response = await axios.get(`${apiUrl}/api/seal/imprint/${draftId}`);
       return response.data.data;
     } catch (error) {
       console.error('Error fetching seal imprint details:', error);
@@ -156,7 +156,7 @@ function PendingApprovalList() {
 
   const fetchSealExportDetail = async (draftId) => {
     try {
-      const response = await axios.get(`/api/seal/export/${draftId}`);
+      const response = await axios.get(`${apiUrl}/api/seal/export/${draftId}`);
       return response.data.data;
     } catch (error) {
       console.error('Error fetching seal export details:', error);
@@ -209,7 +209,7 @@ function PendingApprovalList() {
 
   const approveDocument = async (documentId) => {
     try {
-      await axios.put(`/api/doc/confirm`, null, {
+      await axios.put(`${apiUrl}/api/doc/confirm`, null, {
         params: { draftId: documentId },
       });
       alert('승인이 완료되었습니다.');

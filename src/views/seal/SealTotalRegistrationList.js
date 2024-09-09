@@ -52,7 +52,7 @@ function SealTotalRegistrationList() {
       }
     } else {
       try {
-        const response = await axios.get(`/api/seal/registrationList?instCd=${selectedCenter}`);
+        const response = await axios.get(`${apiUrl}/api/seal/registrationList?instCd=${selectedCenter}`);
         setFilteredApplications(response.data.data);
       } catch (error) {
         console.error('Error fetching center registration list:', error);

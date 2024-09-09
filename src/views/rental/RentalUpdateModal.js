@@ -158,7 +158,7 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         specialNote,
       };
 
-      axios.put(`/api/rental/?detailId=${rentalData.detailId}`, payload)
+      axios.put(`${apiUrl}/api/rental/?detailId=${rentalData.detailId}`, payload)
         .then(response => {
           console.log('Data successfully saved:', response.data);
           onSave([payload]);
