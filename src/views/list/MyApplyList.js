@@ -1,4 +1,4 @@
-import React, { useState, useContext, useCallback } from 'react';
+import React, { useState, useContext, useCallback, useEffect } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import DateFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
@@ -11,31 +11,35 @@ import axios from 'axios';
 
 function MyApplyList() {
   const { auth } = useContext(AuthContext); 
-  const [applications, setApplications] = useState([]);
+  const [applications, setApplications] = useState([]); 
+  const [filteredApplications, setFilteredApplications] = useState([]); 
   const [startDate, setStartDate] = useState(() => {
     const date = new Date();
     date.setMonth(date.getMonth() - 1); 
     return date;
   });
   const [endDate, setEndDate] = useState(new Date());
-  const [documentType, setDocumentType] = useState('');
+  const [documentType, setDocumentType] = useState('');  
+  const [filters, setFilters] = useState({
+    statusApproved: false,
+    statusRejected: false,
+    statusOrdered: false,
+    statusClosed: false,
+  });
   const [showModal, setShowModal] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showRejectionModal, setShowRejectionModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [viewedRejections, setViewedRejections] = useState(new Set(JSON.parse(localStorage.getItem('viewedRejections')) || []));
 
-  const fetchApplications = useCallback(async (filterParams = {}) => {
+  const fetchApplications = useCallback(async () => {
     try {
       const response = await axios.get('/api/myApplyList', {
         params: {
-          documentType: filterParams.documentType || documentType || null,
-          startDate: filterParams.startDate || startDate.toISOString().split('T')[0],
-          endDate: filterParams.endDate || endDate.toISOString().split('T')[0],
           userId: auth.userId, 
         },
       });
-
+  
       const data = response.data?.data || {};
       const combinedData = [
         ...(data.myBcdResponses || []),
@@ -43,7 +47,7 @@ function MyApplyList() {
         ...(data.myCorpDocResponses || []),
         ...(data.mySealResponses || []),
       ];
-    
+  
       const uniqueData = combinedData.reduce((acc, current) => {
         const x = acc.find(item => item.draftId === current.draftId && item.docType === current.docType);
         if (!x) {
@@ -52,12 +56,8 @@ function MyApplyList() {
           return acc;
         }
       }, []);
-
-      const filteredData = documentType
-        ? uniqueData.filter(application => application.docType === documentType)
-        : uniqueData;
-
-      const transformedData = filteredData
+  
+      const transformedData = uniqueData
         .filter(application => application.applyStatus !== 'X')
         .map(application => ({
           ...application,
@@ -68,39 +68,110 @@ function MyApplyList() {
           rejectionReason: application.rejectReason,
           manager: application.approver || application.disapprover || '',
         }));
-
-      transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
   
       setApplications(transformedData);
+      setFilteredApplications(transformedData); 
     } catch (error) {
       console.error('Error fetching applications:', error.response?.data || error.message);
     }
-  }, [documentType, startDate, endDate, auth.userId]);
+  }, [auth.userId]);
 
-  const parseDateTime = (dateString) => {
-    const date = new Date(dateString);
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  useEffect(() => {
+    fetchApplications();  
+  }, [fetchApplications]);
+
+  useEffect(() => {
+    applyStatusFilters();
+  }, [filters]);
+
+  const applyStatusFilters = () => {
+    let filteredData = applications;
+
+    const selectedStatuses = [];
+    if (filters.statusApproved) selectedStatuses.push('승인완료');
+    if (filters.statusRejected) selectedStatuses.push('반려');
+    if (filters.statusOrdered) selectedStatuses.push('발주완료');
+    if (filters.statusClosed) selectedStatuses.push('처리완료');
+
+    if (selectedStatuses.length > 0) {
+      filteredData = filteredData.filter(application =>
+        selectedStatuses.includes(application.applyStatus)
+      );
+    } else {
+      filteredData = [...applications]; 
+    }
+
+    setFilteredApplications(filteredData);
   };
 
+  const applyFilters = () => {
+    let filteredData = applications;
+
+    if (startDate) {
+      const startOfDay = new Date(startDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      filteredData = filteredData.filter(application => new Date(application.draftDate) >= startOfDay);
+    }
+
+    if (endDate) {
+      const endOfDay = new Date(endDate);
+      endOfDay.setHours(23, 59, 59, 999);
+      filteredData = filteredData.filter(application => new Date(application.draftDate) <= endOfDay);
+    }
+
+    if (documentType) {
+      filteredData = filteredData.filter(application => application.docType === documentType);
+    }
+
+    setFilteredApplications(filteredData);
+  };
+  
+  const parseDateTime = (dateString) => {
+    const date = new Date(dateString);
+  
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+  
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  };
+    
   const getStatusText = (status) => {
     switch (status) {
-      case 'A':
-        return '승인대기';
-      case 'B':
-        return '승인완료';
-      case 'C':
-        return '반려';
-      case 'D':
-        return '발주완료';
-      case 'E':
-        return '처리완료';
-      case 'F':
-        return '신청취소';
-      case 'G':
-        return '발급완료';
-      default:
-        return status;
+      case 'A': return '승인대기';
+      case 'B': return '승인완료';
+      case 'C': return '반려';
+      case 'D': return '발주완료';
+      case 'E': return '처리완료';
+      case 'F': return '신청취소';
+      case 'G': return '발급완료';
+      default: return status;
     }
+  };
+
+  const handleFilterChange = (e) => {
+    const { name } = e.target;
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [name]: !prevFilters[name],
+    }));
+  };
+      
+  const handleReset = () => {
+    const defaultStartDate = new Date();
+    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
+    setStartDate(defaultStartDate);
+    setEndDate(new Date());
+    setDocumentType('');
+    setFilters({
+      statusApproved: false,
+      statusRejected: false,
+      statusOrdered: false,
+      statusClosed: false,
+    });
+    setFilteredApplications(applications); 
   };
 
   const handleButtonClick = (application) => {
@@ -144,7 +215,7 @@ function MyApplyList() {
         '명함 수령이 확인되었습니다.';
 
         alert(successMessage);
-        fetchApplications();
+        fetchApplications(); 
       } catch (error) {
         console.error('Error completing application:', error.response?.data || error.message);
       } finally {
@@ -152,23 +223,6 @@ function MyApplyList() {
         setSelectedApplication(null);
       }
     }
-  };
-
-  const handleSearch = () => {
-    fetchApplications({
-      documentType: documentType || null,
-      startDate: startDate ? startDate.toISOString().split('T')[0] : '',
-      endDate: endDate ? endDate.toISOString().split('T')[0] : '',
-    });
-  };
-
-  const handleReset = () => {
-    const defaultStartDate = new Date();
-    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
-    setStartDate(defaultStartDate);
-    setEndDate(new Date());
-    setDocumentType('');
-    fetchApplications();
   };
 
   const applicationColumns = [
@@ -222,11 +276,15 @@ function MyApplyList() {
           setEndDate={setEndDate}
           documentType={documentType}
           setDocumentType={setDocumentType} 
-          onSearch={handleSearch}
+          onSearch={applyFilters}
           onReset={handleReset}
-          setFilters={() => {}} 
+          showStatusFilters={true}
+          forceShowAllStatusFilters={true}
+          filters={filters}
+          setFilters={setFilters}
+          onFilterChange={handleFilterChange}
         />
-        <Table columns={applicationColumns} data={applications} />
+        <Table columns={applicationColumns} data={filteredApplications} />
       </div>
       {showModal && (
         <ConfirmModal
