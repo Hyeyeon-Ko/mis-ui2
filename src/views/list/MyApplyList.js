@@ -67,7 +67,8 @@ function MyApplyList() {
           applyStatus: getStatusText(application.applyStatus),
           rejectionReason: application.rejectReason,
           manager: application.approver || application.disapprover || '',
-        }));
+        }))
+        .sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
   
       setApplications(transformedData);
       setFilteredApplications(transformedData); 
@@ -80,11 +81,7 @@ function MyApplyList() {
     fetchApplications();  
   }, [fetchApplications]);
 
-  useEffect(() => {
-    applyStatusFilters();
-  }, [filters]);
-
-  const applyStatusFilters = () => {
+  const applyStatusFilters = useCallback(() => {
     let filteredData = applications;
 
     const selectedStatuses = [];
@@ -102,7 +99,11 @@ function MyApplyList() {
     }
 
     setFilteredApplications(filteredData);
-  };
+  }, [applications, filters]);
+
+  useEffect(() => {
+    applyStatusFilters();
+  }, [filters, applyStatusFilters]);
 
   const applyFilters = () => {
     let filteredData = applications;

@@ -23,13 +23,6 @@ function DocOutList() {
     keyword: '',
   });
 
-  const [filters, setFilters] = useState({
-    statusApproved: false,
-    statusRejected: false,
-    statusOrdered: false,
-    statusClosed: false,
-  });
-
   const fetchDocOutList = useCallback(async () => {
     try {
       const response = await axios.get('/api/doc/sendList', {
@@ -151,23 +144,6 @@ function DocOutList() {
     });
     setFilteredApplications(applications); 
   };
-
-  const applyStatusFilters = useCallback(
-    (applications) => {
-      return applications.filter((app) => {
-        if (filters.statusApproved && app.status === '승인완료') return true;
-        if (filters.statusRejected && app.status === '반려') return true;
-        if (filters.statusOrdered && app.status === '발주완료') return true;
-        if (filters.statusClosed && app.status === '처리완료') return true;
-        return !Object.values(filters).some(Boolean);
-      });
-    },
-    [filters]
-  );
-
-  useEffect(() => {
-    setFilteredApplications(applyStatusFilters(applications));
-  }, [filters, applications, applyStatusFilters]);
 
   const columns = [
     { header: '접수일자', accessor: 'draftDate', width: '8%' },
