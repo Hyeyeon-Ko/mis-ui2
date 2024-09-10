@@ -50,28 +50,43 @@ function SealApplyExport() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
+        const submission = e.target.elements.destination.value.trim();
+        const department = e.target.elements.department.value.trim();
+        const draftNm = e.target.elements.draftNm.value.trim();
+        const exportDate = e.target.elements.exportDate.value.trim();
+        const returnDate = e.target.elements.returnDate.value.trim();
+        const purpose = e.target.elements.purpose.value.trim();
+        const corporateSealQuantity = sealSelections.corporateSeal.selected ? sealSelections.corporateSeal.quantity : '';
+        const facsimileSealQuantity = sealSelections.facsimileSeal.selected ? sealSelections.facsimileSeal.quantity : '';
+        const companySealQuantity = sealSelections.companySeal.selected ? sealSelections.companySeal.quantity : '';
+    
+        if (!submission || !department || !draftNm || !exportDate || !returnDate || !purpose || (!corporateSealQuantity && !facsimileSealQuantity && !companySealQuantity)) {
+            alert('모든 필수 항목을 입력해주세요.');
+            return; 
+        }
+    
         const selectedSeals = {
-            corporateSeal: sealSelections.corporateSeal.selected ? sealSelections.corporateSeal.quantity : '',
-            facsimileSeal: sealSelections.facsimileSeal.selected ? sealSelections.facsimileSeal.quantity : '',
-            companySeal: sealSelections.companySeal.selected ? sealSelections.companySeal.quantity : '',
+            corporateSeal: corporateSealQuantity,
+            facsimileSeal: facsimileSealQuantity,
+            companySeal: companySealQuantity,
         };
-
+    
         const exportRequestDTO = {
             drafter: auth.hngNm,
             drafterId: auth.userId,
-            submission: e.target.elements.destination.value,
-            useDept: e.target.elements.department.value,
-            expNm: e.target.elements.draftNm.value,
-            expDate: e.target.elements.exportDate.value,
-            returnDate: e.target.elements.returnDate.value,
+            submission: submission,
+            useDept: department,
+            expNm: draftNm,
+            expDate: exportDate,
+            returnDate: returnDate,
             corporateSeal: selectedSeals.corporateSeal,
             facsimileSeal: selectedSeals.facsimileSeal,
             companySeal: selectedSeals.companySeal,
-            purpose: e.target.elements.purpose.value,
+            purpose: purpose,
             instCd: auth.instCd,
         };
-
+    
         const formData = new FormData();
         formData.append('exportRequestDTO', new Blob([JSON.stringify(exportRequestDTO)], {
             type: 'application/json'
@@ -79,7 +94,7 @@ function SealApplyExport() {
         if (file) {
             formData.append('file', file); 
         }
-
+    
         try {
             const response = await axios.post('/api/seal/export', formData, {
                 headers: {
@@ -94,7 +109,7 @@ function SealApplyExport() {
             alert('반출 신청 중 오류가 발생했습니다. 다시 시도해주세요.');
         }
     };
-
+    
     return (
         <div className="content">
             <div className="seal-export-content">
