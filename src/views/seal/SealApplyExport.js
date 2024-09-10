@@ -50,7 +50,7 @@ function SealApplyExport() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+        
         const submission = e.target.elements.destination.value.trim();
         const department = e.target.elements.department.value.trim();
         const draftNm = e.target.elements.draftNm.value.trim();
@@ -60,18 +60,23 @@ function SealApplyExport() {
         const corporateSealQuantity = sealSelections.corporateSeal.selected ? sealSelections.corporateSeal.quantity : '';
         const facsimileSealQuantity = sealSelections.facsimileSeal.selected ? sealSelections.facsimileSeal.quantity : '';
         const companySealQuantity = sealSelections.companySeal.selected ? sealSelections.companySeal.quantity : '';
+        
+        if (!corporateSealQuantity && !facsimileSealQuantity && !companySealQuantity) {
+            alert('최소 하나의 인감을 선택해야 합니다.');
+            return;
+        }
     
-        if (!submission || !department || !draftNm || !exportDate || !returnDate || !purpose || (!corporateSealQuantity && !facsimileSealQuantity && !companySealQuantity)) {
+        if (!submission || !department || !draftNm || !exportDate || !returnDate || !purpose) {
             alert('모든 필수 항목을 입력해주세요.');
             return; 
         }
-    
+        
         const selectedSeals = {
             corporateSeal: corporateSealQuantity,
             facsimileSeal: facsimileSealQuantity,
             companySeal: companySealQuantity,
         };
-    
+        
         const exportRequestDTO = {
             drafter: auth.hngNm,
             drafterId: auth.userId,
@@ -86,7 +91,7 @@ function SealApplyExport() {
             purpose: purpose,
             instCd: auth.instCd,
         };
-    
+        
         const formData = new FormData();
         formData.append('exportRequestDTO', new Blob([JSON.stringify(exportRequestDTO)], {
             type: 'application/json'
@@ -94,7 +99,7 @@ function SealApplyExport() {
         if (file) {
             formData.append('file', file); 
         }
-    
+        
         try {
             const response = await axios.post('/api/seal/export', formData, {
                 headers: {
@@ -109,7 +114,7 @@ function SealApplyExport() {
             alert('반출 신청 중 오류가 발생했습니다. 다시 시도해주세요.');
         }
     };
-    
+        
     return (
         <div className="content">
             <div className="seal-export-content">
@@ -126,6 +131,7 @@ function SealApplyExport() {
                                 <input
                                     type="text"
                                     name="destination"
+                                    required
                                 />
                             </div>
                             <div className='seal-export-form-group'>
@@ -133,12 +139,14 @@ function SealApplyExport() {
                                 <input
                                     type="text"
                                     name="department"
+                                    required
                                 />
                             </div>
                             <div className='seal-export-form-group'>
                                 <label>사용용도</label>
                                 <textarea
                                     name="purpose"
+                                    required
                                 />
                             </div>
                             <div className='seal-imprint-form-group'>
@@ -229,6 +237,7 @@ function SealApplyExport() {
                                 <input
                                     type="text"
                                     name="draftNm"
+                                    required
                                 />
                             </div>
                             <div className='seal-export-form-group'>
@@ -236,6 +245,7 @@ function SealApplyExport() {
                                 <input
                                     type="text"
                                     name="exportDate"
+                                    required
                                 />
                             </div>
                             <div className='seal-export-form-group'>
@@ -243,6 +253,7 @@ function SealApplyExport() {
                                 <input
                                     type="text"
                                     name="returnDate"
+                                    required
                                 />
                             </div>
                             <div className='seal-export-form-group'>

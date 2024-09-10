@@ -47,24 +47,29 @@ function SealApplyImprint() {
         const submission = e.target.elements.destination.value.trim();
         const useDate = e.target.elements.useDate.value.trim();
         const purpose = e.target.elements.purpose.value.trim();
-        const corporateSealQuantity = sealSelections.corporateSeal.selected ? sealSelections.corporateSeal.quantity : '';
-        const facsimileSealQuantity = sealSelections.facsimileSeal.selected ? sealSelections.facsimileSeal.quantity : '';
-        const companySealQuantity = sealSelections.companySeal.selected ? sealSelections.companySeal.quantity : '';
     
-        if (!submission || !useDate || !purpose || (!corporateSealQuantity && !facsimileSealQuantity && !companySealQuantity)) {
-            alert('모든 필수 항목을 입력해주세요.');
-            return; 
+        const isAnySealSelected = sealSelections.corporateSeal.selected || sealSelections.facsimileSeal.selected || sealSelections.companySeal.selected;
+    
+        if (!isAnySealSelected) {
+            alert('최소 하나의 인감을 선택해야 합니다.');
+            return;
         }
+    
+        const selectedSeals = {
+            corporateSeal: sealSelections.corporateSeal.selected ? sealSelections.corporateSeal.quantity : '',
+            facsimileSeal: sealSelections.facsimileSeal.selected ? sealSelections.facsimileSeal.quantity : '',
+            companySeal: sealSelections.companySeal.selected ? sealSelections.companySeal.quantity : '',
+        };
     
         const imprintRequestDTO = {
             drafter: auth.hngNm,
             drafterId: auth.userId,
-            submission: submission,
-            useDate: useDate,
-            corporateSeal: corporateSealQuantity,
-            facsimileSeal: facsimileSealQuantity,
-            companySeal: companySealQuantity,
-            purpose: purpose,
+            submission,
+            useDate,
+            corporateSeal: selectedSeals.corporateSeal,
+            facsimileSeal: selectedSeals.facsimileSeal,
+            companySeal: selectedSeals.companySeal,
+            purpose,
             notes: e.target.elements.notes.value,
             instCd: auth.instCd,
         };
@@ -94,15 +99,15 @@ function SealApplyImprint() {
                             </div>
                             <div className='seal-imprint-form-group'>
                                 <label>제출처</label>
-                                <input type="text" name="destination" />
+                                <input type="text" name="destination" required/>
                             </div>
                             <div className='seal-imprint-form-group'>
                                 <label>사용일자</label>
-                                <input type="text" name="useDate" />
+                                <input type="text" name="useDate" required/>
                             </div>
                             <div className='seal-imprint-form-group'>
                                 <label>사용목적</label>
-                                <textarea name="purpose" />
+                                <textarea name="purpose" required/>
                             </div>
                             <div className='seal-imprint-form-group'>
                                 <label>인장구분</label>
