@@ -266,11 +266,6 @@ function DetailCorpDocApplication() {
         }
     };
 
-    useEffect(() => {
-        console.log('isEdit:', isEdit);
-    }, [isEdit]);
-    
-
     return (
         <div className="content">
             <div className="corpDoc-content">

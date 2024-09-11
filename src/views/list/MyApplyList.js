@@ -258,7 +258,16 @@ function MyApplyList() {
           >
             {row.applyStatus}
           </button>
-        ) : (
+        ) :
+        row.applyStatus === '처리완료' ? (
+          <span style={{
+            fontWeight: row.applyStatus === '처리완료' ? 'bold' : 'normal',
+            color: row.applyStatus === '처리완료' ? 'rgb(169, 169, 169)' : 'rgb(255, 255, 255)'
+          }}>
+            {row.applyStatus}
+          </span>
+        )
+        : (
           row.applyStatus
         )
       ),

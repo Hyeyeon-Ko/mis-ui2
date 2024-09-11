@@ -48,3 +48,9 @@
   margin-left: 3px;
   vertical-align: middle;
 }
+
+.notification-icon {
+  width: 22px;
+  height: 22px;
+  vertical-align: middle;
+}

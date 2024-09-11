@@ -1,5 +1,6 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { subscribeToNotifications } from './SseSubscribe';
 
 // AuthContext 생성 -> 인증 상태 저장
 export const AuthContext = createContext();
@@ -7,6 +8,8 @@ export const AuthContext = createContext();
 // AuthProvider 컴포넌트 -> 인증 상태 제공
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
+  const [notifications, setNotifications] = useState([]);
+  const eventSourceRef = useRef(null);
   const [auth, setAuth] = useState({
     userId: '',
     hngNm: '',
@@ -23,6 +26,10 @@ export const AuthProvider = ({ children }) => {
 
   // 앱 로드 시 세션 스토리지에서 인증 상태를 불러옴
   useEffect(() => {
+
+    const storedNotifications = JSON.parse(sessionStorage.getItem('notifications')) || [];
+    setNotifications(storedNotifications); 
+
     const storedAuth = {
       userId: sessionStorage.getItem('userId'),
       hngNm: sessionStorage.getItem('hngNm'),
@@ -72,6 +79,11 @@ export const AuthProvider = ({ children }) => {
       originalRole: role,
     };
     setAuth(newAuthState);
+
+    if (!eventSourceRef.current) {
+      eventSourceRef.current = subscribeToNotifications(userId, setNotifications);
+    }
+
     navigate('/');  
   };
 
@@ -100,6 +112,12 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.removeItem('teamCd'); 
     sessionStorage.removeItem('isUserMode');
     sessionStorage.removeItem('originalRole');
+    sessionStorage.removeItem('notifications');
+
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
 
     sessionStorage.clear();
     navigate('/api/login');
@@ -117,7 +135,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ auth, login, logout, toggleMode }}>
+    <AuthContext.Provider value={{ auth, login, logout, toggleMode, notifications }}>
       {children}
     </AuthContext.Provider>
   );
