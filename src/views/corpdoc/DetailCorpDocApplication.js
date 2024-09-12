@@ -16,7 +16,7 @@ function DetailCorpDocApplication() {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const applyStatus = queryParams.get('applyStatus'); 
-    const { auth } = useContext(AuthContext);
+    const { auth, refreshSidebar } = useContext(AuthContext);
     const [formData, setFormData] = useState({
         submission: '',
         purpose: '',
@@ -241,6 +241,7 @@ function DetailCorpDocApplication() {
         try {
             await axios.put(`/api/corpDoc/approve?draftId=${draftId}`);
             alert('문서가 승인되었습니다.');
+            await refreshSidebar(); 
             navigate('/api/pendingList?documentType=법인서류');
         } catch (error) {
             console.error('Error approving document:', error);
@@ -257,6 +258,7 @@ function DetailCorpDocApplication() {
             });
             if (response.data.code === 200) {
                 alert('법인서류 신청이 반려되었습니다.');
+                await refreshSidebar(); 
                 navigate('/api/pendingList?documentType=법인서류');
             } else {
                 alert('법인서류 신청 반려 중 오류가 발생하였습니다.');

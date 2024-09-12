@@ -273,9 +273,7 @@ function BcdApplySecond() {
       division: formData.cardType === 'personal' ? 'B' : 'A',
       quantity: formData.quantity,
     };
-  
-    console.log('Final requestData:', requestData);
-  
+    
     try {
       const response = await axios.post('/api/bcd/', requestData);
       if (response.data.code === 200) {
@@ -290,7 +288,6 @@ function BcdApplySecond() {
   };
   
   useEffect(() => {
-    console.log('formData: ', formData);
   }, [formData]);
 
   const handleCenterChange = (e) => {

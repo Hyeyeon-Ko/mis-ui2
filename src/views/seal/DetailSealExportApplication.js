@@ -14,16 +14,13 @@ import downloadIcon from '../../assets/images/download.png';
 import deleteIcon from '../../assets/images/delete2.png';
 
 function DetailSealExportApplication() {
-    const { auth } = useContext(AuthContext);
+    const { auth, refreshSidebar } = useContext(AuthContext);
     const { draftId } = useParams(); 
     const navigate = useNavigate();
     const location = useLocation();
     const { sealExportDetails, readOnly } = location.state || {};
     const queryParams = new URLSearchParams(location.search);
     const applyStatus = queryParams.get('applyStatus'); 
-
-    console.log(applyStatus);
-
 
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [sealSelections, setSealSelections] = useState({
@@ -230,19 +227,18 @@ function DetailSealExportApplication() {
         }
     };
 
-    const handleApproval = (e) => {
-        e.preventDefault();  
-        axios.post(`/api/seal/${draftId}`) 
-        .then(response => {
-            console.log('Approval Response:', response.data);
-            alert('인장 신청이 성공적으로 승인되었습니다.');
-            navigate('/api/pendingList?documentType=인장신청');
-        })
-        .catch(error => {
-            console.error('Error approving application:', error);
-            alert('인장 신청 승인 중 오류가 발생했습니다. 다시 시도해주세요.');
-            navigate('/api/pendingList?documentType=인장신청');
-        });
+    const handleApproval = async (e) => {
+        e.preventDefault();
+        try {
+          await axios.post(`/api/seal/${draftId}`);
+          alert('인장 신청이 성공적으로 승인되었습니다.');
+          await refreshSidebar();
+          navigate('/api/pendingList?documentType=인장신청');
+        } catch (error) {
+          console.error('Error approving application:', error);
+          alert('인장 신청 승인 중 오류가 발생했습니다.');
+          navigate('/api/pendingList?documentType=인장신청');
+        }
     };
 
     const handleReject = (e) => {
@@ -263,6 +259,7 @@ function DetailSealExportApplication() {
           });
           if (response.data.code === 200) {
             alert('인장 신청이 반려되었습니다.');
+            await refreshSidebar();
             navigate(`/api/pendingList?documentType=인장신청`);  
           } else {
             alert('인장 반려 중 오류가 발생했습니다.');

@@ -1,16 +1,43 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import '../../styles/common/Sidebar.css';
 import logo from '../../assets/images/logo.png';
 import { AuthContext } from '../AuthContext';
 import dropdownDefaultIcon from '../../assets/images/dropdownDefault.png';
 import dropdownActiveIcon from '../../assets/images/dropdownActive.png';
+import axios from 'axios';
 
-/* Sidebar component */
 function Sidebar() {
   const location = useLocation();
-  const { auth } = useContext(AuthContext);
+  const { auth, sidebarUpdate } = useContext(AuthContext);
 
+  const [pendingCounts, setPendingCounts] = useState({
+    bcdPendingCount: 0,
+    docPendingCount: 0,
+    corpDocPendingCount: 0,
+    sealPendingCount: 0,
+    corpDocIssuePendingCount: 0,
+    orderPendingCount: 0, 
+  });
+
+  useEffect(() => {
+    const fetchPendingCounts = async () => {
+      try {
+        const response = await axios.get('/api/pendingCount', {
+          params: {
+            instCd: auth.instCd,
+            userId: auth.userId,
+          },
+        });
+        setPendingCounts(response.data.data);
+      } catch (error) {
+        console.error('Error fetching pending counts:', error);
+      }
+    };
+  
+    fetchPendingCounts();
+  }, [auth.instCd, auth.userId, sidebarUpdate]); // sidebarUpdate가 변경될 때 사이드바 다시 로드
+  
   const isActive = (url) => {
     const currentPath = location.pathname;
     const currentQueryParams = new URLSearchParams(location.search);
@@ -45,13 +72,13 @@ function Sidebar() {
 
   const bcdItems = [
     { label: '전체 신청내역', url: '/api/applyList?documentType=명함신청' },
-    { label: '승인대기 내역', url: '/api/pendingList?documentType=명함신청' },
-    { label: '명함 발주', url: '/api/bcd/orderList' },
+    { label: '승인대기 내역', url: '/api/pendingList?documentType=명함신청', count: pendingCounts.bcdPendingCount },
+    { label: '명함 발주', url: '/api/bcd/orderList', count: pendingCounts.orderPendingCount }, 
   ];
 
   const docItems = [
     { label: '전체 신청내역', url: '/api/applyList?documentType=문서수발신' },
-    { label: '승인대기 내역', url: '/api/pendingList?documentType=문서수발신' },
+    { label: '승인대기 내역', url: '/api/pendingList?documentType=문서수발신', count: pendingCounts.docPendingCount },
   ];
 
   const docManageItems = [
@@ -64,28 +91,28 @@ function Sidebar() {
     'B': [
       { title: '인장 관리', items: [
         { label: '전체 신청내역', url: '/api/applyList?documentType=인장신청', subIndex: 'B-1' },
-        { label: '승인대기 내역', url: '/api/pendingList?documentType=인장신청', subIndex: 'B-1' },      
+        { label: '승인대기 내역', url: '/api/pendingList?documentType=인장신청', count: pendingCounts.sealPendingCount , subIndex: 'B-1' },
       ]},
       { title: '인장 대장', items: [
-        { label: '인장 관리대장', url: '/api/seal/managementList', subIndex: 'B-1' },
-        { label: '인장 반출대장', url: '/api/seal/exportList', subIndex: 'B-1' },
-        { label: '인장 등록대장', url: '/api/seal/registrationList', subIndex: 'B-1' },
+        { label: '인장 관리대장', url: '/api/seal/managementList', subIndex: 'B-1'  },
+        { label: '인장 반출대장', url: '/api/seal/exportList', subIndex: 'B-1'  },
+        { label: '인장 등록대장', url: '/api/seal/registrationList', subIndex: 'B-1'  },
         { label: '전국 인장 등록대장', url: '/api/seal/sealRegistrationList', subIndex: 'B-2' },
       ]}
     ],
     'C': [
       { title: '법인서류 관리', items: [
         { label: '전체 신청내역', url: '/api/applyList?documentType=법인서류', subIndex: 'C-1' },
-        { label: '승인대기 내역', url: '/api/pendingList?documentType=법인서류', subIndex: 'C-1' },
+        { label: '승인대기 내역', url: '/api/pendingList?documentType=법인서류', count: pendingCounts.corpDocPendingCount, subIndex: 'C-1' },
       ]},
       { title: '법인서류 대장', items: [
-        { label: '서류 발급 대장', url: '/api/corpDoc/issueList', subIndex: 'C-2' },
+        { label: '서류 발급 대장', url: '/api/corpDoc/issueList', count: pendingCounts.corpDocIssuePendingCount, subIndex: 'C-2' },
         { label: '서류 수불 대장', url: '/api/corpDoc/rnpList', subIndex: 'C-1' },
       ]}
     ],
     'D': [
       { title: '문서수발신 관리', items: docItems },
-      { title: '문서수발신 대장', items: docManageItems }
+      { title: '문서수발신 대장', items: docManageItems },
     ],
     'E': [
       { title: '문서 관리', items: [
@@ -104,7 +131,7 @@ function Sidebar() {
   const filterItemsByPermission = (sectionKey, permissions) => {
     const section = sections[sectionKey];
     if (!section) return [];
-  
+
     return section.map(sectionItem => ({
       ...sectionItem,
       items: sectionItem.items.filter(item => {
@@ -153,7 +180,7 @@ function Sidebar() {
                 items={sectionItem.items}
                 isActive={isActive}
                 location={location}
-                defaultOpen={false}
+                defaultOpen={sectionItem.items.some(item => item.count > 0)}
               />
             ));
           })}
@@ -173,15 +200,19 @@ function Sidebar() {
           )}
         </>
       )}
-      <div className="sidebar-section">
-        <h2 style={{ color: '#EDF1F5' }}>권한 관리</h2>
-      </div>
     </div>
   );
 }
 
 function SidebarSection({ title, items, isActive, location, defaultOpen }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  useEffect(() => {
+    const hasPendingItems = items.some(item => item.count > 0);
+    if (hasPendingItems) {
+      setIsOpen(true);
+    }
+  }, [items]); 
 
   const toggleOpen = () => {
     setIsOpen(!isOpen);
@@ -205,8 +236,11 @@ function SidebarSection({ title, items, isActive, location, defaultOpen }) {
       {isOpen && (
         <ul>
           {items.map((item, index) => (
-            <li key={index}>
-              <Link to={item.url} className={isActive(item.url)}>{item.label}</Link>
+            <li key={index} className="sidebar-item">
+              <Link to={item.url} className={isActive(item.url)}>
+                {item.label}
+                {item.count > 0 && <span className="pending-count">{item.count}</span>}
+              </Link>
             </li>
           ))}
         </ul>

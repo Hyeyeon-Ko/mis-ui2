@@ -35,12 +35,10 @@ const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregist
         userNm: auth.hngNm,
         instCd: auth.instCd
       });
-      console.log("hahah");
     }
   }, [show, auth.userId, auth.hngNm, auth.instCd, totalCorpseal, totalCoregister]);
 
   useEffect(() => {
-    console.log("formData: ", formData);
   }, [formData]);
 
   const handleChange = (e) => {

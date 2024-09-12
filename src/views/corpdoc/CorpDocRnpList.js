@@ -17,7 +17,7 @@ function CorpDocRnpList() {
   const fetchRnpData = useCallback(async () => {
     try {
       const response = await axios.get('/api/corpDoc/rnpList', {
-        params: {instCd: auth.instCd},
+        params: { instCd: auth.instCd },
       });
 
       if (response.data) {
@@ -77,26 +77,27 @@ function CorpDocRnpList() {
       <div className='corpDoc-rnp-list'>
         <h2>서류 수불 대장</h2>
         <Breadcrumb items={['법인서류 대장', '서류 수불 대장']} />
-        {filteredApplications.length > 0 ? (
-          <table className="table">
-            <thead>
-              <tr>
-                <th rowSpan="2">수령일자</th>
-                <th rowSpan="2">신청자</th>
-                <th rowSpan="2">제출처</th>
-                <th rowSpan="2">사용목적</th>
-                <th colSpan="4">법인서류</th>
-                <th rowSpan="2">수령인</th>
-              </tr>
-              <tr>
-                <th>법인인감증명서</th>
-                <th>법인등기사항전부증명서</th>
-                <th>사용인감계</th>
-                <th>위임장</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredApplications.map((app, index) => (
+
+        <table className="table">
+          <thead>
+            <tr>
+              <th rowSpan="2">수령일자</th>
+              <th rowSpan="2">신청자</th>
+              <th rowSpan="2">제출처</th>
+              <th rowSpan="2">사용목적</th>
+              <th colSpan="4">법인서류</th>
+              <th rowSpan="2">수령인</th>
+            </tr>
+            <tr>
+              <th>법인인감증명서</th>
+              <th>법인등기사항전부증명서</th>
+              <th>사용인감계</th>
+              <th>위임장</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredApplications.length > 0 ? (
+              filteredApplications.map((app, index) => (
                 <tr key={index}>
                   <td>{app.date}</td>
                   <td>{app.drafter}</td>
@@ -115,23 +116,20 @@ function CorpDocRnpList() {
                     {app.status}
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div>No data available</div>
-        )}
+              ))
+            ) : (
+              <tr>
+                <td colSpan="9" style={{ textAlign: 'center' }}>데이터가 없습니다</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
       {modalVisible && selectedDocumentDetails && (
         <CorpDocApprovalModal
           show={modalVisible}
           onClose={closeModal}
-          documentDetails={{
-            date: selectedDocumentDetails.date,
-            applicantName: selectedDocumentDetails.applicantName,
-            approvers: selectedDocumentDetails.approvers,
-            signitureImage: selectedDocumentDetails.signitureImage,
-          }}
+          documentDetails={selectedDocumentDetails}
         />
       )}
     </div>

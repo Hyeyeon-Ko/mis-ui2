@@ -22,7 +22,6 @@ function TotalRentalManage() {
           try {
               const response = await axios.get('/api/rentalList/total');
               const { centerResponses, centerRentalResponses, summaryResponses } = response.data.data;
-              console.log(response);
   
               const nationwideCenter = { detailNm: '전국센터', detailCd: 'all' };
               const sortedCenterData = [

@@ -13,7 +13,7 @@ import { AuthContext } from '../../components/AuthContext';
 function PendingApprovalList() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { auth } = useContext(AuthContext); 
+  const { auth, refreshSidebar } = useContext(AuthContext);
   const instCd = auth.instCd;
 
   const [applications, setApplications] = useState([]);
@@ -62,7 +62,8 @@ function PendingApprovalList() {
           documentType,
           startDate: filterParams.startDate || '',
           endDate: filterParams.endDate || '',
-          instCd: instCd || '', 
+          instCd: instCd || '',
+          userId: auth.userId || '', 
         },
       });
 
@@ -118,7 +119,7 @@ function PendingApprovalList() {
     } finally {
       setLoading(false);
     }
-  }, [documentType, instCd]);
+  }, [documentType, instCd, auth.userId]);
 
   useEffect(() => {
     fetchPendingList(filters);
@@ -212,15 +213,20 @@ function PendingApprovalList() {
       });
       alert('승인이 완료되었습니다.');
       closeModal();
-      fetchPendingList(filters);
       
+      fetchPendingList(filters);
+  
+      if (typeof refreshSidebar === 'function') {
+        refreshSidebar();  
+      }
+
       navigate(`/api/pendingList?documentType=${documentType}`);
     } catch (error) {
       console.error('Error approving document:', error);
       alert('Error approving document.');
     }
   };
-  
+    
   const normalizeDate = (dateString) => {
     const date = new Date(dateString);
     date.setHours(0, 0, 0, 0);
@@ -274,8 +280,10 @@ function PendingApprovalList() {
           setFilters={setFilters}
           onSearch={handleSearch}
           onReset={handleReset}
-          showDocumentType={false} // 검색 조건 없이 필터만 사용
-          showSearchCondition={false} // searchType과 keyword 전달 안 함
+          showDocumentType={false}
+          showSearchCondition={false}
+          setDocumentType={() => {}} 
+          searchOptions={[]}          
         />
         {loading ? (
           <p>로딩 중...</p>

@@ -12,7 +12,7 @@ import { FadeLoader } from 'react-spinners';
 import { AuthContext } from '../../components/AuthContext'; 
 
 function BcdOrder() {
-  const { auth } = useContext(AuthContext); 
+  const { auth, refreshSidebar } = useContext(AuthContext);
   const [applications, setApplications] = useState([]);
   const [selectedApplications, setSelectedApplications] = useState([]);
   const [showEmailModal, setShowEmailModal] = useState(false);
@@ -181,7 +181,7 @@ function BcdOrder() {
   
       setShowEmailModal(false);
       alert('발주 요청이 성공적으로 완료되었습니다.');
-      
+      refreshSidebar();
       navigate('/api/std', { replace: true });
       
     } catch (error) {

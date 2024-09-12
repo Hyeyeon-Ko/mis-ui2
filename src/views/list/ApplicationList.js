@@ -96,7 +96,6 @@ function ApplicationsList() {
   };
 
   const applyFilters = useCallback(() => {
-    console.log("필터링을 시작합니다", filterInputs, filters);
     let filteredData = applications;
 
     if (filterInputs.startDate) {
@@ -141,7 +140,6 @@ function ApplicationsList() {
       );
     }
 
-    console.log("필터링 완료된 데이터:", filteredData);
     setFilteredApplications(filteredData);
   }, [applications, filterInputs, filters]);
         
@@ -153,6 +151,7 @@ function ApplicationsList() {
         params: {
           documentType: filterParams.documentType || documentTypeFromUrl || null,
           instCd: instCd || '',
+          userId: auth.userId || '',
           instNm: selectedCenter || '',
         },
       });
@@ -272,7 +271,6 @@ function ApplicationsList() {
   };
         
   const handleSearch = () => {
-    console.log("조회 버튼이 클릭되었습니다");
     applyFilters();
   };
       

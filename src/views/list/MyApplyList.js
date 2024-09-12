@@ -293,6 +293,7 @@ function MyApplyList() {
           filters={filters}
           setFilters={setFilters}
           onFilterChange={handleFilterChange}
+          searchOptions={[]}          
         />
         <Table columns={applicationColumns} data={filteredApplications} />
       </div>

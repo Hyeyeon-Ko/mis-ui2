@@ -199,6 +199,8 @@ function DocInList() {
           keyword={filterInputs.keyword}
           setKeyword={(keyword) => setFilterInputs((prev) => ({ ...prev, keyword }))}
           searchOptions={['전체', '발신처', '제목', '접수인']} 
+          setDocumentType={() => {}} 
+          setFilters={() => {}}
         />
         <div className="doc-out-content">
           <Table columns={columns} data={filteredApplications} />

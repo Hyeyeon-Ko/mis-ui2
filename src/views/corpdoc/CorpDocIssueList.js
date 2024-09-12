@@ -1,22 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useCallback } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Button from '../../components/common/Button';
 import CustomButton from '../../components/common/CustomButton';
-import ConditionFilter from '../../components/common/ConditionFilter';
 import CorpDocApprovalModal from '../../views/corpdoc/CorpDocApprovalModal';
 import CorpDocStoreModal from './CorpDocStoreModal';
 import IssueModal from '../../components/common/ConfirmModal';
 import SignitureImage from '../../assets/images/signiture.png';
 import axios from 'axios';
+import { AuthContext } from '../../components/AuthContext';
 import '../../styles/corpdoc/CorpDocIssueList.css';
 
 function CorpDocIssueList() {
-  const [applications, setApplications] = useState([]);
+  const { auth, refreshSidebar } = useContext(AuthContext);
   const [filteredApplications, setFilteredApplications] = useState([]);
-  const [pendingApplications, setPendingApplications] = useState([]);
   const [filteredPendingApplications, setFilteredPendingApplications] = useState([]);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
   const [clickedRows, setClickedRows] = useState([]);
@@ -26,14 +23,9 @@ function CorpDocIssueList() {
   const [totalCorpseal, setTotalCorpseal] = useState(0);
   const [totalCoregister, setTotalCoregister] = useState(0);
 
-  useEffect(() => {
-    fetchIssueData();
-  }, []);
-
-  const fetchIssueData = async () => {
+  const fetchIssueData = useCallback(async () => {
     try {
       const response = await axios.get('/api/corpDoc/issueList');
-      console.log("response: ", response);
 
       if (response.data) {
         const issueListData = response.data.data.issueList.map(item => ({
@@ -74,9 +66,7 @@ function CorpDocIssueList() {
           signitureImage: SignitureImage,
         }));
 
-        setApplications(issueListData);
         setFilteredApplications(issueListData);
-        setPendingApplications(issuePendingListData);
         setFilteredPendingApplications(issuePendingListData);
 
         const totalValues = extractTotalValues(issueListData);
@@ -87,9 +77,12 @@ function CorpDocIssueList() {
     } catch (error) {
       console.error("Error fetching issue data:", error);
     }
-  };
+  }, []); 
 
-  // IssueList의 마지막 행의 잔고 값 가져오기
+  useEffect(() => {
+    fetchIssueData();
+  }, [fetchIssueData]);  
+
   const extractTotalValues = (data) => {
     if (!data || !Array.isArray(data)) {
       return { totalCorpseal: 0, totalCoregister: 0 };
@@ -100,50 +93,6 @@ function CorpDocIssueList() {
     const totalCoregister = lastRow?.registry?.left ?? 0;
   
     return { totalCorpseal, totalCoregister };
-  };
-  
-  useEffect(() => {
-    console.log("filtered: ", filteredApplications);
-  }, [filteredApplications]);
-
-  const handleSearch = ({ searchType, keyword, startDate, endDate }, listType = 'applications') => {
-    let filtered = listType === 'applications' ? applications : pendingApplications;
-
-    if (keyword) {
-      filtered = filtered.filter(app => {
-        if (searchType === '제출처') return app.submission.includes(keyword);
-        if (searchType === '사용목적') return app.purpose.includes(keyword);
-        if (searchType === '인장구분') return app.status.includes(keyword);
-        if (searchType === '전체') {
-          return (
-            app.submission.includes(keyword) ||
-            app.purpose.includes(keyword) ||
-            app.status.includes(keyword)
-          );
-        }
-        return true;
-      });
-    }
-
-    if (startDate && endDate) {
-      filtered = filtered.filter(app => {
-        const appDate = new Date(app.date);
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        return appDate >= start && appDate <= end;
-      });
-    }
-
-    if (listType === 'applications') {
-      setFilteredApplications(filtered);
-    } else {
-      setFilteredPendingApplications(filtered);
-    }
-  };
-
-  const closeModal = () => {
-    setModalVisible(false);
-    setSelectedDocumentDetails(null);
   };
 
   const handleRowClick = (status, document) => {
@@ -167,21 +116,21 @@ function CorpDocIssueList() {
     setSelectedPendingApp(app);
     setShowIssueModal(true);
   };
-  
+
   const handleconfirmIssue = async () => {
     if (filteredApplications.length === 0) {
       alert('입고된 서류가 없습니다. 먼저 서류 입고를 해주세요.');
       setShowIssueModal(false);
       return;
     }
-
+  
     const { totalCorpseal, totalCoregister } = extractTotalValues(filteredApplications);
-
+  
     if (totalCorpseal === 0 || totalCoregister === 0) {
       alert('입고된 서류가 없습니다. 서류 입고를 해주세요.');
       return;
     }
-
+  
     try {
       const response = await axios.put(`/api/corpDoc/issue?draftId=${selectedPendingApp.id}`, {
         totalCorpseal,
@@ -191,6 +140,8 @@ function CorpDocIssueList() {
       if (response.status === 200) {
         fetchIssueData();
         setShowIssueModal(false);
+        
+        refreshSidebar();
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -201,74 +152,45 @@ function CorpDocIssueList() {
       setShowIssueModal(false);
     }
   };
-
-  const handleOpenStoreModal = () => {
-    if (filteredApplications && Array.isArray(filteredApplications)) {
-      const { totalCorpseal, totalCoregister } = extractTotalValues(filteredApplications);
-      setTotalCorpseal(totalCorpseal);
-      setTotalCoregister(totalCoregister);
-      setShowStoreModal(true);
-    } else {
-      console.error('Filtered applications data is invalid or not available.');
-      alert('서류 목록을 불러오는 데 문제가 발생했습니다.');
-    }
-  };
   
-  const handleCloseStoreModal = () => {
-    setShowStoreModal(false);
-  };
-
-  const handleStoreSave = () => {
-    fetchIssueData();
-  };
-
   return (
     <div className='content'>
       <div className='corpDoc-issue-list'>
         <h2>서류 발급 대장</h2>
         <div className='corpDoc-header-row'>
           <Breadcrumb items={['법인서류 대장', '서류 발급 대장']} />
-          <CustomButton className="store-button" onClick={handleOpenStoreModal}>
+          <CustomButton className="store-button" onClick={() => setShowStoreModal(true)}>
             입고 등록하기
           </CustomButton>
         </div>
-        {/* <ConditionFilter
-          startDate={startDate}
-          setStartDate={setStartDate}
-          endDate={endDate}
-          setEndDate={setEndDate}
-          onSearch={(searchParams) => handleSearch(searchParams, 'applications')}
-          onReset={() => setFilteredApplications(applications)}
-          showDocumentType={false}
-          showSearchCondition={true}
-          excludeRecipient={true}
-        /> */}
-        {filteredApplications.length > 0 ? (
-          <table className="corpDoc-issue-table">
-            <thead>
-              <tr>
-                <th rowSpan="2">No.</th>
-                <th rowSpan="2">발급/입고일자</th>
-                <th colSpan="2">신청자</th>
-                <th rowSpan="2">제출처</th>
-                <th rowSpan="2">사용목적</th>
-                <th colSpan="3">법인인감증명서</th>
-                <th colSpan="3">법인등기사항전부증명서</th>
-                <th rowSpan="2">결재</th>
-              </tr>
-              <tr>
-                <th>센터</th>
-                <th>이름</th>
-                <th>입고</th>
-                <th>사용</th>
-                <th>잔고</th>
-                <th>입고</th>
-                <th>사용</th>
-                <th>잔고</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredApplications.map((app, index) => (
+
+        {/* 서류 발급 대장 테이블 */}
+        <table className="corpDoc-issue-table">
+          <thead>
+            <tr>
+              <th rowSpan="2">No.</th>
+              <th rowSpan="2">발급/입고일자</th>
+              <th colSpan="2">신청자</th>
+              <th rowSpan="2">제출처</th>
+              <th rowSpan="2">사용목적</th>
+              <th colSpan="3">법인인감증명서</th>
+              <th colSpan="3">법인등기사항전부증명서</th>
+              <th rowSpan="2">결재</th>
+            </tr>
+            <tr>
+              <th>센터</th>
+              <th>이름</th>
+              <th>입고</th>
+              <th>사용</th>
+              <th>잔고</th>
+              <th>입고</th>
+              <th>사용</th>
+              <th>잔고</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredApplications.length > 0 ? (
+              filteredApplications.map((app, index) => (
                 <tr key={index}>
                   <td>{index + 1}</td>
                   <td>{app.issueDate}</td>
@@ -289,37 +211,41 @@ function CorpDocIssueList() {
                     {app.approveStatus}
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div></div>
-        )}
+              ))
+            ) : (
+              <tr>
+                <td colSpan="13" style={{ textAlign: 'center' }}>데이터가 없습니다</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+
+        {/* 발급 대기 목록 테이블 */}
         <div className='corpDoc-issue-pending-list'>
           <h3>발급 대기 목록</h3>
-          {filteredPendingApplications.length > 0 ? (
-            <table className="table">
-              <thead>
-                <tr>
-                  <th rowSpan="2">No.</th>
-                  <th rowSpan="2">사용일자</th>
-                  <th colSpan="2">신청자</th>
-                  <th rowSpan="2">제출처</th>
-                  <th rowSpan="2">사용목적</th>
-                  <th colSpan="4">필요 수량</th>
-                  <th rowSpan="2">발급</th>
-                </tr>
-                <tr>
-                  <th>센터</th>
-                  <th>이름</th>
-                  <th>법인인감증명서</th>
-                  <th>법인등기사항전부증명서</th>
-                  <th>사용인감계</th>
-                  <th>위임장</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredPendingApplications.map((app, index) => (
+          <table className="table">
+            <thead>
+              <tr>
+                <th rowSpan="2">No.</th>
+                <th rowSpan="2">사용일자</th>
+                <th colSpan="2">신청자</th>
+                <th rowSpan="2">제출처</th>
+                <th rowSpan="2">사용목적</th>
+                <th colSpan="4">필요 수량</th>
+                <th rowSpan="2">발급</th>
+              </tr>
+              <tr>
+                <th>센터</th>
+                <th>이름</th>
+                <th>법인인감증명서</th>
+                <th>법인등기사항전부증명서</th>
+                <th>사용인감계</th>
+                <th>위임장</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredPendingApplications.length > 0 ? (
+                filteredPendingApplications.map((app, index) => (
                   <tr key={index}>
                     <td>{index + 1}</td>
                     <td>{app.useDate}</td>
@@ -337,41 +263,38 @@ function CorpDocIssueList() {
                     </Button>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div></div>
-          )}
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="11" style={{ textAlign: 'center' }}>데이터가 없습니다</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
       {modalVisible && selectedDocumentDetails && (
         <CorpDocApprovalModal
           show={modalVisible}
-          onClose={closeModal}
-          documentDetails={{
-            date: selectedDocumentDetails.date,
-            applicantName: selectedDocumentDetails.applicantName,
-            approvers: selectedDocumentDetails.approvers,
-            signitureImage: selectedDocumentDetails.signitureImage,
-          }}
+          onClose={() => setModalVisible(false)}
+          documentDetails={selectedDocumentDetails}
         />
       )}
       {showIssueModal && selectedPendingApp && (
         <IssueModal
           show={showIssueModal}
           onClose={() => setShowIssueModal(false)}
+          onCancel={() => setShowIssueModal(false)}
           onConfirm={handleconfirmIssue}
           message={`법인서류를 발급하시겠습니까?`}
-          onCancel={() => setShowIssueModal(false)}
         />
       )}
       <CorpDocStoreModal
         show={showStoreModal}
-        onClose={handleCloseStoreModal}
-        onSave={handleStoreSave}
+        onClose={() => setShowStoreModal(false)}
         totalCorpseal={totalCorpseal}
         totalCoregister={totalCoregister}
+        onSave={fetchIssueData}
       />
     </div>
   );

@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import '../../styles/corpdoc/CorpDocApprovalModal.css';
+import '../../styles/list/ApprovalModal.css';
 import BlankImage from '../../assets/images/blank.png';
 
-const CorpDocApprovalModal = ({ show, onClose, documentDetails = { signitureImage: BlankImage, approvers: [] } }) => {
+const ApprovalModal = ({ show, onClose, documentDetails = { signitureImage: BlankImage, approvers: [] } }) => {
   if (!show) return null;
 
   const renderApproverInfo = (approver, index) => (
@@ -19,10 +19,10 @@ const CorpDocApprovalModal = ({ show, onClose, documentDetails = { signitureImag
   );
 
   return (
-    <div className="corpdoc-approval-modal-overlay">
-      <div className="corpdoc-approval-modal-container">
-        <div className="corpdoc-approval-modal-header">
-          <h3>법인서류 결재 상세정보</h3>
+    <div className="approval-modal-overlay">
+      <div className="approval-modal-container">
+        <div className="approval-modal-header">
+          <h3>결재 진행 상황</h3>
           <button className="doc-confirm-close-button" onClick={onClose}>X</button>
         </div>
         <table>
@@ -41,8 +41,8 @@ const CorpDocApprovalModal = ({ show, onClose, documentDetails = { signitureImag
                     <img src={documentDetails.signitureImage || BlankImage} alt="Applicant" />
                   </div>
                   <div>
-                    <div>{documentDetails.date}</div>
-                    <div>{documentDetails.applicantName}</div>
+                    <div>임시 신청일자</div>
+                    <div>임시 신청자명</div>
                   </div>
                 </div>
               </td>
@@ -57,12 +57,12 @@ const CorpDocApprovalModal = ({ show, onClose, documentDetails = { signitureImag
   );
 };
 
-CorpDocApprovalModal.propTypes = {
+ApprovalModal.propTypes = {
   show: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   documentDetails: PropTypes.shape({
-    date: PropTypes.string.isRequired,
-    applicantName: PropTypes.string.isRequired,
+    date: PropTypes.string,
+    applicantName: PropTypes.string,
     signitureImage: PropTypes.string,
     approvers: PropTypes.arrayOf(
       PropTypes.shape({
@@ -71,7 +71,7 @@ CorpDocApprovalModal.propTypes = {
         signitureImage: PropTypes.string,
       })
     ),
-  }).isRequired,
+  }),
 };
 
-export default CorpDocApprovalModal;
+export default ApprovalModal;

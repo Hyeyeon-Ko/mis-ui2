@@ -24,6 +24,8 @@ export const AuthProvider = ({ children }) => {
     originalRole: '',
   });
 
+  const [sidebarUpdate, setSidebarUpdate] = useState(false); 
+
   // 앱 로드 시 세션 스토리지에서 인증 상태를 불러옴
   useEffect(() => {
 
@@ -134,8 +136,12 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
+  const refreshSidebar = () => {
+    setSidebarUpdate((prev) => !prev); 
+  };
+
   return (
-    <AuthContext.Provider value={{ auth, login, logout, toggleMode, notifications }}>
+    <AuthContext.Provider value={{ auth, login, logout, toggleMode, notifications, refreshSidebar, sidebarUpdate }}>
       {children}
     </AuthContext.Provider>
   );
