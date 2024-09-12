@@ -27,14 +27,14 @@ const ConditionFilter = ({
   setSearchType,
   keyword,  
   setKeyword,
-  searchOptions = [], // 검색 조건 옵션
+  searchOptions = [], 
   forceShowAllStatusFilters = false,
 }) => {
   const resetFilters = () => {
     const defaultStartDate = new Date();
     defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
-    setStartDate(defaultStartDate);
-    setEndDate(new Date());
+    setStartDate && setStartDate(defaultStartDate);
+    setEndDate && setEndDate(new Date());
     
     if (showSearchCondition) {
       setSearchType('전체');
@@ -63,11 +63,11 @@ const ConditionFilter = ({
   };
 
   const handleStartDateChange = (event) => {
-    setStartDate(event.target.value ? new Date(event.target.value) : null);
+    setStartDate && setStartDate(event.target.value ? new Date(event.target.value) : null);
   };
 
   const handleEndDateChange = (event) => {
-    setEndDate(event.target.value ? new Date(event.target.value) : null);
+    setEndDate && setEndDate(event.target.value ? new Date(event.target.value) : null);
   };
 
   const handleDocumentTypeChange = (event) => {
@@ -203,20 +203,25 @@ const ConditionFilter = ({
   return (
     <div className="all-application-filter-container">
       <div className="all-application-filter">
-        <label>신청일자</label>
-        <input
-          type="date"
-          value={startDate ? formatDate(startDate) : formatDate(new Date(new Date().setMonth(new Date().getMonth() - 1)))}
-          onChange={handleStartDateChange}
-          className="custom-datepicker"
-        />
-        <span> ~ </span>
-        <input
-          type="date"
-          value={endDate ? formatDate(endDate) : formatDate(new Date())}
-          onChange={handleEndDateChange}
-          className="custom-datepicker"
-        />
+        {/* 신청일자 필드, startDate나 endDate가 제공되지 않으면 숨김 */}
+        {(startDate !== null && endDate !== null) && (
+          <>
+            <label>신청일자</label>
+            <input
+              type="date"
+              value={startDate ? formatDate(startDate) : formatDate(new Date(new Date().setMonth(new Date().getMonth() - 1)))}
+              onChange={handleStartDateChange}
+              className="custom-datepicker"
+            />
+            <span> ~ </span>
+            <input
+              type="date"
+              value={endDate ? formatDate(endDate) : formatDate(new Date())}
+              onChange={handleEndDateChange}
+              className="custom-datepicker"
+            />
+          </>
+        )}
         {showDocumentType && (
           <>
             <label>문서분류</label>
@@ -271,9 +276,9 @@ const ConditionFilter = ({
 
 ConditionFilter.propTypes = {
   startDate: PropTypes.instanceOf(Date),
-  setStartDate: PropTypes.func.isRequired,
+  setStartDate: PropTypes.func,
   endDate: PropTypes.instanceOf(Date),
-  setEndDate: PropTypes.func.isRequired,
+  setEndDate: PropTypes.func,
   onSearch: PropTypes.func.isRequired,
   onReset: PropTypes.func.isRequired,
   filters: PropTypes.object,
@@ -288,7 +293,7 @@ ConditionFilter.propTypes = {
   setSearchType: PropTypes.func,  
   keyword: PropTypes.string, 
   setKeyword: PropTypes.func,  
-  searchOptions: PropTypes.arrayOf(PropTypes.string).isRequired, // 추가
+  searchOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default ConditionFilter;

@@ -1,15 +1,21 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import SealApprovalModal from './SealApprovalModal';
+import ConditionFilter from '../../components/common/ConditionFilter'; 
 import SignitureImage from '../../assets/images/signiture.png';
 import '../../styles/seal/SealManagementList.css';
 import { AuthContext } from '../../components/AuthContext';
 
 function SealManagementList() {
   const { auth } = useContext(AuthContext); 
+  const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
+  const [filterInputs, setFilterInputs] = useState({
+    searchType: '전체',
+    keyword: '',
+  });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
@@ -41,8 +47,9 @@ function SealManagementList() {
         status: '결재진행중', 
       }));
   
+      setApplications(fetchedData);
       setFilteredApplications(fetchedData);
-  
+
       const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
       setClickedRows(clickedRows);
     } catch (error) {
@@ -54,10 +61,47 @@ function SealManagementList() {
     fetchSealManagementList();
   }, [fetchSealManagementList]);
 
+  const applyFilters = useCallback(() => {
+    let filteredData = applications;
+
+    const keyword = filterInputs.keyword.toLowerCase().trim();
+    if (keyword) {
+      if (filterInputs.searchType === '전체') {
+        filteredData = filteredData.filter(application =>
+          application.date.toLowerCase().includes(keyword) ||
+          application.submitter.toLowerCase().includes(keyword) ||
+          application.purpose.toLowerCase().includes(keyword)
+        );
+      } else if (filterInputs.searchType === '일자') {
+        filteredData = filteredData.filter(application => 
+          application.date.toLowerCase().includes(keyword)
+        );
+      } else if (filterInputs.searchType === '제출처') {
+        filteredData = filteredData.filter(application => 
+          application.submitter.toLowerCase().includes(keyword)
+        );
+      } else if (filterInputs.searchType === '사용목적') {
+        filteredData = filteredData.filter(application => 
+          application.purpose.toLowerCase().includes(keyword)
+        );
+      }
+    }
+
+    setFilteredApplications(filteredData);
+  }, [applications, filterInputs]);
+
+  const handleReset = () => {
+    setFilterInputs({
+      searchType: '전체',
+      keyword: '',
+    });
+    setFilteredApplications(applications); 
+  };
+
   const handleConfirmDelete = () => {
     setShowDeleteModal(false);
   };
-
+  
   const closeModal = () => {
     setModalVisible(false);
     setSelectedDocumentDetails(null);
@@ -81,25 +125,42 @@ function SealManagementList() {
       setModalVisible(true);
     }
   };
-  
+
   return (
     <div className="content">
       <div className="seal-management-list">
         <h2>인장 관리대장</h2>
         <Breadcrumb items={['인장 대장', '인장 관리대장']} />
+
+        <ConditionFilter
+          startDate={null}  
+          setStartDate={() => {}} 
+          endDate={null} 
+          setEndDate={() => {}} 
+          filters={{}} 
+          setFilters={() => {}}
+          onSearch={applyFilters} 
+          onReset={handleReset} 
+          showStatusFilters={false}
+          showSearchCondition={true}
+          showDocumentType={false}
+          searchType={filterInputs.searchType}
+          setSearchType={(searchType) => setFilterInputs(prev => ({ ...prev, searchType }))}
+          keyword={filterInputs.keyword}
+          setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
+          searchOptions={['전체', '일자', '제출처', '사용목적']}
+        />
+
         <table className="table">
           <thead>
             <tr>
-              <th rowSpan="2">일자</th>
-              <th rowSpan="2">제출처</th>
-              <th rowSpan="2">사용목적</th>
-              <th colSpan="3">인장구분</th>
-              <th rowSpan="2">결재</th>
-            </tr>
-            <tr>
+              <th>일자</th>
+              <th>제출처</th>
+              <th>사용목적</th>
               <th>법인인감</th>
               <th>사용인감</th>
               <th>회사인</th>
+              <th>결재</th>
             </tr>
           </thead>
           <tbody>

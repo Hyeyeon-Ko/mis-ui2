@@ -36,7 +36,7 @@ function Sidebar() {
     };
   
     fetchPendingCounts();
-  }, [auth.instCd, auth.userId, sidebarUpdate]); // sidebarUpdate가 변경될 때 사이드바 다시 로드
+  }, [auth.instCd, auth.userId, sidebarUpdate]); 
   
   const isActive = (url) => {
     const currentPath = location.pathname;

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { AuthContext } from '../../components/AuthContext';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CorpDocApprovalModal from '../../views/corpdoc/CorpDocApprovalModal';
+import ConditionFilter from '../../components/common/ConditionFilter';
 import SignitureImage from '../../assets/images/signiture.png';
 import axios from 'axios';
 import '../../styles/corpdoc/CorpDocRnpList.css';
@@ -9,7 +10,12 @@ import '../../styles/corpdoc/CorpDocRnpList.css';
 function CorpDocRnpList() {
   const { auth } = useContext(AuthContext);
 
-  const [filteredApplications, setFilteredApplications] = useState([]);
+  const [applications, setApplications] = useState([]); 
+  const [filteredApplications, setFilteredApplications] = useState([]); 
+  const [filterInputs, setFilterInputs] = useState({
+    searchType: '전체',
+    keyword: '',
+  });
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
   const [clickedRows, setClickedRows] = useState([]);
@@ -36,6 +42,7 @@ function CorpDocRnpList() {
           approvers: [],
         }));
 
+        setApplications(rnpListData);
         setFilteredApplications(rnpListData);
 
         const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
@@ -49,6 +56,48 @@ function CorpDocRnpList() {
   useEffect(() => {
     fetchRnpData();
   }, [fetchRnpData]);
+
+  const applyFilters = useCallback(() => {
+    let filteredData = applications;
+
+    const keyword = filterInputs.keyword.toLowerCase().trim();
+    if (keyword) {
+      if (filterInputs.searchType === '전체') {
+        filteredData = filteredData.filter(application =>
+          application.drafter.toLowerCase().includes(keyword) ||
+          application.submission.toLowerCase().includes(keyword) ||
+          application.purpose.toLowerCase().includes(keyword) ||
+          application.date.includes(keyword)
+        );
+      } else if (filterInputs.searchType === '수령일자') {
+        filteredData = filteredData.filter(application =>
+          application.date.includes(keyword)
+        );
+      } else if (filterInputs.searchType === '신청자') {
+        filteredData = filteredData.filter(application =>
+          application.drafter.toLowerCase().includes(keyword)
+        );
+      } else if (filterInputs.searchType === '제출처') {
+        filteredData = filteredData.filter(application =>
+          application.submission.toLowerCase().includes(keyword)
+        );
+      } else if (filterInputs.searchType === '사용목적') {
+        filteredData = filteredData.filter(application =>
+          application.purpose.toLowerCase().includes(keyword)
+        );
+      }
+    }
+
+    setFilteredApplications(filteredData);
+  }, [applications, filterInputs]);
+
+  const handleReset = () => {
+    setFilterInputs({
+      searchType: '전체',
+      keyword: '',
+    });
+    setFilteredApplications(applications);
+  };
 
   const closeModal = () => {
     setModalVisible(false);
@@ -77,6 +126,25 @@ function CorpDocRnpList() {
       <div className='corpDoc-rnp-list'>
         <h2>서류 수불 대장</h2>
         <Breadcrumb items={['법인서류 대장', '서류 수불 대장']} />
+
+        <ConditionFilter
+          startDate={null}  
+          setStartDate={() => {}} 
+          endDate={null} 
+          setEndDate={() => {}}         
+          filters={{}}
+          setFilters={() => {}}
+          onSearch={applyFilters} 
+          onReset={handleReset}
+          showStatusFilters={false}
+          showSearchCondition={true}
+          showDocumentType={false}
+          searchType={filterInputs.searchType}
+          setSearchType={(searchType) => setFilterInputs(prev => ({ ...prev, searchType }))}
+          keyword={filterInputs.keyword}
+          setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
+          searchOptions={['전체', '수령일자', '신청자', '제출처', '사용목적']}
+        />
 
         <table className="table">
           <thead>

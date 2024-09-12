@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect, useCallback } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Button from '../../components/common/Button';
 import CustomButton from '../../components/common/CustomButton';
+import ConditionFilter from '../../components/common/ConditionFilter'; 
 import CorpDocApprovalModal from '../../views/corpdoc/CorpDocApprovalModal';
 import CorpDocStoreModal from './CorpDocStoreModal';
 import IssueModal from '../../components/common/ConfirmModal';
@@ -11,9 +12,14 @@ import { AuthContext } from '../../components/AuthContext';
 import '../../styles/corpdoc/CorpDocIssueList.css';
 
 function CorpDocIssueList() {
-  const { auth, refreshSidebar } = useContext(AuthContext);
+  const { refreshSidebar } = useContext(AuthContext);
+  const [applications, setApplications] = useState([]); 
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [filteredPendingApplications, setFilteredPendingApplications] = useState([]);
+  const [filterInputs, setFilterInputs] = useState({
+    searchType: '전체',
+    keyword: '',
+  });
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
   const [clickedRows, setClickedRows] = useState([]);
@@ -37,11 +43,13 @@ function CorpDocIssueList() {
           corpSeal: {
             incoming: item.status === "X" ? item.certCorpseal : 0,
             used: item.status === "X" ? 0 : item.certCorpseal,
-            left: item.totalCorpseal },
+            left: item.totalCorpseal
+          },
           registry: {
             incoming: item.status === "X" ? item.certCoregister : 0,
             used: item.status === "X" ? 0 : item.certCoregister,
-            left: item.totalCoregister },
+            left: item.totalCoregister
+          },
           applicantName: item.drafter,
           center: item.instNm,
           approveStatus: '결재진행중',
@@ -57,8 +65,8 @@ function CorpDocIssueList() {
           purpose: item.purpose,
           corpSeal: { incoming: 0, used: item.certCorpseal, left: item.totalCorpseal },
           registry: { incoming: 0, used: item.certCoregister, left: item.totalCoregister },
-          usesignet : {used: item.certUsesignet},
-          warrant : {used: item.warrant},
+          usesignet: { used: item.certUsesignet },
+          warrant: { used: item.warrant },
           status: item.status,
           applicantName: item.drafter,
           center: item.instNm,
@@ -66,6 +74,7 @@ function CorpDocIssueList() {
           signitureImage: SignitureImage,
         }));
 
+        setApplications(issueListData);
         setFilteredApplications(issueListData);
         setFilteredPendingApplications(issuePendingListData);
 
@@ -81,7 +90,54 @@ function CorpDocIssueList() {
 
   useEffect(() => {
     fetchIssueData();
-  }, [fetchIssueData]);  
+  }, [fetchIssueData]);
+
+  const applyFilters = useCallback(() => {
+    let filteredData = applications;
+
+    const keyword = filterInputs.keyword.toLowerCase().trim();
+    if (keyword) {
+      if (filterInputs.searchType === '전체') {
+        filteredData = filteredData.filter(application =>
+          application.applicantName.toLowerCase().includes(keyword) ||
+          application.center.toLowerCase().includes(keyword) ||
+          application.submission.toLowerCase().includes(keyword) ||
+          application.purpose.toLowerCase().includes(keyword) ||
+          application.issueDate.includes(keyword)
+        );
+      } else if (filterInputs.searchType === '발급/입고일자') {
+        filteredData = filteredData.filter(application =>
+          application.issueDate.includes(keyword)
+        );
+      } else if (filterInputs.searchType === '센터') {
+        filteredData = filteredData.filter(application =>
+          application.center.toLowerCase().includes(keyword)
+        );
+      } else if (filterInputs.searchType === '이름') {
+        filteredData = filteredData.filter(application =>
+          application.applicantName.toLowerCase().includes(keyword)
+        );
+      } else if (filterInputs.searchType === '제출처') {
+        filteredData = filteredData.filter(application =>
+          application.submission.toLowerCase().includes(keyword)
+        );
+      } else if (filterInputs.searchType === '사용목적') {
+        filteredData = filteredData.filter(application =>
+          application.purpose.toLowerCase().includes(keyword)
+        );
+      }
+    }
+
+    setFilteredApplications(filteredData); 
+  }, [applications, filterInputs]);
+
+  const handleReset = () => {
+    setFilterInputs({
+      searchType: '전체',
+      keyword: '',
+    });
+    setFilteredApplications(applications); 
+  };
 
   const extractTotalValues = (data) => {
     if (!data || !Array.isArray(data)) {
@@ -164,7 +220,25 @@ function CorpDocIssueList() {
           </CustomButton>
         </div>
 
-        {/* 서류 발급 대장 테이블 */}
+        <ConditionFilter
+          startDate={null}  
+          setStartDate={() => {}} 
+          endDate={null} 
+          setEndDate={() => {}}         
+          filters={{}}
+          setFilters={() => {}}
+          onSearch={applyFilters} 
+          onReset={handleReset}
+          showStatusFilters={false}
+          showSearchCondition={true}
+          showDocumentType={false}
+          searchType={filterInputs.searchType}
+          setSearchType={(searchType) => setFilterInputs(prev => ({ ...prev, searchType }))}
+          keyword={filterInputs.keyword}
+          setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
+          searchOptions={['전체', '발급/입고일자', '센터', '이름', '제출처', '사용목적']}
+        />
+
         <table className="corpDoc-issue-table">
           <thead>
             <tr>
@@ -220,7 +294,6 @@ function CorpDocIssueList() {
           </tbody>
         </table>
 
-        {/* 발급 대기 목록 테이블 */}
         <div className='corpDoc-issue-pending-list'>
           <h3>발급 대기 목록</h3>
           <table className="table">

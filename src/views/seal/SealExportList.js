@@ -5,11 +5,17 @@ import SignitureImage from '../../assets/images/signiture.png';
 import downloadIcon from '../../assets/images/download.png'; 
 import { AuthContext } from '../../components/AuthContext'; 
 import axios from 'axios';
+import ConditionFilter from '../../components/common/ConditionFilter';
 import '../../styles/seal/SealExportList.css';
 
 function SealExportList() {
   const { auth } = useContext(AuthContext);
-  const [filteredApplications, setFilteredApplications] = useState([]);
+  const [applications, setApplications] = useState([]); // 원본 데이터
+  const [filteredApplications, setFilteredApplications] = useState([]); // 필터된 데이터
+  const [filterInputs, setFilterInputs] = useState({
+    searchType: '전체',
+    keyword: '',
+  });
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
   const [clickedRows, setClickedRows] = useState([]);
@@ -40,6 +46,7 @@ function SealExportList() {
         status: '결재진행중',
       }));
   
+      setApplications(fetchedData);
       setFilteredApplications(fetchedData);
   
       const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
@@ -55,6 +62,44 @@ function SealExportList() {
       fetchSealExportList(auth.instCd);
     }
   }, [auth.instCd, fetchSealExportList]);
+
+  // 필터 적용 로직
+  const applyFilters = useCallback(() => {
+    let filteredData = applications;
+
+    const keyword = filterInputs.keyword.toLowerCase().trim();
+    if (keyword) {
+      if (filterInputs.searchType === '전체') {
+        filteredData = filteredData.filter(application =>
+          application.purpose.toLowerCase().includes(keyword) ||
+          application.expDate.includes(keyword) ||
+          application.returnDate.includes(keyword)
+        );
+      } else if (filterInputs.searchType === '반출일자') {
+        filteredData = filteredData.filter(application => 
+          application.expDate.includes(keyword)
+        );
+      } else if (filterInputs.searchType === '반납일자') {
+        filteredData = filteredData.filter(application => 
+          application.returnDate.includes(keyword)
+        );
+      } else if (filterInputs.searchType === '사용목적') {
+        filteredData = filteredData.filter(application => 
+          application.purpose.toLowerCase().includes(keyword)
+        );
+      }
+    }
+
+    setFilteredApplications(filteredData);
+  }, [applications, filterInputs]);
+
+  const handleReset = () => {
+    setFilterInputs({
+      searchType: '전체',
+      keyword: '',
+    });
+    setFilteredApplications(applications); // 전체 데이터 다시 설정
+  };
 
   const handleFileDownload = async (fileUrl, fileName) => {
     try {
@@ -97,12 +142,33 @@ function SealExportList() {
       setModalVisible(true);
     }
   };
-  
+
   return (
     <div className="content">
       <div className="seal-export-list">
         <h2>인장 반출대장</h2>
         <Breadcrumb items={['인장 대장', '인장 반출대장']} />
+
+        {/* ConditionFilter 적용 */}
+        <ConditionFilter
+          startDate={null}  
+          setStartDate={() => {}} 
+          endDate={null} 
+          setEndDate={() => {}} 
+          filters={{}} 
+          setFilters={() => {}}
+          onSearch={applyFilters} 
+          onReset={handleReset} 
+          showStatusFilters={false}
+          showSearchCondition={true}
+          showDocumentType={false}
+          searchType={filterInputs.searchType}
+          setSearchType={(searchType) => setFilterInputs(prev => ({ ...prev, searchType }))}
+          keyword={filterInputs.keyword}
+          setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
+          searchOptions={['전체', '반출일자', '반납일자', '사용목적']}
+        />
+
         <table className="table">
           <thead>
             <tr>
