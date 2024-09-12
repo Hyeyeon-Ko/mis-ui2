@@ -144,6 +144,7 @@ function CorpDocRnpList() {
           keyword={filterInputs.keyword}
           setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
           searchOptions={['전체', '수령일자', '신청자', '제출처', '사용목적']}
+          setDocumentType={() => {}}
         />
 
         <table className="table">

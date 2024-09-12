@@ -38,8 +38,8 @@ function CorpDocIssueList() {
           id: item.draftId,
           date: item.draftDate,
           issueDate: item.issueDate.split("T")[0],
-          submission: item.submission,
-          purpose: item.purpose,
+          submission: item.submission || '', 
+          purpose: item.purpose || '',       
           corpSeal: {
             incoming: item.status === "X" ? item.certCorpseal : 0,
             used: item.status === "X" ? 0 : item.certCorpseal,
@@ -50,8 +50,8 @@ function CorpDocIssueList() {
             used: item.status === "X" ? 0 : item.certCoregister,
             left: item.totalCoregister
           },
-          applicantName: item.drafter,
-          center: item.instNm,
+          applicantName: item.drafter || '',  
+          center: item.instNm || '',         
           approveStatus: '결재진행중',
           status: item.status,
           approvers: [],
@@ -61,15 +61,15 @@ function CorpDocIssueList() {
         const issuePendingListData = response.data.data.issuePendingList.map(item => ({
           id: item.draftId,
           useDate: item.useDate,
-          submission: item.submission,
-          purpose: item.purpose,
+          submission: item.submission || '',  
+          purpose: item.purpose || '',      
           corpSeal: { incoming: 0, used: item.certCorpseal, left: item.totalCorpseal },
           registry: { incoming: 0, used: item.certCoregister, left: item.totalCoregister },
           usesignet: { used: item.certUsesignet },
           warrant: { used: item.warrant },
           status: item.status,
-          applicantName: item.drafter,
-          center: item.instNm,
+          applicantName: item.drafter || '',  
+          center: item.instNm || '',         
           approvers: [],
           signitureImage: SignitureImage,
         }));
@@ -237,6 +237,7 @@ function CorpDocIssueList() {
           keyword={filterInputs.keyword}
           setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
           searchOptions={['전체', '발급/입고일자', '센터', '이름', '제출처', '사용목적']}
+          setDocumentType={() => {}}
         />
 
         <table className="corpDoc-issue-table">

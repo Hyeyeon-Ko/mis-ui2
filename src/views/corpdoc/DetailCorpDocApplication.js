@@ -36,7 +36,6 @@ function DetailCorpDocApplication() {
     const [initialData, setInitialData] = useState(null);
     const [existingFile, setExistingFile] = useState(null);
     const [file, setFile] = useState(null);
-    const [isEdit, setIsEdit] = useState(false);
     const [showRejectModal, setShowRejectModal] = useState(false);
     const isReadOnly = new URLSearchParams(location.search).get('readonly') === 'true';
 
@@ -86,10 +85,9 @@ function DetailCorpDocApplication() {
     useEffect(() => {
         if (draftId) {
             fetchCorpDocDetail(draftId);
-            setIsEdit(true);
         }
     }, [draftId, fetchCorpDocDetail]);
-
+    
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
 

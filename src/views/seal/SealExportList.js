@@ -167,6 +167,7 @@ function SealExportList() {
           keyword={filterInputs.keyword}
           setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
           searchOptions={['전체', '반출일자', '반납일자', '사용목적']}
+          setDocumentType={() => {}}
         />
 
         <table className="table">
