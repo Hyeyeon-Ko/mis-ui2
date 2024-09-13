@@ -8,16 +8,20 @@ export const subscribeToNotifications = (userId, setNotifications) => {
     eventSource.addEventListener('notification', (event) => {
       console.log("New notification event:", event);
 
-      try {
-        const newNotification = JSON.parse(event.data); // JSON 데이터 파싱
-  
-        setNotifications((prevNotifications) => {
+      if (event.data && event.data.startsWith('{')) { // Ensure it's JSON
+        try {
+          const newNotification = JSON.parse(event.data);
+
+          setNotifications((prevNotifications) => {
             const updatedNotifications = [...prevNotifications, newNotification];
-            sessionStorage.setItem('notifications', JSON.stringify(updatedNotifications)); // 세션 스토리지에 저장
+            sessionStorage.setItem('notifications', JSON.stringify(updatedNotifications)); // Store in sessionStorage
             return updatedNotifications;
-        });
-      } catch (error) {
-        console.error("Failed to parse SSE event data:", error);
+          });
+        } catch (error) {
+          console.error("Failed to parse SSE event data:", error);
+        }
+      } else {
+        console.warn("Received non-JSON event data:", event.data);
       }
     });
   
