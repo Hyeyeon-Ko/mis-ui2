@@ -78,7 +78,7 @@
 }
 
 .final-modal-button.cancel {
-    /* background-color: #BDC6CF; */
+    background-color: #ECEEF4;
     color: black;
     border: none;
 }
@@ -88,5 +88,5 @@
 }
 
 .final-modal-button.cancel:hover {
-    background-color: #a1a9b2;
+    background-color: rgb(222, 226, 231);
 }

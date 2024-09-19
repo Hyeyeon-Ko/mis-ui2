@@ -5,6 +5,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import FinalConfirmationModal from './FinalConfirmationModal';
 import PreviewModal2 from './PreviewModal2'; 
+import OrgChartModal from './../../components/OrgChartModal';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/bcd/BcdApplySecond.css';
 import '../../styles/common/Page.css';
@@ -68,6 +69,12 @@ function BcdApplySecond() {
   const [addressOptions, setAddressOptions] = useState([]);
   const [floor, setFloor] = useState('');
   const [isPreviewChecked, setIsPreviewChecked] = useState(false);
+
+  const [showOrgChart, setShowOrgChart] = useState(false); 
+  const [selectedUsers, setSelectedUsers] = useState([]); 
+  const [orgData, setOrgData] = useState([]); 
+  const [expandedNodes, setExpandedNodes] = useState({});
+  const [teamMembers, setTeamMembers] = useState([]);
 
   useEffect(() => {
     if (isOwn) {
@@ -140,6 +147,68 @@ function BcdApplySecond() {
     }
   };
 
+  const fetchOrgChart = () => {
+    const { instCd } = auth;
+    axios.get(`/api/std/orgChart`, {
+      params: { instCd }
+    })
+    .then(response => {
+      setOrgData(response.data.data);
+      setExpandedNodes({});
+      setShowOrgChart(true); 
+    })
+    .catch(error => console.error('Error fetching organization data:', error));
+  };
+  
+  const handleToggle = (detailCd) => {
+    setExpandedNodes((prevState) => ({
+      ...prevState,
+      [detailCd]: !prevState[detailCd],
+    }));
+  };
+  
+  const hasChildren = (detailCd) => {
+    return orgData.some(dept => dept.parentCd === detailCd);
+  };
+
+  const fetchTeamMembers = (detailCd) => {
+    console.log(`Fetching team members for detailCd: ${detailCd}`);
+    axios.get(`/api/info/orgChart`, { params: { detailCd } })
+      .then(response => {
+        console.log('Team members response:', response.data); 
+        setTeamMembers(response.data.data); 
+      })
+      .catch(error => {
+        console.error('Error fetching team members:', error);
+      });
+  };
+  
+  const renderOrgTree = (parentId, level = 0) => {
+    const children = orgData.filter(dept => dept.parentCd === parentId);
+    if (children.length === 0) return null;
+  
+    return (
+      <ul className="org-list">
+        {children.map(dept => (
+          <li key={dept.detailCd} className={`org-item level-${level}`}>
+            <div className="org-item-header" onClick={() => hasChildren(dept.detailCd) && handleToggle(dept.detailCd)}>
+              {hasChildren(dept.detailCd) ? (
+                <span className="toggle-button">
+                  {expandedNodes[dept.detailCd] ? '∧' : '∨'} 
+                </span>
+              ) : (
+                <span className="no-toggle"></span>
+              )}
+              <span className={`icon ${hasChildren(dept.detailCd) ? 'folder-icon' : 'file-icon'}`}></span>
+              <span onClick={() => fetchTeamMembers(dept.detailCd)}>{dept.detailNm}</span>
+            </div>
+            {expandedNodes[dept.detailCd] && renderOrgTree(dept.detailCd, level + 1)} 
+          </li>
+        ))}
+      </ul>
+    );
+  };
+  
   const handleInputClick = (e) => {
     if (!formData.userId) {
       alert('사번 조회를 통해 명함 대상자를 선택하세요.');
@@ -217,18 +286,23 @@ function BcdApplySecond() {
   };
 
   const handleApplyRequest = () => {
-    if (!formData.name) {
-      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
-      return;
-    }
-    if (!validateForm()) {
-      alert('모든 명함 정보를 입력해주세요.');
-      return;
-    }
-    if (!isPreviewChecked) {
-      alert('명함 시안 미리보기를 확인해주세요.');
-      return;
-    }
+    // if (!formData.name) {
+    //   alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+    //   return;
+    // }
+    // if (!validateForm()) {
+    //   alert('모든 명함 정보를 입력해주세요.');
+    //   return;
+    // }
+    // if (!isPreviewChecked) {
+    //   alert('명함 시안 미리보기를 확인해주세요.');
+    //   return;
+    // }
+    fetchOrgChart(); 
+  };
+
+  const handleOrgChartConfirm = () => {
+    setShowOrgChart(false);
     setShowFinalConfirmationModal(true);
   };
 
@@ -236,7 +310,7 @@ function BcdApplySecond() {
     setShowFinalConfirmationModal(false);
   
     const isCustomTeam = formData.team === '000';
-  
+    
     let teamCd, teamNm;
   
     if (isCustomTeam) {
@@ -249,6 +323,9 @@ function BcdApplySecond() {
         teamNm = selectedTeam.detailNm;
       }
     }
+  
+    // 승인자 ID 추출
+    const approverIds = selectedUsers.map(user => user.userId);
   
     const requestData = {
       drafter: auth.hngNm,
@@ -272,8 +349,10 @@ function BcdApplySecond() {
       engAddress: formData.engAddress,
       division: formData.cardType === 'personal' ? 'B' : 'A',
       quantity: formData.quantity,
+      approverIds: approverIds,
+      currentApproverIndex: 0,
     };
-    
+  
     try {
       const response = await axios.post('/api/bcd/', requestData);
       if (response.data.code === 200) {
@@ -286,10 +365,10 @@ function BcdApplySecond() {
       alert('명함 신청 중 오류가 발생했습니다.');
     }
   };
-  
+    
   useEffect(() => {
   }, [formData]);
-
+  
   const handleCenterChange = (e) => {
     if (!formData.userId) {
       alert('사번 조회를 통해 명함 대상자를 선택하세요.');
@@ -389,14 +468,14 @@ function BcdApplySecond() {
 
   const handlePreview = (e) => {
     e.preventDefault();
-    if (!formData.userId) {
-      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
-      return;
-    }
-    if (!validateForm()) {
-      alert('모든 명함 정보를 입력해주세요.');
-      return;
-    }
+    // if (!formData.userId) {
+    //   alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+    //   return;
+    // }
+    // if (!validateForm()) {
+    //   alert('모든 명함 정보를 입력해주세요.');
+    //   return;
+    // }
     setIsPreviewChecked(true);
     setPreviewVisible(true);
   };
@@ -679,23 +758,31 @@ function BcdApplySecond() {
           </CustomButton>
           <CustomButton 
             className="apply-request-button" 
-            onClick={handleApplyRequest} 
-            disabled={!isPreviewChecked}
+            onClick={handleApplyRequest}
           >
             명함 신청하기
           </CustomButton>
         </div>
       </div>
-      <FinalConfirmationModal 
-        show={showFinalConfirmationModal} 
-        onClose={() => setShowFinalConfirmationModal(false)} 
+      {showOrgChart && (
+        <OrgChartModal
+          show={showOrgChart}
+          onClose={() => setShowOrgChart(false)} 
+          onConfirm={handleOrgChartConfirm}
+          selectedUsers={selectedUsers}
+          setSelectedUsers={setSelectedUsers}
+          renderOrgTree={renderOrgTree}
+          teamMembers={teamMembers} 
+        />
+      )}
+      <FinalConfirmationModal
+        show={showFinalConfirmationModal}
+        onClose={() => setShowFinalConfirmationModal(false)}
         applicant={{ name: auth.hngNm, id: auth.userId }}
         recipient={{ name: formData.name, id: formData.userId }}
         cardType={formData.cardType === 'personal' ? '[뒷면] 영문 명함' : '[뒷면] 회사 정보'}
         quantity={formData.quantity}
         onConfirm={handleConfirmRequest}
-        title="최종 신청 확인"
-        confirmButtonText="신 청"
       />
       <PreviewModal2
         show={previewVisible}

@@ -4,6 +4,7 @@ import DateFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import RejectReasonModal from '../../components/RejectReasonModal'; 
+import ApprovalModal from './ApprovalModal';
 import { AuthContext } from '../../components/AuthContext'; 
 import '../../styles/list/MyApplyList.css';
 import '../../styles/common/Page.css';
@@ -31,6 +32,8 @@ function MyApplyList() {
   const [showRejectionModal, setShowRejectionModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [viewedRejections, setViewedRejections] = useState(new Set(JSON.parse(localStorage.getItem('viewedRejections')) || []));
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
+  const [documentDetails, setDocumentDetails] = useState({});
 
   const fetchApplications = useCallback(async () => {
     try {
@@ -226,6 +229,18 @@ function MyApplyList() {
     }
   };
 
+  const handleApprovalClick = (application) => {
+    const allowedDocumentTypes = ['명함신청', '문서수신', '문서발신'];
+    if (allowedDocumentTypes.includes(application.docType)) {
+  
+      setDocumentDetails({
+        signitureImage: application.signitureImage || '',
+        approvers: application.approvalLineResponses || [], 
+      });
+      setShowApprovalModal(true);
+    }
+  };
+    
   const applicationColumns = [
     { header: '문서분류', accessor: 'docType', width: '11%' },
     { header: '제목', accessor: 'title', width: '30%' },
@@ -237,43 +252,53 @@ function MyApplyList() {
       header: '신청상태',
       accessor: 'applyStatus',
       width: '12%',
-      Cell: ({ row }) => (
-        row.applyStatus === '발주완료' || row.applyStatus === '발급완료' ? (
+      Cell: ({ row }) => {
+        const allowedDocumentTypes = ['명함신청', '문서수신', '문서발신'];
+        const isAllowedDocType = allowedDocumentTypes.includes(row.docType);
+  
+        return (row.applyStatus === '승인대기' || row.applyStatus === '승인완료') && isAllowedDocType ? (
+          <button
+            className="status-button"
+            style={{ color: '#2789FE', textDecoration: 'underline' }}
+            onClick={() => handleApprovalClick(row)}
+          >
+            {row.applyStatus}
+          </button>
+        ) : row.applyStatus === '발주완료' || row.applyStatus === '발급완료' ? (
           <button
             className="status-button"
             onClick={() => handleButtonClick(row)}
           >
             수령확인
           </button>
-        ) :
-        row.applyStatus === '반려' ? (
+        ) : row.applyStatus === '반려' ? (
           <button
             className="status-button"
             style={
               viewedRejections.has(row.draftId)
-                ? { color: "black", textDecoration: 'underline' }
-                : { color: "#2789FE", textDecoration: 'underline' }
+                ? { color: 'black', textDecoration: 'underline' }
+                : { color: '#2789FE', textDecoration: 'underline' }
             }
             onClick={() => handleButtonClick(row)}
           >
             {row.applyStatus}
           </button>
-        ) :
-        row.applyStatus === '처리완료' ? (
-          <span style={{
-            fontWeight: row.applyStatus === '처리완료' ? 'bold' : 'normal',
-            color: row.applyStatus === '처리완료' ? 'rgb(169, 169, 169)' : 'rgb(255, 255, 255)'
-          }}>
+        ) : row.applyStatus === '처리완료' ? (
+          <span
+            style={{
+              fontWeight: row.applyStatus === '처리완료' ? 'bold' : 'normal',
+              color: row.applyStatus === '처리완료' ? 'rgb(169, 169, 169)' : 'rgb(255, 255, 255)',
+            }}
+          >
             {row.applyStatus}
           </span>
-        )
-        : (
+        ) : (
           row.applyStatus
-        )
-      ),
+        );
+      },
     },
   ];
-
+  
   return (
     <div className="content">
       <div className="user-applications">
@@ -311,6 +336,13 @@ function MyApplyList() {
           onConfirm={() => {}}
           reason={rejectionReason}
           isViewOnly={true}
+        />
+      )}
+      {showApprovalModal && (
+        <ApprovalModal
+          show={showApprovalModal}
+          onClose={() => setShowApprovalModal(false)}
+          documentDetails={documentDetails}
         />
       )}
     </div>

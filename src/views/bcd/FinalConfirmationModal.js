@@ -11,15 +11,13 @@ const FinalConfirmationModal = ({
   cardType,
   quantity,
   onConfirm,
-  title,
-  confirmButtonText,
 }) => {
   if (!show) return null;
 
   return (
     <div className="final-modal-overlay">
       <div className="final-modal-container">
-        <h3>{title}</h3>
+        <h3>명함신청 최종 확인</h3>
         <div className="confirmation-details">
           <div className="detail-row">
             <p className="detail-label">
@@ -52,10 +50,10 @@ const FinalConfirmationModal = ({
         </div>
         <div className="final-modal-buttons">
           <button className="final-modal-button cancel" onClick={onClose}>
-            <span>취소</span>
+            <span>취 소</span>
           </button>
           <button className="final-modal-button confirm" onClick={onConfirm}>
-            <span>{confirmButtonText}</span>
+            <span>확 인</span>
           </button>
         </div>
       </div>
@@ -77,8 +75,6 @@ FinalConfirmationModal.propTypes = {
   cardType: PropTypes.string.isRequired,
   quantity: PropTypes.number.isRequired,
   onConfirm: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  confirmButtonText: PropTypes.string.isRequired,
 };
 
 export default FinalConfirmationModal;

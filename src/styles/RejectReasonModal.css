@@ -84,6 +84,7 @@
 }
 
 .reject-modal-button.cancel {
+  background-color: #ECEEF4;
   color: black;
   border: none;
 }
@@ -93,5 +94,5 @@
 }
 
 .reject-modal-button.cancel:hover {
-  background-color: #b2b9c2;
+  background-color: rgb(222, 226, 231);
 }

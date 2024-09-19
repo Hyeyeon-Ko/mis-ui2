@@ -50,20 +50,25 @@ th {
     background-color: #f4f7fa;
 }
 
-.applicant-info, .approver-info {
+.approver-info {
     display: flex;
     flex-direction: column;
     align-items: center;
     font-size: 14px;
+    margin-top: 10px;
 }
 
-.applicant-image img, .approver-image img {
-    width: 120px;
-    height: 60px;
+.check-image img {
+    width: 40px;
+    height: 40px; 
+    max-width: 40px; 
+    max-height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 5px 0px 10px 0px;
+    margin: 5px 0px 15px 0px;
+    border-radius: 5px;
+    object-fit: contain;
 }
 
 .close-button {

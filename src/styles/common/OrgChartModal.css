@@ -1,0 +1,351 @@
+.orgChart-selection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 3px;
+  }
+  
+  .orgChart-selection-header h3 {
+    font-size: 18px; 
+    font-weight: bold; 
+    color: black; 
+    margin: 0; 
+    padding-bottom: 10px; 
+    display: inline-block;
+  }  
+
+  .orgChart-selection-buttons {
+    display: flex;
+    gap: 5px; 
+  }
+  
+  .orgChart-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .orgChart-modal-content {
+    background-color: #fff;
+    border-radius: 8px;
+    width: 60%;
+    max-height: 85vh;
+    padding: 20px 40px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1001;
+  }
+  
+  .orgChart-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .orgChart-title {
+    font-size: 23px;
+    font-weight: bold;
+    margin-left: 10px;
+  }
+  
+  .orgChart-close-button {
+    background: none;
+    border: none;
+    font-size: 30px;
+    cursor: pointer;
+    color: #8f8f8f;
+  }
+  
+  .orgChart-close-button:hover {
+    color: #666;
+  }
+  
+  .orgChart-modal-body {
+    display: flex;
+    gap: 20px;
+    max-height: 50vh;
+    min-height: 50vh;
+    overflow-y: auto;
+  }
+  
+  .orgChart-left {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .orgChart-tree {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+    background-color: white;
+    border: 1px solid #f3f2f2;
+  }
+
+  .orgChart-team-members {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: white; 
+    border: 1px solid #e9e8e8;
+  }
+
+  .orgChart-team-members ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .orgChart-team-members li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    background-color: #fcfbfb; /* 부드러운 배경 색상 */
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 약간의 그림자 추가 */
+    transition: transform 0.2s;
+  }
+  
+  .orgChart-team-members li:hover {
+    transform: translateY(-5px); /* 호버 시 살짝 올라가도록 */
+    background-color: #EEF6FF; /* 호버 색상 */
+  }
+  
+  .orgChart-team-members li .team-member-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .orgChart-team-members li .team-member-info span {
+    font-size: 14px;
+    font-weight: bold;
+  }
+  
+  .orgChart-team-members li .team-member-info span.role {
+    font-size: 12px;
+    color: #666;
+  }
+  
+  .orgChart-team-members li .team-member-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .orgChart-team-members li .team-member-actions button {
+    background-color: #2789FE;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.2s;
+  }
+  
+  .orgChart-selection {
+    flex: 7;
+    overflow-y: auto;
+    padding-left: 20px;
+    padding-right: 10px;
+  }
+  
+  .orgChart-tree::-webkit-scrollbar,
+  .orgChart-selection::-webkit-scrollbar {
+    width: 7px;
+  }
+  
+  .orgChart-tree::-webkit-scrollbar-thumb,
+  .orgChart-selection::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 10px;
+    min-height: 150px;
+  }
+  
+  .orgChart-tree::-webkit-scrollbar-track,
+  .orgChart-selection::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+  }
+  
+  .orgChart-tree::-webkit-scrollbar-thumb:hover,
+  .orgChart-selection::-webkit-scrollbar-thumb:hover {
+    background-color: #c0bfbf;
+  }
+  
+  .orgChart-tree::-webkit-scrollbar-button,
+  .orgChart-selection::-webkit-scrollbar-button {
+    display: none;
+  }
+  
+  .org-list {
+    list-style-type: none;
+    padding-left: 8px;
+    position: relative;
+    margin-top: 4px;
+    margin-bottom: -5px;
+  }
+  
+  .org-item {
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    position: relative;
+  }
+  
+  .org-item-header {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .toggle-button {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+    font-size: 12px;
+    text-align: center;
+    line-height: 16px;
+  }
+  
+  .no-toggle {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+  }
+  
+  .level-0 .org-item-header {
+    padding-left: 0;
+  }
+  
+  .level-1 .org-item-header {
+    padding-left: 12px;
+  }
+  
+  .level-2 .org-item-header {
+    padding-left: 24px;
+  }
+  
+  .level-3 .org-item-header {
+    padding-left: 36px;
+  }
+  
+  .level-4 .org-item-header {
+    padding-left: 48px;
+  }
+  
+  .level-5 .org-item-header {
+    padding-left: 60px;
+  }
+  
+  .folder-icon::before,
+  .file-icon::before {
+    display: inline-block;
+    margin-right: 8px;
+    margin-top: 4px;
+    width: 16px;
+    height: 16px;
+    content: '';
+  }
+  
+  .folder-icon::before {
+    background: url('../../assets/images/folder.png') no-repeat center center;
+    background-size: contain;
+  }
+  
+  .file-icon::before {
+    background: url('../../assets/images/file.png') no-repeat center center;
+    background-size: contain;
+  }
+  
+  .orgChart-selection table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .orgChart-selection th,
+  .orgChart-selection td {
+    border: none;
+    border-top: 1px solid #f4f7fa;
+    border-bottom: 1px solid #f4f7fa;
+    padding: 4px 10px;
+    font-size: 13px;
+    text-align: center;
+  }
+  
+  .orgChart-selection .col-num {
+    width: 10%;
+  }
+  
+  .orgChart-selection .col-name {
+    width: 15%;
+  }
+  
+  .orgChart-selection .col-title {
+    width: 12%;
+  }
+  
+  .orgChart-selection .col-position {
+    width: 10%;
+  }
+  
+  .orgChart-selection .col-status {
+    width: 15%;
+  }
+  
+  .orgChart-selection .col-docType {
+    width: 12%;
+  }
+  
+  .orgChart-selection .col-department {
+    width: 20%;
+  }
+  
+  .orgChart-selection th {
+    background-color: #F4F6FA;
+  }
+  
+  .orgChart-selection td {
+    background-color: #fff;
+  }
+  
+  .orgChart-modal-footer {
+    display: flex;
+    justify-content: center;
+    padding-top: 40px;
+    padding-bottom: 20px;
+  }
+  
+  .selection-guidance-header {
+    color: red;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 5px;
+  }
+
+  .selection-guidance-body {
+    color: red;
+    font-size: 13px;
+    margin-top: 5px;
+  }
+  
+  .selection-guidance-container {
+    margin-top: 40px;
+    margin-left: 10px;
+    line-height: 1.2;
+  }
+  
