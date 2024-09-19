@@ -147,7 +147,7 @@ DocConfirmModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onApprove: PropTypes.func.isRequired,
   applyStatus: PropTypes.string.isRequired,
-  refreshSidebar: PropTypes.func.isRequired,  
+  refreshSidebar: PropTypes.func,
 };
 
 export default DocConfirmModal;

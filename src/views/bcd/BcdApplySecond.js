@@ -324,7 +324,6 @@ function BcdApplySecond() {
       }
     }
   
-    // 승인자 ID 추출
     const approverIds = selectedUsers.map(user => user.userId);
   
     const requestData = {
@@ -764,17 +763,16 @@ function BcdApplySecond() {
           </CustomButton>
         </div>
       </div>
-      {showOrgChart && (
-        <OrgChartModal
-          show={showOrgChart}
-          onClose={() => setShowOrgChart(false)} 
-          onConfirm={handleOrgChartConfirm}
-          selectedUsers={selectedUsers}
-          setSelectedUsers={setSelectedUsers}
-          renderOrgTree={renderOrgTree}
-          teamMembers={teamMembers} 
-        />
-      )}
+      <OrgChartModal
+        show={showOrgChart}
+        onClose={() => setShowOrgChart(false)} 
+        onConfirm={handleOrgChartConfirm}
+        selectedUsers={selectedUsers}
+        setSelectedUsers={setSelectedUsers}
+        renderOrgTree={renderOrgTree}
+        teamMembers={teamMembers}
+        mode="bcd" 
+      />
       <FinalConfirmationModal
         show={showFinalConfirmationModal}
         onClose={() => setShowFinalConfirmationModal(false)}

@@ -232,15 +232,15 @@ function MyApplyList() {
   const handleApprovalClick = (application) => {
     const allowedDocumentTypes = ['명함신청', '문서수신', '문서발신'];
     if (allowedDocumentTypes.includes(application.docType)) {
-  
       setDocumentDetails({
+        docType: application.docType,
         signitureImage: application.signitureImage || '',
-        approvers: application.approvalLineResponses || [], 
+        approvers: application.approvalLineResponses || [],
       });
       setShowApprovalModal(true);
     }
   };
-    
+      
   const applicationColumns = [
     { header: '문서분류', accessor: 'docType', width: '11%' },
     { header: '제목', accessor: 'title', width: '30%' },

@@ -73,8 +73,8 @@
   .orgChart-modal-body {
     display: flex;
     gap: 20px;
-    max-height: 50vh;
-    min-height: 50vh;
+    max-height: 60vh;
+    min-height: 60vh;
     overflow-y: auto;
   }
   
@@ -349,3 +349,6 @@
     line-height: 1.2;
   }
   
+  .approver-line-info {
+    margin: 10px 0px;
+  }

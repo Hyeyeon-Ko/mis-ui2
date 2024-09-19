@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import '../../styles/list/ApprovalModal.css';
 import CheckImage from '../../assets/images/check.png';
 
-const ApprovalModal = ({ show, onClose, documentDetails = { signitureImage: CheckImage, approvers: [] } }) => {
+const ApprovalModal = ({ show, onClose, documentDetails = { signitureImage: CheckImage, approvers: [], docType: '' } }) => {
   useEffect(() => {
   }, []);
 
@@ -16,7 +16,7 @@ const ApprovalModal = ({ show, onClose, documentDetails = { signitureImage: Chec
       <td key={index}>
         <div className="approver-info">
           <div className="check-image">
-            {approver?.currentApproverIndex > index ? ( 
+            {approver?.currentApproverIndex > index ? (
               <img src={approver?.signitureImage || CheckImage} alt="Approver" />
             ) : (
               <div style={{ width: '60pxpx', height: '60px' }}></div> 
@@ -28,6 +28,9 @@ const ApprovalModal = ({ show, onClose, documentDetails = { signitureImage: Chec
       </td>
     );
   };
+
+  const isNameCardRequest = documentDetails.docType === '명함신청';
+  const approversToShow = isNameCardRequest ? 3 : 2;
 
   return (
     <div className="approval-modal-overlay">
@@ -41,12 +44,12 @@ const ApprovalModal = ({ show, onClose, documentDetails = { signitureImage: Chec
             <tr>
               <th>신청자 팀장</th>
               <th>총무팀 담당자</th>
-              <th>총무팀 팀장</th>
+              {isNameCardRequest && <th>총무팀 팀장</th>} 
             </tr>
           </thead>
           <tbody>
             <tr>
-              {documentDetails.approvers.slice(0, 3).map((approver, index) =>
+              {documentDetails.approvers.slice(0, approversToShow).map((approver, index) =>
                 renderApproverInfo(approver, index)
               )}
             </tr>
@@ -61,6 +64,7 @@ ApprovalModal.propTypes = {
   show: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   documentDetails: PropTypes.shape({
+    docType: PropTypes.string,  
     signitureImage: PropTypes.string,
     approvers: PropTypes.arrayOf(
       PropTypes.shape({

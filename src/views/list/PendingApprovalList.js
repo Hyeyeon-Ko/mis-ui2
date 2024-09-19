@@ -213,7 +213,7 @@ function PendingApprovalList() {
   const approveDocument = async (documentId) => {
     try {
       await axios.put(`/api/doc/confirm`, null, {
-        params: { draftId: documentId },
+        params: { draftId: documentId, userId: auth.userId },
       });
       alert('승인이 완료되었습니다.');
       closeModal();
