@@ -69,14 +69,27 @@ function DocApply() {
       requiredFields.push('sender');
     }
 
-    return requiredFields.every((field) => formData[field].trim() !== '');
+    const missingFields = requiredFields.filter((field) => formData[field].trim() === '');
+  
+    if (missingFields.length > 0) {
+      alert('모든 필수 항목을 입력해주세요.');
+      return false;
+    }
+
+    // 첨부파일 확인
+    if (!attachment) {
+      alert('첨부파일이 필요합니다.');
+      return false;
+    }
+
+    return true;
   };
 
   const handleApplyRequest = (e) => {
     e.preventDefault();
 
     if (!validateForm()) {
-      alert('모든 필수 항목을 입력해주세요.');
+      // alert('모든 필수 항목을 입력해주세요.');
       return;
     }
 
@@ -305,6 +318,7 @@ function DocApply() {
                   type="file"
                   name="attachment"
                   onChange={handleFileChange}
+                  required
                 />
               </div>
               <div className="doc-apply-button-container">
