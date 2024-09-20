@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { subscribeToNotifications } from './SseSubscribe';
+import axios from 'axios';
 
 // AuthContext 생성 -> 인증 상태 저장
 export const AuthContext = createContext();
@@ -26,9 +27,8 @@ export const AuthProvider = ({ children }) => {
 
   const [sidebarUpdate, setSidebarUpdate] = useState(false); 
 
-  // 앱 로드 시 세션 스토리지에서 인증 상태를 불러옴
+  // 앱 로드 시 세션 스토리지에서 인증 상태와 알림을 불러옴
   useEffect(() => {
-
     const storedNotifications = JSON.parse(sessionStorage.getItem('notifications')) || [];
     setNotifications(storedNotifications); 
 
@@ -51,6 +51,19 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  useEffect(() => {
+    if (auth.userId && !eventSourceRef.current) {
+      eventSourceRef.current = subscribeToNotifications(auth.userId, setNotifications);
+    }
+
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+    };
+  }, [auth.userId]);
+
   // 인증 상태가 변경될 때마다 세션 스토리지에 저장
   useEffect(() => {
     sessionStorage.setItem('userId', auth.userId);
@@ -66,7 +79,7 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.setItem('originalRole', auth.originalRole);
   }, [auth]);
 
-  const login = (userId, hngNm, role, sidebarPermissions, hasStandardDataAuthority, instCd, deptCd, teamCd) => { 
+  const login = (userId, hngNm, role, sidebarPermissions, hasStandardDataAuthority, instCd, deptCd, teamCd) => {
     const newAuthState = {
       userId,
       hngNm,
@@ -86,7 +99,7 @@ export const AuthProvider = ({ children }) => {
       eventSourceRef.current = subscribeToNotifications(userId, setNotifications);
     }
 
-    navigate('/');  
+    navigate('/');
   };
 
   const logout = () => {
@@ -98,7 +111,7 @@ export const AuthProvider = ({ children }) => {
       sidebarPermissions: [],
       hasStandardDataAuthority: false,
       instCd: '',
-      deptCd: '', 
+      deptCd: '',
       teamCd: '',
       isUserMode: false,
       originalRole: '',
@@ -110,8 +123,8 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.removeItem('sidebarPermissions');
     sessionStorage.removeItem('hasStandardDataAuthority');
     sessionStorage.removeItem('instCd');
-    sessionStorage.removeItem('deptCd'); 
-    sessionStorage.removeItem('teamCd'); 
+    sessionStorage.removeItem('deptCd');
+    sessionStorage.removeItem('teamCd');
     sessionStorage.removeItem('isUserMode');
     sessionStorage.removeItem('originalRole');
     sessionStorage.removeItem('notifications');
@@ -137,11 +150,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const refreshSidebar = () => {
-    setSidebarUpdate((prev) => !prev); 
+    setSidebarUpdate((prev) => !prev);
   };
 
   return (
-    <AuthContext.Provider value={{ auth, login, logout, toggleMode, notifications, refreshSidebar, sidebarUpdate }}>
+    <AuthContext.Provider value={{ auth, login, logout, toggleMode, notifications, setNotifications, refreshSidebar, sidebarUpdate }}>
       {children}
     </AuthContext.Provider>
   );

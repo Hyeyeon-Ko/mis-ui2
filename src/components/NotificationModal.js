@@ -5,13 +5,11 @@ import axios from 'axios';
 import '../styles/common/NotificationModal.css';
 
 const NotificationModal = ({ onClose, position }) => {
-  const { notifications } = useContext(AuthContext);
+  const { notifications, setNotifications, auth } = useContext(AuthContext);
   const [readNotifications, setReadNotifications] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-
-    console.log("noti: ", notifications);
     const readNotis = notifications.filter((noti) => noti.isRead).map((noti) => noti.id);
     setReadNotifications(readNotis);
   }, [notifications]);
@@ -19,7 +17,6 @@ const NotificationModal = ({ onClose, position }) => {
   const formatContent = (content) => {
     return content.split('/').join('<br />');
   };
-
 
   const handleItemClick = async (id) => {
     if (!readNotifications.includes(id)) {
@@ -32,6 +29,31 @@ const NotificationModal = ({ onClose, position }) => {
     }
     navigate('/api/myApplyList');
   };
+
+  // DB에서 알림을 불러오는 함수
+  const fetchNotificationsFromDB = async () => {
+    try {
+      const response = await axios.get(`/api/noti/${auth.userId}`);
+      console.log("response: ", response);
+      const fetchedNotifications = Array.isArray(response.data.data) ? response.data.data : [];
+      console.log("NotificationModal -> fetchedNoti: ", fetchedNotifications);
+
+      // 기존 알림과 중복되지 않는 새로운 알림만 추가
+      setNotifications((prevNotifications) => {
+        console.log("prev: ", prevNotifications);
+        const updatedNotifications = prevNotifications.filter(
+          (prevNoti) => !fetchedNotifications.some((noti) => noti.id === prevNoti.id)
+        );
+        return [...fetchedNotifications, ...updatedNotifications];
+      });
+    } catch (error) {
+      console.error("Error fetching notifications from DB:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotificationsFromDB(); // 모달 열릴 때 DB에서 알림 불러오기
+  }, []);
 
   return (
     <div
@@ -60,7 +82,7 @@ const NotificationModal = ({ onClose, position }) => {
                     className="notification-content"
                     dangerouslySetInnerHTML={{ __html: formatContent(noti.content) }}
                   ></span>
-                  <span className="notification-comment">{noti.respondDate}</span>
+                  <span className="notification-date">{noti.createdDate}</span>
                 </li>
               ))
             ) : (
@@ -68,7 +90,6 @@ const NotificationModal = ({ onClose, position }) => {
             )}
           </ul>
         </div>
-        
       </div>
     </div>
   );
