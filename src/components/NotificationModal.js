@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../components/AuthContext.js';
 import axios from 'axios';
@@ -35,7 +35,7 @@ const NotificationModal = ({ onClose, position }) => {
   };
 
   // DB에서 알림을 불러오는 함수
-  const fetchNotificationsFromDB = async () => {
+  const fetchNotificationsFromDB = useCallback(async () => {
     try {
       const response = await axios.get(`/api/noti/${auth.userId}`);
       const fetchedNotifications = Array.isArray(response.data.data) ? response.data.data : [];
@@ -51,11 +51,11 @@ const NotificationModal = ({ onClose, position }) => {
     } catch (error) {
       console.error("Error fetching notifications from DB:", error);
     }
-  };
+  }, [auth.userId, setNotifications]);
 
   useEffect(() => {
     fetchNotificationsFromDB(); // 모달 열릴 때 DB에서 알림 불러오기
-  }, []);
+  }, [fetchNotificationsFromDB]);
 
   // 알림을 읽은 것과 읽지 않은 것으로 나눈 뒤 각각 createdDate로 정렬
   const sortedNotifications = [...notifications]
