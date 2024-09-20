@@ -101,7 +101,7 @@ function SealApplyExport() {
         }
         
         try {
-            const response = await axios.post('/api/seal/export', formData, {
+            await axios.post('/api/seal/export', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

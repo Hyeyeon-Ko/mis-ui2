@@ -213,7 +213,7 @@ function DetailSealExportApplication() {
         formData.append('isFileDeleted', applicationDetails.isFileDeleted);
 
         try {
-            const response = await axios.post(`/api/seal/export/update?draftId=${draftId}`, formData, {
+            await axios.post(`/api/seal/export/update?draftId=${draftId}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
