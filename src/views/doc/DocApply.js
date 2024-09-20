@@ -29,7 +29,7 @@ function DocApply() {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [orgData, setOrgData] = useState([]);
   const [expandedNodes, setExpandedNodes] = useState({});
-  const [teamMembers, setTeamMembers] = useState([]); 
+  const [teamMembers, setTeamMembers] = useState([]);
 
   const setDefaultValues = useCallback(() => {
     const today = new Date();
@@ -72,15 +72,107 @@ function DocApply() {
     return requiredFields.every((field) => formData[field].trim() !== '');
   };
 
+  const handleApplyRequest = (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      alert('모든 필수 항목을 입력해주세요.');
+      return;
+    }
+
+    if (formData.division === 'A') {
+      handleReceiveRequest();
+    } else {
+      fetchOrgChart();
+    }
+  };
+
+  const handleReceiveRequest = async () => {
+    const payload = new FormData();
+
+    payload.append('docRequest', new Blob([JSON.stringify({
+      drafterId: formData.userId,
+      drafter: formData.drafter,
+      division: formData.division,
+      receiver: formData.receiver,
+      docTitle: formData.title,
+      purpose: formData.purpose,
+      instCd: auth.instCd,
+      deptCd: auth.deptCd,
+    })], {
+      type: 'application/json'
+    }));
+
+    if (attachment) {
+      payload.append('file', attachment);
+    }
+
+    try {
+      const response = await fetch('/api/doc/receive', {
+        method: 'POST',
+        body: payload,
+      });
+      if (response.ok) {
+        alert('문서 수신 신청이 완료되었습니다.');
+        navigate('/api/myPendingList');
+      } else {
+        alert('문서 수신 신청에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Error submitting form data:', error);
+      alert('문서 수신 신청에 실패했습니다.');
+    }
+  };
+
+  const handleSendRequest = async () => {
+    const payload = new FormData();
+
+    payload.append('docRequest', new Blob([JSON.stringify({
+      drafterId: formData.userId,
+      drafter: formData.drafter,
+      division: formData.division,
+      sender: formData.sender,
+      docTitle: formData.title,
+      purpose: formData.purpose,
+      instCd: auth.instCd,
+      deptCd: auth.deptCd,
+      approverIds: selectedUsers.map(user => user.userId),
+    })], {
+      type: 'application/json'
+    }));
+
+    if (attachment) {
+      payload.append('file', attachment);
+    }
+
+    try {
+      const response = await fetch('/api/doc/send', {
+        method: 'POST',
+        body: payload,
+      });
+      if (response.ok) {
+        alert('문서 발신 신청이 완료되었습니다.');
+        navigate('/api/myPendingList');
+      } else {
+        alert('문서 발신 신청에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Error submitting form data:', error);
+      alert('문서 발신 신청에 실패했습니다.');
+    }
+  };
+
   const fetchOrgChart = () => {
     const { instCd } = auth;
     axios.get(`/api/std/orgChart`, { params: { instCd } })
       .then(response => {
+        console.log(response);
         setOrgData(response.data.data);
         setExpandedNodes({});
         setShowOrgChart(true);
       })
       .catch(error => console.error('Error fetching organization data:', error));
+    
   };
 
   const handleToggle = (detailCd) => {
@@ -130,59 +222,9 @@ function DocApply() {
     );
   };
 
-  const handleApplyRequest = (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      alert('모든 필수 항목을 입력해주세요.');
-      return;
-    }
-
-    fetchOrgChart(); 
-  };
-
   const handleOrgChartConfirm = () => {
     setShowOrgChart(false);
-    handleSubmit();
-  };
-
-  const handleSubmit = async () => {
-    const payload = new FormData();
-
-    payload.append('docRequest', new Blob([JSON.stringify({
-      drafterId: formData.userId,
-      drafter: formData.drafter,
-      division: formData.division,
-      sender: activeTab === 'reception' ? formData.receiver : '',
-      receiver: activeTab === 'sending' ? formData.sender : '',
-      docTitle: formData.title,
-      purpose: formData.purpose,
-      instCd: auth.instCd,
-      deptCd: auth.deptCd,
-      approverIds: selectedUsers.map(user => user.userId),
-    })], {
-      type: 'application/json'
-    }));
-
-    if (attachment) {
-      payload.append('file', attachment);
-    }
-
-    try {
-      const response = await fetch('/api/doc', {
-        method: 'POST',
-        body: payload,
-      });
-      if (response.ok) {
-        alert('신청이 완료되었습니다.');
-        navigate('/api/myPendingList');
-      } else {
-        alert('신청에 실패했습니다.');
-      }
-    } catch (error) {
-      console.error('Error submitting form data:', error);
-      alert('신청에 실패했습니다.');
-    }
+    handleSendRequest();
   };
 
   return (

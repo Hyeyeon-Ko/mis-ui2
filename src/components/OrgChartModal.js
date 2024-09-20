@@ -28,7 +28,7 @@ const OrgChartModal = ({ show, onClose, onConfirm, renderOrgTree, selectedUsers,
               managerDept
             } = response.data.data[0];
 
-            const teamLeaderSeq = (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2') ? 1 : 3;
+            const teamLeaderSeq = (mode === 'bcd' && auth.teamCd !== 'FDT12' && auth.teamCd !== 'CNT2') ? 3 : 1;
 
             const teamLeader = {
               userId: teamLeaderId,
@@ -38,7 +38,7 @@ const OrgChartModal = ({ show, onClose, onConfirm, renderOrgTree, selectedUsers,
               department: teamLeaderDept,
               status: '대기',
               docType: docType,
-              seq: teamLeaderSeq
+              seq: teamLeaderSeq,
             };
 
             const manager = {
@@ -49,12 +49,24 @@ const OrgChartModal = ({ show, onClose, onConfirm, renderOrgTree, selectedUsers,
               department: managerDept,
               status: '대기',
               docType: docType,
-              seq: 2
+              seq: 2,
             };
 
-            const approvers = (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')
-              ? [teamLeader]
-              : [manager, teamLeader];
+            let approvers = [];
+
+            if (mode === 'bcd') {
+              if (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2') {
+                approvers = [teamLeader];
+              } else {
+                approvers = [manager, teamLeader]; 
+              }
+            } else if (mode === 'doc') {
+              if (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2') {
+                approvers = [teamLeader]; 
+              } else {
+                approvers = [manager];
+              }
+            }
 
             setSelectedUsers(approvers);
           }
@@ -113,12 +125,11 @@ const OrgChartModal = ({ show, onClose, onConfirm, renderOrgTree, selectedUsers,
   const handleConfirmClick = () => {
     const 신청자팀장 = selectedUsers.find(user => user.seq === 1);
 
-    // 신청자 팀장의 직책이 팀장, 파트장, 본부장 중 하나인지 확인
     if (!['팀장', '파트장', '본부장'].includes(신청자팀장?.roleNm)) {
       alert('신청자 팀장의 직책은 팀장, 파트장 또는 본부장이어야 합니다.');
       return;
     }
-    
+
     onConfirm();
   };
 
@@ -134,6 +145,9 @@ const OrgChartModal = ({ show, onClose, onConfirm, renderOrgTree, selectedUsers,
       </td>
     );
   };
+
+  const 총무팀_담당자 = auth.teamCd === 'CNT2' ? '경영지원팀 담당자' : '총무팀 담당자';
+  const 총무팀_팀장 = auth.teamCd === 'CNT2' ? '경영지원팀 팀장' : '총무팀 팀장';
 
   const 신청자팀장 = selectedUsers.find(user => user.seq === 1);
   const 총무팀담당자 = selectedUsers.find(user => user.seq === 2);
@@ -151,9 +165,9 @@ const OrgChartModal = ({ show, onClose, onConfirm, renderOrgTree, selectedUsers,
 
         <div className="orgChart-modal-body">
           <div className="orgChart-left">
-            <div className="orgChart-tree">
-              {renderOrgTree('0000')}
-            </div>
+          <div className="orgChart-tree">
+            {renderOrgTree(auth.instCd === '111' ? 'B100' : '0000')}
+          </div>
 
             <div className="orgChart-team-members">
               <ul>
@@ -207,7 +221,7 @@ const OrgChartModal = ({ show, onClose, onConfirm, renderOrgTree, selectedUsers,
                       <td>{user.userNm}</td>
                       <td>{user.roleNm || '팀원'}</td>
                       <td>{user.positionNm || '사원'}</td>
-                      <td>{user.status || '대기'}</td>
+                      <td>{user.status || ''}</td>
                       <td>{user.docType || docType}</td>
                       <td>{user.department || '부서 없음'}</td>
                     </tr>
@@ -215,31 +229,33 @@ const OrgChartModal = ({ show, onClose, onConfirm, renderOrgTree, selectedUsers,
               </tbody>
             </table>
 
-            <div className="selection-guidance-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>신청자 팀장</th>
-                    <th>총무팀 담당자</th>
-                    {mode === 'bcd' && <th>총무팀 팀장</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    {신청자팀장 && renderApproverInfo(신청자팀장, 0)}
-                    {총무팀담당자 && renderApproverInfo(총무팀담당자, 1)}
-                    {mode === 'bcd' && 총무팀팀장 && renderApproverInfo(총무팀팀장, 2)}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            {!(auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2') && (
+              <div className="selection-container">
+                <table>
+                  <thead>
+                    <tr>
+                      {신청자팀장 && <th>신청자 팀장</th>}  
+                      <th>{총무팀_담당자}</th>
+                      {mode === 'bcd' && <th>{총무팀_팀장}</th>}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      {신청자팀장 && renderApproverInfo(신청자팀장, 0)} 
+                      {총무팀담당자 && renderApproverInfo(총무팀담당자, 1)}
+                      {mode === 'bcd' && 총무팀팀장 && renderApproverInfo(총무팀팀장, 2)}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
 
             <div className="selection-guidance-container">
               {(auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2') && (
                 <>
                   <p className="selection-guidance-header">※ 참고사항 ※</p>
                   <p className="selection-guidance-body">
-                    총무팀 또는 경영지원팀의 경우 승인라인을 설정하지 않으셔도 됩니다.
+                    {auth.teamCd === 'CNT2' ? '경영지원팀' : '총무팀'}의 경우 승인라인을 설정하지 않으셔도 됩니다.
                   </p>
                 </>
               )}
@@ -251,7 +267,10 @@ const OrgChartModal = ({ show, onClose, onConfirm, renderOrgTree, selectedUsers,
                     명함 대상자(본인) 부서의 팀장님을 선택하세요.
                   </p>
                   <p className="selection-guidance-body">
-                    2, 3번은 경영지원팀/총무팀 담당자로 자동 설정되어 있습니다.
+                    팀장님이 없는 부서의 경우 본부장님 또는 파트장님을 선택하세요.
+                  </p>
+                  <p className="selection-guidance-body">
+                    2, 3번은 {auth.teamCd === 'CNT2' ? '경영지원팀' : '총무팀'} 담당자로 자동 설정되어 있습니다.
                   </p>
                 </>
               )}
@@ -263,7 +282,10 @@ const OrgChartModal = ({ show, onClose, onConfirm, renderOrgTree, selectedUsers,
                     신청자(본인) 부서의 팀장님을 선택하세요.
                   </p>
                   <p className="selection-guidance-body">
-                    2번은 경영지원팀/총무팀 담당자로 자동 설정되어 있습니다.
+                    팀장님이 없는 부서의 경우 본부장님 또는 파트장님을 선택하세요.
+                  </p>
+                  <p className="selection-guidance-body">
+                    2번은 {auth.teamCd === 'CNT2' ? '경영지원팀' : '총무팀'} 담당자로 자동 설정되어 있습니다.
                   </p>
                 </>
               )}

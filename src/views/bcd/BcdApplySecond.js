@@ -286,18 +286,18 @@ function BcdApplySecond() {
   };
 
   const handleApplyRequest = () => {
-    // if (!formData.name) {
-    //   alert('사번 조회를 통해 명함 대상자를 선택하세요.');
-    //   return;
-    // }
-    // if (!validateForm()) {
-    //   alert('모든 명함 정보를 입력해주세요.');
-    //   return;
-    // }
-    // if (!isPreviewChecked) {
-    //   alert('명함 시안 미리보기를 확인해주세요.');
-    //   return;
-    // }
+    if (!formData.name) {
+      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+      return;
+    }
+    if (!validateForm()) {
+      alert('모든 명함 정보를 입력해주세요.');
+      return;
+    }
+    if (!isPreviewChecked) {
+      alert('명함 시안 미리보기를 확인해주세요.');
+      return;
+    }
     fetchOrgChart(); 
   };
 
@@ -467,14 +467,14 @@ function BcdApplySecond() {
 
   const handlePreview = (e) => {
     e.preventDefault();
-    // if (!formData.userId) {
-    //   alert('사번 조회를 통해 명함 대상자를 선택하세요.');
-    //   return;
-    // }
-    // if (!validateForm()) {
-    //   alert('모든 명함 정보를 입력해주세요.');
-    //   return;
-    // }
+    if (!formData.userId) {
+      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+      return;
+    }
+    if (!validateForm()) {
+      alert('모든 명함 정보를 입력해주세요.');
+      return;
+    }
     setIsPreviewChecked(true);
     setPreviewVisible(true);
   };

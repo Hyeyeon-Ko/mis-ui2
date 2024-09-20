@@ -4,8 +4,7 @@ import '../../styles/list/ApprovalModal.css';
 import CheckImage from '../../assets/images/check.png';
 
 const ApprovalModal = ({ show, onClose, documentDetails = { signitureImage: CheckImage, approvers: [], docType: '' } }) => {
-  useEffect(() => {
-  }, []);
+  useEffect(() => {}, []);
 
   if (!show) return null;
 
@@ -19,7 +18,7 @@ const ApprovalModal = ({ show, onClose, documentDetails = { signitureImage: Chec
             {approver?.currentApproverIndex > index ? (
               <img src={approver?.signitureImage || CheckImage} alt="Approver" />
             ) : (
-              <div style={{ width: '60pxpx', height: '60px' }}></div> 
+              <div style={{ width: '60px', height: '60px' }}></div>
             )}
           </div>
           <div>{approver?.userName || ''} {displayRoleOrPosition || ''}</div>
@@ -29,12 +28,27 @@ const ApprovalModal = ({ show, onClose, documentDetails = { signitureImage: Chec
     );
   };
 
-  const isNameCardRequest = documentDetails.docType === '명함신청';
-  const approversToShow = isNameCardRequest ? 3 : 2;
+  // 문서 타입에 따른 열 정의
+  const getColumnsByDocType = () => {
+    switch (documentDetails.docType) {
+      case '명함신청':
+        return ['신청자 팀장', '총무팀 담당자', '총무팀 팀장'];
+      case '문서수신':
+        return ['총무팀 담당자'];
+      case '문서발신':
+        return ['신청자 팀장', '총무팀 담당자'];
+      default:
+        return [];
+    }
+  };
+
+  const columns = getColumnsByDocType();
+  const approversToShow = columns.length;
+  const modalWidth = approversToShow * 170 + 60; // 각 열 너비에 맞게 모달의 너비를 계산
 
   return (
     <div className="approval-modal-overlay">
-      <div className="approval-modal-container">
+      <div className="approval-modal-container" style={{ width: `${modalWidth}px` }}>
         <div className="approval-modal-header">
           <h3>승인 진행 상황</h3>
           <button className="doc-confirm-close-button" onClick={onClose}>X</button>
@@ -42,9 +56,9 @@ const ApprovalModal = ({ show, onClose, documentDetails = { signitureImage: Chec
         <table>
           <thead>
             <tr>
-              <th>신청자 팀장</th>
-              <th>총무팀 담당자</th>
-              {isNameCardRequest && <th>총무팀 팀장</th>} 
+              {columns.map((column, index) => (
+                <th key={index}>{column}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
@@ -64,7 +78,7 @@ ApprovalModal.propTypes = {
   show: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   documentDetails: PropTypes.shape({
-    docType: PropTypes.string,  
+    docType: PropTypes.string,
     signitureImage: PropTypes.string,
     approvers: PropTypes.arrayOf(
       PropTypes.shape({
@@ -73,7 +87,7 @@ ApprovalModal.propTypes = {
         roleNm: PropTypes.string,
         positionNm: PropTypes.string,
         signitureImage: PropTypes.string,
-        currentApproverIndex: PropTypes.number, 
+        currentApproverIndex: PropTypes.number,
       })
     ),
   }),

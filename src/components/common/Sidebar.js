@@ -70,24 +70,19 @@ function Sidebar() {
     { label: '승인대기 내역', url: '/api/myPendingList' },
   ];
 
-  const bcdItems = [
-    { label: '전체 신청내역', url: '/api/applyList?documentType=명함신청' },
-    { label: '승인대기 내역', url: '/api/pendingList?documentType=명함신청', count: pendingCounts.bcdPendingCount },
-    { label: '명함 발주', url: '/api/bcd/orderList', count: pendingCounts.orderPendingCount }, 
-  ];
-
-  const docItems = [
-    { label: '전체 신청내역', url: '/api/applyList?documentType=문서수발신' },
-    { label: '승인대기 내역', url: '/api/pendingList?documentType=문서수발신', count: pendingCounts.docPendingCount },
-  ];
-
   const docManageItems = [
     { label: '문서 수신 대장', url: '/api/doc/receiveList' },
     { label: '문서 발신 대장', url: '/api/doc/sendList' },
   ];
 
   const sections = {
-    'A': [{ title: '명함 관리', items: bcdItems }],
+    'A': [
+      { title: '명함 관리', items: [
+        { label: '전체 신청내역', url: '/api/applyList?documentType=명함신청', subIndex: 'A-1' },
+        { label: '승인대기 내역', url: '/api/pendingList?documentType=명함신청', count: pendingCounts.bcdPendingCount, subIndex: 'A-2' },
+        { label: '명함 발주', url: '/api/bcd/orderList', count: pendingCounts.orderPendingCount, subIndex: 'A-1' },
+      ] }
+    ],
     'B': [
       { title: '인장 관리', items: [
         { label: '전체 신청내역', url: '/api/applyList?documentType=인장신청', subIndex: 'B-1' },
@@ -111,7 +106,10 @@ function Sidebar() {
       ]}
     ],
     'D': [
-      { title: '문서수발신 관리', items: docItems },
+      { title: '문서수발신 관리', items: [
+        { label: '전체 신청내역', url: '/api/applyList?documentType=문서수발신', subIndex: 'D-1' },
+        { label: '승인대기 내역', url: '/api/pendingList?documentType=문서수발신', count: pendingCounts.docPendingCount, subIndex: 'D-2' },
+      ] },
       { title: '문서수발신 대장', items: docManageItems },
     ],
     'E': [
