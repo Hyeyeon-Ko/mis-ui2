@@ -120,7 +120,7 @@ function DetailDocApplication() {
 
         formDataToSend.append('docUpdateRequest', new Blob([JSON.stringify({
             drafter: formData.drafter,
-            division: activeTab === 'reception' ? 'A' : 'B',
+            division: formData.division, 
             receiver: activeTab === 'reception' ? null : formData.receiver,
             sender: activeTab === 'reception' ? formData.sender : null,
             docTitle: formData.title,
@@ -155,12 +155,14 @@ function DetailDocApplication() {
             <button
               className={`tab-button ${activeTab === 'reception' ? 'active' : ''}`}
               onClick={() => setActiveTab('reception')}
+              disabled
             >
               문서 수신 신청
             </button>
             <button
               className={`tab-button ${activeTab === 'sending' ? 'active' : ''}`}
               onClick={() => setActiveTab('sending')}
+              disabled
             >
               문서 발신 신청
             </button>

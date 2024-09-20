@@ -1,7 +1,6 @@
 import React, { createContext, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { subscribeToNotifications } from './SseSubscribe';
-import axios from 'axios';
 
 // AuthContext 생성 -> 인증 상태 저장
 export const AuthContext = createContext();

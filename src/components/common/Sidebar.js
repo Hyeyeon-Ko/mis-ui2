@@ -62,7 +62,12 @@ function Sidebar() {
     { label: '인장신청', url: '/api/seal' },
     { label: '법인서류', url: '/api/corpDoc' },
     { label: '문서수발신', url: '/api/doc' },
+    { label: '', url: '/' },
+    { label: '', url: '/' },
+    { label: '토너신청', url: '/api/toner' },
     { label: '문서이관/파쇄', url: '/api/docstorage' },
+    { label: '', url: '/' },
+    { label: '', url: '/' },
   ];
 
   const myApplyItems = [

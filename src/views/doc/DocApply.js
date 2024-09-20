@@ -89,12 +89,13 @@ function DocApply() {
 
   const handleReceiveRequest = async () => {
     const payload = new FormData();
-
+  
     payload.append('docRequest', new Blob([JSON.stringify({
       drafterId: formData.userId,
       drafter: formData.drafter,
       division: formData.division,
-      receiver: formData.receiver,
+      receiver: '',
+      sender: formData.receiver, 
       docTitle: formData.title,
       purpose: formData.purpose,
       instCd: auth.instCd,
@@ -102,11 +103,11 @@ function DocApply() {
     })], {
       type: 'application/json'
     }));
-
+  
     if (attachment) {
       payload.append('file', attachment);
     }
-
+  
     try {
       const response = await fetch('/api/doc/receive', {
         method: 'POST',
@@ -123,15 +124,16 @@ function DocApply() {
       alert('문서 수신 신청에 실패했습니다.');
     }
   };
-
+  
   const handleSendRequest = async () => {
     const payload = new FormData();
-
+  
     payload.append('docRequest', new Blob([JSON.stringify({
       drafterId: formData.userId,
       drafter: formData.drafter,
       division: formData.division,
-      sender: formData.sender,
+      sender: '', 
+      receiver: formData.sender, 
       docTitle: formData.title,
       purpose: formData.purpose,
       instCd: auth.instCd,
@@ -140,11 +142,11 @@ function DocApply() {
     })], {
       type: 'application/json'
     }));
-
+  
     if (attachment) {
       payload.append('file', attachment);
     }
-
+  
     try {
       const response = await fetch('/api/doc/send', {
         method: 'POST',
@@ -161,7 +163,7 @@ function DocApply() {
       alert('문서 발신 신청에 실패했습니다.');
     }
   };
-
+  
   const fetchOrgChart = () => {
     const { instCd } = auth;
     axios.get(`/api/std/orgChart`, { params: { instCd } })
