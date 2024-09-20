@@ -106,7 +106,6 @@ function SealApplyExport() {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            console.log('Response:', response.data);
             alert('반출 신청이 완료되었습니다.');
             navigate('/api/myPendingList');
         } catch (error) {

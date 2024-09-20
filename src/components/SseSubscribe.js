@@ -1,4 +1,5 @@
 export const subscribeToNotifications = (userId, setNotifications) => {
+    // todo: 추후, 운영서버 주소로 변경
     const eventSource = new EventSource(`http://localhost:9090/api/noti/subscribe/${userId}`);
   
     eventSource.onopen = () => {
@@ -6,12 +7,10 @@ export const subscribeToNotifications = (userId, setNotifications) => {
     };
   
     eventSource.addEventListener('notification', (event) => {
-      console.log("New notification event:", event);
 
       if (event.data && event.data.startsWith('{')) {
         try {
           const newNotification = JSON.parse(event.data);
-          console.log("newNoti: ", newNotification);
   
           setNotifications((prevNotifications) => {
             const isDuplicate = prevNotifications.some((prevNoti) => prevNoti.id === newNotification.id);

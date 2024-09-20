@@ -158,7 +158,6 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
 
       axios.put(`/api/rental/?detailId=${rentalData.detailId}`, payload)
         .then(response => {
-          console.log('Data successfully saved:', response.data);
           onSave([payload]);
           alert('항목이 성공적으로 수정되었습니다.');
           onClose();

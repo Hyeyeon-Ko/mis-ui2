@@ -95,8 +95,6 @@ const DocstorageUpdateModal = ({ show, onClose, onSave, docData }) => {
             dpdNum: row[12] !== undefined ? row[12].toString() : '',
           }));
   
-        console.log('Extracted Data:', extractedData);
-  
         onSave(extractedData, true);
         onClose();
       };

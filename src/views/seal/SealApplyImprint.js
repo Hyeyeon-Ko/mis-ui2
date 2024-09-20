@@ -76,7 +76,6 @@ function SealApplyImprint() {
     
         axios.post('/api/seal/imprint', imprintRequestDTO)
             .then(response => {
-                console.log('Response:', response.data);
                 alert('인장 신청이 완료되었습니다.');
                 navigate('/api/myPendingList');
             })

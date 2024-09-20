@@ -32,7 +32,6 @@ function CorpDocIssueList() {
   const fetchIssueData = useCallback(async () => {
     try {
       const response = await axios.get('/api/corpDoc/issueList');
-      console.log("issueList: ", response.data.data.issueList);
 
       if (response.data) {
         const issueListData = response.data.data.issueList.map(item => ({

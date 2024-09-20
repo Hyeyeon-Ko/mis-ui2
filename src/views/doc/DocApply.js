@@ -180,7 +180,6 @@ function DocApply() {
     const { instCd } = auth;
     axios.get(`/api/std/orgChart`, { params: { instCd } })
       .then(response => {
-        console.log(response);
         setOrgData(response.data.data);
         setExpandedNodes({});
         setShowOrgChart(true);

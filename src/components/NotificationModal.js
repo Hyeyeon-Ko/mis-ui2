@@ -39,7 +39,6 @@ const NotificationModal = ({ onClose, position }) => {
     try {
       const response = await axios.get(`/api/noti/${auth.userId}`);
       const fetchedNotifications = Array.isArray(response.data.data) ? response.data.data : [];
-      console.log("NotificationModal -> fetchedNoti: ", fetchedNotifications);
 
       // 기존 알림과 중복되지 않는 새로운 알림만 추가
       setNotifications((prevNotifications) => {

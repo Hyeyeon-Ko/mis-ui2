@@ -110,7 +110,6 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
         axios
           .post('/api/docstorage/data', extractedData)
           .then((response) => {
-            console.log('Data successfully sent:', response.data);
             onSave(response.data);
             resetFormData();
             onClose();
@@ -178,7 +177,6 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
       axios
         .post('/api/docstorage/', payload)
         .then(response => {
-          console.log('Data successfully saved:', response.data);
           onSave([payload]);
           alert('항목이 성공적으로 추가되었습니다.');
           resetFormData();

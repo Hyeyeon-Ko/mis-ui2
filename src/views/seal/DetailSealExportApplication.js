@@ -218,7 +218,6 @@ function DetailSealExportApplication() {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            console.log('Response:', response.data);
             alert('인장 반출 신청이 성공적으로 수정되었습니다.');
             navigate('/api/myPendingList');
         } catch (error) {

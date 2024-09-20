@@ -42,12 +42,6 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
   };
 
   const handleAddItem = () => {
-    console.log("items.length: ", items.length);
-    // groupCd가 A000일 때만 하나 더 추가될 수 있도록 수정
-    // if(items.length === 10) {
-    //   setItems([...items, { value: '' }]);
-    //   return;
-    // }
     if (items.length < 10) {
       setItems([...items, { value: '' }]);
     } else {

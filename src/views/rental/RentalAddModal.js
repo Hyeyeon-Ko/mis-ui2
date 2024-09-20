@@ -102,7 +102,6 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
 
         axios.post('/api/rental/data', extractedData)
           .then((response) => {
-            console.log('Data successfully sent:', response.data);
             onSave(response.data); 
             onClose();
           })
@@ -170,7 +169,6 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
       
       axios.post('/api/rental/', payload)
         .then(response => {
-          console.log('Data successfully save:', response.data);
           onSave([payload]);
           alert('항목이 성공적으로 추가되었습니다.');
           resetFormData();

@@ -139,7 +139,6 @@ function DetailSealImprintApplication() {
             params: { draftId }, 
         })
         .then(response => {
-            console.log('Response:', response.data);
             alert('인장 신청이 성공적으로 수정되었습니다.');
             navigate('/api/myPendingList');
         })
