@@ -22,7 +22,11 @@ const NotificationModal = ({ onClose, position }) => {
     if (!readNotifications.includes(id)) {
       try {
         await axios.put(`/api/noti/read/${id}`);
-        setReadNotifications([...readNotifications, id]);
+        setNotifications((prevNotifications) =>
+          prevNotifications.map((noti) =>
+            noti.id === id ? { ...noti, isRead: true } : noti
+          )
+        );
       } catch (error) {
         console.error("Error marking notification as read:", error);
       }
@@ -34,13 +38,11 @@ const NotificationModal = ({ onClose, position }) => {
   const fetchNotificationsFromDB = async () => {
     try {
       const response = await axios.get(`/api/noti/${auth.userId}`);
-      console.log("response: ", response);
       const fetchedNotifications = Array.isArray(response.data.data) ? response.data.data : [];
       console.log("NotificationModal -> fetchedNoti: ", fetchedNotifications);
 
       // 기존 알림과 중복되지 않는 새로운 알림만 추가
       setNotifications((prevNotifications) => {
-        console.log("prev: ", prevNotifications);
         const updatedNotifications = prevNotifications.filter(
           (prevNoti) => !fetchedNotifications.some((noti) => noti.id === prevNoti.id)
         );
@@ -54,6 +56,12 @@ const NotificationModal = ({ onClose, position }) => {
   useEffect(() => {
     fetchNotificationsFromDB(); // 모달 열릴 때 DB에서 알림 불러오기
   }, []);
+
+  // 알림을 읽은 것과 읽지 않은 것으로 나눈 뒤 각각 createdDate로 정렬
+  const sortedNotifications = [...notifications]
+    .sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate)); // createdDate로 정렬
+  const unreadNotifications = sortedNotifications.filter(noti => !noti.isRead); // 읽지 않은 알림
+  const readNotificationsSorted = sortedNotifications.filter(noti => noti.isRead); // 읽은 알림
 
   return (
     <div
@@ -71,12 +79,13 @@ const NotificationModal = ({ onClose, position }) => {
         </div>
         <div className='modal-content-detail'> 
           <ul>
-            {notifications.length > 0 ? (
-              [...notifications].reverse().map((noti, index) => (
+            {/* 미확인 알림을 먼저 표시 */}
+            {unreadNotifications.length > 0 ? (
+              unreadNotifications.map((noti, index) => (
                 <li
                   key={index}
                   onClick={() => handleItemClick(noti.id)}
-                  className={`notification-item ${readNotifications.includes(noti.id) ? '' : 'unclicked'}`}
+                  className="notification-item unclicked"
                 >
                   <span
                     className="notification-content"
@@ -85,7 +94,27 @@ const NotificationModal = ({ onClose, position }) => {
                   <span className="notification-date">{noti.createdDate}</span>
                 </li>
               ))
-            ) : (
+            ) : null}
+
+            {/* 확인한 알림을 그 밑에 표시 */}
+            {readNotificationsSorted.length > 0 ? (
+              readNotificationsSorted.map((noti, index) => (
+                <li
+                  key={index}
+                  onClick={() => handleItemClick(noti.id)}
+                  className="notification-item"
+                >
+                  <span
+                    className="notification-content"
+                    dangerouslySetInnerHTML={{ __html: formatContent(noti.content) }}
+                  ></span>
+                  <span className="notification-date">{noti.createdDate}</span>
+                </li>
+              ))
+            ) : null}
+            
+            {/* 알림이 없을 때 */}
+            {notifications.length === 0 && (
               <li>알림이 없습니다.</li>
             )}
           </ul>
