@@ -53,14 +53,19 @@ const NotificationModal = ({ onClose, position }) => {
   }, [auth.userId, setNotifications]);
 
   useEffect(() => {
-    fetchNotificationsFromDB(); // 모달 열릴 때 DB에서 알림 불러오기
+    fetchNotificationsFromDB();
   }, [fetchNotificationsFromDB]);
 
   // 알림을 읽은 것과 읽지 않은 것으로 나눈 뒤 각각 createdDate로 정렬
   const sortedNotifications = [...notifications]
-    .sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate)); // createdDate로 정렬
-  const unreadNotifications = sortedNotifications.filter(noti => !noti.isRead); // 읽지 않은 알림
-  const readNotificationsSorted = sortedNotifications.filter(noti => noti.isRead); // 읽은 알림
+    .sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
+  const unreadNotifications = sortedNotifications.filter(noti => !noti.isRead);
+  const now = new Date();
+  const thirtyDaysAgo = new Date(now.setDate(now.getDate() - 30));
+
+  const readNotificationsSorted = sortedNotifications
+    .filter(noti => noti.isRead && new Date(noti.createdDate) > thirtyDaysAgo);
+
 
   return (
     <div
