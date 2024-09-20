@@ -103,7 +103,7 @@ function SealApplyImprint() {
                             </div>
                             <div className='seal-imprint-form-group'>
                                 <label>사용일자</label>
-                                <input type="text" name="useDate" required/>
+                                <input type="text" name="useDate" required placeholder="YYYY-MM-DD"/>
                             </div>
                             <div className='seal-imprint-form-group'>
                                 <label>사용목적</label>

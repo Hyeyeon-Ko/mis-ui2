@@ -245,6 +245,7 @@ function SealApplyExport() {
                                 <input
                                     type="text"
                                     name="exportDate"
+                                    placeholder="YYYY-MM-DD"
                                     required
                                 />
                             </div>
@@ -253,6 +254,8 @@ function SealApplyExport() {
                                 <input
                                     type="text"
                                     name="returnDate"
+                                    placeholder="YYYY-MM-DD"
+                                
                                     required
                                 />
                             </div>
