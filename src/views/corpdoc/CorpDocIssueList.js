@@ -32,6 +32,7 @@ function CorpDocIssueList() {
   const fetchIssueData = useCallback(async () => {
     try {
       const response = await axios.get('/api/corpDoc/issueList');
+      console.log("issueList: ", response.data.data.issueList);
 
       if (response.data) {
         const issueListData = response.data.data.issueList.map(item => ({
@@ -50,6 +51,7 @@ function CorpDocIssueList() {
             used: item.status === "X" ? 0 : item.certCoregister,
             left: item.totalCoregister
           },
+          note: item.note,
           applicantName: item.drafter || '',  
           center: item.instNm || '',         
           approveStatus: '결재진행중',
@@ -250,6 +252,7 @@ function CorpDocIssueList() {
               <th rowSpan="2">사용목적</th>
               <th colSpan="3">법인인감증명서</th>
               <th colSpan="3">법인등기사항전부증명서</th>
+              <th rowSpan="2">비고</th>
               <th rowSpan="2">결재</th>
             </tr>
             <tr>
@@ -279,6 +282,7 @@ function CorpDocIssueList() {
                   <td>{app.registry.incoming}</td>
                   <td>{app.registry.used}</td>
                   <td>{app.registry.left}</td>
+                  <td>{app.note}</td>
                   <td
                     className={`status-${app.approveStatus.replace(/\s+/g, '-').toLowerCase()} clickable ${
                       clickedRows.includes(app.id) ? 'confirmed' : ''}`}

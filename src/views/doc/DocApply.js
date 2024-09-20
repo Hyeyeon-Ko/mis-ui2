@@ -89,7 +89,6 @@ function DocApply() {
     e.preventDefault();
 
     if (!validateForm()) {
-      // alert('모든 필수 항목을 입력해주세요.');
       return;
     }
 
