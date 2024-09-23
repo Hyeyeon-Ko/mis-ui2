@@ -190,7 +190,7 @@ function ApplicationsList() {
     } finally {
       setLoading(false);
     }
-  }, [fetchApplications]);
+  }, [fetchApplications, applyStatusFilters, auth.userId, documentTypeFromUrl, instCd, selectedCenter]);
 
   const fetchSealImprintDetail = async (draftId) => {
     try {
