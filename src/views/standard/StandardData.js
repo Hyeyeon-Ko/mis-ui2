@@ -29,6 +29,7 @@ function StandardData() {
   const categories = [
     { categoryCode: 'A', categoryName: 'A 공통' },
     { categoryCode: 'B', categoryName: 'B 권한' },
+    { categoryCode: 'C', categoryName: 'C 인사정보' },
   ];
 
   useEffect(() => {

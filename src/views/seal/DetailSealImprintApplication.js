@@ -14,16 +14,13 @@ import RejectReasonModal from '../../components/RejectReasonModal';
 const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
 function DetailSealImprintApplication() {
-    const { auth } = useContext(AuthContext);
+    const { auth, refreshSidebar } = useContext(AuthContext);
     const { draftId } = useParams(); 
     const navigate = useNavigate();
     const location = useLocation();
     const { sealImprintDetails, readOnly } = location.state || {}; 
     const queryParams = new URLSearchParams(location.search);
     const applyStatus = queryParams.get('applyStatus'); 
-
-    console.log(applyStatus);
-
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [sealSelections, setSealSelections] = useState({
         corporateSeal: { selected: false, quantity: '' },
@@ -144,7 +141,6 @@ function DetailSealImprintApplication() {
             params: { draftId }, 
         })
         .then(response => {
-            console.log('Response:', response.data);
             alert('인장 신청이 성공적으로 수정되었습니다.');
             navigate('/api/myPendingList');
         })
@@ -156,7 +152,7 @@ function DetailSealImprintApplication() {
 
     const handleApproval = (e) => {
         e.preventDefault();  
-        axios.post(`${apiUrl}/api/seal/${draftId}`) 
+        axios.post(`/api/seal/${draftId}`) 
         .then(response => {
             console.log('Approval Response:', response.data);
             alert('인장 신청이 성공적으로 승인되었습니다.');
@@ -168,7 +164,7 @@ function DetailSealImprintApplication() {
             navigate('/api/pendingList?documentType=인장신청');
         });
     };
-    
+                
     const handleReject = (e) => {
         e.preventDefault();
         setShowRejectModal(true);
@@ -187,14 +183,15 @@ function DetailSealImprintApplication() {
           });
           if (response.data.code === 200) {
             alert('인장 신청이 반려되었습니다.');
-            navigate(`/api/pendingList?documentType=인장신청`);  
+            await refreshSidebar();
+            navigate(`/api/pendingList?documentType=인장신청`);
           } else {
             alert('인장 반려 중 오류가 발생했습니다.');
           }
         } catch (error) {
           alert('인장 반려 중 오류가 발생했습니다.');
         }
-      };    
+    };
     
     const handleChange = (e) => {
         if (!readOnly) {

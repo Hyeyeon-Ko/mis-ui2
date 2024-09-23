@@ -15,7 +15,7 @@ const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 function PendingApprovalList() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { auth } = useContext(AuthContext); 
+  const { auth, refreshSidebar } = useContext(AuthContext);
   const instCd = auth.instCd;
 
   const [applications, setApplications] = useState([]);
@@ -26,9 +26,13 @@ function PendingApprovalList() {
   const [selectedCenter, setSelectedCenter] = useState('전체');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const [filters, setFilters] = useState({
+  const [startDate, setStartDate] = useState(() => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - 1);
+    return date;
+  });
+  const [endDate, setEndDate] = useState(new Date());
+    const [filters, setFilters] = useState({
     statusApproved: false,
     statusRejected: false,
     statusOrdered: false,
@@ -64,7 +68,8 @@ function PendingApprovalList() {
           documentType,
           startDate: filterParams.startDate || '',
           endDate: filterParams.endDate || '',
-          instCd: instCd || '', 
+          instCd: instCd || '',
+          userId: auth.userId || '', 
         },
       });
 
@@ -120,7 +125,7 @@ function PendingApprovalList() {
     } finally {
       setLoading(false);
     }
-  }, [documentType, instCd]);
+  }, [documentType, instCd, auth.userId]);
 
   useEffect(() => {
     fetchPendingList(filters);
@@ -209,20 +214,25 @@ function PendingApprovalList() {
 
   const approveDocument = async (documentId) => {
     try {
-      await axios.put(`${apiUrl}/api/doc/confirm`, null, {
+      await axios.put(`/api/doc/confirm`, null, {
         params: { draftId: documentId },
       });
       alert('승인이 완료되었습니다.');
       closeModal();
-      fetchPendingList(filters);
       
+      fetchPendingList(filters);
+  
+      if (typeof refreshSidebar === 'function') {
+        refreshSidebar();  
+      }
+
       navigate(`/api/pendingList?documentType=${documentType}`);
     } catch (error) {
       console.error('Error approving document:', error);
       alert('Error approving document.');
     }
   };
-  
+    
   const normalizeDate = (dateString) => {
     const date = new Date(dateString);
     date.setHours(0, 0, 0, 0);
@@ -277,6 +287,9 @@ function PendingApprovalList() {
           onSearch={handleSearch}
           onReset={handleReset}
           showDocumentType={false}
+          showSearchCondition={false}
+          setDocumentType={() => {}} 
+          searchOptions={[]}          
         />
         {loading ? (
           <p>로딩 중...</p>
@@ -296,7 +309,7 @@ function PendingApprovalList() {
         />
       )}
     </div>
-    );
-  }
+  );
+}
 
 export default PendingApprovalList;

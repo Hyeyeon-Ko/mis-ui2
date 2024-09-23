@@ -48,3 +48,28 @@
   margin-left: 3px;
   vertical-align: middle;
 }
+
+.notification-icon {
+  width: 22px;
+  height: 22px;
+  vertical-align: middle;
+}
+
+.notification-wrapper {
+  position: relative;
+}
+
+.unread-badge {
+  position: absolute;
+  top: -2px;
+  right: 3px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../components/AuthContext';
 import Breadcrumb from '../../components/common/Breadcrumb';
@@ -136,10 +136,6 @@ function CorpDocApply() {
             alert('서류 신청에 실패했습니다.');
         }
     };
-
-    useEffect(() => {
-        console.log("formData: ", formData);
-    });
 
     return (
         <div className="content">

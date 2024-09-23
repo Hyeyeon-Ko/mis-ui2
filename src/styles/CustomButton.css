@@ -95,10 +95,10 @@
   border: none;
   border-radius: 5px;
   padding: 10px 6px 10px 20px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   letter-spacing: 16px;
-  margin-right: 16px;
+  margin-right: 10px;
   cursor: pointer;
 }
 
@@ -112,7 +112,7 @@
   border: none;
   border-radius: 5px;
   padding: 10px 6px 10px 20px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   letter-spacing: 16px;
   margin-right: 16px;
@@ -121,6 +121,23 @@
 
 .reject-button:hover {
   background-color: #E84646;
+}
+
+.chart-cancel-button {
+  background-color: #ECEEF4;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 6px 10px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 16px;
+  margin-right: 16px;
+  cursor: pointer;
+}
+
+.chart-cancel-button:hover {
+  background-color: rgb(222, 226, 231);
 }
 
 .store-button {
@@ -140,4 +157,23 @@
   width: 100px;
   height: 40px;
   padding-left: 15px;
+}
+
+.white-button {
+  color: #394A5B;
+  background-color: white;
+  border: 1px solid #DADDE1;
+  padding: 8px 12px;
+  font-weight: 400;
+  font-size: 12px;
+  border-radius: 4px;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 1.2;
+  min-width: 60px;
+  min-height: 30px;
+}
+
+.white-button:hover {
+  border-color: #9BA5B1;
 }

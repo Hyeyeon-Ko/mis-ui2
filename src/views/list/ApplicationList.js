@@ -97,105 +97,15 @@ function ApplicationsList() {
     }
   };
 
-  // const fetchApplications = useCallback(async (filterParams = {}) => {
-  //   setLoading(true);
-  //   setError(null);
-  //   try {
-  //     const response = await axios.get(`${apiUrl}/api/applyList', {
-  //       params: {
-  //         documentType: filterParams.documentType || documentTypeFromUrl || null,
-  //         startDate: filterParams.startDate || '',
-  //         endDate: filterParams.endDate || '',
-  //         searchType: filterParams.searchType || '전체',
-  //         keyword: filterParams.keyword || '',
-  //         instCd: instCd || '',
-  //         instNm: selectedCenter || '',
-  //       },
-  //     });
-
-  //     const { bcdMasterResponses, docMasterResponses, corpDocMasterResponses, sealMasterResponses } = response.data.data;
-
-  //     const combinedData = [
-  //       ...(bcdMasterResponses || []),
-  //       ...(docMasterResponses || []),
-  //       ...(corpDocMasterResponses || []),
-  //       ...(sealMasterResponses || []),
-  //     ];
-
-  //     const filteredData = combinedData.filter(application => application.applyStatus !== 'X');
-
-  //     const transformedData = filteredData.map(application => ({
-  //       draftId: application.draftId,
-  //       instCd: application.instCd,
-  //       instNm: application.instNm,
-  //       title: application.title,
-  //       draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
-  //       respondDate: application.respondDate ? parseDateTime(application.respondDate) : '',
-  //       orderDate: application.orderDate ? parseDateTime(application.orderDate) : '',
-  //       drafter: application.drafter,
-  //       applyStatus: getStatusText(application.applyStatus),
-  //       docType: application.docType,
-  //     }));
-
-  //     transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
-
-  //     setApplications(transformedData);
-  //     applyStatusFilters(transformedData);
-  //   } catch (error) {
-  //     console.error('Error fetching applications:', error);
-  //     setError('데이터를 불러오는 중 오류가 발생했습니다.');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }, [documentTypeFromUrl, instCd, selectedCenter, applyStatusFilters]);
-
-  const fetchSealImprintDetail = async (draftId) => {
-    try {
-      const response = await axios.get(`${apiUrl}/api/seal/imprint/${draftId}`);
-      return response.data.data;
-    } catch (error) {
-      console.error('Error fetching seal imprint details:', error);
-      alert('날인신청 정보를 불러오는 중 오류가 발생했습니다.');
-    }
-  };
-
-  const fetchSealExportDetail = async (draftId) => {
-    try {
-      const response = await axios.get(`${apiUrl}/api/seal/export/${draftId}`);
-      return response.data.data;
-    } catch (error) {
-      console.error('Error fetching seal export details:', error);
-      alert('반출신청 정보를 불러오는 중 오류가 발생했습니다.');
-    }
-  };
-
-  const applyStatusFilters = useCallback((data) => {
-    const filtered = data.filter((app) => {
-      if (filters.statusApproved && app.applyStatus === '승인완료') return true;
-      if (filters.statusRejected && app.applyStatus === '반려') return true;
-      if (filters.statusOrdered && app.applyStatus === '발주완료') return true;
-      if (filters.statusClosed && app.applyStatus === '처리완료') return true;
-      return !Object.values(filters).some(Boolean); 
-    });
-    setFilteredApplications(filtered);
-  }, [filters, setFilteredApplications]);
-
-  useEffect(() => {
-    applyStatusFilters(applications);
-  }, [filters, applications, applyStatusFilters]);
-
-  const fetchApplications = useCallback(async (filterParams = {}) => {
+  const fetchApplications = async (filterParams = {}) => {
     setLoading(true);
     setError(null);
     try {
       const response = await axios.get(`${apiUrl}/api/applyList`, {
         params: {
           documentType: filterParams.documentType || documentTypeFromUrl || null,
-          startDate: filterParams.startDate || '',
-          endDate: filterParams.endDate || '',
-          searchType: filterParams.searchType || '전체',
-          keyword: filterParams.keyword || '',
           instCd: instCd || '',
+          userId: auth.userId || '',
           instNm: selectedCenter || '',
         },
       });
@@ -234,7 +144,47 @@ function ApplicationsList() {
     } finally {
       setLoading(false);
     }
-  }, [documentTypeFromUrl, instCd, selectedCenter, applyStatusFilters]);
+  };
+
+  const fetchSealImprintDetail = async (draftId) => {
+    try {
+      const response = await axios.get(`/api/seal/imprint/${draftId}`);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching seal imprint details:', error);
+      alert('날인신청 정보를 불러오는 중 오류가 발생했습니다.');
+    }
+  };
+
+  const fetchSealExportDetail = async (draftId) => {
+    try {
+      const response = await axios.get(`/api/seal/export/${draftId}`);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching seal export details:', error);
+      alert('반출신청 정보를 불러오는 중 오류가 발생했습니다.');
+    }
+  };
+
+  const applyStatusFilters = useCallback((data) => {
+    const filtered = data.filter((app) => {
+      if (filters.statusApproved && app.applyStatus === '승인완료') return true;
+      if (filters.statusRejected && app.applyStatus === '반려') return true;
+      if (filters.statusOrdered && app.applyStatus === '발주완료') return true;
+      if (filters.statusClosed && app.applyStatus === '처리완료') return true;
+      return !Object.values(filters).some(Boolean); 
+    });
+    setFilteredApplications(filtered);
+  }, [filters]);
+
+  useEffect(() => {
+    applyStatusFilters(applications);
+  }, [filters, applications, applyStatusFilters]);
+
+  useEffect(() => {
+    resetFilters();
+    fetchApplications();
+  }, [documentTypeFromUrl]);
 
   const resetFilters = useCallback(() => {
     const defaultStartDate = new Date();
@@ -280,18 +230,11 @@ function ApplicationsList() {
       [name]: !prevFilters[name],
     }));
   };
-
-  const handleSearch = (searchParams) => {
-    fetchApplications({
-      documentType: filterInputs.documentType,
-      startDate: filterInputs.startDate ? filterInputs.startDate.toISOString().split('T')[0] : '',
-      endDate: filterInputs.endDate ? filterInputs.endDate.toISOString().split('T')[0] : '',
-      searchType: searchParams.searchType,
-      keyword: searchParams.keyword,
-      instCd: instCd,
-    });
+        
+  const handleSearch = () => {
+    applyFilters();
   };
-
+      
   const handleReset = () => {
     resetFilters();
     fetchApplications();
@@ -453,6 +396,7 @@ function ApplicationsList() {
           setSearchType={(searchType) => setFilterInputs(prev => ({ ...prev, searchType }))}
           keyword={filterInputs.keyword}
           setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
+          searchOptions={['전체', '제목', '신청자']} 
         />
         {loading ? (
           <p>로딩 중...</p>

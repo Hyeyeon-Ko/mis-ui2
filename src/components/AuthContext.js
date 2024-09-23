@@ -1,5 +1,6 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { subscribeToNotifications } from './SseSubscribe';
 
 // AuthContext 생성 -> 인증 상태 저장
 export const AuthContext = createContext();
@@ -7,6 +8,8 @@ export const AuthContext = createContext();
 // AuthProvider 컴포넌트 -> 인증 상태 제공
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
+  const [notifications, setNotifications] = useState([]);
+  const eventSourceRef = useRef(null);
   const [auth, setAuth] = useState({
     userId: '',
     hngNm: '',
@@ -17,12 +20,18 @@ export const AuthProvider = ({ children }) => {
     instCd: '',
     deptCd: '',
     teamCd: '',
+    roleNm: '',
     isUserMode: false,
     originalRole: '',
   });
 
-  // 앱 로드 시 세션 스토리지에서 인증 상태를 불러옴
+  const [sidebarUpdate, setSidebarUpdate] = useState(false); 
+
+  // 앱 로드 시 세션 스토리지에서 인증 상태와 알림을 불러옴
   useEffect(() => {
+    const storedNotifications = JSON.parse(sessionStorage.getItem('notifications')) || [];
+    setNotifications(storedNotifications); 
+
     const storedAuth = {
       userId: sessionStorage.getItem('userId'),
       hngNm: sessionStorage.getItem('hngNm'),
@@ -33,6 +42,7 @@ export const AuthProvider = ({ children }) => {
       instCd: sessionStorage.getItem('instCd') || '',
       deptCd: sessionStorage.getItem('deptCd') || '',
       teamCd: sessionStorage.getItem('teamCd') || '',
+      roleNm: sessionStorage.getItem('roleNm') || '',
       isUserMode: sessionStorage.getItem('isUserMode') === 'true',
       originalRole: sessionStorage.getItem('originalRole') || sessionStorage.getItem('role'),
     };
@@ -41,6 +51,19 @@ export const AuthProvider = ({ children }) => {
       setAuth(storedAuth);
     }
   }, []);
+
+  useEffect(() => {
+    if (auth.userId && !eventSourceRef.current) {
+      eventSourceRef.current = subscribeToNotifications(auth.userId, setNotifications);
+    }
+
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+    };
+  }, [auth.userId]);
 
   // 인증 상태가 변경될 때마다 세션 스토리지에 저장
   useEffect(() => {
@@ -53,11 +76,12 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.setItem('instCd', auth.instCd);
     sessionStorage.setItem('deptCd', auth.deptCd);
     sessionStorage.setItem('teamCd', auth.teamCd);
+    sessionStorage.setItem('roleNm', auth.roleNm);
     sessionStorage.setItem('isUserMode', auth.isUserMode.toString());
     sessionStorage.setItem('originalRole', auth.originalRole);
   }, [auth]);
 
-  const login = (userId, hngNm, role, sidebarPermissions, hasStandardDataAuthority, instCd, deptCd, teamCd) => { 
+  const login = (userId, hngNm, role, sidebarPermissions, hasStandardDataAuthority, instCd, deptCd, teamCd, roleNm) => {
     const newAuthState = {
       userId,
       hngNm,
@@ -68,11 +92,17 @@ export const AuthProvider = ({ children }) => {
       instCd,
       deptCd,
       teamCd,
+      roleNm,
       isUserMode: false,
       originalRole: role,
     };
     setAuth(newAuthState);
-    navigate('/');  
+
+    if (!eventSourceRef.current) {
+      eventSourceRef.current = subscribeToNotifications(userId, setNotifications);
+    }
+
+    navigate('/');
   };
 
   const logout = () => {
@@ -84,8 +114,9 @@ export const AuthProvider = ({ children }) => {
       sidebarPermissions: [],
       hasStandardDataAuthority: false,
       instCd: '',
-      deptCd: '', 
+      deptCd: '',
       teamCd: '',
+      roleNm: '',
       isUserMode: false,
       originalRole: '',
     });
@@ -96,10 +127,17 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.removeItem('sidebarPermissions');
     sessionStorage.removeItem('hasStandardDataAuthority');
     sessionStorage.removeItem('instCd');
-    sessionStorage.removeItem('deptCd'); 
-    sessionStorage.removeItem('teamCd'); 
+    sessionStorage.removeItem('deptCd');
+    sessionStorage.removeItem('teamCd');
+    sessionStorage.removeItem('roleNm');
     sessionStorage.removeItem('isUserMode');
     sessionStorage.removeItem('originalRole');
+    sessionStorage.removeItem('notifications');
+
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
 
     sessionStorage.clear();
     navigate('/api/login');
@@ -116,8 +154,12 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
+  const refreshSidebar = () => {
+    setSidebarUpdate((prev) => !prev);
+  };
+
   return (
-    <AuthContext.Provider value={{ auth, login, logout, toggleMode }}>
+    <AuthContext.Provider value={{ auth, login, logout, toggleMode, notifications, setNotifications, refreshSidebar, sidebarUpdate }}>
       {children}
     </AuthContext.Provider>
   );

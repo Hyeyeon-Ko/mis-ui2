@@ -11,7 +11,6 @@ const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [documentType, setDocumentType] = useState('');
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
@@ -24,7 +23,7 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
         draftDate: parseDateTime(item.draftDate), 
       }));
       setData(transformedData);
-      setFilteredData(transformedData);
+      setFilteredData(transformedData); 
     } catch (error) {
       console.error('Error fetching application history:', error);
     }
@@ -67,25 +66,21 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
     }
   };
 
-  const handleSearch = (filterParams) => {
-    const { startDate, endDate, documentType } = filterParams;
+  const handleSearch = () => {
     const newData = data.filter((item) => {
       const itemDate = new Date(item.draftDate);
       const matchesDate =
         (!startDate || itemDate >= new Date(startDate)) &&
         (!endDate || itemDate <= new Date(endDate));
-      const matchesDocumentType =
-        !documentType || item.title.includes(documentType);
-      return matchesDate && matchesDocumentType;
+      return matchesDate;
     });
-    setFilteredData(newData);
+    setFilteredData(newData); 
   };
 
   const handleReset = () => {
     setStartDate(null);
     setEndDate(null);
-    setDocumentType('');
-    setFilteredData(data);
+    setFilteredData(data); 
   };
 
   if (!show) return null;
@@ -116,10 +111,10 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
             setStartDate={setStartDate}
             endDate={endDate}
             setEndDate={setEndDate}
-            documentType={documentType}
-            setDocumentType={setDocumentType}
             onSearch={handleSearch}
             onReset={handleReset}
+            showDocumentType={false}
+            showSearchCondition={false}
           />
         </div>
         <div className="table-container">

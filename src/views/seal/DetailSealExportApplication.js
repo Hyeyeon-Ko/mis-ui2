@@ -16,16 +16,13 @@ import deleteIcon from '../../assets/images/delete2.png';
 const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
 function DetailSealExportApplication() {
-    const { auth } = useContext(AuthContext);
+    const { auth, refreshSidebar } = useContext(AuthContext);
     const { draftId } = useParams(); 
     const navigate = useNavigate();
     const location = useLocation();
     const { sealExportDetails, readOnly } = location.state || {};
     const queryParams = new URLSearchParams(location.search);
     const applyStatus = queryParams.get('applyStatus'); 
-
-    console.log(applyStatus);
-
 
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [sealSelections, setSealSelections] = useState({
@@ -218,12 +215,11 @@ function DetailSealExportApplication() {
         formData.append('isFileDeleted', applicationDetails.isFileDeleted);
 
         try {
-            const response = await axios.post(`${apiUrl}/api/seal/export/update?draftId=${draftId}`, formData, {
+            const response = await axios.post(`/api/seal/export/update?draftId=${draftId}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            console.log('Response:', response.data);
             alert('인장 반출 신청이 성공적으로 수정되었습니다.');
             navigate('/api/myPendingList');
         } catch (error) {
@@ -234,7 +230,7 @@ function DetailSealExportApplication() {
 
     const handleApproval = (e) => {
         e.preventDefault();  
-        axios.post(`${apiUrl}/api/seal/${draftId}`) 
+        axios.post(`/api/seal/${draftId}`) 
         .then(response => {
             console.log('Approval Response:', response.data);
             alert('인장 신청이 성공적으로 승인되었습니다.');
@@ -265,6 +261,7 @@ function DetailSealExportApplication() {
           });
           if (response.data.code === 200) {
             alert('인장 신청이 반려되었습니다.');
+            await refreshSidebar();
             navigate(`/api/pendingList?documentType=인장신청`);  
           } else {
             alert('인장 반려 중 오류가 발생했습니다.');

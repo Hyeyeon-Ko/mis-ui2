@@ -5,8 +5,6 @@ import BlankImage from '../../assets/images/blank.png';
 const SealApprovalModal = ({ show, onClose, documentDetails = { signitureImage: BlankImage, approvers: [] } }) => {
   if (!show) return null;
 
-  console.log("모달에 전달된 documentDetails:", documentDetails);
-
   const renderApproverInfo = (approver, index) => (
     <td key={index}>
       <div className="approver-info">

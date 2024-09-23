@@ -45,38 +45,48 @@ function SealApplyImprint() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
+    
+        const submission = e.target.elements.destination.value.trim();
+        const useDate = e.target.elements.useDate.value.trim();
+        const purpose = e.target.elements.purpose.value.trim();
+    
+        const isAnySealSelected = sealSelections.corporateSeal.selected || sealSelections.facsimileSeal.selected || sealSelections.companySeal.selected;
+    
+        if (!isAnySealSelected) {
+            alert('최소 하나의 인감을 선택해야 합니다.');
+            return;
+        }
+    
         const selectedSeals = {
             corporateSeal: sealSelections.corporateSeal.selected ? sealSelections.corporateSeal.quantity : '',
             facsimileSeal: sealSelections.facsimileSeal.selected ? sealSelections.facsimileSeal.quantity : '',
             companySeal: sealSelections.companySeal.selected ? sealSelections.companySeal.quantity : '',
         };
-
+    
         const imprintRequestDTO = {
             drafter: auth.hngNm,
             drafterId: auth.userId,
-            submission: e.target.elements.destination.value,
-            useDate: e.target.elements.useDate.value,
+            submission,
+            useDate,
             corporateSeal: selectedSeals.corporateSeal,
             facsimileSeal: selectedSeals.facsimileSeal,
             companySeal: selectedSeals.companySeal,
-            purpose: e.target.elements.purpose.value,
+            purpose,
             notes: e.target.elements.notes.value,
             instCd: auth.instCd,
         };
 
-        axios.post(`${apiUrl}/api/seal/imprint`, imprintRequestDTO)
+        axios.post('/api/seal/imprint', imprintRequestDTO)
             .then(response => {
-                console.log('Response:', response.data);
-                alert('인장 신청이 완료되었습니다.'); 
+                alert('인장 신청이 완료되었습니다.');
                 navigate('/api/myPendingList');
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('인장 신청 중 오류가 발생했습니다. 다시 시도해주세요.'); 
+                alert('인장 신청 중 오류가 발생했습니다. 다시 시도해주세요.');
             });
     };
-
+    
     return (
         <div className="content">
             <div className="seal-imprint-content">
@@ -90,15 +100,15 @@ function SealApplyImprint() {
                             </div>
                             <div className='seal-imprint-form-group'>
                                 <label>제출처</label>
-                                <input type="text" name="destination" />
+                                <input type="text" name="destination" required/>
                             </div>
                             <div className='seal-imprint-form-group'>
                                 <label>사용일자</label>
-                                <input type="text" name="useDate" />
+                                <input type="text" name="useDate" required placeholder="YYYY-MM-DD"/>
                             </div>
                             <div className='seal-imprint-form-group'>
                                 <label>사용목적</label>
-                                <textarea name="purpose" />
+                                <textarea name="purpose" required/>
                             </div>
                             <div className='seal-imprint-form-group'>
                                 <label>인장구분</label>

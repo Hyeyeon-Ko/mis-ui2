@@ -5,14 +5,13 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import FinalConfirmationModal from './FinalConfirmationModal';
 import PreviewModal2 from './PreviewModal2'; 
+import OrgChartModal from './../../components/OrgChartModal';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/bcd/BcdApplySecond.css';
 import '../../styles/common/Page.css';
 
 import backImageEng from '../../assets/images/backimage_eng.png';
 import backImageCompany from '../../assets/images/backimage_company.png';
-
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
 function BcdApplySecond() {
   const { auth } = useContext(AuthContext);
@@ -71,6 +70,12 @@ function BcdApplySecond() {
   const [floor, setFloor] = useState('');
   const [isPreviewChecked, setIsPreviewChecked] = useState(false);
 
+  const [showOrgChart, setShowOrgChart] = useState(false); 
+  const [selectedUsers, setSelectedUsers] = useState([]); 
+  const [orgData, setOrgData] = useState([]); 
+  const [expandedNodes, setExpandedNodes] = useState({});
+  const [teamMembers, setTeamMembers] = useState([]);
+
   useEffect(() => {
     if (isOwn) {
       fetchUserInfo(auth.userId);
@@ -80,7 +85,7 @@ function BcdApplySecond() {
 
   const fetchUserInfo = async (userId) => {
     try {
-      const response = await axios.get(`${apiUrl}/api/info/${userId}`);
+      const response = await axios.get(`/api/info/${userId}`);
       if (response.data && response.data.data) {
         const userData = response.data.data;
         setFormData((prevFormData) => ({
@@ -105,7 +110,7 @@ function BcdApplySecond() {
 
   const fetchBcdStd = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/api/std/bcd`);
+      const response = await axios.get('/api/std/bcd');
       if (response.data && response.data.data) {
         const data = response.data.data;
 
@@ -142,6 +147,68 @@ function BcdApplySecond() {
     }
   };
 
+  const fetchOrgChart = () => {
+    const { instCd } = auth;
+    axios.get(`/api/std/orgChart`, {
+      params: { instCd }
+    })
+    .then(response => {
+      setOrgData(response.data.data);
+      setExpandedNodes({});
+      setShowOrgChart(true); 
+    })
+    .catch(error => console.error('Error fetching organization data:', error));
+  };
+  
+  const handleToggle = (detailCd) => {
+    setExpandedNodes((prevState) => ({
+      ...prevState,
+      [detailCd]: !prevState[detailCd],
+    }));
+  };
+  
+  const hasChildren = (detailCd) => {
+    return orgData.some(dept => dept.parentCd === detailCd);
+  };
+
+  const fetchTeamMembers = (detailCd) => {
+    console.log(`Fetching team members for detailCd: ${detailCd}`);
+    axios.get(`/api/info/orgChart`, { params: { detailCd } })
+      .then(response => {
+        console.log('Team members response:', response.data); 
+        setTeamMembers(response.data.data); 
+      })
+      .catch(error => {
+        console.error('Error fetching team members:', error);
+      });
+  };
+  
+  const renderOrgTree = (parentId, level = 0) => {
+    const children = orgData.filter(dept => dept.parentCd === parentId);
+    if (children.length === 0) return null;
+  
+    return (
+      <ul className="org-list">
+        {children.map(dept => (
+          <li key={dept.detailCd} className={`org-item level-${level}`}>
+            <div className="org-item-header" onClick={() => hasChildren(dept.detailCd) && handleToggle(dept.detailCd)}>
+              {hasChildren(dept.detailCd) ? (
+                <span className="toggle-button">
+                  {expandedNodes[dept.detailCd] ? '∧' : '∨'} 
+                </span>
+              ) : (
+                <span className="no-toggle"></span>
+              )}
+              <span className={`icon ${hasChildren(dept.detailCd) ? 'folder-icon' : 'file-icon'}`}></span>
+              <span onClick={() => fetchTeamMembers(dept.detailCd)}>{dept.detailNm}</span>
+            </div>
+            {expandedNodes[dept.detailCd] && renderOrgTree(dept.detailCd, level + 1)} 
+          </li>
+        ))}
+      </ul>
+    );
+  };
+  
   const handleInputClick = (e) => {
     if (!formData.userId) {
       alert('사번 조회를 통해 명함 대상자를 선택하세요.');
@@ -155,7 +222,7 @@ function BcdApplySecond() {
       return;
     }
     try {
-      const response = await axios.get(`${apiUrl}/api/info/${userIdInput}`);
+      const response = await axios.get(`/api/info/${userIdInput}`);
       if (response.data && response.data.data) {
         const userData = response.data.data;
 
@@ -231,16 +298,31 @@ function BcdApplySecond() {
       alert('명함 시안 미리보기를 확인해주세요.');
       return;
     }
+
+    if (auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) {
+      setSelectedUsers([]);
+      setShowFinalConfirmationModal(true); 
+    } else {
+      if (auth.roleNm !== '팀원') {
+        autoSelectApproversAndSubmit(); 
+      } else {
+        fetchOrgChart();
+      }
+    }
+  };
+  
+  const handleOrgChartConfirm = () => {
+    setShowOrgChart(false);
     setShowFinalConfirmationModal(true);
   };
 
   const handleConfirmRequest = async () => {
     setShowFinalConfirmationModal(false);
-  
+
     const isCustomTeam = formData.team === '000';
-  
+
     let teamCd, teamNm;
-  
+
     if (isCustomTeam) {
       teamCd = '000';
       teamNm = formData.teamNm;
@@ -251,7 +333,9 @@ function BcdApplySecond() {
         teamNm = selectedTeam.detailNm;
       }
     }
-  
+
+    const approverIds = selectedUsers.map(user => user.userId);
+
     const requestData = {
       drafter: auth.hngNm,
       drafterId: auth.userId,
@@ -261,7 +345,7 @@ function BcdApplySecond() {
       instCd: mappings.instMap[formData.center],
       deptCd: mappings.deptMap[formData.department],
       teamCd: teamCd,
-      teamNm: teamNm, 
+      teamNm: teamNm,
       engTeamNm: isCustomTeam ? formData.engTeam : null,
       gradeCd: formData.position,
       gradeNm: formData.position === '000' ? formData.gradeNm : formData.gradeNm,
@@ -274,15 +358,17 @@ function BcdApplySecond() {
       engAddress: formData.engAddress,
       division: formData.cardType === 'personal' ? 'B' : 'A',
       quantity: formData.quantity,
+      approverIds: approverIds,
+      currentApproverIndex: 0,
     };
-  
-    console.log('Final requestData:', requestData);
-  
+
     try {
-      const response = await axios.post(`${apiUrl}/api/bcd/`, requestData);
+      const endpoint = (auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) ? '/api/bcd/leader' : '/api/bcd/';
+
+      const response = await axios.post(endpoint, requestData);
       if (response.data.code === 200) {
         alert('명함 신청이 완료되었습니다.');
-        navigate('/api/myApplyList');
+        navigate('/api/myPendingList');
       } else {
         alert('명함 신청 중 오류가 발생했습니다.');
       }
@@ -290,11 +376,60 @@ function BcdApplySecond() {
       alert('명함 신청 중 오류가 발생했습니다.');
     }
   };
-  
-  useEffect(() => {
-    console.log('formData: ', formData);
-  }, [formData]);
 
+  const autoSelectApproversAndSubmit = async () => {
+    try {
+      const response = await axios.get('/api/info/confirm', { params: { instCd: auth.instCd } });
+  
+      if (response.data && response.data.data) {
+        const {
+          teamLeaderId,
+          teamLeaderNm,
+          teamLeaderRoleNm,
+          teamLeaderPositionNm,
+          teamLeaderDept,
+          managerId,
+          managerNm,
+          managerRoleNm,
+          managerPositionNm,
+          managerDept
+        } = response.data.data[0];
+  
+        const approvers = [
+          {
+            userId: managerId,
+            userNm: managerNm,
+            positionNm: managerPositionNm,
+            roleNm: managerRoleNm,
+            department: managerDept,
+            status: '대기',
+            docType: '명함신청',
+            seq: 1,
+          },
+          {
+            userId: teamLeaderId,
+            userNm: teamLeaderNm,
+            positionNm: teamLeaderPositionNm,
+            roleNm: teamLeaderRoleNm,
+            department: teamLeaderDept,
+            status: '대기',
+            docType: '명함신청',
+            seq: 2,
+          }
+        ];
+  
+        setSelectedUsers(approvers); 
+        setShowFinalConfirmationModal(true);  
+      }
+    } catch (error) {
+      console.error('Error fetching approvers data:', error);
+      alert('결재자 정보를 불러오는 중 오류가 발생했습니다.');
+    }
+  };  
+    
+  useEffect(() => {
+  }, [formData]);
+  
   const handleCenterChange = (e) => {
     if (!formData.userId) {
       alert('사번 조회를 통해 명함 대상자를 선택하세요.');
@@ -684,23 +819,30 @@ function BcdApplySecond() {
           </CustomButton>
           <CustomButton 
             className="apply-request-button" 
-            onClick={handleApplyRequest} 
-            disabled={!isPreviewChecked}
+            onClick={handleApplyRequest}
           >
             명함 신청하기
           </CustomButton>
         </div>
       </div>
-      <FinalConfirmationModal 
-        show={showFinalConfirmationModal} 
-        onClose={() => setShowFinalConfirmationModal(false)} 
+      <OrgChartModal
+        show={showOrgChart}
+        onClose={() => setShowOrgChart(false)} 
+        onConfirm={handleOrgChartConfirm}
+        selectedUsers={selectedUsers}
+        setSelectedUsers={setSelectedUsers}
+        renderOrgTree={renderOrgTree}
+        teamMembers={teamMembers}
+        mode="bcd" 
+      />
+      <FinalConfirmationModal
+        show={showFinalConfirmationModal}
+        onClose={() => setShowFinalConfirmationModal(false)}
         applicant={{ name: auth.hngNm, id: auth.userId }}
         recipient={{ name: formData.name, id: formData.userId }}
         cardType={formData.cardType === 'personal' ? '[뒷면] 영문 명함' : '[뒷면] 회사 정보'}
         quantity={formData.quantity}
         onConfirm={handleConfirmRequest}
-        title="최종 신청 확인"
-        confirmButtonText="신 청"
       />
       <PreviewModal2
         show={previewVisible}

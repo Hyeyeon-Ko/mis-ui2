@@ -6,7 +6,7 @@ import downloadIcon from '../../assets/images/download.png';
 
 const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
-const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus }) => {
+const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, refreshSidebar }) => {
   const [formData, setFormData] = useState({
     receptionDate: '',
     drafter: '',
@@ -16,7 +16,7 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus }) 
     purpose: '',
     division: '',
     fileName: '',
-    fileUrl: '' 
+    fileUrl: ''
   });
 
   const fetchDocumentData = useCallback(async (id) => {
@@ -52,8 +52,15 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus }) 
     return date.toISOString().split('T')[0];
   };
 
-  const handleApprove = () => {
-    onApprove(documentId);
+  const handleApprove = async () => {
+    try {
+      await onApprove(documentId);
+      if (refreshSidebar) {
+        refreshSidebar();  
+      }
+    } catch (error) {
+      console.error('Error approving document:', error);
+    }
   };
 
   const handleFileDownload = async () => {
@@ -66,7 +73,7 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus }) 
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', formData.fileName); 
+        link.setAttribute('download', formData.fileName);
         document.body.appendChild(link);
         link.click();
         link.parentNode.removeChild(link);
@@ -124,7 +131,7 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus }) 
             </div>
           </div>
         )}
-        {applyStatus === '승인대기' && ( 
+        {applyStatus === '승인대기' && (
           <div className="doc-confirm-modal-buttons">
             <button className="doc-confirm-button confirm" onClick={handleApprove}>
               <span>승인</span>
@@ -141,7 +148,8 @@ DocConfirmModal.propTypes = {
   documentId: PropTypes.number.isRequired,
   onClose: PropTypes.func.isRequired,
   onApprove: PropTypes.func.isRequired,
-  applyStatus: PropTypes.string.isRequired, 
+  applyStatus: PropTypes.string.isRequired,
+  refreshSidebar: PropTypes.func,
 };
 
 export default DocConfirmModal;
