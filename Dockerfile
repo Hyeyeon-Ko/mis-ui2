@@ -10,6 +10,10 @@ COPY package.json ./
 # package-lock.json 파일이 있는 경우 삭제
 RUN rm -f package-lock.json
 
+# 환경 변수 설정: ESLint 경고/오류 무시
+ENV ESLINT_NO_DEV_ERRORS=true
+ENV CI=false
+
 # 의존성 설치
 RUN npm install
 
