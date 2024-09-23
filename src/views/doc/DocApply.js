@@ -92,7 +92,11 @@ function DocApply() {
     }
   
     if (formData.division === 'A') {
-      handleReceiveRequest();
+      if (auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) {
+        handleReceiveLeaderRequest();
+      } else {
+        handleReceiveRequest();
+      }
     } else {
       if (auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) {
         handleSendLeaderRequest();
@@ -143,6 +147,45 @@ function DocApply() {
       alert('문서 수신 신청에 실패했습니다.');
     }
   };
+
+  const handleReceiveLeaderRequest = async () => {
+    const payload = new FormData();
+  
+    payload.append('docRequest', new Blob([JSON.stringify({
+      drafterId: formData.userId,
+      drafter: formData.drafter,
+      division: formData.division,
+      receiver: '',
+      sender: formData.receiver, 
+      docTitle: formData.title,
+      purpose: formData.purpose,
+      instCd: auth.instCd,
+      deptCd: auth.deptCd,
+    })], {
+      type: 'application/json'
+    }));
+  
+    if (attachment) {
+      payload.append('file', attachment);
+    }
+  
+    try {
+      const response = await fetch('/api/doc/receive/leader', {
+        method: 'POST',
+        body: payload,
+      });
+      if (response.ok) {
+        alert('문서 수신 신청이 완료되었습니다.');
+        navigate('/api/myApplyList');
+      } else {
+        alert('문서 수신 신청에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Error submitting form data:', error);
+      alert('문서 수신 신청에 실패했습니다.');
+    }
+
+  }
   
   const handleSendRequest = async (approvers) => {
     const payload = new FormData();
@@ -247,6 +290,7 @@ const autoSelectApproversAndSubmit = async () => {
       purpose: formData.purpose,
       instCd: auth.instCd,
       deptCd: auth.deptCd,
+      approverIds: [],
     })], {
       type: 'application/json'
     }));
@@ -262,7 +306,7 @@ const autoSelectApproversAndSubmit = async () => {
       });
       if (response.ok) {
         alert('문서 발신 신청이 완료되었습니다.');
-        navigate('/api/myPendingList');
+        navigate('/api/myApplyList');
       } else {
         alert('문서 발신 신청에 실패했습니다.');
       }

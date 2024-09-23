@@ -368,7 +368,7 @@ function BcdApplySecond() {
       const response = await axios.post(endpoint, requestData);
       if (response.data.code === 200) {
         alert('명함 신청이 완료되었습니다.');
-        navigate('/api/myPendingList');
+        navigate((auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) ? '/api/myApplyList' : '/api/myPendingList');
       } else {
         alert('명함 신청 중 오류가 발생했습니다.');
       }

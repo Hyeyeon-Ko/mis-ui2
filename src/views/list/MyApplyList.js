@@ -255,8 +255,14 @@ function MyApplyList() {
       Cell: ({ row }) => {
         const allowedDocumentTypes = ['명함신청', '문서수신', '문서발신'];
         const isAllowedDocType = allowedDocumentTypes.includes(row.docType);
-  
-        return (row.applyStatus === '승인대기' || row.applyStatus === '승인완료') && isAllowedDocType ? (
+    
+        const isSpecialRoleAndTeam =
+          (auth.roleNm === '팀장' || auth.roleNm === '본부장') &&
+          (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2');
+    
+        return (row.applyStatus === '승인대기' || row.applyStatus === '승인완료') &&
+          isAllowedDocType &&
+          !isSpecialRoleAndTeam ? (
           <button
             className="status-button"
             style={{ color: '#2789FE', textDecoration: 'underline' }}
@@ -265,10 +271,7 @@ function MyApplyList() {
             {row.applyStatus}
           </button>
         ) : row.applyStatus === '발주완료' || row.applyStatus === '발급완료' ? (
-          <button
-            className="status-button"
-            onClick={() => handleButtonClick(row)}
-          >
+          <button className="status-button" onClick={() => handleButtonClick(row)}>
             수령확인
           </button>
         ) : row.applyStatus === '반려' ? (
@@ -287,7 +290,9 @@ function MyApplyList() {
           <span
             style={{
               fontWeight: row.applyStatus === '처리완료' ? 'bold' : 'normal',
-              color: row.applyStatus === '처리완료' ? 'rgb(169, 169, 169)' : 'rgb(255, 255, 255)',
+              color: row.applyStatus === '처리완료'
+                ? 'rgb(169, 169, 169)'
+                : 'rgb(255, 255, 255)',
             }}
           >
             {row.applyStatus}

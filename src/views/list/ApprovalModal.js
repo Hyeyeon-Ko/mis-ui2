@@ -37,7 +37,7 @@ const ApprovalModal = ({ show, onClose, documentDetails = { signitureImage: Chec
       case '문서수신':
         return ['총무팀 담당자'];
       case '문서발신':
-        return ['신청자 팀장', '총무팀 담당자'];
+        return auth.roleNm = '팀원' ? ['신청자 팀장', '총무팀 담당자'] : ['총무팀 담당자'];
       default:
         return [];
     }
