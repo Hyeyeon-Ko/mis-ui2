@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext  } from 'react';
 import PropTypes from 'prop-types';
+import { AuthContext } from '../../components/AuthContext';
 import '../../styles/list/ApprovalModal.css';
 import CheckImage from '../../assets/images/check.png';
 
 const ApprovalModal = ({ show, onClose, documentDetails = { signitureImage: CheckImage, approvers: [], docType: '' } }) => {
   useEffect(() => {}, []);
-
+  
+  const { auth } = useContext(AuthContext);
   if (!show) return null;
 
   const renderApproverInfo = (approver, index) => {
@@ -28,11 +30,10 @@ const ApprovalModal = ({ show, onClose, documentDetails = { signitureImage: Chec
     );
   };
 
-  // 문서 타입에 따른 열 정의
   const getColumnsByDocType = () => {
     switch (documentDetails.docType) {
       case '명함신청':
-        return ['신청자 팀장', '총무팀 담당자', '총무팀 팀장'];
+        return auth.roleNm === '팀원' ? ['신청자 팀장', '총무팀 담당자', '총무팀 팀장'] : ['총무팀 담당자', '총무팀 팀장'];
       case '문서수신':
         return ['총무팀 담당자'];
       case '문서발신':
@@ -44,7 +45,7 @@ const ApprovalModal = ({ show, onClose, documentDetails = { signitureImage: Chec
 
   const columns = getColumnsByDocType();
   const approversToShow = columns.length;
-  const modalWidth = approversToShow * 170 + 60; // 각 열 너비에 맞게 모달의 너비를 계산
+  const modalWidth = approversToShow * 170 + 60; 
 
   return (
     <div className="approval-modal-overlay">

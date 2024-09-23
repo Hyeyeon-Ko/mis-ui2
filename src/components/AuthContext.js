@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }) => {
     instCd: '',
     deptCd: '',
     teamCd: '',
+    roleNm: '',
     isUserMode: false,
     originalRole: '',
   });
@@ -41,6 +42,7 @@ export const AuthProvider = ({ children }) => {
       instCd: sessionStorage.getItem('instCd') || '',
       deptCd: sessionStorage.getItem('deptCd') || '',
       teamCd: sessionStorage.getItem('teamCd') || '',
+      roleNm: sessionStorage.getItem('roleNm') || '',
       isUserMode: sessionStorage.getItem('isUserMode') === 'true',
       originalRole: sessionStorage.getItem('originalRole') || sessionStorage.getItem('role'),
     };
@@ -74,11 +76,12 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.setItem('instCd', auth.instCd);
     sessionStorage.setItem('deptCd', auth.deptCd);
     sessionStorage.setItem('teamCd', auth.teamCd);
+    sessionStorage.setItem('roleNm', auth.roleNm);
     sessionStorage.setItem('isUserMode', auth.isUserMode.toString());
     sessionStorage.setItem('originalRole', auth.originalRole);
   }, [auth]);
 
-  const login = (userId, hngNm, role, sidebarPermissions, hasStandardDataAuthority, instCd, deptCd, teamCd) => {
+  const login = (userId, hngNm, role, sidebarPermissions, hasStandardDataAuthority, instCd, deptCd, teamCd, roleNm) => {
     const newAuthState = {
       userId,
       hngNm,
@@ -89,6 +92,7 @@ export const AuthProvider = ({ children }) => {
       instCd,
       deptCd,
       teamCd,
+      roleNm,
       isUserMode: false,
       originalRole: role,
     };
@@ -112,6 +116,7 @@ export const AuthProvider = ({ children }) => {
       instCd: '',
       deptCd: '',
       teamCd: '',
+      roleNm: '',
       isUserMode: false,
       originalRole: '',
     });
@@ -124,6 +129,7 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.removeItem('instCd');
     sessionStorage.removeItem('deptCd');
     sessionStorage.removeItem('teamCd');
+    sessionStorage.removeItem('roleNm');
     sessionStorage.removeItem('isUserMode');
     sessionStorage.removeItem('originalRole');
     sessionStorage.removeItem('notifications');

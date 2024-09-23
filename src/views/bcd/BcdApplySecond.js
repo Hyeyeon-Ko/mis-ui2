@@ -298,9 +298,19 @@ function BcdApplySecond() {
       alert('명함 시안 미리보기를 확인해주세요.');
       return;
     }
-    fetchOrgChart(); 
-  };
 
+    if (auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) {
+      setSelectedUsers([]);
+      setShowFinalConfirmationModal(true); 
+    } else {
+      if (auth.roleNm !== '팀원') {
+        autoSelectApproversAndSubmit(); 
+      } else {
+        fetchOrgChart();
+      }
+    }
+  };
+  
   const handleOrgChartConfirm = () => {
     setShowOrgChart(false);
     setShowFinalConfirmationModal(true);
@@ -308,11 +318,11 @@ function BcdApplySecond() {
 
   const handleConfirmRequest = async () => {
     setShowFinalConfirmationModal(false);
-  
+
     const isCustomTeam = formData.team === '000';
-    
+
     let teamCd, teamNm;
-  
+
     if (isCustomTeam) {
       teamCd = '000';
       teamNm = formData.teamNm;
@@ -323,9 +333,9 @@ function BcdApplySecond() {
         teamNm = selectedTeam.detailNm;
       }
     }
-  
+
     const approverIds = selectedUsers.map(user => user.userId);
-  
+
     const requestData = {
       drafter: auth.hngNm,
       drafterId: auth.userId,
@@ -335,7 +345,7 @@ function BcdApplySecond() {
       instCd: mappings.instMap[formData.center],
       deptCd: mappings.deptMap[formData.department],
       teamCd: teamCd,
-      teamNm: teamNm, 
+      teamNm: teamNm,
       engTeamNm: isCustomTeam ? formData.engTeam : null,
       gradeCd: formData.position,
       gradeNm: formData.position === '000' ? formData.gradeNm : formData.gradeNm,
@@ -351,9 +361,11 @@ function BcdApplySecond() {
       approverIds: approverIds,
       currentApproverIndex: 0,
     };
-  
+
     try {
-      const response = await axios.post('/api/bcd/', requestData);
+      const endpoint = (auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) ? '/api/bcd/leader' : '/api/bcd/';
+
+      const response = await axios.post(endpoint, requestData);
       if (response.data.code === 200) {
         alert('명함 신청이 완료되었습니다.');
         navigate('/api/myPendingList');
@@ -364,6 +376,56 @@ function BcdApplySecond() {
       alert('명함 신청 중 오류가 발생했습니다.');
     }
   };
+
+  const autoSelectApproversAndSubmit = async () => {
+    try {
+      const response = await axios.get('/api/info/confirm', { params: { instCd: auth.instCd } });
+  
+      if (response.data && response.data.data) {
+        const {
+          teamLeaderId,
+          teamLeaderNm,
+          teamLeaderRoleNm,
+          teamLeaderPositionNm,
+          teamLeaderDept,
+          managerId,
+          managerNm,
+          managerRoleNm,
+          managerPositionNm,
+          managerDept
+        } = response.data.data[0];
+  
+        const approvers = [
+          {
+            userId: managerId,
+            userNm: managerNm,
+            positionNm: managerPositionNm,
+            roleNm: managerRoleNm,
+            department: managerDept,
+            status: '대기',
+            docType: '명함신청',
+            seq: 1,
+          },
+          {
+            userId: teamLeaderId,
+            userNm: teamLeaderNm,
+            positionNm: teamLeaderPositionNm,
+            roleNm: teamLeaderRoleNm,
+            department: teamLeaderDept,
+            status: '대기',
+            docType: '명함신청',
+            seq: 2,
+          }
+        ];
+  
+        setSelectedUsers(approvers); 
+        setShowFinalConfirmationModal(true);  
+      }
+    } catch (error) {
+      console.error('Error fetching approvers data:', error);
+      alert('결재자 정보를 불러오는 중 오류가 발생했습니다.');
+    }
+  };  
     
   useEffect(() => {
   }, [formData]);

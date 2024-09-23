@@ -25,8 +25,6 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      console.log('Attempting login with:', { userId, userPw });
-
       const response = await fetch('/api/login', {
         method: 'POST',
         headers: {
@@ -35,11 +33,8 @@ const Login = () => {
         body: JSON.stringify({ userId, userPw }),
       });
 
-      console.log('Login response:', response);
-
       if (response.ok) {
         const data = await response.json();
-        console.log('Login data received:', data);
 
         if (data && data.data) {
           const authorityResponse = await fetch('/api/auth/standardData', {
@@ -50,11 +45,8 @@ const Login = () => {
             },
           });
 
-          console.log('Authority response:', authorityResponse);
-
           if (authorityResponse.ok) {
             const authorityData = await authorityResponse.json();
-            console.log('Authority data received:', authorityData);
 
             login(
               userId, 
@@ -65,9 +57,8 @@ const Login = () => {
               data.data.instCd, 
               data.data.deptCd,
               data.data.teamCd,
+              data.data.roleNm,
             );
-
-            console.log('User logged in with role:', data.data.role);
 
             if (data.data.role === 'ADMIN' || data.data.role === 'MASTER') {
               navigate('/api/std');

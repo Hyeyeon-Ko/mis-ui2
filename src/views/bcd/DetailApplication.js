@@ -311,7 +311,7 @@ function DetailApplication() {
         
   const handleRejectConfirm = async (reason) => {
     try {
-      const response = await axios.post(`/api/bcd/applyList/return/${draftId}`, reason, {
+      const response = await axios.post(`/api/bcd/applyList/return/${draftId}`, reason, auth.userId, {
         headers: {
           'Content-Type': 'text/plain',
         },

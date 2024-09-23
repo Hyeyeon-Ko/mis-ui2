@@ -1,11 +1,7 @@
 export const subscribeToNotifications = (userId, setNotifications) => {
-    // todo: 추후, 운영서버 주소로 변경
+    // TODO: 추후, 운영서버 주소로 변경
     const eventSource = new EventSource(`http://localhost:9090/api/noti/subscribe/${userId}`);
-  
-    eventSource.onopen = () => {
-      console.log("SSE connection opened for user:", userId);
-    };
-  
+    
     eventSource.addEventListener('notification', (event) => {
 
       if (event.data && event.data.startsWith('{')) {

@@ -76,7 +76,6 @@ function DocApply() {
       return false;
     }
 
-    // 첨부파일 확인
     if (!attachment) {
       alert('첨부파일이 필요합니다.');
       return false;
@@ -87,18 +86,26 @@ function DocApply() {
 
   const handleApplyRequest = (e) => {
     e.preventDefault();
-
+  
     if (!validateForm()) {
       return;
     }
-
+  
     if (formData.division === 'A') {
       handleReceiveRequest();
     } else {
-      fetchOrgChart();
+      if (auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) {
+        handleSendLeaderRequest();
+      } else {
+        if (auth.roleNm !== '팀원') {
+          autoSelectApproversAndSubmit(); 
+        } else {
+          fetchOrgChart(); 
+        }
+      }
     }
   };
-
+  
   const handleReceiveRequest = async () => {
     const payload = new FormData();
   
@@ -137,9 +144,9 @@ function DocApply() {
     }
   };
   
-  const handleSendRequest = async () => {
+  const handleSendRequest = async (approvers) => {
     const payload = new FormData();
-  
+
     payload.append('docRequest', new Blob([JSON.stringify({
       drafterId: formData.userId,
       drafter: formData.drafter,
@@ -150,15 +157,15 @@ function DocApply() {
       purpose: formData.purpose,
       instCd: auth.instCd,
       deptCd: auth.deptCd,
-      approverIds: selectedUsers.map(user => user.userId),
+      approverIds: approvers.map(user => user.userId), 
     })], {
       type: 'application/json'
     }));
-  
+
     if (attachment) {
       payload.append('file', attachment);
     }
-  
+
     try {
       const response = await fetch('/api/doc/send', {
         method: 'POST',
@@ -176,6 +183,95 @@ function DocApply() {
     }
   };
   
+const autoSelectApproversAndSubmit = async () => {
+    try {
+      const response = await axios.get('/api/info/confirm', { params: { instCd: auth.instCd } });
+
+      if (response.data && response.data.data) {
+        const {
+          teamLeaderId,
+          teamLeaderNm,
+          teamLeaderRoleNm,
+          teamLeaderPositionNm,
+          teamLeaderDept,
+          managerId,
+          managerNm,
+          managerRoleNm,
+          managerPositionNm,
+          managerDept,
+        } = response.data.data[0];
+
+        const teamLeader = {
+          userId: teamLeaderId,
+          userNm: teamLeaderNm,
+          positionNm: teamLeaderPositionNm,
+          roleNm: teamLeaderRoleNm,
+          department: teamLeaderDept,
+          status: '대기',
+          docType: '문서수발신',
+          seq: 1,
+        };
+
+        const manager = {
+          userId: managerId,
+          userNm: managerNm,
+          positionNm: managerPositionNm,
+          roleNm: managerRoleNm,
+          department: managerDept,
+          status: '대기',
+          docType: '문서수발신',
+          seq: 2,
+        };
+
+        const approvers = [manager, teamLeader];
+        setSelectedUsers(approvers); 
+        
+        handleSendRequest(approvers);  
+
+      }
+    } catch (error) {
+      console.error('Error fetching confirm data:', error);
+    }
+  };
+
+  const handleSendLeaderRequest = async () => {
+    const payload = new FormData();
+  
+    payload.append('docRequest', new Blob([JSON.stringify({
+      drafterId: formData.userId,
+      drafter: formData.drafter,
+      division: formData.division,
+      sender: '',
+      receiver: formData.sender,
+      docTitle: formData.title,
+      purpose: formData.purpose,
+      instCd: auth.instCd,
+      deptCd: auth.deptCd,
+    })], {
+      type: 'application/json'
+    }));
+  
+    if (attachment) {
+      payload.append('file', attachment);
+    }
+  
+    try {
+      const response = await fetch('/api/doc/send/leader', {
+        method: 'POST',
+        body: payload,
+      });
+      if (response.ok) {
+        alert('문서 발신 신청이 완료되었습니다.');
+        navigate('/api/myPendingList');
+      } else {
+        alert('문서 발신 신청에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Error submitting form data:', error);
+      alert('문서 발신 신청에 실패했습니다.');
+    }
+  };  
+
   const fetchOrgChart = () => {
     const { instCd } = auth;
     axios.get(`/api/std/orgChart`, { params: { instCd } })
@@ -237,8 +333,8 @@ function DocApply() {
 
   const handleOrgChartConfirm = () => {
     setShowOrgChart(false);
-    handleSendRequest();
-  };
+    handleSendRequest(selectedUsers);
+};
 
   return (
     <div className="content">
