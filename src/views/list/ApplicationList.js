@@ -142,6 +142,17 @@ function ApplicationsList() {
 
     setFilteredApplications(filteredData);
   }, [applications, filterInputs, filters]);
+
+  const applyStatusFilters = useCallback((data) => {
+    const filtered = data.filter((app) => {
+      if (filters.statusApproved && app.applyStatus === '승인완료') return true;
+      if (filters.statusRejected && app.applyStatus === '반려') return true;
+      if (filters.statusOrdered && app.applyStatus === '발주완료') return true;
+      if (filters.statusClosed && app.applyStatus === '처리완료') return true;
+      return !Object.values(filters).some(Boolean); 
+    });
+    setFilteredApplications(filtered);
+  }, [filters]);
         
   const fetchApplications = useCallback(async (filterParams = {}) => {
     setLoading(true);
@@ -190,7 +201,7 @@ function ApplicationsList() {
     } finally {
       setLoading(false);
     }
-  }, [fetchApplications, applyStatusFilters, auth.userId, documentTypeFromUrl, instCd, selectedCenter]);
+  }, [applyStatusFilters, auth.userId, documentTypeFromUrl, instCd, selectedCenter]);
 
   const fetchSealImprintDetail = async (draftId) => {
     try {
@@ -212,16 +223,7 @@ function ApplicationsList() {
     }
   };
 
-  const applyStatusFilters = useCallback((data) => {
-    const filtered = data.filter((app) => {
-      if (filters.statusApproved && app.applyStatus === '승인완료') return true;
-      if (filters.statusRejected && app.applyStatus === '반려') return true;
-      if (filters.statusOrdered && app.applyStatus === '발주완료') return true;
-      if (filters.statusClosed && app.applyStatus === '처리완료') return true;
-      return !Object.values(filters).some(Boolean); 
-    });
-    setFilteredApplications(filtered);
-  }, [filters]);
+  
 
   useEffect(() => {
     applyFilters(); 
