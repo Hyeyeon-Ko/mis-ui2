@@ -12,8 +12,6 @@ import axios from 'axios';
 import fileDownload from 'js-file-download';
 import { AuthContext } from '../../components/AuthContext';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-
 function ApplicationsList() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -97,11 +95,59 @@ function ApplicationsList() {
     }
   };
 
+  const applyFilters = useCallback(() => {
+    let filteredData = applications;
+
+    if (filterInputs.startDate) {
+      const startOfDay = new Date(filterInputs.startDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      filteredData = filteredData.filter(application => new Date(application.draftDate) >= startOfDay);
+    }
+
+    if (filterInputs.endDate) {
+      const endOfDay = new Date(filterInputs.endDate);
+      endOfDay.setHours(23, 59, 59, 999);
+      filteredData = filteredData.filter(application => new Date(application.draftDate) <= endOfDay);
+    }
+
+    const keyword = filterInputs.keyword.toLowerCase().trim();
+    if (keyword) {
+      if (filterInputs.searchType === '전체') {
+        filteredData = filteredData.filter(application =>
+          application.title.toLowerCase().includes(keyword) ||
+          application.drafter.toLowerCase().includes(keyword)
+        );
+      } else if (filterInputs.searchType === '제목') {
+        filteredData = filteredData.filter(application => 
+          application.title.toLowerCase().includes(keyword)
+        );
+      } else if (filterInputs.searchType === '신청자') {
+        filteredData = filteredData.filter(application => 
+          application.drafter.toLowerCase().includes(keyword)
+        );
+      }
+    }
+
+    const selectedStatuses = [];
+    if (filters.statusApproved) selectedStatuses.push('승인완료');
+    if (filters.statusRejected) selectedStatuses.push('반려');
+    if (filters.statusOrdered) selectedStatuses.push('발주완료');
+    if (filters.statusClosed) selectedStatuses.push('처리완료');
+
+    if (selectedStatuses.length > 0) {
+      filteredData = filteredData.filter(application =>
+        selectedStatuses.includes(application.applyStatus)
+      );
+    }
+
+    setFilteredApplications(filteredData);
+  }, [applications, filterInputs, filters]);
+        
   const fetchApplications = async (filterParams = {}) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${apiUrl}/api/applyList`, {
+      const response = await axios.get('/api/applyList', {
         params: {
           documentType: filterParams.documentType || documentTypeFromUrl || null,
           instCd: instCd || '',
@@ -178,9 +224,9 @@ function ApplicationsList() {
   }, [filters]);
 
   useEffect(() => {
-    applyStatusFilters(applications);
-  }, [filters, applications, applyStatusFilters]);
-
+    applyFilters(); 
+  }, [filters]);  
+  
   useEffect(() => {
     resetFilters();
     fetchApplications();
@@ -204,13 +250,6 @@ function ApplicationsList() {
     });
     setSelectedCenter('전체');
   }, [documentTypeFromUrl]);
-
-  
-  useEffect(() => {
-    resetFilters();
-    fetchApplications();
-  }, [documentTypeFromUrl, fetchApplications, resetFilters]);
-
 
   useEffect(() => {
     if (documentTypeFromUrl === '명함신청') {
@@ -263,7 +302,7 @@ function ApplicationsList() {
         selectedApplications,
       };
 
-      const response = await axios.post(`${apiUrl}/api/bsc/applyList/orderExcel`, requestData, {
+      const response = await axios.post('/api/bsc/applyList/orderExcel', requestData, {
         responseType: 'blob',
       });
 
@@ -284,7 +323,7 @@ function ApplicationsList() {
 
   const approveDocument = async (documentId) => {
     try {
-      await axios.put(`${apiUrl}/api/doc/confirm`, null, {
+      await axios.put(`/api/doc/confirm`, null, {
         params: { draftId: documentId },
       });
       alert('승인이 완료되었습니다.');
