@@ -95,55 +95,8 @@ function ApplicationsList() {
     }
   };
 
-  const applyFilters = useCallback(() => {
-    let filteredData = applications;
-
-    if (filterInputs.startDate) {
-      const startOfDay = new Date(filterInputs.startDate);
-      startOfDay.setHours(0, 0, 0, 0);
-      filteredData = filteredData.filter(application => new Date(application.draftDate) >= startOfDay);
-    }
-
-    if (filterInputs.endDate) {
-      const endOfDay = new Date(filterInputs.endDate);
-      endOfDay.setHours(23, 59, 59, 999);
-      filteredData = filteredData.filter(application => new Date(application.draftDate) <= endOfDay);
-    }
-
-    const keyword = filterInputs.keyword.toLowerCase().trim();
-    if (keyword) {
-      if (filterInputs.searchType === '전체') {
-        filteredData = filteredData.filter(application =>
-          application.title.toLowerCase().includes(keyword) ||
-          application.drafter.toLowerCase().includes(keyword)
-        );
-      } else if (filterInputs.searchType === '제목') {
-        filteredData = filteredData.filter(application => 
-          application.title.toLowerCase().includes(keyword)
-        );
-      } else if (filterInputs.searchType === '신청자') {
-        filteredData = filteredData.filter(application => 
-          application.drafter.toLowerCase().includes(keyword)
-        );
-      }
-    }
-
-    const selectedStatuses = [];
-    if (filters.statusApproved) selectedStatuses.push('승인완료');
-    if (filters.statusRejected) selectedStatuses.push('반려');
-    if (filters.statusOrdered) selectedStatuses.push('발주완료');
-    if (filters.statusClosed) selectedStatuses.push('처리완료');
-
-    if (selectedStatuses.length > 0) {
-      filteredData = filteredData.filter(application =>
-        selectedStatuses.includes(application.applyStatus)
-      );
-    }
-
-    setFilteredApplications(filteredData);
-  }, [applications, filterInputs, filters]);
-        
-  const fetchApplications = async (filterParams = {}) => {
+  // fetchApplications 함수는 메모이제이션 필요
+  const fetchApplications = useCallback(async (filterParams = {}) => {
     setLoading(true);
     setError(null);
     try {
@@ -190,49 +143,46 @@ function ApplicationsList() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [auth.userId, documentTypeFromUrl, instCd, selectedCenter]);
 
-  const fetchSealImprintDetail = async (draftId) => {
-    try {
-      const response = await axios.get(`/api/seal/imprint/${draftId}`);
-      return response.data.data;
-    } catch (error) {
-      console.error('Error fetching seal imprint details:', error);
-      alert('날인신청 정보를 불러오는 중 오류가 발생했습니다.');
+  // 필터 적용 함수도 useCallback으로 메모이제이션
+  const applyFilters = useCallback(() => {
+    let filteredData = applications;
+
+    if (filterInputs.startDate) {
+      const startOfDay = new Date(filterInputs.startDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      filteredData = filteredData.filter(application => new Date(application.draftDate) >= startOfDay);
     }
-  };
 
-  const fetchSealExportDetail = async (draftId) => {
-    try {
-      const response = await axios.get(`/api/seal/export/${draftId}`);
-      return response.data.data;
-    } catch (error) {
-      console.error('Error fetching seal export details:', error);
-      alert('반출신청 정보를 불러오는 중 오류가 발생했습니다.');
+    if (filterInputs.endDate) {
+      const endOfDay = new Date(filterInputs.endDate);
+      endOfDay.setHours(23, 59, 59, 999);
+      filteredData = filteredData.filter(application => new Date(application.draftDate) <= endOfDay);
     }
-  };
 
-  const applyStatusFilters = useCallback((data) => {
-    const filtered = data.filter((app) => {
-      if (filters.statusApproved && app.applyStatus === '승인완료') return true;
-      if (filters.statusRejected && app.applyStatus === '반려') return true;
-      if (filters.statusOrdered && app.applyStatus === '발주완료') return true;
-      if (filters.statusClosed && app.applyStatus === '처리완료') return true;
-      return !Object.values(filters).some(Boolean); 
-    });
-    setFilteredApplications(filtered);
-  }, [filters]);
+    const keyword = filterInputs.keyword.toLowerCase().trim();
+    if (keyword) {
+      if (filterInputs.searchType === '전체') {
+        filteredData = filteredData.filter(application =>
+          application.title.toLowerCase().includes(keyword) ||
+          application.drafter.toLowerCase().includes(keyword)
+        );
+      } else if (filterInputs.searchType === '제목') {
+        filteredData = filteredData.filter(application => 
+          application.title.toLowerCase().includes(keyword)
+        );
+      } else if (filterInputs.searchType === '신청자') {
+        filteredData = filteredData.filter(application => 
+          application.drafter.toLowerCase().includes(keyword)
+        );
+      }
+    }
 
-  useEffect(() => {
-    applyFilters(); 
-  }, [filters, filterInputs, applications]);
-  
-  useEffect(() => {
-    resetFilters();
-    fetchApplications();
-  }, [documentTypeFromUrl, resetFilters, fetchApplications]);
-  
+    setFilteredApplications(filteredData);
+  }, [applications, filterInputs]);
 
+  // resetFilters를 useEffect보다 먼저 정의
   const resetFilters = useCallback(() => {
     const defaultStartDate = new Date();
     defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
@@ -252,156 +202,15 @@ function ApplicationsList() {
     setSelectedCenter('전체');
   }, [documentTypeFromUrl]);
 
+  // useEffect에 의존성 배열 추가
   useEffect(() => {
-    if (documentTypeFromUrl === '명함신청') {
-      const isShowExcelButton = filters.statusClosed && selectedApplications.length > 0;
-      setShowCheckboxColumn(filters.statusClosed);
-      setShowExcelButton(isShowExcelButton);
-    } else {
-      setShowCheckboxColumn(false);
-      setShowExcelButton(false);
-    }
-  }, [filters, selectedApplications, documentTypeFromUrl]);
+    applyFilters(); 
+  }, [filters, filterInputs, applications, applyFilters]);
 
-  const handleFilterChange = (e) => {
-    const { name } = e.target;
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [name]: !prevFilters[name],
-    }));
-  };
-        
-  const handleSearch = () => {
-    applyFilters();
-  };
-      
-  const handleReset = () => {
+  useEffect(() => {
     resetFilters();
     fetchApplications();
-  };
-
-  const handleSelectAll = (isChecked) => {
-    setSelectedApplications(isChecked ? filteredApplications.map(app => app.draftId) : []);
-  };
-
-  const handleSelect = (isChecked, id) => {
-    setSelectedApplications(isChecked
-      ? [...selectedApplications, id]
-      : selectedApplications.filter(appId => appId !== id)
-    );
-  };
-
-  const handleExcelDownload = async () => {
-    if (selectedApplications.length === 0) {
-      alert('엑셀변환 할 명함 신청 목록을 선택하세요.');
-      return;
-    }
-
-    try {
-      const requestData = {
-        instCd: auth.instCd,
-        selectedApplications,
-      };
-
-      const response = await axios.post('/api/bsc/applyList/orderExcel', requestData, {
-        responseType: 'blob',
-      });
-
-      fileDownload(response.data, '명함 완료내역.xlsx');
-    } catch (error) {
-      console.error('Error downloading excel: ', error);
-    }
-  };
-
-  const handleCenterChange = (e) => {
-    setSelectedCenter(e.target.value);
-  };
-
-  const closeModal = () => {
-    setModalVisible(false);
-    setSelectedDocumentId(null);
-  };
-
-  const approveDocument = async (documentId) => {
-    try {
-      await axios.put(`/api/doc/confirm`, null, {
-        params: { draftId: documentId },
-      });
-      alert('승인이 완료되었습니다.');
-      closeModal();
-      fetchApplications(filterInputs);
-    } catch (error) {
-      console.error('Error approving document:', error);
-      alert('Error approving document.');
-    }
-  };
-
-  const handleRowClick = async (draftId, docType, applyStatus) => {
-    if (docType === '문서수신' || docType === '문서발신') {
-      setSelectedDocumentId(draftId);
-      setModalVisible(true);
-      setSelectedApplyStatus(applyStatus);
-    } else if (docType === '명함신청') {
-      navigate(`/api/bcd/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`);
-    } else if (docType === '법인서류') {
-      navigate(`/api/corpDoc/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`);
-    } else if (docType === '인장신청(날인)') {
-      const sealImprintDetails = await fetchSealImprintDetail(draftId);
-      navigate(`/api/seal/imprint/${draftId}?readonly=true&applyStatus=${applyStatus}`, { state: { sealImprintDetails, readOnly: true } });
-    } else if (docType === '인장신청(반출)') {
-      const sealExportDetails = await fetchSealExportDetail(draftId);
-      navigate(`/api/seal/export/${draftId}?readonly=true&applyStatus=${applyStatus}`, { state: { sealExportDetails, readOnly: true } });
-    }
-  };
-
-  const columns = [
-    ...(showCheckboxColumn && documentTypeFromUrl === '명함신청' ? [{
-      header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
-      accessor: 'select',
-      width: '4%',
-      Cell: ({ row }) => (
-        <input
-          type="checkbox"
-          checked={selectedApplications.includes(row.draftId)}
-          onChange={(e) => handleSelect(e.target.checked, row.draftId)}
-        />
-      ),
-    }] : []),
-    { header: '문서분류', accessor: 'docType', width: '10%' },
-    ...(documentTypeFromUrl === '법인서류' ? [{
-      header: <CenterSelect centers={centers} selectedCenter={selectedCenter} onCenterChange={handleCenterChange} />,
-      accessor: 'instNm',
-      width: '10%',
-    }] : [
-      { header: '센터', accessor: 'instNm', width: '10%' },
-    ]),
-    {
-      header: '제목',
-      accessor: 'title',
-      width: '24%',
-      Cell: ({ row }) => (
-        <span
-          className="status-pending clickable"
-          onClick={() => handleRowClick(row.draftId, row.docType, row.applyStatus)}
-        >
-          {row.title}
-        </span>
-      ),
-    },
-    { header: '신청일시', accessor: 'draftDate', width: '13%' },
-    { header: '신청자', accessor: 'drafter', width: '6%' },
-    {
-      header: documentTypeFromUrl === '문서수발신' ? '승인일시' : '승인/반려일시',
-      accessor: 'respondDate',
-      width: '13%',
-    },
-    ...(documentTypeFromUrl === '문서수발신' || documentTypeFromUrl === '법인서류' || documentTypeFromUrl === '인장신청' ? [] : [
-      { header: '발주일시', accessor: 'orderDate', width: '14%' },
-    ]),
-    { header: '문서상태', accessor: 'applyStatus', width: '10%' },
-  ];
-
-  const showStatusFilters = documentTypeFromUrl === '명함신청' || documentTypeFromUrl === '법인서류' || documentTypeFromUrl === '문서수발신' || documentTypeFromUrl === '인장신청';
+  }, [documentTypeFromUrl, resetFilters, fetchApplications]);
 
   return (
     <div className="content">
