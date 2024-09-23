@@ -38,6 +38,7 @@ import DocstorageList from './views/docstorage/DocstorageList';
 import TotalDocstorageList from './views/docstorage/TotalDocstorageList';
 import RentalManage from './views/rental/RentalManage';
 import TotalRentalManage from './views/rental/TotalRentalManage';
+import TonerApplyFirst from './views/toner/TonerApply';
 import { AuthProvider, AuthContext } from './components/AuthContext';
 
 function MainLayout({ children }) {
@@ -135,6 +136,7 @@ function App() {
                 <Route path="/api/totalRentalList" element={<RequireAuth><TotalRentalManage /></RequireAuth>} />
                 <Route path="/api/bcd/orderList" element={<RequireAuth><BcdOrder /></RequireAuth>} />
                 <Route path="/api/std" element={<RequireAuth><StandardData /></RequireAuth>} />
+                <Route path="/api/toner" element={<RequireAuth><TonerApplyFirst /></RequireAuth>} />
                 <Route path="/api/bcd/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
                 <Route path="/api/doc/:draftId" element={<RequireAuth><DetailDocApplication /></RequireAuth>} />
                 <Route path="/api/corpDoc/:draftId" element={<RequireAuth><DetailCorpDocApplication/></RequireAuth>}/>
