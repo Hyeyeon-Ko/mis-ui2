@@ -202,6 +202,129 @@ function ApplicationsList() {
     setSelectedCenter('전체');
   }, [documentTypeFromUrl]);
 
+  // 엑셀 다운로드 핸들러
+  const handleExcelDownload = async () => {
+    if (selectedApplications.length === 0) {
+      alert('엑셀변환 할 신청 목록을 선택하세요.');
+      return;
+    }
+
+    try {
+      const requestData = {
+        instCd: auth.instCd,
+        selectedApplications,
+      };
+
+      const response = await axios.post('/api/bsc/applyList/orderExcel', requestData, {
+        responseType: 'blob',
+      });
+
+      fileDownload(response.data, '완료내역.xlsx');
+    } catch (error) {
+      console.error('Error downloading excel: ', error);
+    }
+  };
+
+  // 필터 변경 핸들러
+  const handleFilterChange = (e) => {
+    const { name } = e.target;
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [name]: !prevFilters[name],
+    }));
+  };
+
+  // 검색 버튼 핸들러
+  const handleSearch = () => {
+    applyFilters();
+  };
+
+  // 필터 초기화 핸들러
+  const handleReset = () => {
+    resetFilters();
+    fetchApplications();
+  };
+
+  // 상태 필터 표시 여부
+  const showStatusFilters = documentTypeFromUrl === '명함신청' || documentTypeFromUrl === '법인서류' || documentTypeFromUrl === '문서수발신' || documentTypeFromUrl === '인장신청';
+
+  // 테이블 컬럼 정의
+  const columns = [
+    ...(showCheckboxColumn && documentTypeFromUrl === '명함신청' ? [{
+      header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
+      accessor: 'select',
+      width: '4%',
+      Cell: ({ row }) => (
+        <input
+          type="checkbox"
+          checked={selectedApplications.includes(row.draftId)}
+          onChange={(e) => handleSelect(e.target.checked, row.draftId)}
+        />
+      ),
+    }] : []),
+    { header: '문서분류', accessor: 'docType', width: '10%' },
+    ...(documentTypeFromUrl === '법인서류' ? [{
+      header: <CenterSelect centers={centers} selectedCenter={selectedCenter} onCenterChange={handleCenterChange} />,
+      accessor: 'instNm',
+      width: '10%',
+    }] : [
+      { header: '센터', accessor: 'instNm', width: '10%' },
+    ]),
+    {
+      header: '제목',
+      accessor: 'title',
+      width: '24%',
+      Cell: ({ row }) => (
+        <span
+          className="status-pending clickable"
+          onClick={() => handleRowClick(row.draftId, row.docType, row.applyStatus)}
+        >
+          {row.title}
+        </span>
+      ),
+    },
+    { header: '신청일시', accessor: 'draftDate', width: '13%' },
+    { header: '신청자', accessor: 'drafter', width: '6%' },
+    {
+      header: documentTypeFromUrl === '문서수발신' ? '승인일시' : '승인/반려일시',
+      accessor: 'respondDate',
+      width: '13%',
+    },
+    ...(documentTypeFromUrl === '문서수발신' || documentTypeFromUrl === '법인서류' || documentTypeFromUrl === '인장신청' ? [] : [
+      { header: '발주일시', accessor: 'orderDate', width: '14%' },
+    ]),
+    { header: '문서상태', accessor: 'applyStatus', width: '10%' },
+  ];
+
+  // 테이블 행 선택 핸들러
+  const handleSelect = (isChecked, id) => {
+    setSelectedApplications(isChecked
+      ? [...selectedApplications, id]
+      : selectedApplications.filter(appId => appId !== id)
+    );
+  };
+
+  // 모달 닫기 핸들러
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedDocumentId(null);
+  };
+
+  // 문서 승인 핸들러
+  const approveDocument = async (documentId) => {
+    try {
+      await axios.put(`/api/doc/confirm`, null, {
+        params: { draftId: documentId },
+      });
+      alert('승인이 완료되었습니다.');
+      closeModal();
+      fetchApplications(filterInputs);
+    } catch (error) {
+      console.error('Error approving document:', error);
+      alert('문서를 승인하는 중 오류가 발생했습니다.');
+    }
+  };
+
   // useEffect에 의존성 배열 추가
   useEffect(() => {
     applyFilters(); 
