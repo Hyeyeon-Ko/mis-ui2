@@ -9,8 +9,6 @@ import '../../styles/doc/DocOutList.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-
 function DocOutList() {
   const { auth } = useContext(AuthContext);
   const [applications, setApplications] = useState([]);
@@ -25,27 +23,11 @@ function DocOutList() {
     keyword: '',
   });
 
-  const [filters, setFilters] = useState({
-    statusApproved: false,
-    statusRejected: false,
-    statusOrdered: false,
-    statusClosed: false,
-  });
-
-  const formatDate = (date) => (date ? date.toISOString().split('T')[0] : null);
-
-  const fetchDocOutList = useCallback(
-    async (params = {}) => {
-      try {
-        const response = await axios.get('/api/doc/sendList', {
-          params: {
-            instCd: auth.instCd,
-            startDate: formatDate(params.startDate),
-            endDate: formatDate(params.endDate),
-            searchType: params.searchType || null,
-            keyword: params.keyword || null,
-          },
-        });
+  const fetchDocOutList = useCallback(async () => {
+    try {
+      const response = await axios.get('/api/doc/sendList', {
+        params: { instCd: auth.instCd },
+      });
 
       if (response.data && response.data.data) {
         const formattedData = response.data.data.map((item) => ({
@@ -73,7 +55,7 @@ function DocOutList() {
 
   const handleFileDownload = async (fileName) => {
     try {
-      const response = await axios.get(`${apiUrl}/api/doc/download/${encodeURIComponent(fileName)}`, {
+      const response = await axios.get(`/api/doc/download/${encodeURIComponent(fileName)}`, {
         responseType: 'blob',
       });
 
@@ -103,7 +85,7 @@ function DocOutList() {
     if (selectedDraftId === null) return;
 
     try {
-      await axios.put(`${apiUrl}/api/doc/delete`, null, {
+      await axios.put('/api/doc/delete', null, {
         params: {
           draftId: selectedDraftId,
         },

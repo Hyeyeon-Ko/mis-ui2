@@ -13,8 +13,6 @@ import RejectReasonModal from '../../components/RejectReasonModal';
 import downloadIcon from '../../assets/images/download.png';
 import deleteIcon from '../../assets/images/delete2.png';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-
 function DetailSealExportApplication() {
     const { auth, refreshSidebar } = useContext(AuthContext);
     const { draftId } = useParams(); 
@@ -74,7 +72,7 @@ function DetailSealExportApplication() {
                 },
             });
         } else {
-            axios.get(`${apiUrl}/api/seal/export/${draftId}`)
+            axios.get(`/api/seal/export/${draftId}`)
                 .then(response => {
                     const data = response.data.data;
                     setApplicationDetails({
@@ -163,7 +161,7 @@ function DetailSealExportApplication() {
     const handleFileDownload = async () => {
         if (applicationDetails.fileName && applicationDetails.filePath) {
             try {
-                const response = await axios.get(`${apiUrl}/api/doc/download/${encodeURIComponent(applicationDetails.fileName)}`, {
+                const response = await axios.get(`/api/doc/download/${encodeURIComponent(applicationDetails.fileName)}`, {
                     responseType: 'blob',
                 });
 
@@ -215,7 +213,7 @@ function DetailSealExportApplication() {
         formData.append('isFileDeleted', applicationDetails.isFileDeleted);
 
         try {
-            const response = await axios.post(`/api/seal/export/update?draftId=${draftId}`, formData, {
+            await axios.post(`/api/seal/export/update?draftId=${draftId}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -228,19 +226,18 @@ function DetailSealExportApplication() {
         }
     };
 
-    const handleApproval = (e) => {
-        e.preventDefault();  
-        axios.post(`/api/seal/${draftId}`) 
-        .then(response => {
-            console.log('Approval Response:', response.data);
-            alert('인장 신청이 성공적으로 승인되었습니다.');
-            navigate('/api/pendingList?documentType=인장신청');
-        })
-        .catch(error => {
-            console.error('Error approving application:', error);
-            alert('인장 신청 승인 중 오류가 발생했습니다. 다시 시도해주세요.');
-            navigate('/api/pendingList?documentType=인장신청');
-        });
+    const handleApproval = async (e) => {
+        e.preventDefault();
+        try {
+          await axios.post(`/api/seal/${draftId}`);
+          alert('인장 신청이 성공적으로 승인되었습니다.');
+          await refreshSidebar();
+          navigate('/api/pendingList?documentType=인장신청');
+        } catch (error) {
+          console.error('Error approving application:', error);
+          alert('인장 신청 승인 중 오류가 발생했습니다.');
+          navigate('/api/pendingList?documentType=인장신청');
+        }
     };
 
     const handleReject = (e) => {
@@ -254,7 +251,7 @@ function DetailSealExportApplication() {
 
     const handleRejectConfirm = async (reason) => {
         try {
-          const response = await axios.post(`${apiUrl}/api/seal/return/${draftId}`, reason, {
+          const response = await axios.post(`/api/seal/return/${draftId}`, reason, {
             headers: {
               'Content-Type': 'text/plain',
             },

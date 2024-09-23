@@ -10,8 +10,6 @@ import corporateSeal from '../../assets/images/corporate_seal.png';
 import facsimileSeal from '../../assets/images/facsimile_seal.png';
 import companySeal from '../../assets/images/company_seal.png';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-
 function SealApplyExport() {
     const { auth } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -103,7 +101,7 @@ function SealApplyExport() {
         }
         
         try {
-            const response = await axios.post('/api/seal/export', formData, {
+            await axios.post('/api/seal/export', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

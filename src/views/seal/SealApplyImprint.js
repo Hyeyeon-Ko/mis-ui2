@@ -10,8 +10,6 @@ import corporateSeal from '../../assets/images/corporate_seal.png';
 import facsimileSeal from '../../assets/images/facsimile_seal.png';
 import companySeal from '../../assets/images/company_seal.png';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-
 function SealApplyImprint() {
     const { auth } = useContext(AuthContext);
     const navigate = useNavigate(); 
@@ -75,7 +73,7 @@ function SealApplyImprint() {
             notes: e.target.elements.notes.value,
             instCd: auth.instCd,
         };
-
+    
         axios.post('/api/seal/imprint', imprintRequestDTO)
             .then(response => {
                 alert('인장 신청이 완료되었습니다.');
