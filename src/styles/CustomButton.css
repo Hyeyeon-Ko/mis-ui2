@@ -150,13 +150,21 @@
   color: rgb(126, 125, 125);
 }
 
-.save-button {
+.save-button, .add-button, .data-reset-button {
   background-color: #2789FE;
   margin-top: 40px;
   letter-spacing: 5px;
   width: 100px;
   height: 40px;
-  padding-left: 15px;
+}
+
+.add-button {
+  background-color: #07AF5A;
+}
+
+.data-reset-button {
+  background-color: #BDC6CF;
+  color: rgb(95, 95, 95);
 }
 
 .white-button {
