@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useCallback } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Button from '../../components/common/Button';
 import CustomButton from '../../components/common/CustomButton';
-import ConditionFilter from '../../components/common/ConditionFilter';
+import ConditionFilter from '../../components/common/ConditionFilter'; 
 import CorpDocApprovalModal from '../../views/corpdoc/CorpDocApprovalModal';
 import CorpDocStoreModal from './CorpDocStoreModal';
 import IssueModal from '../../components/common/ConfirmModal';
@@ -11,15 +11,15 @@ import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/corpdoc/CorpDocIssueList.css';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-
 function CorpDocIssueList() {
-  const [applications, setApplications] = useState([]);
+  const { refreshSidebar } = useContext(AuthContext);
+  const [applications, setApplications] = useState([]); 
   const [filteredApplications, setFilteredApplications] = useState([]);
-  const [pendingApplications, setPendingApplications] = useState([]);
   const [filteredPendingApplications, setFilteredPendingApplications] = useState([]);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [filterInputs, setFilterInputs] = useState({
+    searchType: '전체',
+    keyword: '',
+  });
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
   const [clickedRows, setClickedRows] = useState([]);
@@ -29,14 +29,9 @@ function CorpDocIssueList() {
   const [totalCorpseal, setTotalCorpseal] = useState(0);
   const [totalCoregister, setTotalCoregister] = useState(0);
 
-  useEffect(() => {
-    fetchIssueData();
-  }, []);
-
-  const fetchIssueData = async () => {
+  const fetchIssueData = useCallback(async () => {
     try {
       const response = await axios.get('/api/corpDoc/issueList');
-      console.log("response: ", response);
 
       if (response.data) {
         const issueListData = response.data.data.issueList.map(item => ({
@@ -92,7 +87,7 @@ function CorpDocIssueList() {
     } catch (error) {
       console.error("Error fetching issue data:", error);
     }
-  };
+  }, []); 
 
   useEffect(() => {
     fetchIssueData();
@@ -156,50 +151,6 @@ function CorpDocIssueList() {
   
     return { totalCorpseal, totalCoregister };
   };
-  
-  useEffect(() => {
-    console.log("filtered: ", filteredApplications);
-  }, [filteredApplications]);
-
-  const handleSearch = ({ searchType, keyword, startDate, endDate }, listType = 'applications') => {
-    let filtered = listType === 'applications' ? applications : pendingApplications;
-
-    if (keyword) {
-      filtered = filtered.filter(app => {
-        if (searchType === '제출처') return app.submission.includes(keyword);
-        if (searchType === '사용목적') return app.purpose.includes(keyword);
-        if (searchType === '인장구분') return app.status.includes(keyword);
-        if (searchType === '전체') {
-          return (
-            app.submission.includes(keyword) ||
-            app.purpose.includes(keyword) ||
-            app.status.includes(keyword)
-          );
-        }
-        return true;
-      });
-    }
-
-    if (startDate && endDate) {
-      filtered = filtered.filter(app => {
-        const appDate = new Date(app.date);
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        return appDate >= start && appDate <= end;
-      });
-    }
-
-    if (listType === 'applications') {
-      setFilteredApplications(filtered);
-    } else {
-      setFilteredPendingApplications(filtered);
-    }
-  };
-
-  const closeModal = () => {
-    setModalVisible(false);
-    setSelectedDocumentDetails(null);
-  };
 
   const handleRowClick = (status, document) => {
     if (status === '결재진행중' || status === '결재완료') {
@@ -238,7 +189,7 @@ function CorpDocIssueList() {
     }
   
     try {
-      const response = await axios.put(`${apiUrl}/api/corpDoc/issue?draftId=${selectedPendingApp.id}`, {
+      const response = await axios.put(`/api/corpDoc/issue?draftId=${selectedPendingApp.id}`, {
         totalCorpseal,
         totalCoregister
       });

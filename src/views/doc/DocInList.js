@@ -9,8 +9,6 @@ import '../../styles/doc/DocOutList.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-
 function DocInList() {
   const { auth } = useContext(AuthContext);
   const [applications, setApplications] = useState([]);
@@ -27,16 +25,8 @@ function DocInList() {
 
   const fetchDocInList = useCallback(async () => {
     try {
-      const formatDate = (date) => date ? date.toISOString().split('T')[0] : null;
-
       const response = await axios.get('/api/doc/receiveList', {
-        params: {
-          instCd: auth.instCd,
-          startDate: formatDate(params.startDate),
-          endDate: formatDate(params.endDate),
-          searchType: params.searchType || null,
-          keyword: params.keyword || null,
-        },
+        params: { instCd: auth.instCd },
       });
 
       if (response.data && response.data.data) {
@@ -59,46 +49,13 @@ function DocInList() {
     }
   }, [auth.instCd]);
 
-  const handleDeptChange = (e) => {
-    const deptCd = e.target.value;
-    setSelectedDeptCd(deptCd);
-
-    if (deptCd) {
-      fetchDeptReceiveList(deptCd);
-    } else {
-      fetchDocInList();
-    }
-  };
-
-  const fetchDeptReceiveList = async (deptCd) => {
-    try {
-      const response = await axios.get('/api/doc/deptReceiveList', {
-        params: { deptCd },
-      });
-      if (response.data && response.data.data) {
-        const formattedData = response.data.data.map((item) => ({
-          draftId: item.draftId,
-          draftDate: item.draftDate,
-          docId: item.docId,
-          resSender: item.resSender,
-          title: item.title,
-          drafter: item.drafter,
-          status: item.status,
-          fileName: item.fileName,
-          fileUrl: item.fileUrl,
-          deleted: item.status === '신청취소',
-        }));
-        setApplications(formattedData);
-        setFilteredApplications(formattedData);
-      }
-    } catch (error) {
-      console.error('부서별 문서 수신 목록을 불러오는 중 오류가 발생했습니다.', error);
-    }
-  };
+  useEffect(() => {
+    fetchDocInList();
+  }, [fetchDocInList]);
 
   const handleFileDownload = async (fileName) => {
     try {
-      const response = await axios.get(`${apiUrl}/api/doc/download/${encodeURIComponent(fileName)}`, {
+      const response = await axios.get(`/api/doc/download/${encodeURIComponent(fileName)}`, {
         responseType: 'blob',
       });
 
@@ -128,7 +85,7 @@ function DocInList() {
     if (selectedDraftId === null) return;
 
     try {
-      await axios.put(`${apiUrl}/api/doc/delete`, null, {
+      await axios.put('/api/doc/delete', null, {
         params: {
           draftId: selectedDraftId,
         },
