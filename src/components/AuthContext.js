@@ -140,7 +140,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     sessionStorage.clear();
-    navigate('/api/login');
+    navigate('/login');
   };
 
   const toggleMode = () => {
@@ -148,7 +148,7 @@ export const AuthProvider = ({ children }) => {
       if (prevAuth.originalRole === 'USER') return prevAuth;
       const newMode = !prevAuth.isUserMode;
       const newRole = newMode ? 'USER' : prevAuth.originalRole;
-      navigate(newMode ? '/' : '/api/std');
+      navigate(newMode ? '/' : '/std');
 
       return { ...prevAuth, isUserMode: newMode, role: newRole };
     });

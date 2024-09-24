@@ -8,7 +8,7 @@ const RequireAuth = ({ children }) => {
 
   useEffect(() => {
     if (!auth.isAuthenticated) {
-      navigate('/api/login');
+      navigate('/login');
     }
   }, [auth.isAuthenticated, navigate]);
 

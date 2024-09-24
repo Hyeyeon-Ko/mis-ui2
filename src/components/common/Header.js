@@ -51,7 +51,7 @@ function Header() {
               />
             </>
           ) : (
-            <a href="/api/login">로그인</a>
+            <a href="/login">로그인</a>
           )}
         </div>
       </div>
