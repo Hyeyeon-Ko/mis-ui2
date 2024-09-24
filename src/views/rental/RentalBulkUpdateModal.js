@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 
 const RentalBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds }) => {
   const [formData, setFormData] = useState({

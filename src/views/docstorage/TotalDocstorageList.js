@@ -6,7 +6,7 @@ import '../../styles/common/Page.css';
 import '../../styles/docstorage/TotalDocstorageList.css';
 import axios from 'axios';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 
 function TotalDocstorageList() {
   const [centerData, setCenterData] = useState([]);

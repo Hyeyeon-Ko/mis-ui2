@@ -10,7 +10,7 @@ import StatusSelect from '../../components/StatusSelect';
 import '../../styles/common/Page.css';
 import '../../styles/docstorage/DocstorageList.css';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 
 function DocstorageList() {
   const { auth } = useContext(AuthContext);

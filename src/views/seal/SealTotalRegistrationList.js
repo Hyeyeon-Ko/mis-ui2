@@ -3,7 +3,7 @@ import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import '../../styles/seal/SealTotalRegistrationList.css';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 
 function SealTotalRegistrationList() {
   const [filteredApplications, setFilteredApplications] = useState([]);

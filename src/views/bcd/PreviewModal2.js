@@ -6,7 +6,7 @@ import frontImageBlank from '../../assets/images/frontimage_blank.png';
 import backImageEngBlank from '../../assets/images/backimage_eng_blank.png';
 import backImageCompany from '../../assets/images/backimage_company.png';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 
 const PreviewModal = ({ show, onClose, formData }) => {
   const canvasRef = useRef(null);

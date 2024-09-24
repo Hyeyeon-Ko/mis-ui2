@@ -10,7 +10,7 @@ import '../../styles/list/MyApplyList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 
 function MyApplyList() {
   const { auth } = useContext(AuthContext); 

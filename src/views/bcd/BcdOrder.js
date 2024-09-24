@@ -11,7 +11,7 @@ import fileDownload from 'js-file-download';
 import { FadeLoader } from 'react-spinners';
 import { AuthContext } from '../../components/AuthContext'; 
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 
 function BcdOrder() {
   const { auth, refreshSidebar } = useContext(AuthContext);

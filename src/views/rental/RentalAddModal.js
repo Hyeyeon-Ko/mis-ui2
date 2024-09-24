@@ -5,7 +5,7 @@ import * as XLSX from 'xlsx';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/rental/RentalAddModal.css';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 
 const RentalAddModal = ({ show, onClose, onSave }) => {
   const { auth } = useContext(AuthContext); 

@@ -5,7 +5,7 @@ import Table from '../../components/common/Table';
 import '../../styles/common/Page.css';
 import '../../styles/rental/TotalRentalManage.css';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 
 function TotalRentalManage() {
     const [selectedCenter, setSelectedCenter] = useState('all'); 

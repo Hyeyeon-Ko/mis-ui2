@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import '../../styles/corpdoc/CorpDocStoreModal.css';
 import CustomButton from '../../components/common/CustomButton';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 
 const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregister }) => {
   const { auth } = useContext(AuthContext);

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import '../../styles/authority/AuthorityModal.css';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 
 /* 권한 관리 모달 */
 const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) => {

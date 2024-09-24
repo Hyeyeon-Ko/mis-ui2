@@ -12,7 +12,7 @@ import '../../styles/common/Page.css';
 import '../../styles/docstorage/Docstorage.css';
 import { AuthContext } from '../../components/AuthContext';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 
 function Docstorage() {
   const { auth } = useContext(AuthContext);

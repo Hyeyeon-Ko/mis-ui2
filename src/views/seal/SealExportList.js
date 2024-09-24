@@ -8,7 +8,7 @@ import axios from 'axios';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import '../../styles/seal/SealExportList.css';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 
 function SealExportList() {
   const { auth } = useContext(AuthContext);

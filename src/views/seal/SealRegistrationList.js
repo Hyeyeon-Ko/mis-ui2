@@ -7,7 +7,7 @@ import '../../styles/seal/SealRegistrationList.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 
 function SealRegistrationList() {
   const { auth } = useContext(AuthContext);

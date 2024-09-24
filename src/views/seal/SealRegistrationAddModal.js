@@ -3,7 +3,7 @@ import '../../styles/seal/SealRegistrationAddModal.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 
 function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
   const { auth } = useContext(AuthContext);

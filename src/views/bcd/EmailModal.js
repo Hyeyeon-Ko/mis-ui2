@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import '../../styles/bcd/EmailModal.css';
 import { FadeLoader } from 'react-spinners';
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 
 /* 이메일 작성 모달 */
 const EmailModal = ({ show, onClose, onSend }) => {
