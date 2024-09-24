@@ -21,7 +21,7 @@ RUN npm install
 COPY . ./
 
 # 애플리케이션 빌드 (PUBLIC_URL 설정)
-ENV PUBLIC_URL=http://172.16.250.87  # 웹 서버 IP 주소 설정
+ENV PUBLIC_URL=http://172.16.250.87
 RUN npm run build
 
 # 단계 2: 프로덕션 단계
