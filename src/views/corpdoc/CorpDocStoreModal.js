@@ -49,9 +49,10 @@ const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregist
     }));
   };
 
-  const handleSave = async () => {  // async로 변경
+  const handleSave = async () => {
     const { storeDate, userId, instCd } = formData;
 
+    /* 입력값 예외처리 : 입고일자, id값, 필수 입력항목 누락 */
     const datePattern = /^\d{4}-\d{2}-\d{2}$/;
     if (!datePattern.test(storeDate)) {
       alert('입고 일자는 yyyy-MM-dd 형식으로 입력해 주세요.');
@@ -61,6 +62,16 @@ const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregist
     if (!userId || !instCd) {
         alert('사용자 정보 또는 기관 코드가 누락되었습니다.');
         return;
+    }
+
+    if (!formData.certCorpseal && formData.certCorpseal !== 0) {
+      alert('법인인감 증명서 수량을 입력해 주세요.');
+      return;
+    }
+  
+    if (!formData.certCoregister && formData.certCoregister !== 0) {
+      alert('법인등기사항전부증명서 수량을 입력해 주세요.');
+      return;
     }
 
     const requestData = {
@@ -125,7 +136,9 @@ const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregist
             name="certCorpseal"
             value={formData.certCorpseal}
             onChange={handleChange}
+            placeholder='수량 입력'
             min="0"
+            required
           />
         </div>
         <div className="corpDoc-store-form-group">
@@ -135,7 +148,9 @@ const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregist
             name="certCoregister"
             value={formData.certCoregister}
             onChange={handleChange}
+            placeholder='수량 입력'
             min="0"
+            required
           />
         </div>
         <div className="corpDoc-store-modal-buttons">
