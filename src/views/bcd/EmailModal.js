@@ -17,7 +17,7 @@ const EmailModal = ({ show, onClose, onSend }) => {
 
   useEffect(() => {
     if (show) {
-      fetch(`${apiUrl}/api/bsc/order/email-settings`)
+      fetch(`/api/bsc/order/email-settings`)
         .then((response) => {
           if (!response.ok) {
             throw new Error('Network response was not ok');

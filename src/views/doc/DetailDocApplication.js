@@ -32,7 +32,7 @@ function DetailDocApplication() {
 
   const fetchDocDetail = useCallback(async (id) => {
     try {
-      const response = await axios.get(`${apiUrl}/api/doc/${id}`);
+      const response = await axios.get(`/api/doc/${id}`);
       if (response.data && response.data.data) {
         const { draftDate, division, receiver, sender, docTitle, purpose, fileName, filePath } = response.data.data;
         const fetchedData = {
@@ -89,7 +89,7 @@ function DetailDocApplication() {
   const handleFileDownload = async () => {
     if (existingFile) {
       try {
-        const response = await axios.get(`${apiUrl}/api/doc/download/${encodeURIComponent(existingFile.name)}`, {
+        const response = await axios.get(`/api/doc/download/${encodeURIComponent(existingFile.name)}`, {
           responseType: 'blob',
         });
   
@@ -133,7 +133,7 @@ function DetailDocApplication() {
             formDataToSend.append('file', file);
         }
 
-        await axios.post(`${apiUrl}/api/doc/update?draftId=${draftId}&isFileDeleted=${isFileDeleted}`, formDataToSend, {
+        await axios.post(`/api/doc/update?draftId=${draftId}&isFileDeleted=${isFileDeleted}`, formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },

@@ -20,7 +20,7 @@ const PreviewModal = ({ show, onClose, formData }) => {
   const fetchBcdStd = useCallback(async () => {
     try {
       console.log('Fetching BCD standard data for preview');
-      const response = await axios.get(`${apiUrl}/api/std/bcd`);
+      const response = await axios.get(`/api/std/bcd`);
       if (response.data && response.data.data) {
         const data = response.data.data;
         console.log('Fetched BCD standard data for preview:', data);

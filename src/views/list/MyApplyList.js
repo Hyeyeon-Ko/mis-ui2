@@ -39,7 +39,7 @@ function MyApplyList() {
 
   const fetchApplications = useCallback(async () => {
     try {
-      const response = await axios.get(`${apiUrl}/api/myApplyList`, {
+      const response = await axios.get(`/api/myApplyList`, {
         params: {
           userId: auth.userId, 
         },
