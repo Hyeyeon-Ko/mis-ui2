@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import '../../styles/common/Sidebar.css';
 import logo from '../../assets/images/logo.png';
+import sideToggle from '../../assets/images/left arrow.png'
 import { AuthContext } from '../AuthContext';
 import dropdownDefaultIcon from '../../assets/images/dropdownDefault.png';
 import dropdownActiveIcon from '../../assets/images/dropdownActive.png';
@@ -10,6 +11,7 @@ import axios from 'axios';
 function Sidebar() {
   const location = useLocation();
   const { auth, sidebarUpdate } = useContext(AuthContext);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const [pendingCounts, setPendingCounts] = useState({
     bcdPendingCount: 0,
@@ -19,6 +21,10 @@ function Sidebar() {
     corpDocIssuePendingCount: 0,
     orderPendingCount: 0, 
   });
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  }
 
   useEffect(() => {
     const fetchPendingCounts = async () => {
@@ -151,7 +157,10 @@ function Sidebar() {
   };
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
+      <div className="sidebar-toggle-button" onClick={toggleSidebar}> {/* 사이드바 토글 버튼 */}
+        {isSidebarOpen ? '≡' : '≡'}
+      </div>
       <Link to="/">
         <img src={logo} alt="KMI Logo" className="logo" />
       </Link>
