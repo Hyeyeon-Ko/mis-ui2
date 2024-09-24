@@ -1,8 +1,8 @@
 .custom-button {
   border-radius: 7px;
-  padding: 10px 12px; 
+  padding: 9px 11px; 
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: bold;
   letter-spacing: 0.4px;
   color: white;
@@ -44,9 +44,7 @@
   background-color: #2789FE;
   margin-top: 50px;
   letter-spacing: 5px;
-  width: 100px;
-  height: 40px;
-  padding-left: 15px;
+  padding: 15px;
 }
 
 .authority-add-button:hover {
@@ -142,7 +140,7 @@
 
 .store-button {
   border-radius: 7px;
-  padding: 10px 12px;
+  padding: 9px 11px;
   cursor: pointer;
   font-size: 12px;
   font-weight: bold;
@@ -152,10 +150,10 @@
 
 .save-button, .add-button, .data-reset-button {
   background-color: #2789FE;
-  margin-top: 40px;
+  margin-top: 20px;
   letter-spacing: 5px;
-  width: 100px;
-  height: 40px;
+  padding: 11px 19px 11px 22px; 
+  font-size: 12.5px;
 }
 
 .add-button {

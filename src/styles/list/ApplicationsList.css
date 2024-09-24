@@ -3,7 +3,7 @@
 }
 
 .all-applications h2, .order h2 {
-  font-size: 28px;
+  font-size: 26px;
   margin-bottom: 16px;
 }
 
@@ -26,12 +26,13 @@
 
 .status-filters label {
   margin-right: 2px;
-  font-size: 13.5px;
+  font-size: 12px;
   font-weight: normal;
 }
 
 .status-filters input[type="checkbox"] {
-  margin-right: 0.3cqw;
+  margin-right: 5px;
+  margin-top: 2px;
 }
 
 .status {
@@ -75,7 +76,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
 }
 
 .buttons-container {

@@ -46,16 +46,16 @@
 }
 
 .modal-content li {
-  padding: 20px 20px 20px 40px;
+  padding: 18px 20px 18px 40px;
 }
 
 .notification-content, .notification-date {
   display: block;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .notification-date {
-  font-size: 14px;
+  font-size: 12px;
   color: grey;
 }
 

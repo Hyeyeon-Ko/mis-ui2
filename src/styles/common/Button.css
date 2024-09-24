@@ -1,13 +1,11 @@
 .button {
     border-radius: 8px;
     padding: 4px 8px;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: bold;
   }
   
   .modify-button {
-    width: 56px;
-    height: 28px;
     background-color: #BDC6CF;
     color: black;
     border: none;
@@ -18,8 +16,6 @@
   }
   
   .cancel-button {
-    width: 56px;
-    height: 28px;
     background-color: #2789FE;
     color: white;
     border: none;
@@ -33,7 +29,7 @@
     background: transparent;
     border: none;
     color: black;
-    font-size: 11px;
+    font-size: 10px;
   }
   
   .delete-button:hover {

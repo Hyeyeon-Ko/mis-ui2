@@ -23,7 +23,7 @@
 }
 
 .final-modal-container h3 {
-    font-size: 24px;
+    font-size: 22.5px;
     font-weight: bold;
     margin-bottom: 22px;
 }
@@ -39,13 +39,13 @@
 }
 
 .detail-label {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
     flex: 1;
 }
 
 .detail-value {
-    font-size: 15px;
+    font-size: 13.5px;
     flex: 1;
     text-align: left;
 }
@@ -62,7 +62,7 @@
     border-radius: 5px;
     padding: 10px 13px 10px 16px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
     min-width: 80px;
 }
