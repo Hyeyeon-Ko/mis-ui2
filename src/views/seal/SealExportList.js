@@ -24,7 +24,7 @@ function SealExportList() {
 
   const fetchSealExportList = useCallback(async (instCd) => {
     try {
-      const response = await axios.get(`${apiUrl}/api/seal/exportList`, {
+      const response = await axios.get(`/api/seal/exportList`, {
         params: {
           instCd,
         },
@@ -44,7 +44,7 @@ function SealExportList() {
         signitureImage: SignitureImage,
         fileName: item.fileName,
         filePath: item.filePath,
-        fileUrl: `${apiUrl}/api/doc/download/${encodeURIComponent(item.fileName)}`,
+        fileUrl: `/api/doc/download/${encodeURIComponent(item.fileName)}`,
         status: '결재진행중',
       }));
   

@@ -20,7 +20,7 @@ function MyPendingList() {
 
   const fetchPendingApplications = useCallback(async () => {
     try {
-      const response = await axios.get(`${apiUrl}/api/myPendingList`, {
+      const response = await axios.get(`/api/myPendingList`, {
         params: {
           userId: auth.userId, 
         },

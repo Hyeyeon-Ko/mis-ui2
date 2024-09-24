@@ -219,7 +219,7 @@ function DetailSealExportApplication() {
                 },
             });
             alert('인장 반출 신청이 성공적으로 수정되었습니다.');
-            navigate('/api/myPendingList');
+            navigate('/myPendingList');
         } catch (error) {
             console.error('Error updating application:', error);
             alert('인장 반출 신청 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
@@ -232,11 +232,11 @@ function DetailSealExportApplication() {
           await axios.post(`/api/seal/${draftId}`);
           alert('인장 신청이 성공적으로 승인되었습니다.');
           await refreshSidebar();
-          navigate('/api/pendingList?documentType=인장신청');
+          navigate('/pendingList?documentType=인장신청');
         } catch (error) {
           console.error('Error approving application:', error);
           alert('인장 신청 승인 중 오류가 발생했습니다.');
-          navigate('/api/pendingList?documentType=인장신청');
+          navigate('/pendingList?documentType=인장신청');
         }
     };
 
@@ -259,7 +259,7 @@ function DetailSealExportApplication() {
           if (response.data.code === 200) {
             alert('인장 신청이 반려되었습니다.');
             await refreshSidebar();
-            navigate(`/api/pendingList?documentType=인장신청`);  
+            navigate(`/pendingList?documentType=인장신청`);  
           } else {
             alert('인장 반려 중 오류가 발생했습니다.');
           }

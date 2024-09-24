@@ -31,7 +31,7 @@ const NotificationModal = ({ onClose, position }) => {
         console.error("Error marking notification as read:", error);
       }
     }
-    navigate('/api/myApplyList');
+    navigate('/myApplyList');
   };
 
   // DB에서 알림을 불러오는 함수

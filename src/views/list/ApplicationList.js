@@ -345,15 +345,15 @@ function ApplicationsList() {
       setModalVisible(true);
       setSelectedApplyStatus(applyStatus);
     } else if (docType === '명함신청') {
-      navigate(`/api/bcd/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`);
+      navigate(`/bcd/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`);
     } else if (docType === '법인서류') {
-      navigate(`/api/corpDoc/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`);
+      navigate(`/corpDoc/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`);
     } else if (docType === '인장신청(날인)') {
       const sealImprintDetails = await fetchSealImprintDetail(draftId);
-      navigate(`/api/seal/imprint/${draftId}?readonly=true&applyStatus=${applyStatus}`, { state: { sealImprintDetails, readOnly: true } });
+      navigate(`/seal/imprint/${draftId}?readonly=true&applyStatus=${applyStatus}`, { state: { sealImprintDetails, readOnly: true } });
     } else if (docType === '인장신청(반출)') {
       const sealExportDetails = await fetchSealExportDetail(draftId);
-      navigate(`/api/seal/export/${draftId}?readonly=true&applyStatus=${applyStatus}`, { state: { sealExportDetails, readOnly: true } });
+      navigate(`/seal/export/${draftId}?readonly=true&applyStatus=${applyStatus}`, { state: { sealExportDetails, readOnly: true } });
     }
   };
 

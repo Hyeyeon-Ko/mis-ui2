@@ -53,7 +53,7 @@ const EmailModal = ({ show, onClose, onSend }) => {
     onSend(emailData)
       .finally(() => {
         setIsLoading(false);
-        window.location.href = '/api/bcd/orderList';
+        window.location.href = '/bcd/orderList';
         onClose();
       });
   };

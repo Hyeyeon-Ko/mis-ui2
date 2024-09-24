@@ -19,7 +19,7 @@ function SealRegistrationList() {
 
   const fetchSealRegistrationList = useCallback(async () => {
     try {
-      const response = await axios.get(`${apiUrl}/api/seal/registrationList`, {
+      const response = await axios.get(`/api/seal/registrationList`, {
         params: { instCd: auth.instCd } 
       });
 
@@ -28,7 +28,7 @@ function SealRegistrationList() {
           draftId: item.draftId,
           seal: item.sealNm,
           sealImage: item.sealImage, 
-          sealImageUrl: `${apiUrl}/api/images/${encodeURIComponent(item.sealImage)}`,
+          sealImageUrl: `/api/images/${encodeURIComponent(item.sealImage)}`,
           department: item.useDept,
           purpose: item.purpose,
           manager: item.manager,

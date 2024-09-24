@@ -27,7 +27,7 @@ function SealManagementList() {
     try {
       const { instCd } = auth;  
 
-      const response = await axios.get(`${apiUrl}/api/seal/managementList`, {
+      const response = await axios.get(`/api/seal/managementList`, {
         params: {
           instCd,
         },

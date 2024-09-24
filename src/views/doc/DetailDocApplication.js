@@ -140,7 +140,7 @@ function DetailDocApplication() {
         });
 
         alert('문서 수정이 완료되었습니다');
-        navigate('/api/MyPendingList');
+        navigate('/MyPendingList');
     } catch (error) {
         console.error('Error submitting document:', error);
         alert('문서 수정 중 오류가 발생했습니다.');

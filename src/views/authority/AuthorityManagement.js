@@ -10,9 +10,6 @@ import '../../styles/authority/AuthorityManagement.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 
-
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-
 /**
  * 권한 관리 페이지 컴포넌트
  */
@@ -32,7 +29,7 @@ function AuthorityManagement() {
    */
   const fetchAuthorityList = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/api/auth`);
+      const response = await axios.get(`/api/auth`);
       const data = response.data.data || response.data;
       const transformedData = data.map((item) => ({
         id: item.userId,
@@ -60,7 +57,7 @@ function AuthorityManagement() {
    */
   const handleEdit = async (admin) => {
     try {
-      const response = await axios.get(`${apiUrl}/api/auth/admin/${admin.authId}`);
+      const response = await axios.get(`/api/auth/admin/${admin.authId}`);
       const adminData = response.data.data;
 
       setSelectedAdmin({
@@ -82,7 +79,7 @@ function AuthorityManagement() {
    */
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`${apiUrl}/api/auth/admin/${selectedAdmin.authId}`, {
+      await axios.delete(`/api/auth/admin/${selectedAdmin.authId}`, {
         params: {
           detailCd: selectedAdmin.detailCd,
         },

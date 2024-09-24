@@ -48,7 +48,7 @@ function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
     data.append('sealImage', formData.sealImage);
   
     try {
-      const response = await axios.post(`${apiUrl}/api/seal/register`, data, {
+      const response = await axios.post(`/api/seal/register`, data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

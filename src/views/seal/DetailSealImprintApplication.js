@@ -58,7 +58,7 @@ function DetailSealImprintApplication() {
                 },
             });
         } else {
-            axios.get(`${apiUrl}/api/seal/imprint/${draftId}`)
+            axios.get(`/api/seal/imprint/${draftId}`)
                 .then(response => {
                     const data = response.data.data;
                     setApplicationDetails({
@@ -137,7 +137,7 @@ function DetailSealImprintApplication() {
             instCd: auth.instCd,
         };
     
-        axios.post(`${apiUrl}/api/seal/imprint/update`, updatedImprintRequestDTO, {
+        axios.post(`/api/seal/imprint/update`, updatedImprintRequestDTO, {
             params: { draftId }, 
         })
         .then(response => {
@@ -156,12 +156,12 @@ function DetailSealImprintApplication() {
         .then(response => {
             console.log('Approval Response:', response.data);
             alert('인장 신청이 성공적으로 승인되었습니다.');
-            navigate('/api/pendingList?documentType=인장신청');
+            navigate('/pendingList?documentType=인장신청');
         })
         .catch(error => {
             console.error('Error approving application:', error);
             alert('인장 신청 승인 중 오류가 발생했습니다. 다시 시도해주세요.');
-            navigate('/api/pendingList?documentType=인장신청');
+            navigate('/pendingList?documentType=인장신청');
         });
     };
                 
@@ -176,7 +176,7 @@ function DetailSealImprintApplication() {
 
     const handleRejectConfirm = async (reason) => {
         try {
-          const response = await axios.post(`${apiUrl}/api/seal/return/${draftId}`, reason, {
+          const response = await axios.post(`/api/seal/return/${draftId}`, reason, {
             headers: {
               'Content-Type': 'text/plain',
             },
@@ -184,7 +184,7 @@ function DetailSealImprintApplication() {
           if (response.data.code === 200) {
             alert('인장 신청이 반려되었습니다.');
             await refreshSidebar();
-            navigate(`/api/pendingList?documentType=인장신청`);
+            navigate(`/pendingList?documentType=인장신청`);
           } else {
             alert('인장 반려 중 오류가 발생했습니다.');
           }

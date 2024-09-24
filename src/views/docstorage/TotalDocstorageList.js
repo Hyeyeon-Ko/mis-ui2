@@ -23,7 +23,7 @@ function TotalDocstorageList() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/api/docstorageList/total`);
+        const response = await axios.get(`/api/docstorageList/total`);
         const { centerResponses, centerDocstorageResponses } = response.data.data;
 
         setCenterData([...centerResponses]); 
@@ -118,7 +118,7 @@ function TotalDocstorageList() {
 
   const downloadExcel = async () => {
     try {
-        const response = await axios.post(`${apiUrl}/api/docstorage/excel`, selectedRows, {
+        const response = await axios.post(`/api/docstorage/excel`, selectedRows, {
             responseType: 'blob',
         });
 

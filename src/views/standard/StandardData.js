@@ -39,7 +39,7 @@ function StandardData() {
 
   const fetchSubCategories = async (classCd) => {
     try {
-      const response = await axios.get(`${apiUrl}/api/std/groupInfo`, { params: { classCd } });
+      const response = await axios.get(`/api/std/groupInfo`, { params: { classCd } });
       const data = response.data.data || [];
       data.sort((a, b) => parseInt(a.groupCd, 10) - parseInt(b.groupCd, 10));
       setSubCategories(data);
@@ -59,7 +59,7 @@ function StandardData() {
 
   const fetchDetails = async (groupCd) => {
     try {
-      const response = await axios.get(`${apiUrl}/api/std/detailInfo`, { params: { groupCd } });
+      const response = await axios.get(`/api/std/detailInfo`, { params: { groupCd } });
       const data = response.data.data || [];
       if (Array.isArray(data)) {
         data.sort((a, b) => parseInt(a.detailCd, 10) - parseInt(b.detailCd, 10));
@@ -78,7 +78,7 @@ function StandardData() {
 
   const fetchSelectedDetail = async (groupCd, detailCd) => {
     try {
-      const response = await axios.get(`${apiUrl}/api/std/detailInfo/${detailCd}`, { params: { groupCd } });
+      const response = await axios.get(`/api/std/detailInfo/${detailCd}`, { params: { groupCd } });
       const detailData = response.data.data;
       setEditDetailData(detailData);
       setModalMode('edit');
@@ -91,7 +91,7 @@ function StandardData() {
 
   const fetchHeaderData = async (groupCd) => {
     try {
-      const response = await axios.get(`${apiUrl}/api/std/header`, { params: { groupCd } });
+      const response = await axios.get(`/api/std/header`, { params: { groupCd } });
       const headerData = response.data.data[0] || {};
       setHeaderData(headerData);
     } catch (error) {
@@ -121,7 +121,7 @@ function StandardData() {
   const handleSaveRow = async (newRow) => {
     if (modalMode === 'detail') {
       try {
-        await axios.post(`${apiUrl}/api/std/detailInfo`, {
+        await axios.post(`/api/std/detailInfo`, {
           detailCd: newRow.detailCode,
           groupCd: selectedSubCategory,
           detailNm: newRow.detailName,
@@ -153,7 +153,7 @@ function StandardData() {
     } else if (modalMode === 'edit') {
       try {
         const oriDetailCd = selectedDetails[0];
-        await axios.put(`${apiUrl}/api/std/detailInfo`, {
+        await axios.put(`/api/std/detailInfo`, {
           detailCd: newRow.detailCode,
           groupCd: selectedSubCategory,
           detailNm: newRow.detailName,
@@ -183,7 +183,7 @@ function StandardData() {
       }
     } else if (modalMode === 'group') {
       try {
-        await axios.post(`${apiUrl}/api/std/groupInfo`, {
+        await axios.post(`/api/std/groupInfo`, {
           classCd: newRow.classCd,
           groupCd: newRow.groupCd,
           groupNm: newRow.groupNm,
@@ -238,7 +238,7 @@ function StandardData() {
 
     try {
       for (const detailCd of selectedDetails) {
-        await axios.put(`${apiUrl}/api/std/deleteDetailInfo`, null, {
+        await axios.put(`/api/std/deleteDetailInfo`, null, {
           params: { groupCd: selectedSubCategory, detailCd }
         });
       }

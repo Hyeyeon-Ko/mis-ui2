@@ -63,7 +63,7 @@ function PendingApprovalList() {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${apiUrl}/api/pendingList`, {
+      const response = await axios.get(`/api/pendingList`, {
         params: {
           documentType,
           startDate: filterParams.startDate || '',
@@ -151,7 +151,7 @@ function PendingApprovalList() {
 
   const fetchSealImprintDetail = async (draftId) => {
     try {
-      const response = await axios.get(`${apiUrl}/api/seal/imprint/${draftId}`);
+      const response = await axios.get(`/api/seal/imprint/${draftId}`);
       return response.data.data;
     } catch (error) {
       console.error('Error fetching seal imprint details:', error);
@@ -161,7 +161,7 @@ function PendingApprovalList() {
 
   const fetchSealExportDetail = async (draftId) => {
     try {
-      const response = await axios.get(`${apiUrl}/api/seal/export/${draftId}`);
+      const response = await axios.get(`/api/seal/export/${draftId}`);
       return response.data.data;
     } catch (error) {
       console.error('Error fetching seal export details:', error);
@@ -174,15 +174,15 @@ function PendingApprovalList() {
       setSelectedDocumentId(draftId);
       setModalVisible(true);
     } else if (docType === '명함신청') {
-      navigate(`/api/bcd/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
+      navigate(`/bcd/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
     }  else if (docType === '법인서류') {
-      navigate(`/api/corpDoc/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
+      navigate(`/corpDoc/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
     } else if (docType === '인장신청(날인)') {
       const sealImprintDetails = await fetchSealImprintDetail(draftId);
-      navigate(`/api/seal/imprint/${draftId}?readonly=true&applyStatus=승인대기`, { state: { sealImprintDetails, readOnly: true }});
+      navigate(`/seal/imprint/${draftId}?readonly=true&applyStatus=승인대기`, { state: { sealImprintDetails, readOnly: true }});
     } else if (docType === '인장신청(반출)') {
       const sealExportDetails = await fetchSealExportDetail(draftId);
-      navigate(`/api/seal/export/${draftId}?readonly=true&applyStatus=승인대기`, { state: { sealExportDetails, readOnly: true }});
+      navigate(`/seal/export/${draftId}?readonly=true&applyStatus=승인대기`, { state: { sealExportDetails, readOnly: true }});
     }
   };
 
@@ -226,7 +226,7 @@ function PendingApprovalList() {
         refreshSidebar();  
       }
 
-      navigate(`/api/pendingList?documentType=${documentType}`);
+      navigate(`/pendingList?documentType=${documentType}`);
     } catch (error) {
       console.error('Error approving document:', error);
       alert('Error approving document.');

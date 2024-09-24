@@ -43,7 +43,7 @@ function DetailCorpDocApplication() {
 
     const fetchCorpDocDetail = useCallback(async (id) => {
         try {
-            const response = await axios.get(`${apiUrl}/api/corpDoc/${id}`);
+            const response = await axios.get(`/api/corpDoc/${id}`);
             if (response.data && response.data.data) {
                 const {
                     submission,
@@ -121,7 +121,7 @@ function DetailCorpDocApplication() {
     const handleFileDownload = async () => {
         if (existingFile) {
             try {
-                const response = await axios.get(`${apiUrl}/api/corpDoc/download/${encodeURIComponent(existingFile.name)}`, {
+                const response = await axios.get(`/api/corpDoc/download/${encodeURIComponent(existingFile.name)}`, {
                     responseType: 'blob',
                 });
 
@@ -213,14 +213,14 @@ function DetailCorpDocApplication() {
                 formDataToSend.append('file', file);
             }
 
-            await axios.post(`${apiUrl}/api/corpDoc/update?draftId=${draftId}&isFileDeleted=${isFileDeleted}`, formDataToSend, {
+            await axios.post(`/api/corpDoc/update?draftId=${draftId}&isFileDeleted=${isFileDeleted}`, formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
 
             alert('법인서류 수정이 완료되었습니다.');
-            navigate('/api/myPendingList');
+            navigate('/myPendingList');
         } catch (error) {
             console.error('Error submitting corporate document:', error);
             alert('법인서류 수정 중 오류가 발생했습니다.');
@@ -239,10 +239,10 @@ function DetailCorpDocApplication() {
     const handleApprove = async (e) => {
         e.preventDefault(); 
         try {
-            await axios.put(`${apiUrl}/api/corpDoc/approve?draftId=${draftId}`);
+            await axios.put(`/api/corpDoc/approve?draftId=${draftId}`);
             alert('문서가 승인되었습니다.');
             await refreshSidebar(); 
-            navigate('/api/pendingList?documentType=법인서류');
+            navigate('/pendingList?documentType=법인서류');
         } catch (error) {
             console.error('Error approving document:', error);
             alert('문서 승인 중 오류가 발생했습니다.');
@@ -251,7 +251,7 @@ function DetailCorpDocApplication() {
     
     const handleRejectConfirm = async (reason) => {
         try {
-            const response = await axios.put(`${apiUrl}/api/corpDoc/reject?draftId=${draftId}`, reason, {
+            const response = await axios.put(`/api/corpDoc/reject?draftId=${draftId}`, reason, {
                 headers: {
                     'Content-Type': 'text/plain',
                 },
@@ -259,7 +259,7 @@ function DetailCorpDocApplication() {
             if (response.data.code === 200) {
                 alert('법인서류 신청이 반려되었습니다.');
                 await refreshSidebar(); 
-                navigate('/api/pendingList?documentType=법인서류');
+                navigate('/pendingList?documentType=법인서류');
             } else {
                 alert('법인서류 신청 반려 중 오류가 발생하였습니다.');
             }

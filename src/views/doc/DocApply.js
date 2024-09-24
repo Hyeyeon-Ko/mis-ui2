@@ -134,7 +134,7 @@ function DocApply() {
       });
       if (response.ok) {
         alert('문서 수신 신청이 완료되었습니다.');
-        navigate('/api/myPendingList');
+        navigate('/myPendingList');
       } else {
         alert('문서 수신 신청에 실패했습니다.');
       }
@@ -173,7 +173,7 @@ function DocApply() {
       });
       if (response.ok) {
         alert('문서 발신 신청이 완료되었습니다.');
-        navigate('/api/myPendingList');
+        navigate('/myPendingList');
       } else {
         alert('문서 발신 신청에 실패했습니다.');
       }
@@ -262,7 +262,7 @@ const autoSelectApproversAndSubmit = async () => {
       });
       if (response.ok) {
         alert('문서 발신 신청이 완료되었습니다.');
-        navigate('/api/myPendingList');
+        navigate('/myPendingList');
       } else {
         alert('문서 발신 신청에 실패했습니다.');
       }

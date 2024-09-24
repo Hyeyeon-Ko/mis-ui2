@@ -16,7 +16,7 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
 
   const fetchHistory = useCallback(async (draftId) => {
     try {
-      const response = await axios.get(`${apiUrl}/api/bcd/applyList/history/${draftId}`);
+      const response = await axios.get(`/api/bcd/applyList/history/${draftId}`);
       const transformedData = response.data.data.map((item) => ({
         ...item,
         applyStatus: getStatusText(item.applyStatus),

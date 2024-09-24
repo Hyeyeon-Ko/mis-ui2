@@ -97,7 +97,7 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
           }));
 
         try {
-          axios.post(`${apiUrl}/api/rental/update`, extractedData);
+          axios.post(`/api/rental/update`, extractedData);
           alert('수정이 완료되었습니다.');
           onSave(extractedData, true);
           onClose();
@@ -158,7 +158,7 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         specialNote,
       };
 
-      axios.put(`${apiUrl}/api/rental/?detailId=${rentalData.detailId}`, payload)
+      axios.put(`/api/rental/?detailId=${rentalData.detailId}`, payload)
         .then(response => {
           onSave([payload]);
           alert('항목이 성공적으로 수정되었습니다.');

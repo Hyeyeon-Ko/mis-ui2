@@ -37,7 +37,7 @@ function RentalManage() {
 
   const fetchRentalData = useCallback(async () => {
     try {
-      const response = await axios.get(`${apiUrl}/api/rentalList/center`, {
+      const response = await axios.get(`/api/rentalList/center`, {
         params: { instCd: auth.instCd },
       });
   
@@ -140,7 +140,7 @@ function RentalManage() {
   
     try {
         for (const detailId of selectedRows) {
-            await axios.delete(`${apiUrl}/api/rental/`, { params: { detailId } });
+            await axios.delete(`/api/rental/`, { params: { detailId } });
         }
         alert('선택된 항목이 삭제되었습니다.');
   
@@ -179,7 +179,7 @@ function RentalManage() {
     }
 
     try {
-        await axios.put(`${apiUrl}/api/rental/finish`, selectedRows);
+        await axios.put(`/api/rental/finish`, selectedRows);
 
         alert('선택된 항목이 최종 업데이트되었습니다.');
 
@@ -223,7 +223,7 @@ function RentalManage() {
     }
 
     try {
-      const response = await axios.post(`${apiUrl}/api/rental/excel`, selectedRows, {
+      const response = await axios.post(`/api/rental/excel`, selectedRows, {
         responseType: 'blob', 
       });
 

@@ -72,7 +72,7 @@ const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregist
     };
 
     try {
-      const response = await axios.post(`${apiUrl}/api/corpDoc/store`, requestData, {
+      const response = await axios.post(`/api/corpDoc/store`, requestData, {
         headers: {
           'Content-Type': 'application/json',
         },

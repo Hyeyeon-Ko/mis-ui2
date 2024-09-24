@@ -21,7 +21,7 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
 
   const fetchDocumentData = useCallback(async (id) => {
     try {
-      const response = await axios.get(`${apiUrl}/api/doc/${id}`);
+      const response = await axios.get(`/api/doc/${id}`);
       if (response.data && response.data.data) {
         const data = response.data.data;
         setFormData({
@@ -33,7 +33,7 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
           purpose: data.purpose,
           division: data.division,
           fileName: data.fileName,
-          fileUrl: data.filePath ? `${apiUrl}/api/doc/download/${encodeURIComponent(data.fileName)}` : ''
+          fileUrl: data.filePath ? `/api/doc/download/${encodeURIComponent(data.fileName)}` : ''
         });
       }
     } catch (error) {

@@ -22,7 +22,7 @@ function TotalRentalManage() {
     useEffect(() => {
       const fetchRentalData = async () => {
           try {
-              const response = await axios.get(`${apiUrl}/api/rentalList/total`);
+              const response = await axios.get(`/api/rentalList/total`);
               const { centerResponses, centerRentalResponses, summaryResponses } = response.data.data;
   
               const nationwideCenter = { detailNm: '전국센터', detailCd: 'all' };
@@ -184,13 +184,13 @@ function TotalRentalManage() {
       try {
         let response;
         if (selectedCenter === 'all') {
-          response = await axios.get(`${apiUrl}/api/rental/totalExcel`, {
+          response = await axios.get(`/api/rental/totalExcel`, {
             responseType: 'blob',
           });
         } else {
           const detailIds = selectedRows;
           
-          response = await axios.post(`${apiUrl}/api/rental/excel`, detailIds, {
+          response = await axios.post(`/api/rental/excel`, detailIds, {
             responseType: 'blob',
           });
         }
