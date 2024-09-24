@@ -1,6 +1,5 @@
 import React from 'react';
 import ApplyComponent from '../../components/apply/ApplyComponents';
-import '../../styles/bcd/BcdApplyFirst.css';
 
 // 명함 신청 컴포넌트
 function BcdApplyFirst() {

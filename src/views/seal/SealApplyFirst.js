@@ -1,6 +1,5 @@
 import React from 'react';
 import ApplyComponent from '../../components/apply/ApplyComponents';
-import '../../styles/seal/SealApply.css';
 
 // 인장 신청 컴포넌트
 function SealApplyFirst() {

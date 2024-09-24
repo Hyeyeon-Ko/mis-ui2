@@ -1,6 +1,7 @@
 import React from 'react';
 import Breadcrumb from '../common/Breadcrumb';
 import CircleButton from '../CircleButton';
+import '../../styles/apply/ApplyComponents.css'
 import '../../styles/common/Page.css';
 
 // 신청 컴포넌트
