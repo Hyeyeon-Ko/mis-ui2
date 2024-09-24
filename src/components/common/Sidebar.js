@@ -215,7 +215,7 @@ function Sidebar() {
   );
 }
 
-function SidebarSection({ title, items, isActive, location, defaultOpen }) {
+function SidebarSection({ title, items, isActive, defaultOpen }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   useEffect(() => {
