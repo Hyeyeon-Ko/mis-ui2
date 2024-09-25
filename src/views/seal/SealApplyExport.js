@@ -4,6 +4,7 @@ import axios from 'axios';
 import SealFormComponents from '../../components/apply/SealFormComponents';
 import { useSealForm } from '../../hooks/seal/useSealForm';
 import { AuthContext } from '../../components/AuthContext';
+import { validateForm } from '../../hooks/validateForm';
 
 
 function SealApplyExport() {
@@ -29,25 +30,25 @@ function SealApplyExport() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const corporateSealQuantity = sealSelections.corporateSeal.selected ? sealSelections.corporateSeal.quantity : '';
-        const facsimileSealQuantity = sealSelections.facsimileSeal.selected ? sealSelections.facsimileSeal.quantity : '';
-        const companySealQuantity = sealSelections.companySeal.selected ? sealSelections.companySeal.quantity : '';
+        const selectedSeals = ['corporateSeal', 'facsimileSeal', 'companySeal'].reduce((acc, sealType) => {
+            const { selected, quantity } = sealSelections[sealType];
+            acc[sealType] = {
+                selected,
+                quantity: selected ? quantity : '',
+            };
+            return acc;
+        }, {});
 
-        if (!corporateSealQuantity && !facsimileSealQuantity && !companySealQuantity) {
-            alert('최소 하나의 인감을 선택해야 합니다.');
+        const inputDates = {
+            exportDate: exportDate,
+            returnDate: returnDate
+        }
+
+        const { isValid, message } = validateForm('Seal', selectedSeals, inputDates);
+        if (!isValid) {
+            alert(message);
             return;
         }
-
-        if (!submission || !draftNm || !exportDate || !returnDate || !purpose) {
-            alert('모든 필수 항목을 입력해주세요.');
-            return; 
-        }
-
-        const selectedSeals = {
-            corporateSeal: corporateSealQuantity,
-            facsimileSeal: facsimileSealQuantity,
-            companySeal: companySealQuantity,
-        };
 
         const exportRequestDTO = {
             drafter: auth.hngNm,
@@ -57,9 +58,9 @@ function SealApplyExport() {
             expNm: draftNm,
             expDate: exportDate,
             returnDate: returnDate,
-            corporateSeal: selectedSeals.corporateSeal,
-            facsimileSeal: selectedSeals.facsimileSeal,
-            companySeal: selectedSeals.companySeal,
+            corporateSeal: selectedSeals.corporateSeal.quantity,
+            facsimileSeal: selectedSeals.facsimileSeal.quantity,
+            companySeal: selectedSeals.companySeal.quantity,
             purpose: purpose,
             instCd: auth.instCd,
         };
