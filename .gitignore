@@ -31,3 +31,4 @@ Dockerfile
 .gitignore
 
 package-lock.json
+package.json

@@ -24,6 +24,7 @@ function SealExportList() {
   
   const fetchSealExportList = useCallback(async (searchType = null, keyword = null) => {
     try {
+      const { instCd } = auth;
       const response = await axios.get(`/api/seal/exportList`, {
         params: {
           instCd,
