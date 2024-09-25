@@ -33,6 +33,10 @@
     margin-bottom: 12px;
 }
 
+.select-back {
+    font-size: 14.5px; 
+}  
+
 .form-group-horizontal {
     display: flex;
     align-items: center;
@@ -275,9 +279,9 @@ input[type="text2"] {
     margin-left: 20px;
     margin-bottom: 30px;
     height: auto;
-    border: 1px solid #ccc; 
+    border: 1px solid #dbdbdb; 
     border-radius: 8px; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(85, 85, 85, 0.1);
 }
 
 .image-preview {
