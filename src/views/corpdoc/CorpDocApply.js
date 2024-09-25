@@ -1,6 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../components/AuthContext';
+import { validateForm } from '../../hooks/validateForm';
+import { getTypeName } from '../../hooks/fieldNameUtils';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import '../../styles/common/Page.css';
@@ -53,52 +55,38 @@ function CorpDocApply() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        // 사용일자 입력형식 검증
-        const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-        if (!datePattern.test(formData.useDate)) {
-            alert('사용일자는 YYYY-MM-DD 형식으로 입력해야 합니다.');
+
+        // 1. SealForm Validation
+        const requiredInputs = {
+            submission: formData.submission,
+            purpose: formData.purpose,
+            useDate: formData.useDate,
+            type: formData.type,
+            docFile: formData.department,
+        }
+
+        const selectedCorpDocs = ['document1', 'document2', 'document3', 'document4'].reduce((acc, docType, index) => {
+            const quantityKey = `quantity${index + 1}`;
+            acc[`cert${docType.charAt(0).toUpperCase() + docType.slice(1)}`] = {
+                selected: formData[docType],
+                quantity: formData[docType] ? formData[quantityKey] : '',
+            };
+            return acc;
+        }, {});        
+
+        const inputDates = {
+            useDate: formData.useDate
+        }
+
+        const { isValid, message } = validateForm('CorpDoc', requiredInputs, selectedCorpDocs, inputDates);
+        if (!isValid) {
+            alert(message);
             return;
         }
 
-        // 체크박스 선택 여부 검증
-        if (!formData.document1 && !formData.document2 && !formData.document3 && !formData.document4) {
-            alert('필요서류 중 최소 하나를 선택해야 합니다.');
-            return;
-        }
-
-        // 수량 입력형식 검증
-        const quantities = [
-            { document: formData.document1, quantity: formData.quantity1 },
-            { document: formData.document2, quantity: formData.quantity2 },
-            { document: formData.document3, quantity: formData.quantity3 },
-            { document: formData.document4, quantity: formData.quantity4 },
-        ];
-    
-        for (let i = 0; i < quantities.length; i++) {
-            const { document, quantity } = quantities[i];
-            if (document && (!/^\d+$/.test(quantity) || parseInt(quantity) <= 0)) {
-                alert('올바르지 않은 입력값입니다. 수량을 다시 입력해주세요.');
-                return;
-            }
-        }
-
+        // 2. Submit CorpDocForm
         const payload = new FormData();
-
-        let typeValue = '';
-        switch (formData.type) {
-            case 'original':
-                typeValue = 'O';
-                break;
-            case 'pdf':
-                typeValue = 'P';
-                break;
-            case 'both':
-                typeValue = 'B';
-                break;
-            default:
-                typeValue = '';
-        }
+        const typeValue = getTypeName(formData.type);
 
         payload.append('corpDocRequest', new Blob([JSON.stringify({
             drafter: auth.hngNm,
@@ -149,46 +137,47 @@ function CorpDocApply() {
                                 <label>법인서류 신청서</label>
                             </div>
                             <div className='corpDoc-form-group'>
-                                <label>제출처</label>
+                                <label>제출처 <span style={{ color: 'red' }}>*</span></label>
                                 <input
                                     type="text"
                                     name="submission"
                                     value={formData.submission}
                                     onChange={handleChange}
-                                    required
                                 />
                             </div>
                             <div className='corpDoc-form-group'>
-                                <label>사용목적</label>
+                                <label>사용목적 <span style={{ color: 'red' }}>*</span></label>
                                 <textarea
                                     name="purpose"
                                     value={formData.purpose}
                                     onChange={handleChange}
-                                    required
                                 />
                             </div>
                             <div className='corpDoc-form-group'>
-                                <label>사용일자</label>
+                                <label>사용일자 <span style={{ color: 'red' }}>*</span></label>
                                 <input
                                     type="text"
                                     name="useDate"
                                     value={formData.useDate}
                                     onChange={handleChange}
                                     placeholder="YYYY-MM-DD"
-                                    required
                                 />
                             </div>
                             <div className='corpDoc-form-group'>
-                                <label>증빙서류</label>
-                                <input
-                                    type="file"
-                                    name="department"
-                                    onChange={handleFileChange}
-                                    required
-                                />
+                                <label>원본 / pdf <span style={{ color: 'red' }}>*</span></label>
+                                <select 
+                                    name="type" 
+                                    value={formData.type}
+                                    onChange={handleChange}
+                                >
+                                    <option value="">선택하세요</option>
+                                    <option value="original">원본</option>
+                                    <option value="pdf">PDF</option>
+                                    <option value="both">원본 + PDF</option>
+                                </select>
                             </div> &nbsp;
                             <div className='corpDoc-form-group'>
-                                <label>필요서류/수량</label>
+                                <label>필요서류/수량 <span style={{ color: 'red' }}>*</span></label>
                                 <div className='corpDoc-form-group-inline'>
                                     <input 
                                         type="checkbox" 
@@ -271,18 +260,12 @@ function CorpDocApply() {
                                 </div>
                             </div> &nbsp;
                             <div className='corpDoc-form-group'>
-                                <label>원본 / pdf</label>
-                                <select 
-                                    name="type" 
-                                    value={formData.type}
-                                    onChange={handleChange}
-                                    required
-                                >
-                                    <option value="">선택하세요</option>
-                                    <option value="original">원본</option>
-                                    <option value="pdf">PDF</option>
-                                    <option value="both">원본 + PDF</option>
-                                </select>
+                                <label>근거서류 <span style={{ color: 'red' }}>*</span></label>
+                                <input
+                                    type="file"
+                                    name="department"
+                                    onChange={handleFileChange}
+                                />
                             </div>
                             <div className='corpDoc-form-group'>
                                 <label>특이사항</label>

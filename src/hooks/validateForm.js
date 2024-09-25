@@ -47,11 +47,21 @@ export const requiredInput = (inputValues) => {
     for (const [field, value] of Object.entries(inputValues)) {
         
         const fieldName = getFieldName(field);
-        if (!value || value.trim() === '') {
+
+        // input, select box 값 선택 안한 경우
+        if (typeof value === 'string') {
+            if (!value || value.trim() === '') {
+                return {
+                    isValid: false,
+                    message: (field !== 'type') ? `${fieldName} 입력해주세요.` : `${fieldName} 선택해주세요.`
+                    }
+            }
+        } // 첨부파일 업로드 안한 경우
+        else if (!value) {
             return {
                 isValid: false,
-                message: (field !== 'file') ? `${fieldName} 입력해주세요.` : `${fieldName} 첨부해주세요.`
-            };
+                message: `${fieldName} 업로드 해주세요.`
+            }
         }
     }
 

@@ -48,7 +48,7 @@ function SealFormComponents({
                                 <label>{`${title} 신청서`}</label>
                             </div>
                             <div className='seal-apply-form-group'>
-                                <label>제출처<span style={{ color: 'red' }}>*</span></label>
+                                <label>제출처 <span style={{ color: 'red' }}>*</span></label>
                                 <input 
                                     type="text" 
                                     name="destination" 
@@ -61,7 +61,7 @@ function SealFormComponents({
                             {isExport ? (
                                 <>
                                     <div className='seal-apply-form-group'>
-                                        <label>반출자명<span style={{ color: 'red' }}>*</span></label>
+                                        <label>반출자명 <span style={{ color: 'red' }}>*</span></label>
                                         <input 
                                             type="text" 
                                             name="draftNm" 
@@ -70,7 +70,7 @@ function SealFormComponents({
                                         />
                                     </div>
                                     <div className='seal-apply-form-group'>
-                                        <label>반출일자<span style={{ color: 'red' }}>*</span></label>
+                                        <label>반출일자 <span style={{ color: 'red' }}>*</span></label>
                                         <input 
                                             type="text" 
                                             name="exportDate" 
@@ -80,7 +80,7 @@ function SealFormComponents({
                                         />
                                     </div>
                                     <div className='seal-apply-form-group'>
-                                        <label>반납일자<span style={{ color: 'red' }}>*</span></label>
+                                        <label>반납일자 <span style={{ color: 'red' }}>*</span></label>
                                         <input 
                                             type="text" 
                                             name="returnDate" 
@@ -92,7 +92,7 @@ function SealFormComponents({
                                 </>
                             ) : (
                                 <div className='seal-apply-form-group'>
-                                    <label>사용일자<span style={{ color: 'red' }}>*</span></label>
+                                    <label>사용일자 <span style={{ color: 'red' }}>*</span></label>
                                     <input 
                                         type="text" 
                                         name="useDate" 
@@ -104,7 +104,7 @@ function SealFormComponents({
                             )}
 
                             <div className='seal-apply-form-group'>
-                                <label>사용 목적<span style={{ color: 'red' }}>*</span></label>
+                                <label>사용 목적 <span style={{ color: 'red' }}>*</span></label>
                                 <textarea 
                                     name="purpose" 
                                     value={purpose} 
@@ -113,7 +113,7 @@ function SealFormComponents({
                             </div>
 
                             <div className='seal-apply-form-group'>
-                                <label>인감 구분<span style={{ color: 'red' }}>*</span></label>
+                                <label>인감 구분 <span style={{ color: 'red' }}>*</span></label>
                                 <div className="seal-options">
                                     <SealCheckbox
                                         sealName="corporateSeal"
@@ -156,7 +156,7 @@ function SealFormComponents({
 
                             {isExport && (
                                 <div className='seal-apply-form-group'>
-                                    <label>참조자료<span style={{ color: 'red' }}>*</span></label>
+                                    <label>근거서류 <span style={{ color: 'red' }}>*</span></label>
                                     <input 
                                         type="file" 
                                         name="purposeFile" 

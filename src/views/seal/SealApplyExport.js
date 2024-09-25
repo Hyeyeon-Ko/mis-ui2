@@ -37,7 +37,7 @@ function SealApplyExport() {
             exportDate: exportDate,
             returnDate: returnDate,
             purpose: purpose,
-            file: file,
+            docFile: file,
         }
 
         const selectedSeals = ['corporateSeal', 'facsimileSeal', 'companySeal'].reduce((acc, sealType) => {
