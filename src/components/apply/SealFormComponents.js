@@ -48,13 +48,12 @@ function SealFormComponents({
                                 <label>{`${title} 신청서`}</label>
                             </div>
                             <div className='seal-apply-form-group'>
-                                <label>제출처</label>
+                                <label>제출처<span style={{ color: 'red' }}>*</span></label>
                                 <input 
                                     type="text" 
                                     name="destination" 
                                     value={submission} 
-                                    onChange={(e) => setSubmission(e.target.value)} 
-                                    required 
+                                    onChange={(e) => setSubmission(e.target.value)}
                                 />
                             </div>
 
@@ -62,64 +61,59 @@ function SealFormComponents({
                             {isExport ? (
                                 <>
                                     <div className='seal-apply-form-group'>
-                                        <label>반출자명</label>
+                                        <label>반출자명<span style={{ color: 'red' }}>*</span></label>
                                         <input 
                                             type="text" 
                                             name="draftNm" 
                                             value={draftNm} 
                                             onChange={(e) => setDraftNm(e.target.value)} 
-                                            required 
                                         />
                                     </div>
                                     <div className='seal-apply-form-group'>
-                                        <label>반출일자</label>
+                                        <label>반출일자<span style={{ color: 'red' }}>*</span></label>
                                         <input 
                                             type="text" 
                                             name="exportDate" 
                                             value={exportDate} 
                                             onChange={(e) => setExportDate(e.target.value)} 
-                                            required 
                                             placeholder="YYYY-MM-DD" 
                                         />
                                     </div>
                                     <div className='seal-apply-form-group'>
-                                        <label>반납일자</label>
+                                        <label>반납일자<span style={{ color: 'red' }}>*</span></label>
                                         <input 
                                             type="text" 
                                             name="returnDate" 
                                             value={returnDate} 
                                             onChange={(e) => setReturnDate(e.target.value)} 
-                                            required 
                                             placeholder="YYYY-MM-DD" 
                                         />
                                     </div>
                                 </>
                             ) : (
                                 <div className='seal-apply-form-group'>
-                                    <label>사용일자</label>
+                                    <label>사용일자<span style={{ color: 'red' }}>*</span></label>
                                     <input 
                                         type="text" 
                                         name="useDate" 
                                         value={useDate} 
                                         onChange={(e) => setUseDate(e.target.value)} 
-                                        required 
                                         placeholder="YYYY-MM-DD" 
                                     />
                                 </div>
                             )}
 
                             <div className='seal-apply-form-group'>
-                                <label>사용 목적</label>
+                                <label>사용 목적<span style={{ color: 'red' }}>*</span></label>
                                 <textarea 
                                     name="purpose" 
                                     value={purpose} 
                                     onChange={(e) => setPurpose(e.target.value)} 
-                                    required 
                                 />
                             </div>
 
                             <div className='seal-apply-form-group'>
-                                <label>인감 구분</label>
+                                <label>인감 구분<span style={{ color: 'red' }}>*</span></label>
                                 <div className="seal-options">
                                     <SealCheckbox
                                         sealName="corporateSeal"
@@ -162,7 +156,7 @@ function SealFormComponents({
 
                             {isExport && (
                                 <div className='seal-apply-form-group'>
-                                    <label>참조자료</label>
+                                    <label>참조자료<span style={{ color: 'red' }}>*</span></label>
                                     <input 
                                         type="file" 
                                         name="purposeFile" 
