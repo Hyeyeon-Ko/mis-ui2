@@ -106,7 +106,7 @@ function MyApplyList() {
 
   useEffect(() => {
     fetchApplications();
-  }, []);
+  }, [fetchApplications]);
 
   const applyStatusFilters = useCallback(() => {
     let filteredData = applications;

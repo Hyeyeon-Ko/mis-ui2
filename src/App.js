@@ -38,7 +38,7 @@ import DocstorageList from './views/docstorage/DocstorageList';
 import TotalDocstorageList from './views/docstorage/TotalDocstorageList';
 import RentalManage from './views/rental/RentalManage';
 import TotalRentalManage from './views/rental/TotalRentalManage';
-import TonerApplyFirst from './views/toner/TonerApply';
+// import TonerApplyFirst from './views/toner/TonerApply';
 import { AuthProvider, AuthContext } from './components/AuthContext';
 
 function MainLayout({ children }) {
