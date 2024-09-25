@@ -10,6 +10,8 @@ import '../../styles/list/MyApplyList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 
+
+
 function MyApplyList() {
   const { auth } = useContext(AuthContext); 
   const [applications, setApplications] = useState([]); 
@@ -52,7 +54,7 @@ function MyApplyList() {
 
   const fetchApplications = useCallback(async () => {
     try {
-      const response = await axios.get('/api/myApplyList', {
+      const response = await axios.get(`/api/myApplyList`, {
         params: {
           userId: auth.userId,
           startDate: startDate ? startDate.toISOString().split('T')[0] : null,

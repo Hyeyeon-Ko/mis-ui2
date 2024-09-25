@@ -21,3 +21,13 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# build 불필요 파일
+node_modules
+build
+.dockerignore
+Dockerfile
+.git
+.gitignore
+
+package-lock.json

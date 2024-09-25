@@ -127,7 +127,7 @@ function CorpDocApply() {
 
             if (response.ok) {
                 alert('서류 신청이 완료되었습니다.');
-                navigate('/api/myPendingList');
+                navigate('/myPendingList');
             } else {
                 alert('서류 신청에 실패했습니다.');
             }

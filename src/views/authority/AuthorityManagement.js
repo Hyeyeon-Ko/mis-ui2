@@ -29,7 +29,7 @@ function AuthorityManagement() {
    */
   const fetchAuthorityList = async () => {
     try {
-      const response = await axios.get('/api/auth');
+      const response = await axios.get(`/api/auth`);
       const data = response.data.data || response.data;
       const transformedData = data.map((item) => ({
         id: item.userId,

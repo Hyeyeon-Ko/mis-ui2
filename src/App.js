@@ -43,7 +43,7 @@ import { AuthProvider, AuthContext } from './components/AuthContext';
 
 function MainLayout({ children }) {
   const location = useLocation();
-  const isLoginPage = location.pathname === '/api/login';
+  const isLoginPage = location.pathname === '/login';
 
   return (
     <div className="app">
@@ -61,11 +61,11 @@ function RequireAuth({ children }) {
   const location = useLocation();
 
   if (!auth.isAuthenticated) {
-    return <Navigate to="/api/login" />;
+    return <Navigate to="/login" />;
   }
 
   if ((auth.role === 'ADMIN' || auth.role === 'MASTER') && location.pathname === '/') {
-    return <Navigate to="/api/std" />;
+    return <Navigate to="/std" />;
   }
 
   return children;
@@ -103,47 +103,46 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
-          <Route path="/api/login" element={<Login />} />
+          <Route path="/login" element={<Login />} />
           <Route path="*" element={
             <MainLayout>
               <Routes>
                 <Route path="/" element={<RequireAuth><Apply /></RequireAuth>} />
-                <Route path="/api/auth" element={<RequireAuth><AuthorityManagement /></RequireAuth>} />
-                <Route path="/api/bcd" element={<RequireAuth><BcdApplyFirst /></RequireAuth>} />
-                <Route path="/api/bcd/own" element={<RequireAuth><BcdApplySecond /></RequireAuth>} />
-                <Route path="/api/bcd/other" element={<RequireAuth><BcdApplySecond /></RequireAuth>} />
-                <Route path="/api/doc" element={<RequireAuth><DocApply /></RequireAuth>} />
-                <Route path="/api/corpDoc" element={<RequireAuth><CorpDocApply /></RequireAuth>} />
-                <Route path="/api/seal" element={<RequireAuth><SealApplyFirst /></RequireAuth>} />
-                <Route path="/api/seal/imprint" element={<RequireAuth><SealApplyImprint /></RequireAuth>} />
-                <Route path="/api/seal/export" element={<RequireAuth><SealApplyExport /></RequireAuth>} />
-                <Route path="/api/seal/managementList" element={<RequireAuth><SealManagementList /></RequireAuth>} />
-                <Route path="/api/seal/registrationList" element={<RequireAuth><SealRegistrationList /></RequireAuth>} />
-                <Route path="/api/seal/sealRegistrationList" element={<RequireAuth><SealTotalRegistrationList /></RequireAuth>} />
-                <Route path="/api/seal/exportList" element={<RequireAuth><SealExportList /></RequireAuth>} />
-                <Route path="/api/corpDoc/rnpList" element={<RequireAuth><CorpDocRnpList /></RequireAuth>} />
-                <Route path="/api/corpDoc/issueList" element={<RequireAuth><CorpDocIssueList /></RequireAuth>} />
-                <Route path="/api/myApplyList" element={<RequireAuth><MyApplyList /></RequireAuth>} />
-                <Route path="/api/myPendingList" element={<RequireAuth><MyPendingList /></RequireAuth>} />
-                <Route path="/api/applyList" element={<RequireAuth><ApplicationsList /></RequireAuth>} />
-                <Route path="/api/pendingList" element={<RequireAuth><PendingApprovalList /></RequireAuth>} />
-                <Route path="/api/doc/receiveList" element={<RequireAuth><DocInList /></RequireAuth>} />
-                <Route path="/api/doc/sendList" element={<RequireAuth><DocOutList /></RequireAuth>} />
-                <Route path="/api/docstorage" element={<RequireAuth><Docstorage /></RequireAuth>} />
-                <Route path="/api/docstorageList" element={<RequireAuth><DocstorageList /></RequireAuth>} />
-                <Route path="/api/totalDocstorageList" element={<RequireAuth><TotalDocstorageList /></RequireAuth>} />
-                <Route path="/api/rentalList" element={<RequireAuth><RentalManage /></RequireAuth>} />
-                <Route path="/api/totalRentalList" element={<RequireAuth><TotalRentalManage /></RequireAuth>} />
-                <Route path="/api/bcd/orderList" element={<RequireAuth><BcdOrder /></RequireAuth>} />
-                <Route path="/api/std" element={<RequireAuth><StandardData /></RequireAuth>} />
-                <Route path="/api/toner" element={<RequireAuth><TonerApplyFirst /></RequireAuth>} />
-                <Route path="/api/bcd/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
-                <Route path="/api/doc/:draftId" element={<RequireAuth><DetailDocApplication /></RequireAuth>} />
-                <Route path="/api/corpDoc/:draftId" element={<RequireAuth><DetailCorpDocApplication/></RequireAuth>}/>
-                <Route path="/api/seal/imprint/:draftId" element={<RequireAuth><DetailSealImprintApplication /></RequireAuth>} />
-                <Route path="/api/seal/export/:draftId" element={<RequireAuth><DetailSealExportApplication /></RequireAuth>} />
-                <Route path="/api/bcd/applyList/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
-                <Route path="/api/corpDoc/applyList/:draftId" element={<RequireAuth><DetailCorpDocApplication /></RequireAuth>} />
+                <Route path="/auth" element={<RequireAuth><AuthorityManagement /></RequireAuth>} />
+                <Route path="/bcd" element={<RequireAuth><BcdApplyFirst /></RequireAuth>} />
+                <Route path="/bcd/own" element={<RequireAuth><BcdApplySecond /></RequireAuth>} />
+                <Route path="/bcd/other" element={<RequireAuth><BcdApplySecond /></RequireAuth>} />
+                <Route path="/doc" element={<RequireAuth><DocApply /></RequireAuth>} />
+                <Route path="/corpDoc" element={<RequireAuth><CorpDocApply /></RequireAuth>} />
+                <Route path="/seal" element={<RequireAuth><SealApplyFirst /></RequireAuth>} />
+                <Route path="/seal/imprint" element={<RequireAuth><SealApplyImprint /></RequireAuth>} />
+                <Route path="/seal/export" element={<RequireAuth><SealApplyExport /></RequireAuth>} />
+                <Route path="/seal/managementList" element={<RequireAuth><SealManagementList /></RequireAuth>} />
+                <Route path="/seal/registrationList" element={<RequireAuth><SealRegistrationList /></RequireAuth>} />
+                <Route path="/seal/sealRegistrationList" element={<RequireAuth><SealTotalRegistrationList /></RequireAuth>} />
+                <Route path="/seal/exportList" element={<RequireAuth><SealExportList /></RequireAuth>} />
+                <Route path="/corpDoc/rnpList" element={<RequireAuth><CorpDocRnpList /></RequireAuth>} />
+                <Route path="/corpDoc/issueList" element={<RequireAuth><CorpDocIssueList /></RequireAuth>} />
+                <Route path="/myApplyList" element={<RequireAuth><MyApplyList /></RequireAuth>} />
+                <Route path="/myPendingList" element={<RequireAuth><MyPendingList /></RequireAuth>} />
+                <Route path="/applyList" element={<RequireAuth><ApplicationsList /></RequireAuth>} />
+                <Route path="/pendingList" element={<RequireAuth><PendingApprovalList /></RequireAuth>} />
+                <Route path="/doc/receiveList" element={<RequireAuth><DocInList /></RequireAuth>} />
+                <Route path="/doc/sendList" element={<RequireAuth><DocOutList /></RequireAuth>} />
+                <Route path="/docstorage" element={<RequireAuth><Docstorage /></RequireAuth>} />
+                <Route path="/docstorageList" element={<RequireAuth><DocstorageList /></RequireAuth>} />
+                <Route path="/totalDocstorageList" element={<RequireAuth><TotalDocstorageList /></RequireAuth>} />
+                <Route path="/rentalList" element={<RequireAuth><RentalManage /></RequireAuth>} />
+                <Route path="/totalRentalList" element={<RequireAuth><TotalRentalManage /></RequireAuth>} />
+                <Route path="/bcd/orderList" element={<RequireAuth><BcdOrder /></RequireAuth>} />
+                <Route path="/std" element={<RequireAuth><StandardData /></RequireAuth>} />
+                <Route path="/bcd/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
+                <Route path="/doc/:draftId" element={<RequireAuth><DetailDocApplication /></RequireAuth>} />
+                <Route path="/corpDoc/:draftId" element={<RequireAuth><DetailCorpDocApplication/></RequireAuth>}/>
+                <Route path="/seal/imprint/:draftId" element={<RequireAuth><DetailSealImprintApplication /></RequireAuth>} />
+                <Route path="/seal/export/:draftId" element={<RequireAuth><DetailSealExportApplication /></RequireAuth>} />
+                <Route path="/bcd/applyList/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
+                <Route path="/corpDoc/applyList/:draftId" element={<RequireAuth><DetailCorpDocApplication /></RequireAuth>} />
               </Routes>
             </MainLayout>
           } />

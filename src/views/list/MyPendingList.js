@@ -9,6 +9,8 @@ import '../../styles/list/MyPendingList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 
+
+
 function MyPendingList() {
   const { auth } = useContext(AuthContext); 
   const [pendingApplications, setPendingApplications] = useState([]);
@@ -18,7 +20,7 @@ function MyPendingList() {
 
   const fetchPendingApplications = useCallback(async () => {
     try {
-      const response = await axios.get('/api/myPendingList', {
+      const response = await axios.get(`/api/myPendingList`, {
         params: {
           userId: auth.userId, 
         },

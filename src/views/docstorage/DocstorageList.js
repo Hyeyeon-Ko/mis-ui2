@@ -10,6 +10,8 @@ import StatusSelect from '../../components/StatusSelect';
 import '../../styles/common/Page.css';
 import '../../styles/docstorage/DocstorageList.css';
 
+
+
 function DocstorageList() {
   const { auth } = useContext(AuthContext);
   const categories = [
@@ -41,7 +43,7 @@ function DocstorageList() {
 
   const fetchDeptList = useCallback(async () => {
     try {
-      const response = await axios.get('/api/docstorageList/deptList', {
+      const response = await axios.get(`/api/docstorageList/deptList`, {
         params: { instCd: auth.instCd },
       });
       setDeptResponses(response.data.data);
@@ -52,7 +54,7 @@ function DocstorageList() {
 
   const fetchPendingApprovalList = useCallback(async () => {
     try {
-      const response = await axios.get('/api/docstorageList/pending', {
+      const response = await axios.get(`/api/docstorageList/pending`, {
         params: { instCd: auth.instCd },
       });
       const pendingList = response.data.data;
@@ -71,7 +73,7 @@ function DocstorageList() {
   
   const fetchDocstorageData = useCallback(async (deptCd) => {
     try {
-      const response = await axios.get('/api/docstorageList/center', {
+      const response = await axios.get(`/api/docstorageList/center`, {
         params: { deptCd },
       });
       const numberedDetails = response.data.data.map((item, index) => ({
@@ -89,7 +91,7 @@ function DocstorageList() {
 
   const fetchTotalDeptData = useCallback(async () => {
     try {
-      const response = await axios.get('/api/docstorageList/totalDept', {
+      const response = await axios.get(`/api/docstorageList/totalDept`, {
         params: { instCd: auth.instCd }, 
       });
       const totalDeptData = response.data.data.map((item, index) => ({
@@ -191,7 +193,7 @@ function DocstorageList() {
       }
   
       try {
-        const response = await axios.get('/api/docstorage/', { params: { detailId } });
+        const response = await axios.get(`/api/docstorage/`, { params: { detailId } });
         const data = response.data.data;
         setSelectedDoc({ ...data, detailId });
         setShowEditModal(true);
@@ -206,7 +208,7 @@ function DocstorageList() {
   
   const handleBulkUpdate = async (payload) => {
     try {
-      const response = await axios.put('/api/docstorage/bulkUpdate', payload);
+      const response = await axios.put(`/api/docstorage/bulkUpdate`, payload);
       if (response.status === 200) {
         alert('일괄 수정이 완료되었습니다.');
         setShowBulkEditModal(false);
@@ -222,7 +224,7 @@ function DocstorageList() {
   const handleUpdate = async (updatedData, isFileUpload = false) => {
     try {
         if (isFileUpload) {
-            const response = await axios.post('/api/docstorage/update', updatedData);
+            const response = await axios.post(`/api/docstorage/update`, updatedData);
             if (response.status === 200) {
                 alert('수정이 완료되었습니다.');
                 setShowEditModal(false);
@@ -231,7 +233,7 @@ function DocstorageList() {
             }
         } else {
             const { detailId } = selectedDoc; 
-            const response = await axios.put('/api/docstorage/', updatedData, {
+            const response = await axios.put(`/api/docstorage/`, updatedData, {
                 params: { detailId } 
             });
             if (response.status === 200) {
@@ -253,7 +255,7 @@ function DocstorageList() {
 
   const downloadExcel = async () => {
     try {
-      const response = await axios.post('/api/docstorage/excel', selectedRows, {
+      const response = await axios.post(`/api/docstorage/excel`, selectedRows, {
         responseType: 'blob',
       });
 
@@ -284,7 +286,7 @@ function DocstorageList() {
           return;
         }
     
-        await axios.put('/api/docstorage/approve', draftIds);
+        await axios.put(`/api/docstorage/approve`, draftIds);
         alert('모든 문서가 승인되었습니다.');
         setDocstorageDetails([]); 
       } catch (error) {
@@ -308,7 +310,7 @@ function DocstorageList() {
     }
   
     try {
-      const response = await axios.post('/api/docstorage/finish', selectedDetailIds);
+      const response = await axios.post(`/api/docstorage/finish`, selectedDetailIds);
   
       if (response.status === 200) {
         alert('선택된 문서가 완료되었습니다.');

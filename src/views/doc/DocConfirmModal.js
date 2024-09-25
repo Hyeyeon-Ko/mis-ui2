@@ -4,6 +4,8 @@ import axios from 'axios';
 import '../../styles/doc/DocConfirmModal.css';
 import downloadIcon from '../../assets/images/download.png';
 
+
+
 const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, refreshSidebar }) => {
   const [formData, setFormData] = useState({
     receptionDate: '',

@@ -3,6 +3,8 @@ import '../../styles/seal/SealRegistrationAddModal.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 
+
+
 function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
   const { auth } = useContext(AuthContext);
   const [formData, setFormData] = useState({

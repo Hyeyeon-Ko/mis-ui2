@@ -25,6 +25,8 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      console.log('Attempting login with:', { userId, userPw });
+
       const response = await fetch('/api/login', {
         method: 'POST',
         headers: {
@@ -37,7 +39,7 @@ const Login = () => {
         const data = await response.json();
 
         if (data && data.data) {
-          const authorityResponse = await fetch('/api/auth/standardData', {
+          const authorityResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/standardData`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',

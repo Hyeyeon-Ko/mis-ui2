@@ -147,8 +147,19 @@ function ApplicationsList() {
 
     setFilteredApplications(filteredData);
   }, [applications, filterInputs, filters]);
+
+  const applyStatusFilters = useCallback((data) => {
+    const filtered = data.filter((app) => {
+      if (filters.statusApproved && app.applyStatus === '승인완료') return true;
+      if (filters.statusRejected && app.applyStatus === '반려') return true;
+      if (filters.statusOrdered && app.applyStatus === '발주완료') return true;
+      if (filters.statusClosed && app.applyStatus === '처리완료') return true;
+      return !Object.values(filters).some(Boolean); 
+    });
+    setFilteredApplications(filtered);
+  }, [filters]);
         
-  const fetchApplications = async (filterParams = {}) => {
+  const fetchApplications = useCallback(async (filterParams = {}) => {
     setLoading(true);
     setError(null);
     try {
@@ -195,7 +206,7 @@ function ApplicationsList() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [applyStatusFilters, auth.userId, documentTypeFromUrl, instCd, selectedCenter]);
 
   const fetchSealImprintDetail = async (draftId) => {
     try {
@@ -217,21 +228,11 @@ function ApplicationsList() {
     }
   };
 
-  const applyStatusFilters = useCallback((data) => {
-    const filtered = data.filter((app) => {
-      if (filters.statusApproved && app.applyStatus === '승인완료') return true;
-      if (filters.statusRejected && app.applyStatus === '반려') return true;
-      if (filters.statusOrdered && app.applyStatus === '발주완료') return true;
-      if (filters.statusClosed && app.applyStatus === '처리완료') return true;
-      return !Object.values(filters).some(Boolean); 
-    });
-    setFilteredApplications(filtered);
-  }, [filters]);
+  
 
   useEffect(() => {
     applyFilters(); 
-  }, [filters]);  
- 
+  }, [filters, applyFilters]);  
   useEffect(() => {
     resetFilters();
     fetchApplications();
@@ -255,6 +256,13 @@ function ApplicationsList() {
     });
     setSelectedCenter('전체');
   }, [documentTypeFromUrl]);
+
+  
+  useEffect(() => {
+    resetFilters();
+    fetchApplications();
+  }, [documentTypeFromUrl, fetchApplications, resetFilters]);
+
 
   useEffect(() => {
     if (documentTypeFromUrl === '명함신청') {
@@ -346,15 +354,15 @@ function ApplicationsList() {
       setModalVisible(true);
       setSelectedApplyStatus(applyStatus);
     } else if (docType === '명함신청') {
-      navigate(`/api/bcd/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`);
+      navigate(`/bcd/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`);
     } else if (docType === '법인서류') {
-      navigate(`/api/corpDoc/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`);
+      navigate(`/corpDoc/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`);
     } else if (docType === '인장신청(날인)') {
       const sealImprintDetails = await fetchSealImprintDetail(draftId);
-      navigate(`/api/seal/imprint/${draftId}?readonly=true&applyStatus=${applyStatus}`, { state: { sealImprintDetails, readOnly: true } });
+      navigate(`/seal/imprint/${draftId}?readonly=true&applyStatus=${applyStatus}`, { state: { sealImprintDetails, readOnly: true } });
     } else if (docType === '인장신청(반출)') {
       const sealExportDetails = await fetchSealExportDetail(draftId);
-      navigate(`/api/seal/export/${draftId}?readonly=true&applyStatus=${applyStatus}`, { state: { sealExportDetails, readOnly: true } });
+      navigate(`/seal/export/${draftId}?readonly=true&applyStatus=${applyStatus}`, { state: { sealExportDetails, readOnly: true } });
     }
   };
 

@@ -8,6 +8,8 @@ import axios from 'axios';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import '../../styles/seal/SealExportList.css';
 
+
+
 function SealExportList() {
   const { auth } = useContext(AuthContext);
   const [applications, setApplications] = useState([]);
@@ -22,8 +24,7 @@ function SealExportList() {
   
   const fetchSealExportList = useCallback(async (searchType = null, keyword = null) => {
     try {
-      const { instCd } = auth;
-      const response = await axios.get('/api/seal/exportList', {
+      const response = await axios.get(`/api/seal/exportList`, {
         params: {
           instCd,
           searchType,

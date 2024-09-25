@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 import '../../styles/corpdoc/CorpDocStoreModal.css';
 import CustomButton from '../../components/common/CustomButton';
 
+
+
 const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregister }) => {
   const { auth } = useContext(AuthContext);
   const initialFormData = {
@@ -81,7 +83,7 @@ const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregist
     };
 
     try {
-      const response = await axios.post('/api/corpDoc/store', requestData, {
+      const response = await axios.post(`/api/corpDoc/store`, requestData, {
         headers: {
           'Content-Type': 'application/json',
         },

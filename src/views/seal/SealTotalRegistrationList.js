@@ -3,6 +3,8 @@ import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import '../../styles/seal/SealTotalRegistrationList.css';
 
+
+
 function SealTotalRegistrationList() {
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [centerData, setCenterData] = useState([]);
@@ -11,7 +13,7 @@ function SealTotalRegistrationList() {
   useEffect(() => {
     const fetchCenterData = async () => {
       try {
-        const response = await axios.get('/api/rentalList/total');
+        const response = await axios.get(`/api/rentalList/total`);
         const { centerResponses } = response.data.data;
 
         const nationwideCenter = { detailNm: '전국센터', detailCd: 'all' };
@@ -24,7 +26,7 @@ function SealTotalRegistrationList() {
 
     const fetchTotalRegistrationList = async () => {
       try {
-        const response = await axios.get('/api/seal/totalRegistrationList');
+        const response = await axios.get(`/api/seal/totalRegistrationList`);
         setFilteredApplications(response.data.data); 
       } catch (error) {
         console.error('Error fetching total registration list:', error);
@@ -42,7 +44,7 @@ function SealTotalRegistrationList() {
 
     if (selectedCenter === 'all') {
       try {
-        const response = await axios.get('/api/seal/totalRegistrationList');
+        const response = await axios.get(`/api/seal/totalRegistrationList`);
         setFilteredApplications(response.data.data);
       } catch (error) {
         console.error('Error fetching total registration list:', error);

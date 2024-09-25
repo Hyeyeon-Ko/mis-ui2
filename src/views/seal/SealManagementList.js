@@ -7,6 +7,8 @@ import SignitureImage from '../../assets/images/signiture.png';
 import '../../styles/seal/SealManagementList.css';
 import { AuthContext } from '../../components/AuthContext';
 
+
+
 function SealManagementList() {
   const { auth } = useContext(AuthContext);
   const [applications, setApplications] = useState([]);
@@ -21,8 +23,8 @@ function SealManagementList() {
 
   const fetchSealManagementList = useCallback(async (searchType = null, keyword = null) => {
     try {
-      const { instCd } = auth;
-      const response = await axios.get('/api/seal/managementList', {
+      const { instCd } = auth;  
+      const response = await axios.get(`/api/seal/managementList`, {
         params: {
           instCd,
           searchType,

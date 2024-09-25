@@ -5,6 +5,8 @@ import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
 import '../../styles/bcd/ApplicationHistoryModal.css';
 
+
+
 /* 신청 이력 모달 */
 const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   const [startDate, setStartDate] = useState(null);

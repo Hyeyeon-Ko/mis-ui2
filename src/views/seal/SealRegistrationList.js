@@ -7,6 +7,8 @@ import '../../styles/seal/SealRegistrationList.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 
+
+
 function SealRegistrationList() {
   const { auth } = useContext(AuthContext);
   const [filteredApplications, setFilteredApplications] = useState([]);
@@ -17,7 +19,7 @@ function SealRegistrationList() {
 
   const fetchSealRegistrationList = useCallback(async () => {
     try {
-      const response = await axios.get('/api/seal/registrationList', {
+      const response = await axios.get(`/api/seal/registrationList`, {
         params: { instCd: auth.instCd } 
       });
 

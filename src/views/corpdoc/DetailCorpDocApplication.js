@@ -10,6 +10,8 @@ import '../../styles/corpdoc/CorpDocApply.css';
 import downloadIcon from '../../assets/images/download.png';
 import deleteIcon from '../../assets/images/delete2.png'; 
 
+
+
 function DetailCorpDocApplication() {
     const { draftId } = useParams();
     const navigate = useNavigate();
@@ -218,7 +220,7 @@ function DetailCorpDocApplication() {
             });
 
             alert('법인서류 수정이 완료되었습니다.');
-            navigate('/api/myPendingList');
+            navigate('/myPendingList');
         } catch (error) {
             console.error('Error submitting corporate document:', error);
             alert('법인서류 수정 중 오류가 발생했습니다.');
@@ -240,7 +242,7 @@ function DetailCorpDocApplication() {
             await axios.put(`/api/corpDoc/approve?draftId=${draftId}`);
             alert('문서가 승인되었습니다.');
             await refreshSidebar(); 
-            navigate('/api/pendingList?documentType=법인서류');
+            navigate('/pendingList?documentType=법인서류');
         } catch (error) {
             console.error('Error approving document:', error);
             alert('문서 승인 중 오류가 발생했습니다.');
@@ -257,7 +259,7 @@ function DetailCorpDocApplication() {
             if (response.data.code === 200) {
                 alert('법인서류 신청이 반려되었습니다.');
                 await refreshSidebar(); 
-                navigate('/api/pendingList?documentType=법인서류');
+                navigate('/pendingList?documentType=법인서류');
             } else {
                 alert('법인서류 신청 반려 중 오류가 발생하였습니다.');
             }

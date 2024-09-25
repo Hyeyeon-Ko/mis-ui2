@@ -5,6 +5,8 @@ import * as XLSX from 'xlsx';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/rental/RentalAddModal.css';
 
+
+
 const RentalAddModal = ({ show, onClose, onSave }) => {
   const { auth } = useContext(AuthContext); 
   const [activeTab, setActiveTab] = useState('file');
@@ -100,7 +102,7 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
             instCd: auth.instCd, 
           }));
 
-        axios.post('/api/rental/data', extractedData)
+        axios.post(`/api/rental/data`, extractedData)
           .then((response) => {
             onSave(response.data); 
             onClose();
@@ -167,7 +169,7 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
           specialNote,
         };
       
-      axios.post('/api/rental/', payload)
+      axios.post(`/api/rental/`, payload)
         .then(response => {
           onSave([payload]);
           alert('항목이 성공적으로 추가되었습니다.');

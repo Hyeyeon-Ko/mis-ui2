@@ -18,7 +18,7 @@ const PreviewModal = ({ show, onClose, formData }) => {
   // fetchBcdStd 함수
   const fetchBcdStd = async () => {
     try {
-      const response = await axios.get('/api/std/bcd');
+      const response = await axios.get(`/api/std/bcd`);
       if (response.data && response.data.data) {
         const data = response.data.data;
         setBcdData(data);

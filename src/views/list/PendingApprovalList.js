@@ -10,6 +10,8 @@ import '../../styles/common/Page.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 
+
+
 function PendingApprovalList() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -76,7 +78,7 @@ function PendingApprovalList() {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('/api/pendingList', {
+      const response = await axios.get(`/api/pendingList`, {
         params: {
           documentType: convertDocumentType(documentType),
           startDate: filterParams.startDate || '',
@@ -187,15 +189,15 @@ function PendingApprovalList() {
       setSelectedDocumentId(draftId);
       setModalVisible(true);
     } else if (docType === '명함신청') {
-      navigate(`/api/bcd/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
+      navigate(`/bcd/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
     }  else if (docType === '법인서류') {
-      navigate(`/api/corpDoc/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
+      navigate(`/corpDoc/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
     } else if (docType === '인장신청(날인)') {
       const sealImprintDetails = await fetchSealImprintDetail(draftId);
-      navigate(`/api/seal/imprint/${draftId}?readonly=true&applyStatus=승인대기`, { state: { sealImprintDetails, readOnly: true }});
+      navigate(`/seal/imprint/${draftId}?readonly=true&applyStatus=승인대기`, { state: { sealImprintDetails, readOnly: true }});
     } else if (docType === '인장신청(반출)') {
       const sealExportDetails = await fetchSealExportDetail(draftId);
-      navigate(`/api/seal/export/${draftId}?readonly=true&applyStatus=승인대기`, { state: { sealExportDetails, readOnly: true }});
+      navigate(`/seal/export/${draftId}?readonly=true&applyStatus=승인대기`, { state: { sealExportDetails, readOnly: true }});
     }
   };
 
@@ -231,7 +233,7 @@ function PendingApprovalList() {
   const approveDocument = async (documentId) => {
     try {
       await axios.put(`/api/doc/confirm`, null, {
-        params: { draftId: documentId, userId: auth.userId },
+        params: { draftId: documentId },
       });
       alert('승인이 완료되었습니다.');
       closeModal();
@@ -242,7 +244,7 @@ function PendingApprovalList() {
         refreshSidebar();  
       }
 
-      navigate(`/api/pendingList?documentType=${documentType}`);
+      navigate(`/pendingList?documentType=${documentType}`);
     } catch (error) {
       console.error('Error approving document:', error);
       alert('Error approving document.');

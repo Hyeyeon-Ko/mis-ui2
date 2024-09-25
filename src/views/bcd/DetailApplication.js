@@ -272,7 +272,7 @@ function DetailApplication() {
       const response = await axios.post(`/api/bcd/update?draftId=${draftId}`, requestData);
       if (response.data.code === 200) {
         alert('명함 수정이 완료되었습니다.');
-        navigate('/api/myPendingList');
+        navigate('/myPendingList');
       } else {
         alert('명함 수정 중 오류가 발생했습니다.');
       }
@@ -300,7 +300,7 @@ function DetailApplication() {
       if (response.data.code === 200) {
         alert('명함이 승인되었습니다.');
         refreshSidebar();
-        navigate(`/api/pendingList?documentType=명함신청`);
+        navigate(`/pendingList?documentType=명함신청`);
       } else {
         alert('명함 승인 중 오류가 발생했습니다.');
       }
@@ -320,7 +320,7 @@ function DetailApplication() {
       if (response.data.code === 200) {
         alert('명함이 반려되었습니다.');
         await refreshSidebar();
-        navigate(`/api/pendingList?documentType=명함신청`);
+        navigate(`/pendingList?documentType=명함신청`);
       } else {
         alert('명함 반려 중 오류가 발생했습니다.');
       }

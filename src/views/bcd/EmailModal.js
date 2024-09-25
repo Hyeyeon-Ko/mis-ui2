@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import '../../styles/bcd/EmailModal.css';
 import { FadeLoader } from 'react-spinners';
 
+
+
 /* 이메일 작성 모달 */
 const EmailModal = ({ show, onClose, onSend }) => {
   const [fromEmail, setFromEmail] = useState('');
@@ -15,7 +17,7 @@ const EmailModal = ({ show, onClose, onSend }) => {
 
   useEffect(() => {
     if (show) {
-      fetch('/api/bsc/order/email-settings')
+      fetch(`/api/bsc/order/email-settings`)
         .then((response) => {
           if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -51,7 +53,7 @@ const EmailModal = ({ show, onClose, onSend }) => {
     onSend(emailData)
       .finally(() => {
         setIsLoading(false);
-        window.location.href = '/api/bcd/orderList';
+        window.location.href = '/bcd/orderList';
         onClose();
       });
   };

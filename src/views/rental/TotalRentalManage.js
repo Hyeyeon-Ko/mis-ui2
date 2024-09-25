@@ -5,6 +5,8 @@ import Table from '../../components/common/Table';
 import '../../styles/common/Page.css';
 import '../../styles/rental/TotalRentalManage.css';
 
+
+
 function TotalRentalManage() {
     const [selectedCenter, setSelectedCenter] = useState('all'); 
     const [centerData, setCenterData] = useState([]);
@@ -20,7 +22,7 @@ function TotalRentalManage() {
     useEffect(() => {
       const fetchRentalData = async () => {
           try {
-              const response = await axios.get('/api/rentalList/total');
+              const response = await axios.get(`/api/rentalList/total`);
               const { centerResponses, centerRentalResponses, summaryResponses } = response.data.data;
   
               const nationwideCenter = { detailNm: '전국센터', detailCd: 'all' };
@@ -182,13 +184,13 @@ function TotalRentalManage() {
       try {
         let response;
         if (selectedCenter === 'all') {
-          response = await axios.get('/api/rental/totalExcel', {
+          response = await axios.get(`/api/rental/totalExcel`, {
             responseType: 'blob',
           });
         } else {
           const detailIds = selectedRows;
           
-          response = await axios.post('/api/rental/excel', detailIds, {
+          response = await axios.post(`/api/rental/excel`, detailIds, {
             responseType: 'blob',
           });
         }

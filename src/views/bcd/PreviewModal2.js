@@ -6,6 +6,8 @@ import frontImageBlank from '../../assets/images/frontimage_blank.png';
 import backImageEngBlank from '../../assets/images/backimage_eng_blank.png';
 import backImageCompany from '../../assets/images/backimage_company.png';
 
+
+
 const PreviewModal = ({ show, onClose, formData }) => {
   const canvasRef = useRef(null);
   const [bcdData, setBcdData] = useState({
@@ -18,7 +20,7 @@ const PreviewModal = ({ show, onClose, formData }) => {
   const fetchBcdStd = useCallback(async () => {
     try {
       console.log('Fetching BCD standard data for preview');
-      const response = await axios.get('/api/std/bcd');
+      const response = await axios.get(`/api/std/bcd`);
       if (response.data && response.data.data) {
         const data = response.data.data;
         console.log('Fetched BCD standard data for preview:', data);

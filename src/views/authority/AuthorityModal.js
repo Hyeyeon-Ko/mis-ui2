@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import '../../styles/authority/AuthorityModal.css';
 
+
+
 /* 권한 관리 모달 */
 const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) => {
   const [role, setRole] = useState('');
@@ -101,7 +103,7 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
         return;
       }
 
-      const response = await axios.post('/api/auth', null, { params: { userId: userId } });
+      const response = await axios.post(`/api/auth`, null, { params: { userId: userId } });
       const userName = response.data.data;
 
       setQueryResult([{
@@ -164,7 +166,7 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
   
     try {
       if (!adminData) {
-        await axios.post('/api/auth/admin', requestData);
+        await axios.post(`/api/auth/admin`, requestData);
         alert('추가 완료되었습니다');
       } else {
         await axios.put(`/api/auth/admin/${adminData.authId}`, requestData);
