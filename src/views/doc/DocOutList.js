@@ -11,7 +11,8 @@ import { AuthContext } from '../../components/AuthContext';
 
 function DocOutList() {
   const { auth } = useContext(AuthContext);
-  const [applications, setApplications] = useState([]);
+  // const [applications, setApplications] = useState([]);
+  const [setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDraftId, setSelectedDraftId] = useState(null);

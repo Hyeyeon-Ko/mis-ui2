@@ -228,15 +228,14 @@ function ApplicationsList() {
     }
   };
 
-  
-
   useEffect(() => {
     applyFilters(); 
   }, [filters, applyFilters]);  
+  
   useEffect(() => {
     resetFilters();
     fetchApplications();
-  }, [documentTypeFromUrl]);
+  }, [documentTypeFromUrl, fetchApplications]);
 
   const resetFilters = useCallback(() => {
     const defaultStartDate = new Date();
