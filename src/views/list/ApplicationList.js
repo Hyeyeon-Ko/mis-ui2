@@ -208,6 +208,10 @@ function ApplicationsList() {
     }
   }, [applyStatusFilters, auth.userId, documentTypeFromUrl, instCd, selectedCenter]);
 
+  useEffect(() => {
+    fetchApplications();
+}, [fetchApplications]); 
+
   const fetchSealImprintDetail = async (draftId) => {
     try {
       const response = await axios.get(`/api/seal/imprint/${draftId}`);
@@ -253,8 +257,7 @@ function ApplicationsList() {
 
   useEffect(() => {
     resetFilters();
-    fetchApplications();
-  }, [documentTypeFromUrl, resetFilters, fetchApplications]);
+  }, [documentTypeFromUrl, resetFilters]);
   
   useEffect(() => {
     if (documentTypeFromUrl === '명함신청') {
