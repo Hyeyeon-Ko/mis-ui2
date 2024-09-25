@@ -48,7 +48,7 @@ function DocOutList() {
     } catch (error) {
       console.error('Error fetching document list:', error);
     }
-  }, [auth.instCd]);
+  }, [auth.instCd, setApplications]);
 
   useEffect(() => {
     fetchDocOutList();
