@@ -12,7 +12,7 @@ import { AuthContext } from '../../components/AuthContext';
 function DocOutList() {
   const { auth } = useContext(AuthContext);
   // const [applications, setApplications] = useState([]);
-  const [setApplications] = useState([]);
+  const [, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDraftId, setSelectedDraftId] = useState(null);
@@ -24,12 +24,21 @@ function DocOutList() {
     keyword: '',
   });
 
-  const fetchDocOutList = useCallback(async () => {
+  const fetchDocOutList = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null) => {
     try {
+      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : '';
+      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : '';
+  
       const response = await axios.get('/api/doc/sendList', {
-        params: { instCd: auth.instCd },
+        params: {
+          instCd: auth.instCd,
+          searchType,
+          keyword,
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+        },
       });
-
+  
       if (response.data && response.data.data) {
         const formattedData = response.data.data.map((item) => ({
           draftId: item.draftId,
@@ -49,7 +58,7 @@ function DocOutList() {
       console.error('Error fetching document list:', error);
     }
   }, [auth.instCd, setApplications]);
-
+  
   useEffect(() => {
     fetchDocOutList();
   }, [fetchDocOutList]);
@@ -100,14 +109,19 @@ function DocOutList() {
   };
 
   const handleSearch = async () => {
-    const { searchType, keyword } = filterInputs;
+    const { searchType, keyword, startDate, endDate } = filterInputs;
+  
+    const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : null;
+    const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : null;
   
     try {
       const response = await axios.get('/api/doc/sendList', {
         params: {
           instCd: auth.instCd,
-          searchType: searchType, 
+          searchType: searchType,
           keyword: keyword.trim() !== '' ? keyword : null,
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
         },
       });
   
@@ -131,14 +145,25 @@ function DocOutList() {
     }
   };
   
-  const handleReset = () => {
+  const resetFilters = useCallback(() => {
+    const defaultStartDate = new Date();
+    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
     setFilterInputs({
-      startDate: null,
-      endDate: null,
+      startDate: defaultStartDate,
+      endDate: new Date(),
       searchType: '전체',
       keyword: '',
     });
-    fetchDocOutList(); 
+  }, []);
+
+  useEffect(() => {
+    resetFilters();
+  }, [resetFilters]);
+
+  
+  const handleReset = () => {
+    resetFilters();
+    fetchDocOutList();
   };
   
   const columns = [
@@ -183,10 +208,10 @@ function DocOutList() {
         <Breadcrumb items={['문서수발신 대장', '문서 발신 대장']} />
         <ConditionFilter
           startDate={filterInputs.startDate}
-          setStartDate={(date) => setFilterInputs((prev) => ({ ...prev, startDate: date }))}
+          setStartDate={(date) => setFilterInputs((prev) => ({ ...prev, startDate: date }))}  // 여기서 바로 API 호출 안됨
           endDate={filterInputs.endDate}
-          setEndDate={(date) => setFilterInputs((prev) => ({ ...prev, endDate: date }))}
-          onSearch={handleSearch}
+          setEndDate={(date) => setFilterInputs((prev) => ({ ...prev, endDate: date }))}  // 여기서 바로 API 호출 안됨
+          onSearch={handleSearch} 
           onReset={handleReset}
           showDocumentType={false}
           showSearchCondition={true}
@@ -194,9 +219,8 @@ function DocOutList() {
           setSearchType={(searchType) => setFilterInputs((prev) => ({ ...prev, searchType }))}
           keyword={filterInputs.keyword}
           setKeyword={(keyword) => setFilterInputs((prev) => ({ ...prev, keyword }))}
-          searchOptions={['전체', '수신처', '제목', '접수인']} 
-          setDocumentType={() => {}} 
-          setFilters={() => {}}
+          searchOptions={['전체', '수신처', '제목', '접수인']}
+          startDateLabel="접수일자"
         />
         <div className="doc-out-content">
           <Table columns={columns} data={filteredApplications} />

@@ -30,6 +30,16 @@ function SealApplyExport() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // 1. SealForm Validation
+        const requiredInputs = {
+            submission: submission,
+            expNm: draftNm,
+            exportDate: exportDate,
+            returnDate: returnDate,
+            purpose: purpose,
+            docFile: file,
+        }
+
         const selectedSeals = ['corporateSeal', 'facsimileSeal', 'companySeal'].reduce((acc, sealType) => {
             const { selected, quantity } = sealSelections[sealType];
             acc[sealType] = {
@@ -44,7 +54,7 @@ function SealApplyExport() {
             returnDate: returnDate
         }
 
-        const { isValid, message } = validateForm('Seal', selectedSeals, inputDates);
+        const { isValid, message } = validateForm('Seal', requiredInputs, selectedSeals, inputDates);
         if (!isValid) {
             alert(message);
             return;

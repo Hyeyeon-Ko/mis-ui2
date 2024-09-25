@@ -20,7 +20,7 @@ function ApplicationsList() {
   const instCd = auth.instCd;
 
   const [applications, setApplications] = useState([]);
-  const [filteredApplications, setFilteredApplications] = useState([]);
+  const [filteredApplications, setFilteredApplications] = useState([]); // 필터링된 데이터
   const [filterInputs, setFilterInputs] = useState({
     startDate: null,
     endDate: null,
@@ -42,7 +42,7 @@ function ApplicationsList() {
   const [showExcelButton, setShowExcelButton] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState(null);
-  const [selectedCenter, setSelectedCenter] = useState('전체');
+  const [selectedCenter, setSelectedCenter] = useState('전체'); // 기본값 '전체'
 
   const [centers] = useState([
     '전체', '재단본부', '광화문', '여의도센터', '강남센터',
@@ -159,16 +159,23 @@ function ApplicationsList() {
     setFilteredApplications(filtered);
   }, [filters]);
         
-  const fetchApplications = useCallback(async (filterParams = {}) => {
+  const fetchApplications = useCallback(async (filterParams = {}, searchType = '전체', keyword = '', startDate = null, endDate = null) => {
     setLoading(true);
     setError(null);
     try {
+      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : '';
+      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : '';
+
       const response = await axios.get('/api/applyList', {
         params: {
           documentType: convertDocumentType(filterParams.documentType) || convertDocumentType(documentTypeFromUrl) || null,
+          searchType,
+          keyword,
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
           instCd: instCd || '',
           userId: auth.userId || '',
-          instNm: selectedCenter || '',
+          instNm: selectedCenter || '', // 센터 필터 추가
         },
       });
 
@@ -208,9 +215,18 @@ function ApplicationsList() {
     }
   }, [applyStatusFilters, auth.userId, documentTypeFromUrl, instCd, selectedCenter]);
 
+  // selectedCenter 변경 시 필터링 처리
+  useEffect(() => {
+    const centerFilteredData = selectedCenter === '전체' 
+      ? applications 
+      : applications.filter(app => app.instNm === selectedCenter);
+
+    setFilteredApplications(centerFilteredData);
+  }, [selectedCenter, applications]);
+
   useEffect(() => {
     fetchApplications();
-}, [fetchApplications]); 
+  }, [fetchApplications]);
 
   const fetchSealImprintDetail = async (draftId) => {
     try {
@@ -231,10 +247,6 @@ function ApplicationsList() {
       alert('반출신청 정보를 불러오는 중 오류가 발생했습니다.');
     }
   };
-
-  useEffect(() => {
-    applyFilters(); 
-  }, [filters, applyFilters]);  
 
   const resetFilters = useCallback(() => {
     const defaultStartDate = new Date();

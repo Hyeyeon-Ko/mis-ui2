@@ -19,7 +19,13 @@ function SealApplyImprint() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // 인감선택 및 입력일자 validation 진행
+        // 1. SealForm validation
+        const requiredInputs = {
+            submission: submission,
+            useDate: useDate,
+            purpose: purpose,
+        }
+
         const selectedSeals = ['corporateSeal', 'facsimileSeal', 'companySeal'].reduce((acc, sealType) => {
             const { selected, quantity } = sealSelections[sealType];
             acc[sealType] = {
@@ -33,12 +39,13 @@ function SealApplyImprint() {
             useDate: useDate
         }
 
-        const { isValid, message } = validateForm('Seal', selectedSeals, inputDates);
+        const { isValid, message } = validateForm('Seal', requiredInputs, selectedSeals, inputDates);
         if (!isValid) {
             alert(message);
             return;
         }
 
+        // 2. Submit SealForm
         const imprintRequestDTO = {
             drafter: auth.hngNm,
             drafterId: auth.userId,

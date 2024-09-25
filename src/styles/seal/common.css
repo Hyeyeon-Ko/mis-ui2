@@ -43,8 +43,9 @@
   
   .seal-apply-form-group label {
     font-weight: 580;
-    font-size: 14.5px;
+    font-size: 13px;
     color: #222121;
+    font-weight: bold;
     margin-bottom: 5px;
     margin-right: 10px;
     text-align: left;
