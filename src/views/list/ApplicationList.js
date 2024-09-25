@@ -231,11 +231,6 @@ function ApplicationsList() {
   useEffect(() => {
     applyFilters(); 
   }, [filters, applyFilters]);  
-  
-  useEffect(() => {
-    resetFilters();
-    fetchApplications();
-  }, [documentTypeFromUrl, fetchApplications]);
 
   const resetFilters = useCallback(() => {
     const defaultStartDate = new Date();
@@ -256,13 +251,11 @@ function ApplicationsList() {
     setSelectedCenter('전체');
   }, [documentTypeFromUrl]);
 
-  
   useEffect(() => {
     resetFilters();
     fetchApplications();
-  }, [documentTypeFromUrl, fetchApplications, resetFilters]);
-
-
+  }, [documentTypeFromUrl, resetFilters, fetchApplications]);
+  
   useEffect(() => {
     if (documentTypeFromUrl === '명함신청') {
       const isShowExcelButton = filters.statusClosed && selectedApplications.length > 0;
