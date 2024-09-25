@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
-import ConfirmModal from '../../components/common/ConfirmModal';
 import SealApprovalModal from './SealApprovalModal';
 import ConditionFilter from '../../components/common/ConditionFilter'; 
 import SignitureImage from '../../assets/images/signiture.png';
@@ -9,47 +8,45 @@ import '../../styles/seal/SealManagementList.css';
 import { AuthContext } from '../../components/AuthContext';
 
 function SealManagementList() {
-  const { auth } = useContext(AuthContext); 
+  const { auth } = useContext(AuthContext);
   const [applications, setApplications] = useState([]);
-  const [filteredApplications, setFilteredApplications] = useState([]);
   const [filterInputs, setFilterInputs] = useState({
     searchType: '전체',
     keyword: '',
   });
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
   const [clickedRows, setClickedRows] = useState([]);
+  const [initialLoad, setInitialLoad] = useState(true);  
 
-  const fetchSealManagementList = useCallback(async () => {
+  const fetchSealManagementList = useCallback(async (searchType = null, keyword = null) => {
     try {
-      const { instCd } = auth;  
-
+      const { instCd } = auth;
       const response = await axios.get('/api/seal/managementList', {
         params: {
           instCd,
+          searchType,
+          keyword,
         },
       });
-    
+      
       const fetchedData = response.data.data.map(item => ({
         id: item.draftId,
         date: item.useDate,
         submitter: item.submission,
         purpose: item.purpose,
-        drafter: item.drafter, 
+        drafter: item.drafter,
         sealType: {
           corporateSeal: item.corporateSeal !== "" ? item.corporateSeal : 0,
           facsimileSeal: item.facsimileSeal !== "" ? item.facsimileSeal : 0,
           companySeal: item.companySeal !== "" ? item.companySeal : 0,
         },
-        signitureImage: SignitureImage, 
-        approval: [],  
-        status: '결재진행중', 
+        signitureImage: SignitureImage,
+        approval: [],
+        status: '결재진행중',
       }));
-  
-      setApplications(fetchedData);
-      setFilteredApplications(fetchedData);
 
+      setApplications(fetchedData);
       const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
       setClickedRows(clickedRows);
     } catch (error) {
@@ -58,50 +55,24 @@ function SealManagementList() {
   }, [auth]);
 
   useEffect(() => {
-    fetchSealManagementList();
-  }, [fetchSealManagementList]);
-
-  const applyFilters = useCallback(() => {
-    let filteredData = applications;
-
-    const keyword = filterInputs.keyword.toLowerCase().trim();
-    if (keyword) {
-      if (filterInputs.searchType === '전체') {
-        filteredData = filteredData.filter(application =>
-          application.date.toLowerCase().includes(keyword) ||
-          application.submitter.toLowerCase().includes(keyword) ||
-          application.purpose.toLowerCase().includes(keyword)
-        );
-      } else if (filterInputs.searchType === '일자') {
-        filteredData = filteredData.filter(application => 
-          application.date.toLowerCase().includes(keyword)
-        );
-      } else if (filterInputs.searchType === '제출처') {
-        filteredData = filteredData.filter(application => 
-          application.submitter.toLowerCase().includes(keyword)
-        );
-      } else if (filterInputs.searchType === '사용목적') {
-        filteredData = filteredData.filter(application => 
-          application.purpose.toLowerCase().includes(keyword)
-        );
-      }
+    if (initialLoad) {
+      fetchSealManagementList();
+      setInitialLoad(false);  
     }
+  }, [initialLoad, fetchSealManagementList]);
 
-    setFilteredApplications(filteredData);
-  }, [applications, filterInputs]);
+  const handleSearch = () => {
+    fetchSealManagementList(filterInputs.searchType, filterInputs.keyword); 
+  };
 
   const handleReset = () => {
     setFilterInputs({
       searchType: '전체',
       keyword: '',
     });
-    setFilteredApplications(applications); 
+    fetchSealManagementList();  
   };
 
-  const handleConfirmDelete = () => {
-    setShowDeleteModal(false);
-  };
-  
   const closeModal = () => {
     setModalVisible(false);
     setSelectedDocumentDetails(null);
@@ -133,14 +104,14 @@ function SealManagementList() {
         <Breadcrumb items={['인장 대장', '인장 관리대장']} />
 
         <ConditionFilter
-          startDate={null}  
-          setStartDate={() => {}} 
-          endDate={null} 
-          setEndDate={() => {}} 
-          filters={{}} 
+          startDate={null}
+          setStartDate={() => {}}
+          endDate={null}
+          setEndDate={() => {}}
+          filters={{}}
           setFilters={() => {}}
-          onSearch={applyFilters} 
-          onReset={handleReset} 
+          onSearch={handleSearch}  
+          onReset={handleReset}    
           showStatusFilters={false}
           showSearchCondition={true}
           showDocumentType={false}
@@ -165,8 +136,8 @@ function SealManagementList() {
             </tr>
           </thead>
           <tbody>
-            {filteredApplications.length > 0 ? (
-              filteredApplications.map((app, index) => (
+            {applications.length > 0 ? (
+              applications.map((app, index) => (
                 <tr key={index}>
                   <td>{app.date}</td>
                   <td>{app.submitter}</td>
@@ -191,14 +162,8 @@ function SealManagementList() {
             )}
           </tbody>
         </table>
-        {showDeleteModal && (
-          <ConfirmModal
-            message="이 문서를 삭제하시겠습니까?"
-            onConfirm={handleConfirmDelete}
-            onCancel={() => setShowDeleteModal(false)}
-          />
-        )}
       </div>
+
       {modalVisible && selectedDocumentDetails && (
         <SealApprovalModal
           show={modalVisible}

@@ -98,43 +98,38 @@ function DocOutList() {
     }
   };
 
-  const handleSearch = () => {
-    const { startDate, endDate, searchType, keyword } = filterInputs;
-    let filteredData = applications;
-
-    if (startDate) {
-      filteredData = filteredData.filter((item) => new Date(item.draftDate) >= new Date(startDate));
-    }
-
-    if (endDate) {
-      filteredData = filteredData.filter((item) => new Date(item.draftDate) <= new Date(endDate));
-    }
-
-    if (keyword.trim() !== '') {
-      filteredData = filteredData.filter((item) => {
-        if (searchType === '전체') {
-          return (
-            item.title.toLowerCase().includes(keyword.toLowerCase()) ||
-            item.drafter.toLowerCase().includes(keyword.toLowerCase()) ||
-            item.resSender.toLowerCase().includes(keyword.toLowerCase())
-          );
-        }
-        if (searchType === '수신처') {
-          return item.resSender.toLowerCase().includes(keyword.toLowerCase());
-        }
-        if (searchType === '제목') {
-          return item.title.toLowerCase().includes(keyword.toLowerCase());
-        }
-        if (searchType === '접수인') {
-          return item.drafter.toLowerCase().includes(keyword.toLowerCase());
-        }
-        return false;
+  const handleSearch = async () => {
+    const { searchType, keyword } = filterInputs;
+  
+    try {
+      const response = await axios.get('/api/doc/sendList', {
+        params: {
+          instCd: auth.instCd,
+          searchType: searchType, 
+          keyword: keyword.trim() !== '' ? keyword : null,
+        },
       });
+  
+      if (response.data && response.data.data) {
+        const formattedData = response.data.data.map((item) => ({
+          draftId: item.draftId,
+          draftDate: item.draftDate,
+          docId: item.docId,
+          resSender: item.resSender,
+          title: item.title,
+          drafter: item.drafter,
+          status: item.status,
+          fileName: item.fileName,
+          fileUrl: item.fileUrl,
+        }));
+        setApplications(formattedData);
+        setFilteredApplications(formattedData);
+      }
+    } catch (error) {
+      console.error('Error fetching document list:', error);
     }
-
-    setFilteredApplications(filteredData);
   };
-
+  
   const handleReset = () => {
     setFilterInputs({
       startDate: null,
@@ -142,9 +137,9 @@ function DocOutList() {
       searchType: '전체',
       keyword: '',
     });
-    setFilteredApplications(applications); 
+    fetchDocOutList(); 
   };
-
+  
   const columns = [
     { header: '접수일자', accessor: 'draftDate', width: '8%' },
     { header: '문서번호', accessor: 'docId', width: '8%' },

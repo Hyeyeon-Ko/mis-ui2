@@ -14,12 +14,12 @@ import '../../styles/corpdoc/CorpDocIssueList.css';
 function CorpDocIssueList() {
   const { refreshSidebar } = useContext(AuthContext);
   const [applications, setApplications] = useState([]); 
-  const [filteredApplications, setFilteredApplications] = useState([]);
-  const [filteredPendingApplications, setFilteredPendingApplications] = useState([]);
+  const [pendingApplications, setPendingApplications] = useState([]);
   const [filterInputs, setFilterInputs] = useState({
     searchType: '전체',
     keyword: '',
   });
+  const [initialDataLoaded, setInitialDataLoaded] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
   const [clickedRows, setClickedRows] = useState([]);
@@ -29,10 +29,9 @@ function CorpDocIssueList() {
   const [totalCorpseal, setTotalCorpseal] = useState(0);
   const [totalCoregister, setTotalCoregister] = useState(0);
 
-  const fetchIssueData = useCallback(async () => {
+  const fetchIssueData = useCallback(async (searchType = '전체', keyword = '') => {
     try {
-      const response = await axios.get('/api/corpDoc/issueList');
-
+      const response = await axios.get(`/api/corpDoc/issueList?searchType=${searchType}&keyword=${keyword}`);
       if (response.data) {
         const issueListData = response.data.data.issueList.map(item => ({
           id: item.draftId,
@@ -76,70 +75,34 @@ function CorpDocIssueList() {
         }));
 
         setApplications(issueListData);
-        setFilteredApplications(issueListData);
-        setFilteredPendingApplications(issuePendingListData);
+        setPendingApplications(issuePendingListData);
 
         const totalValues = extractTotalValues(issueListData);
 
         setTotalCorpseal(totalValues.totalCorpseal);
         setTotalCoregister(totalValues.totalCoregister);
+
+        setInitialDataLoaded(true);
       }
     } catch (error) {
       console.error("Error fetching issue data:", error);
     }
-  }, []); 
+  }, []);
 
   useEffect(() => {
-    fetchIssueData();
-  }, [fetchIssueData]);
-
-  const applyFilters = useCallback(() => {
-    let filteredData = applications;
-
-    const keyword = filterInputs.keyword.toLowerCase().trim();
-    if (keyword) {
-      if (filterInputs.searchType === '전체') {
-        filteredData = filteredData.filter(application =>
-          application.applicantName.toLowerCase().includes(keyword) ||
-          application.center.toLowerCase().includes(keyword) ||
-          application.submission.toLowerCase().includes(keyword) ||
-          application.purpose.toLowerCase().includes(keyword) ||
-          application.issueDate.includes(keyword)
-        );
-      } else if (filterInputs.searchType === '발급/입고일자') {
-        filteredData = filteredData.filter(application =>
-          application.issueDate.includes(keyword)
-        );
-      } else if (filterInputs.searchType === '센터') {
-        filteredData = filteredData.filter(application =>
-          application.center.toLowerCase().includes(keyword)
-        );
-      } else if (filterInputs.searchType === '이름') {
-        filteredData = filteredData.filter(application =>
-          application.applicantName.toLowerCase().includes(keyword)
-        );
-      } else if (filterInputs.searchType === '제출처') {
-        filteredData = filteredData.filter(application =>
-          application.submission.toLowerCase().includes(keyword)
-        );
-      } else if (filterInputs.searchType === '사용목적') {
-        filteredData = filteredData.filter(application =>
-          application.purpose.toLowerCase().includes(keyword)
-        );
-      }
+    if (!initialDataLoaded) {
+      fetchIssueData();  
     }
-
-    setFilteredApplications(filteredData); 
-  }, [applications, filterInputs]);
+  }, [fetchIssueData, initialDataLoaded]);
 
   const handleReset = () => {
     setFilterInputs({
       searchType: '전체',
       keyword: '',
     });
-    setFilteredApplications(applications); 
+    fetchIssueData();
   };
-
+  
   const extractTotalValues = (data) => {
     if (!data || !Array.isArray(data)) {
       return { totalCorpseal: 0, totalCoregister: 0 };
@@ -175,13 +138,13 @@ function CorpDocIssueList() {
   };
 
   const handleconfirmIssue = async () => {
-    if (filteredApplications.length === 0) {
+    if (applications.length === 0) {
       alert('입고된 서류가 없습니다. 먼저 서류 입고를 해주세요.');
       setShowIssueModal(false);
       return;
     }
   
-    const { totalCorpseal, totalCoregister } = extractTotalValues(filteredApplications);
+    const { totalCorpseal, totalCoregister } = extractTotalValues(applications);
   
     if (totalCorpseal === 0 || totalCoregister === 0) {
       alert('입고된 서류가 없습니다. 서류 입고를 해주세요.');
@@ -228,7 +191,7 @@ function CorpDocIssueList() {
           setEndDate={() => {}}         
           filters={{}}
           setFilters={() => {}}
-          onSearch={applyFilters} 
+          onSearch={() => fetchIssueData(filterInputs.searchType, filterInputs.keyword)} 
           onReset={handleReset}
           showStatusFilters={false}
           showSearchCondition={true}
@@ -237,7 +200,7 @@ function CorpDocIssueList() {
           setSearchType={(searchType) => setFilterInputs(prev => ({ ...prev, searchType }))}
           keyword={filterInputs.keyword}
           setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
-          searchOptions={['전체', '발급/입고일자', '센터', '이름', '제출처', '사용목적']}
+          searchOptions={['전체', '발급/입고일자', '이름', '제출처', '사용목적']}
           setDocumentType={() => {}}
         />
 
@@ -266,8 +229,8 @@ function CorpDocIssueList() {
             </tr>
           </thead>
           <tbody>
-            {filteredApplications.length > 0 ? (
-              filteredApplications.map((app, index) => (
+            {applications.length > 0 ? (
+              applications.map((app, index) => (
                 <tr key={index}>
                   <td>{index + 1}</td>
                   <td>{app.issueDate}</td>
@@ -321,8 +284,8 @@ function CorpDocIssueList() {
               </tr>
             </thead>
             <tbody>
-              {filteredPendingApplications.length > 0 ? (
-                filteredPendingApplications.map((app, index) => (
+              {pendingApplications.length > 0 ? (
+                pendingApplications.map((app, index) => (
                   <tr key={index}>
                     <td>{index + 1}</td>
                     <td>{app.useDate}</td>

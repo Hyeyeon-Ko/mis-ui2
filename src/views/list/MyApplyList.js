@@ -35,11 +35,29 @@ function MyApplyList() {
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [documentDetails, setDocumentDetails] = useState({});
 
+  const convertDocumentType = (type) => {
+    switch (type) {
+      case '명함신청':
+        return 'A';
+      case '문서수발신':
+        return 'B';
+      case '법인서류':
+        return 'C';
+      case '인장신청':
+        return 'D';
+      default:
+        return null;
+    }
+  };
+
   const fetchApplications = useCallback(async () => {
     try {
       const response = await axios.get('/api/myApplyList', {
         params: {
-          userId: auth.userId, 
+          userId: auth.userId,
+          startDate: startDate ? startDate.toISOString().split('T')[0] : null,
+          endDate: endDate ? endDate.toISOString().split('T')[0] : null,
+          documentType: convertDocumentType(documentType),
         },
       });
   
@@ -78,11 +96,15 @@ function MyApplyList() {
     } catch (error) {
       console.error('Error fetching applications:', error.response?.data || error.message);
     }
-  }, [auth.userId]);
+  }, [auth.userId, startDate, endDate, documentType]);
+
+  const applyFilters = () => {
+    fetchApplications();
+  };
 
   useEffect(() => {
-    fetchApplications();  
-  }, [fetchApplications]);
+    fetchApplications();
+  }, []);
 
   const applyStatusFilters = useCallback(() => {
     let filteredData = applications;
@@ -108,28 +130,6 @@ function MyApplyList() {
     applyStatusFilters();
   }, [filters, applyStatusFilters]);
 
-  const applyFilters = () => {
-    let filteredData = applications;
-
-    if (startDate) {
-      const startOfDay = new Date(startDate);
-      startOfDay.setHours(0, 0, 0, 0);
-      filteredData = filteredData.filter(application => new Date(application.draftDate) >= startOfDay);
-    }
-
-    if (endDate) {
-      const endOfDay = new Date(endDate);
-      endOfDay.setHours(23, 59, 59, 999);
-      filteredData = filteredData.filter(application => new Date(application.draftDate) <= endOfDay);
-    }
-
-    if (documentType) {
-      filteredData = filteredData.filter(application => application.docType === documentType);
-    }
-
-    setFilteredApplications(filteredData);
-  };
-  
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
   
@@ -168,16 +168,17 @@ function MyApplyList() {
     defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
     setStartDate(defaultStartDate);
     setEndDate(new Date());
-    setDocumentType('');
+    setDocumentType('');  
     setFilters({
       statusApproved: false,
       statusRejected: false,
       statusOrdered: false,
       statusClosed: false,
     });
-    setFilteredApplications(applications); 
+  
+    fetchApplications(); 
   };
-
+  
   const handleButtonClick = (application) => {
     setSelectedApplication(application);
     if (application.applyStatus === '반려') {

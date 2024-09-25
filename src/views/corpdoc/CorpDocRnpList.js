@@ -11,7 +11,6 @@ function CorpDocRnpList() {
   const { auth } = useContext(AuthContext);
 
   const [applications, setApplications] = useState([]); 
-  const [filteredApplications, setFilteredApplications] = useState([]); 
   const [filterInputs, setFilterInputs] = useState({
     searchType: '전체',
     keyword: '',
@@ -19,11 +18,16 @@ function CorpDocRnpList() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
   const [clickedRows, setClickedRows] = useState([]);
+  const [initialDataLoaded, setInitialDataLoaded] = useState(false);
 
-  const fetchRnpData = useCallback(async () => {
+  const fetchRnpData = useCallback(async (searchType = '전체', keyword = '') => {
     try {
       const response = await axios.get('/api/corpDoc/rnpList', {
-        params: { instCd: auth.instCd },
+        params: {
+          instCd: auth.instCd,
+          searchType,
+          keyword,
+        },
       });
 
       if (response.data) {
@@ -43,10 +47,11 @@ function CorpDocRnpList() {
         }));
 
         setApplications(rnpListData);
-        setFilteredApplications(rnpListData);
 
         const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
         setClickedRows(clickedRows);
+
+        setInitialDataLoaded(true);
       }
     } catch (error) {
       console.error("Error fetching RNP data:", error);
@@ -54,49 +59,21 @@ function CorpDocRnpList() {
   }, [auth.instCd]);
 
   useEffect(() => {
-    fetchRnpData();
-  }, [fetchRnpData]);
+    if (!initialDataLoaded) {
+      fetchRnpData();  
+    }
+  }, [fetchRnpData, initialDataLoaded]);
 
   const applyFilters = useCallback(() => {
-    let filteredData = applications;
-
-    const keyword = filterInputs.keyword.toLowerCase().trim();
-    if (keyword) {
-      if (filterInputs.searchType === '전체') {
-        filteredData = filteredData.filter(application =>
-          application.drafter.toLowerCase().includes(keyword) ||
-          application.submission.toLowerCase().includes(keyword) ||
-          application.purpose.toLowerCase().includes(keyword) ||
-          application.date.includes(keyword)
-        );
-      } else if (filterInputs.searchType === '수령일자') {
-        filteredData = filteredData.filter(application =>
-          application.date.includes(keyword)
-        );
-      } else if (filterInputs.searchType === '신청자') {
-        filteredData = filteredData.filter(application =>
-          application.drafter.toLowerCase().includes(keyword)
-        );
-      } else if (filterInputs.searchType === '제출처') {
-        filteredData = filteredData.filter(application =>
-          application.submission.toLowerCase().includes(keyword)
-        );
-      } else if (filterInputs.searchType === '사용목적') {
-        filteredData = filteredData.filter(application =>
-          application.purpose.toLowerCase().includes(keyword)
-        );
-      }
-    }
-
-    setFilteredApplications(filteredData);
-  }, [applications, filterInputs]);
+    fetchRnpData(filterInputs.searchType, filterInputs.keyword); 
+  }, [fetchRnpData, filterInputs]);
 
   const handleReset = () => {
     setFilterInputs({
       searchType: '전체',
       keyword: '',
     });
-    setFilteredApplications(applications);
+    fetchRnpData(); 
   };
 
   const closeModal = () => {
@@ -134,8 +111,8 @@ function CorpDocRnpList() {
           setEndDate={() => {}}         
           filters={{}}
           setFilters={() => {}}
-          onSearch={applyFilters} 
-          onReset={handleReset}
+          onSearch={applyFilters}  
+          onReset={handleReset}   
           showStatusFilters={false}
           showSearchCondition={true}
           showDocumentType={false}
@@ -165,8 +142,8 @@ function CorpDocRnpList() {
             </tr>
           </thead>
           <tbody>
-            {filteredApplications.length > 0 ? (
-              filteredApplications.map((app, index) => (
+            {applications.length > 0 ? (
+              applications.map((app, index) => (
                 <tr key={index}>
                   <td>{app.date}</td>
                   <td>{app.drafter}</td>

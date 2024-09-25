@@ -16,12 +16,11 @@ function ApplicationsList() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const documentTypeFromUrl = queryParams.get('documentType');
-
   const { auth } = useContext(AuthContext);
   const instCd = auth.instCd;
 
   const [applications, setApplications] = useState([]);
-  const [filteredApplications, setFilteredApplications] = useState([]); 
+  const [filteredApplications, setFilteredApplications] = useState([]);
   const [filterInputs, setFilterInputs] = useState({
     startDate: null,
     endDate: null,
@@ -67,6 +66,21 @@ function ApplicationsList() {
     }
   };
 
+  const convertDocumentType = (type) => {
+    switch (type) {
+      case '명함신청':
+        return 'A';
+      case '문서수발신':
+        return 'B';
+      case '법인서류':
+        return 'C';
+      case '인장신청':
+        return 'D';
+      default:
+        return null;
+    }
+  };
+
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
@@ -74,24 +88,15 @@ function ApplicationsList() {
 
   const getStatusText = (status) => {
     switch (status) {
-      case 'A':
-        return '승인대기';
-      case 'B':
-        return '승인완료';
-      case 'C':
-        return '반려';
-      case 'D':
-        return '발주완료';
-      case 'E':
-        return '처리완료';
-      case 'F':
-        return '신청취소';
-      case 'G':
-        return '발급완료';
-      case 'X':
-        return '상태없음';
-      default:
-        return status;
+      case 'A': return '승인대기';
+      case 'B': return '승인완료';
+      case 'C': return '반려';
+      case 'D': return '발주완료';
+      case 'E': return '처리완료';
+      case 'F': return '신청취소';
+      case 'G': return '발급완료';
+      case 'X': return '상태없음';
+      default: return status;
     }
   };
 
@@ -149,7 +154,7 @@ function ApplicationsList() {
     try {
       const response = await axios.get('/api/applyList', {
         params: {
-          documentType: filterParams.documentType || documentTypeFromUrl || null,
+          documentType: convertDocumentType(filterParams.documentType) || convertDocumentType(documentTypeFromUrl) || null,
           instCd: instCd || '',
           userId: auth.userId || '',
           instNm: selectedCenter || '',
@@ -226,7 +231,7 @@ function ApplicationsList() {
   useEffect(() => {
     applyFilters(); 
   }, [filters]);  
-  
+ 
   useEffect(() => {
     resetFilters();
     fetchApplications();

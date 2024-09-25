@@ -10,8 +10,7 @@ import '../../styles/seal/SealExportList.css';
 
 function SealExportList() {
   const { auth } = useContext(AuthContext);
-  const [applications, setApplications] = useState([]); // 원본 데이터
-  const [filteredApplications, setFilteredApplications] = useState([]); // 필터된 데이터
+  const [applications, setApplications] = useState([]);
   const [filterInputs, setFilterInputs] = useState({
     searchType: '전체',
     keyword: '',
@@ -19,15 +18,19 @@ function SealExportList() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
   const [clickedRows, setClickedRows] = useState([]);
-
-  const fetchSealExportList = useCallback(async (instCd) => {
+  const [initialLoad, setInitialLoad] = useState(true); 
+  
+  const fetchSealExportList = useCallback(async (searchType = null, keyword = null) => {
     try {
+      const { instCd } = auth;
       const response = await axios.get('/api/seal/exportList', {
         params: {
           instCd,
+          searchType,
+          keyword,
         },
       });
-  
+      
       const fetchedData = response.data.data.map((item, index) => ({
         id: index + 1,
         expDate: item.expDate,
@@ -47,58 +50,30 @@ function SealExportList() {
       }));
   
       setApplications(fetchedData);
-      setFilteredApplications(fetchedData);
-  
       const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
       setClickedRows(clickedRows);
     } catch (error) {
       console.error('Error fetching seal export list:', error);
-      alert('데이터를 불러오는 중 오류가 발생했습니다.');
     }
-  }, []);
-  
+  }, [auth]);
+
   useEffect(() => {
-    if (auth.instCd) {
-      fetchSealExportList(auth.instCd);
+    if (initialLoad) {
+      fetchSealExportList();
+      setInitialLoad(false); 
     }
-  }, [auth.instCd, fetchSealExportList]);
+  }, [initialLoad, fetchSealExportList]);
 
-  // 필터 적용 로직
-  const applyFilters = useCallback(() => {
-    let filteredData = applications;
-
-    const keyword = filterInputs.keyword.toLowerCase().trim();
-    if (keyword) {
-      if (filterInputs.searchType === '전체') {
-        filteredData = filteredData.filter(application =>
-          application.purpose.toLowerCase().includes(keyword) ||
-          application.expDate.includes(keyword) ||
-          application.returnDate.includes(keyword)
-        );
-      } else if (filterInputs.searchType === '반출일자') {
-        filteredData = filteredData.filter(application => 
-          application.expDate.includes(keyword)
-        );
-      } else if (filterInputs.searchType === '반납일자') {
-        filteredData = filteredData.filter(application => 
-          application.returnDate.includes(keyword)
-        );
-      } else if (filterInputs.searchType === '사용목적') {
-        filteredData = filteredData.filter(application => 
-          application.purpose.toLowerCase().includes(keyword)
-        );
-      }
-    }
-
-    setFilteredApplications(filteredData);
-  }, [applications, filterInputs]);
+  const handleSearch = () => {
+    fetchSealExportList(filterInputs.searchType, filterInputs.keyword);  
+  };
 
   const handleReset = () => {
     setFilterInputs({
       searchType: '전체',
       keyword: '',
     });
-    setFilteredApplications(applications); // 전체 데이터 다시 설정
+    fetchSealExportList(); 
   };
 
   const handleFileDownload = async (fileUrl, fileName) => {
@@ -110,7 +85,7 @@ function SealExportList() {
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', fileName); 
+      link.setAttribute('download', fileName);
       document.body.appendChild(link);
       link.click();
       link.parentNode.removeChild(link);
@@ -149,16 +124,15 @@ function SealExportList() {
         <h2>인장 반출대장</h2>
         <Breadcrumb items={['인장 대장', '인장 반출대장']} />
 
-        {/* ConditionFilter 적용 */}
         <ConditionFilter
-          startDate={null}  
-          setStartDate={() => {}} 
-          endDate={null} 
-          setEndDate={() => {}} 
-          filters={{}} 
+          startDate={null}
+          setStartDate={() => {}}
+          endDate={null}
+          setEndDate={() => {}}
+          filters={{}}
           setFilters={() => {}}
-          onSearch={applyFilters} 
-          onReset={handleReset} 
+          onSearch={handleSearch}  
+          onReset={handleReset}    
           showStatusFilters={false}
           showSearchCondition={true}
           showDocumentType={false}
@@ -188,8 +162,8 @@ function SealExportList() {
             </tr>
           </thead>
           <tbody>
-            {filteredApplications.length > 0 ? (
-              filteredApplications.map((app, index) => (
+            {applications.length > 0 ? (
+              applications.map((app, index) => (
                 <tr key={index}>
                   <td>{index + 1}</td>
                   <td>{app.expDate}</td>
@@ -228,6 +202,7 @@ function SealExportList() {
           </tbody>
         </table>
       </div>
+
       {modalVisible && selectedDocumentDetails && (
         <SealApprovalModal
           show={modalVisible}

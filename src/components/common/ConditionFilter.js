@@ -203,7 +203,6 @@ const ConditionFilter = ({
   return (
     <div className="all-application-filter-container">
       <div className="all-application-filter">
-        {/* 신청일자 필드, startDate나 endDate가 제공되지 않으면 숨김 */}
         {(startDate !== null && endDate !== null) && (
           <>
             <label>신청일자</label>
@@ -231,11 +230,9 @@ const ConditionFilter = ({
             >
               <option value="">전체</option>
               <option value="명함신청">명함신청</option>
-              <option value="문서수신">문서수신</option>
-              <option value="문서발신">문서발신</option>
-              <option value="인장신청(날인)">인장신청(날인)</option>
-              <option value="인장신청(반출)">인장신청(반출)</option>
+              <option value="문서수발신">문서수발신</option>
               <option value="법인서류">법인서류</option>
+              <option value="인장신청">인장신청</option>
             </select>
           </>
         )}
