@@ -29,6 +29,7 @@ const ConditionFilter = ({
   setKeyword,
   searchOptions = [], 
   forceShowAllStatusFilters = false,
+  startDateLabel = '신청일자',
 }) => {
   const resetFilters = () => {
     const defaultStartDate = new Date();
@@ -205,7 +206,7 @@ const ConditionFilter = ({
       <div className="all-application-filter">
         {(startDate !== null && endDate !== null) && (
           <>
-            <label>신청일자</label>
+            <label>{startDateLabel}</label>
             <input
               type="date"
               value={startDate ? formatDate(startDate) : formatDate(new Date(new Date().setMonth(new Date().getMonth() - 1)))}

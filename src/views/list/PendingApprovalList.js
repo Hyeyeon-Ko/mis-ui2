@@ -32,7 +32,7 @@ function PendingApprovalList() {
     return date;
   });
   const [endDate, setEndDate] = useState(new Date());
-    const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState({
     statusApproved: false,
     statusRejected: false,
     statusOrdered: false,

@@ -18,6 +18,8 @@ function CorpDocIssueList() {
   const [filterInputs, setFilterInputs] = useState({
     searchType: '전체',
     keyword: '',
+    startDate: null, 
+    endDate: null,   
   });
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -29,9 +31,20 @@ function CorpDocIssueList() {
   const [totalCorpseal, setTotalCorpseal] = useState(0);
   const [totalCoregister, setTotalCoregister] = useState(0);
 
-  const fetchIssueData = useCallback(async (searchType = '전체', keyword = '') => {
+  const fetchIssueData = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null) => {
     try {
-      const response = await axios.get(`/api/corpDoc/issueList?searchType=${searchType}&keyword=${keyword}`);
+      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : '';
+      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : '';
+
+      const response = await axios.get(`/api/corpDoc/issueList`, {
+        params: {
+          searchType,
+          keyword,
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+        },
+      });
+
       if (response.data) {
         const issueListData = response.data.data.issueList.map(item => ({
           id: item.draftId,
@@ -95,11 +108,23 @@ function CorpDocIssueList() {
     }
   }, [fetchIssueData, initialDataLoaded]);
 
-  const handleReset = () => {
+  const resetFilters = useCallback(() => {
+    const defaultStartDate = new Date();
+    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
     setFilterInputs({
+      startDate: defaultStartDate,
+      endDate: new Date(),
       searchType: '전체',
       keyword: '',
     });
+  }, []);
+
+  useEffect(() => {
+    resetFilters();
+  }, [resetFilters]);
+
+  const handleReset = () => {
+    resetFilters();
     fetchIssueData();
   };
   
@@ -185,13 +210,13 @@ function CorpDocIssueList() {
         </div>
 
         <ConditionFilter
-          startDate={null}  
-          setStartDate={() => {}} 
-          endDate={null} 
-          setEndDate={() => {}}         
+          startDate={filterInputs.startDate}
+          setStartDate={(startDate) => setFilterInputs(prev => ({ ...prev, startDate }))}
+          endDate={filterInputs.endDate}
+          setEndDate={(endDate) => setFilterInputs(prev => ({ ...prev, endDate }))}
           filters={{}}
           setFilters={() => {}}
-          onSearch={() => fetchIssueData(filterInputs.searchType, filterInputs.keyword)} 
+          onSearch={() => fetchIssueData(filterInputs.searchType, filterInputs.keyword, filterInputs.startDate, filterInputs.endDate)} 
           onReset={handleReset}
           showStatusFilters={false}
           showSearchCondition={true}
@@ -201,7 +226,7 @@ function CorpDocIssueList() {
           keyword={filterInputs.keyword}
           setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
           searchOptions={['전체', '발급/입고일자', '이름', '제출처', '사용목적']}
-          setDocumentType={() => {}}
+          startDateLabel="발급/입고일자"
         />
 
         <table className="corpDoc-issue-table">

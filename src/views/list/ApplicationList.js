@@ -159,13 +159,20 @@ function ApplicationsList() {
     setFilteredApplications(filtered);
   }, [filters]);
         
-  const fetchApplications = useCallback(async (filterParams = {}) => {
+  const fetchApplications = useCallback(async (filterParams = {}, searchType = '전체', keyword = '', startDate = null, endDate = null) => {
     setLoading(true);
     setError(null);
     try {
+      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : '';
+      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : '';
+
       const response = await axios.get('/api/applyList', {
         params: {
           documentType: convertDocumentType(filterParams.documentType) || convertDocumentType(documentTypeFromUrl) || null,
+          searchType,
+          keyword,
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
           instCd: instCd || '',
           userId: auth.userId || '',
           instNm: selectedCenter || '',
@@ -231,10 +238,6 @@ function ApplicationsList() {
       alert('반출신청 정보를 불러오는 중 오류가 발생했습니다.');
     }
   };
-
-  useEffect(() => {
-    applyFilters(); 
-  }, [filters, applyFilters]);  
 
   const resetFilters = useCallback(() => {
     const defaultStartDate = new Date();
