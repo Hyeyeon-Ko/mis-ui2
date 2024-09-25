@@ -1,6 +1,6 @@
 export const subscribeToNotifications = (userId, setNotifications) => {
     // TODO: 추후, 운영서버 주소로 변경
-    const eventSource = new EventSource(`http://172.16.250.87/api/noti/subscribe/${userId}`);
+    const eventSource = new EventSource(`/api/noti/subscribe/${userId}`);
     
     eventSource.addEventListener('notification', (event) => {
 
