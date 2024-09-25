@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../components/AuthContext';
 import { useSealForm } from '../../hooks/seal/useSealForm';
+import { validateForm } from '../../hooks/validateForm';
 import SealFormComponents from '../../components/apply/SealFormComponents';
 
 function SealApplyImprint() {
@@ -18,38 +19,40 @@ function SealApplyImprint() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const corporateSealQuantity = sealSelections.corporateSeal.selected ? sealSelections.corporateSeal.quantity : '';
-        const facsimileSealQuantity = sealSelections.facsimileSeal.selected ? sealSelections.facsimileSeal.quantity : '';
-        const companySealQuantity = sealSelections.companySeal.selected ? sealSelections.companySeal.quantity : '';
+        // 인감선택 및 입력일자 validation 진행
+        const selectedSeals = ['corporateSeal', 'facsimileSeal', 'companySeal'].reduce((acc, sealType) => {
+            const { selected, quantity } = sealSelections[sealType];
+            acc[sealType] = {
+                selected,
+                quantity: selected ? quantity : '',
+            };
+            return acc;
+        }, {});
 
-        if (!corporateSealQuantity && !facsimileSealQuantity && !companySealQuantity) {
-            alert('최소 하나의 인감을 선택해야 합니다.');
-            return;
+        const inputDates = {
+            useDate: useDate
         }
 
-        if (!submission || !useDate || !purpose) {
-            alert('모든 필수 항목을 입력해주세요.');
+        const { isValid, message } = validateForm('Seal', selectedSeals, inputDates);
+        if (!isValid) {
+            alert(message);
             return;
         }
-
-        const selectedSeals = {
-            corporateSeal: corporateSealQuantity,
-            facsimileSeal: facsimileSealQuantity,
-            companySeal: companySealQuantity,
-        };
 
         const imprintRequestDTO = {
             drafter: auth.hngNm,
             drafterId: auth.userId,
             submission,
             useDate,
-            corporateSeal: selectedSeals.corporateSeal,
-            facsimileSeal: selectedSeals.facsimileSeal,
-            companySeal: selectedSeals.companySeal,
+            corporateSeal: selectedSeals.corporateSeal.quantity,
+            facsimileSeal: selectedSeals.facsimileSeal.quantity,
+            companySeal: selectedSeals.companySeal.quantity,
             purpose,
             notes,
             instCd: auth.instCd,
         };
+
+        console.log("imprint: ", imprintRequestDTO)
 
         try {
             await axios.post('/api/seal/imprint', imprintRequestDTO);

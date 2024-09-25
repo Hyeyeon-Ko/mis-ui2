@@ -184,6 +184,7 @@ function CorpDocApply() {
                                     type="file"
                                     name="department"
                                     onChange={handleFileChange}
+                                    required
                                 />
                             </div> &nbsp;
                             <div className='corpDoc-form-group'>
