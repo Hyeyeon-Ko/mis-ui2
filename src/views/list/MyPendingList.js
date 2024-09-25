@@ -89,20 +89,20 @@ function MyPendingList() {
   
       switch (selectedApplication.docType) {
         case '명함신청':
-          endpoint = '/api/bcd/';
+          endpoint = '/bcd/';
           break;
         case '문서발신':
         case '문서수신': 
-          endpoint = '/api/doc/';
+          endpoint = '/doc/';
           break;
         case '법인서류':
-          endpoint = '/api/corpDoc/';
+          endpoint = '/corpDoc/';
           break;
         case '인장신청(날인)':
-          endpoint = '/api/seal/imprint/';
+          endpoint = '/seal/imprint/';
           break;
         case '인장신청(반출)':
-          endpoint = '/api/seal/export/';
+          endpoint = '/seal/export/';
           break;
         default:
           console.error('Unknown document type:', selectedApplication.docType);
@@ -143,24 +143,24 @@ function MyPendingList() {
             let path;
             switch (row.docType) {
               case '명함신청':
-                path = `/api/bcd/${row.draftId}`;
+                path = `/bcd/${row.draftId}`;
                 break;
               case '문서수발신':
-                path = `/api/doc/${row.draftId}`;
+                path = `/doc/${row.draftId}`;
                 break;
               case '법인서류':
-                path = `/api/corpDoc/${row.draftId}`;
+                path = `/corpDoc/${row.draftId}`;
                 break;
               case '인장신청(날인)':
-                path = `/api/seal/imprint/${row.draftId}`;
+                path = `/seal/imprint/${row.draftId}`;
                 break;
               case '인장신청(반출)':
-                path = `/api/seal/export/${row.draftId}`;
+                path = `/seal/export/${row.draftId}`;
                 break;
               default:
-                path = `/api/doc/${row.draftId}`; 
+                path = `/doc/${row.draftId}`; 
             }
-            navigate(path, { state: { returnTo: '/api/myPendingList' } });
+            navigate(path, { state: { returnTo: '/myPendingList' } });
           }}
         >
           수 정

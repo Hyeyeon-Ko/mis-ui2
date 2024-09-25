@@ -5,8 +5,8 @@ import ApplyComponent from '../../components/apply/ApplyComponents';
 function SealApplyFirst() {
 
   const buttons = [
-    { to: '/api/seal/imprint', label: '날 인' },
-    { to: '/api/seal/export', label: '반 출' },
+    { to: '/seal/imprint', label: '날 인' },
+    { to: '/seal/export', label: '반 출' },
   ];
 
   return (

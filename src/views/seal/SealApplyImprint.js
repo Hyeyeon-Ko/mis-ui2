@@ -54,7 +54,7 @@ function SealApplyImprint() {
         try {
             await axios.post('/api/seal/imprint', imprintRequestDTO);
             alert('인장 날인 신청이 완료되었습니다.');
-            navigate('/api/myPendingList');
+            navigate('/myPendingList');
         } catch (error) {
             console.error('Error:', error);
             alert('날인 신청 중 오류가 발생했습니다. 다시 시도해주세요.');

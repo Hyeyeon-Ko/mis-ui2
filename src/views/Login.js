@@ -15,7 +15,7 @@ const Login = () => {
   useEffect(() => {
     if (auth.isAuthenticated) {
       if (auth.role === 'ADMIN' || auth.role === 'MASTER') {
-        navigate('/api/std');
+        navigate('/std');
       } else {
         navigate('/');
       }
@@ -63,7 +63,7 @@ const Login = () => {
             );
 
             if (data.data.role === 'ADMIN' || data.data.role === 'MASTER') {
-              navigate('/api/std');
+              navigate('/std');
             } else {
               navigate('/');
             }

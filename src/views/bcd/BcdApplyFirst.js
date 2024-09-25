@@ -4,8 +4,8 @@ import ApplyComponent from '../../components/apply/ApplyComponents';
 // 명함 신청 컴포넌트
 function BcdApplyFirst() {
   const buttons = [
-    { to: '/api/bcd/own', label: '본 인' },
-    { to: '/api/bcd/other', label: '타 인' },
+    { to: '/bcd/own', label: '본 인' },
+    { to: '/bcd/other', label: '타 인' },
   ];
 
   return (
