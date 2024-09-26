@@ -89,9 +89,14 @@ function DetailDocApplication() {
   const handleFileDownload = async () => {
     if (existingFile) {
       try {
-        const response = await axios.get(`/api/doc/download/${encodeURIComponent(existingFile.name)}`, {
-          responseType: 'blob',
-        });
+        const documentType = "doc";
+        
+        const response = await axios.get(
+          `/api/file/download/${encodeURIComponent(existingFile.name)}?documentType=${encodeURIComponent(documentType)}`, 
+          {
+            responseType: 'blob',
+          }
+        );
   
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
@@ -106,7 +111,7 @@ function DetailDocApplication() {
       }
     }
   };
-    
+      
   const handleSubmit = async (e) => {
     e.preventDefault();
 

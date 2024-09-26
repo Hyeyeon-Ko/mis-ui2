@@ -4,8 +4,6 @@ import axios from 'axios';
 import '../../styles/doc/DocConfirmModal.css';
 import downloadIcon from '../../assets/images/download.png';
 
-
-
 const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, refreshSidebar }) => {
   const [formData, setFormData] = useState({
     receptionDate: '',
@@ -16,7 +14,7 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
     purpose: '',
     division: '',
     fileName: '',
-    fileUrl: ''
+    filePath: '',
   });
 
   const fetchDocumentData = useCallback(async (id) => {
@@ -33,7 +31,7 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
           purpose: data.purpose,
           division: data.division,
           fileName: data.fileName,
-          fileUrl: data.filePath ? `/api/doc/download/${encodeURIComponent(data.fileName)}` : ''
+          filePath: data.filePath, // 기존 filePath 정보 추가
         });
       }
     } catch (error) {
@@ -64,16 +62,18 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
   };
 
   const handleFileDownload = async () => {
-    if (formData.fileUrl) {
+    if (formData.filePath) {
       try {
-        const response = await axios.get(formData.fileUrl, {
-          responseType: 'blob',
-        });
+        const documentType = "doc"; // 필요에 따라 documentType 값을 설정하세요
+        const response = await axios.get(
+          `/api/file/download/${encodeURIComponent(formData.fileName)}?documentType=${encodeURIComponent(documentType)}`,
+          { responseType: 'blob' }
+        );
 
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', formData.fileName);
+        link.setAttribute('download', formData.fileName); // 다운로드 파일 이름 설정
         document.body.appendChild(link);
         link.click();
         link.parentNode.removeChild(link);
@@ -120,7 +120,7 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
           <label>사용 용도</label>
           <textarea value={formData.purpose} readOnly className="doc-confirm-textarea" />
         </div>
-        {formData.fileUrl && (
+        {formData.filePath && (
           <div className="doc-confirm-form-group">
             <label>첨부 파일</label>
             <div className="doc-confirm-file-download">

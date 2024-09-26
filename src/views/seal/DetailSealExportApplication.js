@@ -159,26 +159,31 @@ function DetailSealExportApplication() {
     };
 
     const handleFileDownload = async () => {
-        if (applicationDetails.fileName && applicationDetails.filePath) {
-            try {
-                const response = await axios.get(`/api/doc/download/${encodeURIComponent(applicationDetails.fileName)}`, {
-                    responseType: 'blob',
-                });
-
-                const url = window.URL.createObjectURL(new Blob([response.data]));
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', applicationDetails.fileName);
-                document.body.appendChild(link);
-                link.click();
-                link.parentNode.removeChild(link);
-            } catch (error) {
-                console.error('Error downloading the file:', error);
-                alert('파일 다운로드에 실패했습니다.');
-            }
+        if (applicationDetails) {
+          try {
+            const documentType = "seal";
+            
+            const response = await axios.get(
+              `/api/file/download/${encodeURIComponent(applicationDetails.fileName)}?documentType=${encodeURIComponent(documentType)}`, 
+              {
+                responseType: 'blob',
+              }
+            );
+      
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', applicationDetails.fileName); 
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+          } catch (error) {
+            console.error('Error downloading the file:', error);
+            alert('파일 다운로드에 실패했습니다.');
+          }
         }
-    };
-
+      };
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
 

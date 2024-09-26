@@ -120,25 +120,30 @@ function DetailCorpDocApplication() {
 
     const handleFileDownload = async () => {
         if (existingFile) {
-            try {
-                const response = await axios.get(`/api/corpDoc/download/${encodeURIComponent(existingFile.name)}`, {
-                    responseType: 'blob',
-                });
-
-                const url = window.URL.createObjectURL(new Blob([response.data]));
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', existingFile.name);
-                document.body.appendChild(link);
-                link.click();
-                link.parentNode.removeChild(link);
-            } catch (error) {
-                console.error('Error downloading the file:', error);
-                alert('파일 다운로드에 실패했습니다.');
-            }
+          try {
+            const documentType = "corpdoc";
+            
+            const response = await axios.get(
+              `/api/file/download/${encodeURIComponent(existingFile.name)}?documentType=${encodeURIComponent(documentType)}`, 
+              {
+                responseType: 'blob',
+              }
+            );
+      
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', existingFile.name); 
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+          } catch (error) {
+            console.error('Error downloading the file:', error);
+            alert('파일 다운로드에 실패했습니다.');
+          }
         }
-    };
-
+      };
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
 
