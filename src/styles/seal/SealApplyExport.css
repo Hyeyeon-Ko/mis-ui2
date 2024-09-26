@@ -42,8 +42,8 @@
 }
 
 .seal-export-form-group label {
-  font-weight: 580;
-  font-size: 14.5px;
+  font-weight: 500;
+  font-size: 16px;
   color: #222121;
   margin-bottom: 5px;
   margin-right: 10px;
@@ -59,7 +59,7 @@
   border: 1px solid #e4e1e1;
   border-radius: 6px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .seal-export-form-group select {
@@ -142,7 +142,7 @@
 }
 
 .seal-export-disclaimer {
-  font-size: 0.7em;
+  font-size: 14px;
   color: #888;
   text-align: right;
   width: 80%;
