@@ -1,6 +1,7 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; 
+import { useSealForm } from '../../hooks/useSealForm';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import { AuthContext } from '../../components/AuthContext';
@@ -10,34 +11,8 @@ import { SealCheckbox, sealImages } from '../../datas/sealDatas';
 
 function SealApplyImprint() {
     const { auth } = useContext(AuthContext);
-    const navigate = useNavigate(); 
-
-    const [sealSelections, setSealSelections] = useState({
-        corporateSeal: { selected: false, quantity: '' },
-        facsimileSeal: { selected: false, quantity: '' },
-        companySeal: { selected: false, quantity: '' },
-    });
-
-    const handleSealChange = (sealName) => {
-        setSealSelections(prevState => ({
-            ...prevState,
-            [sealName]: {
-                ...prevState[sealName],
-                selected: !prevState[sealName].selected,
-            }
-        }));
-    };
-
-    const handleQuantityChange = (e, sealName) => {
-        const value = e.target.value;
-        setSealSelections(prevState => ({
-            ...prevState,
-            [sealName]: {
-                ...prevState[sealName],
-                quantity: value
-            }
-        }));
-    };
+    const navigate = useNavigate();
+    const { sealSelections, handleSealChange, handleQuantityChange } = useSealForm();
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -114,7 +89,7 @@ function SealApplyImprint() {
                                     ))}
                                 </div>
                                 <div className="seal-imprint-disclaimer">
-                                    *실제 인감이 아닙니다.
+                                    * 실제 인감이 아닙니다.
                                 </div>
                             </div>
                             <div className='seal-imprint-form-group'>

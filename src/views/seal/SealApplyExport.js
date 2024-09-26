@@ -1,6 +1,7 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useSealForm } from '../../hooks/useSealForm';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import { AuthContext } from '../../components/AuthContext';
@@ -12,40 +13,7 @@ import { SealOption, sealOptions } from '../../datas/sealDatas';
 function SealApplyExport() {
     const { auth } = useContext(AuthContext);
     const navigate = useNavigate();
-
-    const [sealSelections, setSealSelections] = useState({
-        corporateSeal: { selected: false, quantity: '' },
-        facsimileSeal: { selected: false, quantity: '' },
-        companySeal: { selected: false, quantity: '' },
-    });
-
-    const [file, setFile] = useState(null);
-
-    const handleSealChange = (sealName) => {
-        setSealSelections(prevState => ({
-            ...prevState,
-            [sealName]: {
-                ...prevState[sealName],
-                selected: !prevState[sealName].selected,
-                quantity: ''
-            }
-        }));
-    };
-
-    const handleQuantityChange = (e, sealName) => {
-        const value = e.target.value;
-        setSealSelections(prevState => ({
-            ...prevState,
-            [sealName]: {
-                ...prevState[sealName],
-                quantity: value
-            }
-        }));
-    };
-
-    const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
-    };
+    const {sealSelections, file, handleSealChange, handleQuantityChange, handleFileChange} = useSealForm();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -144,7 +112,7 @@ function SealApplyExport() {
                                     ))}
                                 </div>
                                 <div className="seal-export-disclaimer">
-                                    *실제 인감이 아닙니다.
+                                    * 실제 인감이 아닙니다.
                                 </div>
                             </div>
                             <div className='seal-export-form-group'>
