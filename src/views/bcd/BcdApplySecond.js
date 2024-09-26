@@ -599,7 +599,8 @@ function BcdApplySecond() {
                     onChange={handleCardTypeChange}
                     onClick={handleInputClick}
                   />
-                  <label htmlFor="personal">[뒷면] 영문 명함</label>
+                  <label htmlFor="personal" className="select-back">[뒷면] 영문 명함</label>
+                  
                   <input
                     type="radio"
                     id="company"
@@ -609,7 +610,7 @@ function BcdApplySecond() {
                     onChange={handleCardTypeChange}
                     onClick={handleInputClick}
                   />
-                  <label htmlFor="company">[뒷면] 회사 정보</label>
+                  <label htmlFor="company" className="select-back">[뒷면] 회사 정보</label>
                 </div>
                 <div className="image-preview">
                   {formData.cardType === 'personal' && (

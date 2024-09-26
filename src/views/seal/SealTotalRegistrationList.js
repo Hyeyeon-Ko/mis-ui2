@@ -3,12 +3,10 @@ import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import '../../styles/seal/SealTotalRegistrationList.css';
 
-
-
 function SealTotalRegistrationList() {
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [centerData, setCenterData] = useState([]);
-  const [selectedCenter, setSelectedCenter] = useState('all'); 
+  const [selectedCenter, setSelectedCenter] = useState('all');
 
   useEffect(() => {
     const fetchCenterData = async () => {
@@ -27,37 +25,32 @@ function SealTotalRegistrationList() {
     const fetchTotalRegistrationList = async () => {
       try {
         const response = await axios.get(`/api/seal/totalRegistrationList`);
-        setFilteredApplications(response.data.data); 
+        setFilteredApplications(response.data.data);
       } catch (error) {
         console.error('Error fetching total registration list:', error);
         alert('데이터를 불러오는 중 오류가 발생했습니다.');
       }
     };
 
-    fetchCenterData(); 
-    fetchTotalRegistrationList(); 
+    fetchCenterData();
+    fetchTotalRegistrationList();
   }, []);
 
   const handleCenterChange = async (e) => {
     const selectedCenter = e.target.value;
     setSelectedCenter(selectedCenter);
 
-    if (selectedCenter === 'all') {
-      try {
+    try {
+      if (selectedCenter === 'all') {
         const response = await axios.get(`/api/seal/totalRegistrationList`);
         setFilteredApplications(response.data.data);
-      } catch (error) {
-        console.error('Error fetching total registration list:', error);
-        alert('데이터를 불러오는 중 오류가 발생했습니다.');
-      }
-    } else {
-      try {
+      } else {
         const response = await axios.get(`/api/seal/registrationList?instCd=${selectedCenter}`);
         setFilteredApplications(response.data.data);
-      } catch (error) {
-        console.error('Error fetching center registration list:', error);
-        alert('데이터를 불러오는 중 오류가 발생했습니다.');
       }
+    } catch (error) {
+      console.error('Error fetching center registration list:', error);
+      alert('데이터를 불러오는 중 오류가 발생했습니다.');
     }
   };
 
@@ -68,12 +61,12 @@ function SealTotalRegistrationList() {
         <Breadcrumb items={['인장 대장', '전국 인장 등록대장']} />
         <div className="seal-total-category-section">
           <div className="seal-total-category">
-            <label htmlFor="center" className="seal-total-category-label">센 터&gt;&gt;</label>
+            <label htmlFor="center" className="seal-total-category-label">센터&gt;&gt;</label>
             <select
               id="center"
               className="seal-total-category-dropdown"
-              value={selectedCenter} 
-              onChange={handleCenterChange} 
+              value={selectedCenter}
+              onChange={handleCenterChange}
             >
               {centerData.map(center => (
                 <option key={center.detailCd} value={center.detailCd}>
@@ -104,7 +97,15 @@ function SealTotalRegistrationList() {
                 <tr key={index}>
                   <td>{app.sealNm}</td>
                   <td>
-                    <img src={`/api/images/${encodeURIComponent(app.sealImage)}`} alt="Seal" className="seal-total-image" />
+                    {app.sealImage ? (
+                      <img
+                        src={`data:image/png;base64,${app.sealImage}`}
+                        alt="Seal"
+                        className="seal-total-image"
+                      />
+                    ) : (
+                      '이미지 없음'
+                    )}
                   </td>
                   <td>{app.useDept}</td>
                   <td>{app.purpose}</td>
