@@ -9,10 +9,7 @@
 
 .form-wrapper {
     display: flex;
-    justify-content: space-between;
     padding: 0px 52px;
-    max-width: 1200px;
-    margin: 0 auto;
     position: relative;
 }
 
@@ -25,15 +22,9 @@
 .form-left, .form-right {
     flex: 1;
     position: relative;
-}
-
-.form-left {
-    left: 0;
-    padding-right: 16px;
-}
-
-.form-right {
-    right: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .form-group {
@@ -60,7 +51,6 @@
     font-size: 19px;
     margin-top: 30px;
     margin-bottom: 12px;
-    margin-right: 40px;
 }
 
 .sub-label {
@@ -92,6 +82,11 @@ input[type="text2"] {
     border-radius: 5px;
     font-size: 14.3px;
     background-color: #fff;
+}
+
+.apply-content input[type="text"].form-name-input {
+    width: 340px;
+
 }
 
 .apply-content input[type="text"].english-name {
@@ -189,6 +184,9 @@ input[type="text2"] {
     transition: border-color 0.5s;
 }
 
+.apply-content .address-select {
+    width: 180px;
+}
 .apply-content select:focus{
     outline: none;
     border-color: #b1cef1;
@@ -239,8 +237,8 @@ input[type="text2"] {
 
 .quantity-group {
     display: flex;
-    align-items: center;
     margin-top: 50px;
+    gap: 80px;
 }
 
 .quantity-selector {
@@ -308,6 +306,7 @@ input[type="text2"] {
     padding: 10px 0px 10px 6.5px;
     font-size: 16px;
     font-weight: bold;
+    gap: 12px;
 }
   
 .form-horizontal {
