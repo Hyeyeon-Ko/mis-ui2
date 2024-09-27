@@ -99,27 +99,6 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
     }
   };
 
-  // const handleCheckboxChange = () => {
-  //   if (role === 'MASTER') {
-  //     alert('MASTER 권한의 경우 기준자료관리는 필수입니다.');
-  //     return;
-  //   }
-  //   setIsStandardChecked(!isStandardChecked);
-
-  //   setQueryResult(prevResult => {
-  //     if (prevResult.length > 0) {
-  //       return [{
-  //         ...prevResult[0],
-  //         permissions: {
-  //           standardDataManagement: !isStandardChecked
-  //         }
-  //       }];
-  //     } else {
-  //       return prevResult;
-  //     }
-  //   });
-  // };
-
   const handleSave = async () => {
     if (!role || (!userId && !adminData)) {
       alert('권한과 사번을 입력하세요');
