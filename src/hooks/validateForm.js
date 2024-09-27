@@ -9,7 +9,7 @@ export const validateUseDate = (dates) => {
         if (!regex.test(date)) {
             return {
                 isValid: false,
-                message: `${fieldName} YYYY-MM-DD 형식으로 입력해야 합니다.`
+                message: `${fieldName} YYYY-MM-DD 형식으로 입력해주세요.`
             };
         }
     
@@ -54,6 +54,8 @@ export const requiredInput = (inputValues, type) => {
             }
         }
         const fieldName = getFieldName(fieldInput);
+        console.log("field, fieldNAme: ", field, fieldName)
+        console.log("type: ", value)
 
         // input, select box 값 선택 안한 경우
         if (typeof value === 'string') {

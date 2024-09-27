@@ -46,7 +46,17 @@ export const getFieldName = (key) => {
             return "생성일자를";
         case 'disposalDate':
             return "폐기일자를";
-
+        // 인장등록
+        case 'sealNm':
+            return "인영 종류를";
+        case 'sealImage':
+            return "인영 이미지를";
+        case 'useDept':
+            return "사용부서를";
+        case 'usage':
+            return "용도를";
+        case 'draftDate':
+            return "등록일자를";
         default:
             return key;
     }
