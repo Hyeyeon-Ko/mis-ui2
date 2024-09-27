@@ -13,63 +13,28 @@ import '../../styles/common/Page.css';
 
 import backImageEng from '../../assets/images/backimage_eng.png';
 import backImageCompany from '../../assets/images/backimage_company.png';
-import { inputValue } from '../../datas/bdcDatas';
+import { bcdInfoData, inputValue } from '../../datas/bdcDatas';
 import Form from '../../components/common/Form';
+import useBdcChange from '../../hooks/useBdcChange';
 
 function DetailApplication() {
+  const { handleFloorChange, handleAddressChange, handleDepartmentChange, handleTeamChange, handlePositionChange, handleDetailChange, handleDetailCardTypeChange, floor , setFloor} = useBdcChange();
   const { auth, refreshSidebar } = useContext(AuthContext);
   const { draftId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const applyStatus = queryParams.get('applyStatus'); 
-  // const [formData, setFormData] = useState({
-  //   name: '',
-  //   firstName: '',
-  //   lastName: '',
-  //   center: '',
-  //   department: '',
-  //   team: '',
-  //   teamNm: '',
-  //   addTeamNm: '',
-  //   addEngTeamNm: '',
-  //   position: '',
-  //   engPosition: '',
-  //   gradeNm: '',
-  //   addGradeNm: '',
-  //   enGradeNm: '',
-  //   phone1: '',
-  //   phone2: '',
-  //   phone3: '',
-  //   fax1: '',
-  //   fax2: '',
-  //   fax3: '',
-  //   mobile1: '',
-  //   mobile2: '',
-  //   mobile3: '',
-  //   email: '',
-  //   address: '',
-  //   quantity: 1,
-  //   cardType: 'personal',
-  //   userId: '',
-  //   engAddress: '',
-  // });
   const [formData, setFormData] = useState(inputValue)
 
   const [addressOptions, setAddressOptions] = useState([]);
-  const [floor, setFloor] = useState('');
   const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false);
   const isReadOnly = new URLSearchParams(location.search).get('readonly') === 'true';
 
-  const [bcdData, setBcdData] = useState({
-    instInfo: [],
-    deptInfo: [],
-    teamInfo: [],
-    gradeInfo: [],
-  });
+  const [bcdData, setBcdData] = useState(bcdInfoData);
 
   const addressInputRef = useRef(null);
 
@@ -210,14 +175,6 @@ function DetailApplication() {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleCardTypeChange = (e) => {
-    setFormData({ ...formData, cardType: e.target.value });
-  };
 
   const validateForm = () => {
     const requiredFields = [
@@ -346,51 +303,10 @@ function DetailApplication() {
     fetchAddressOptions(selectedCenter);
   };
 
-  const handleDepartmentChange = (e) => {
-    setFormData({ ...formData, department: e.target.value, team: '' });
-  };
-
-  const handleTeamChange = (e) => {
-    const selectedTeam = e.target.value;
-    const selectedTeamInfo = bcdData.teamInfo.find((team) => team.detailCd === selectedTeam);
-    const teamNm = selectedTeamInfo ? selectedTeamInfo.detailNm : '';
-
-    setFormData({ ...formData, team: selectedTeam, teamNm: teamNm });
-  };
-
-  const handlePositionChange = (e) => {
-    const selectedPosition = e.target.value;
-    const selectedPositionInfo = bcdData.gradeInfo.find((position) => position.detailCd === selectedPosition);
-    const enGradeNm = selectedPositionInfo ? selectedPositionInfo.etcItem2 : '';
-    setFormData(() => ({
-      ...formData,
-      position: selectedPosition,
-      gradeNm: selectedPosition === '000' ? formData.addGradeNm : selectedPositionInfo.detailNm,
-      enGradeNm: selectedPosition === '000' ? enGradeNm : '',
-    }));
-  };
 
   const handlePreview = (e) => {
     e.preventDefault();
     setPreviewVisible(true);
-  };
-
-  const handleAddressChange = (e) => {
-    const updatedAddress = e.target.value + (floor ? `, ${floor}` : '');
-    setFormData({ ...formData, address: updatedAddress });
-  };
-
-  const handleFloorChange = (e) => {
-    const updatedFloor = e.target.value;
-    setFloor(updatedFloor);
-
-    const baseAddress = formData.address.split(',')[0];
-    const updatedAddress = `${baseAddress}${updatedFloor ? `, ${updatedFloor}` : ''}`;
-
-    const originalEngAddress = bcdData.instInfo.find((inst) => inst.detailCd === formData.center)?.etcItem2 || '';
-    const updatedEngAddress = updatedFloor ? `${updatedFloor}F, ${originalEngAddress}` : originalEngAddress;
-
-    setFormData({ ...formData, address: updatedAddress, engAddress: updatedEngAddress });
   };
 
   const handleNumberInput = (e) => {
@@ -427,7 +343,7 @@ function DetailApplication() {
                       name="cardType"
                       value="personal"
                       checked={formData.cardType === 'personal'}
-                      onChange={handleCardTypeChange}
+                      onChange={handleDetailCardTypeChange}
                       disabled={isReadOnly}
                     />
                     <label htmlFor="personal">[뒷면] 영문 명함</label>
@@ -437,7 +353,7 @@ function DetailApplication() {
                       name="cardType"
                       value="company"
                       checked={formData.cardType === 'company'}
-                      onChange={handleCardTypeChange}
+                      onChange={handleDetailCardTypeChange}
                       disabled={isReadOnly}
                     />
                     <label htmlFor="company">[뒷면] 회사 정보</label>
@@ -489,8 +405,8 @@ function DetailApplication() {
                 <div className="form-group-horizontal">
                   <label className="form-label">영문이름</label>
                   <div className="name-inputs">
-                    <input type="text" name="firstName" placeholder="First name" value={formData.firstName} onChange={handleChange} required={!isReadOnly} readOnly={isReadOnly} className="english-name" />
-                    <input type="text" name="lastName" placeholder="Last name" value={formData.lastName} onChange={handleChange} required={!isReadOnly} readOnly={isReadOnly} className="english-name" />
+                    <input type="text" name="firstName" placeholder="First name" value={formData.firstName} onChange={handleDetailChange} required={!isReadOnly} readOnly={isReadOnly} className="english-name" />
+                    <input type="text" name="lastName" placeholder="Last name" value={formData.lastName} onChange={handleDetailChange} required={!isReadOnly} readOnly={isReadOnly} className="english-name" />
                   </div>
                 </div>
                 <div className="form-group-horizontal">
@@ -543,7 +459,7 @@ function DetailApplication() {
                         type="text"
                         name="addTeamNm"
                         value={formData.addTeamNm}
-                        onChange={handleChange}
+                        onChange={handleDetailChange}
                         required
                         placeholder="팀명"
                         disabled={isReadOnly}
@@ -555,7 +471,7 @@ function DetailApplication() {
                         type="text"
                         name="addEngTeamNm"
                         value={formData.addEngTeamNm}
-                        onChange={handleChange}
+                        onChange={handleDetailChange}
                         required
                         placeholder="영문 팀명"
                         disabled={isReadOnly}
@@ -582,7 +498,7 @@ function DetailApplication() {
                       type="text"
                       name="addGradeNm"
                       value={formData.addGradeNm}
-                      onChange={handleChange}
+                      onChange={handleDetailChange}
                       placeholder="직위"
                       required={!isReadOnly} 
                       disabled={isReadOnly}
@@ -594,7 +510,7 @@ function DetailApplication() {
                       type="text"
                       name="enGradeNm"
                       value={formData.enGradeNm}
-                      onChange={handleChange}
+                      onChange={handleDetailChange}
                       placeholder="영문 직위"
                       required={!isReadOnly} 
                       disabled={isReadOnly}
@@ -629,7 +545,7 @@ function DetailApplication() {
                 <div className="form-group-horizontal">
                   <label className="form-label">메일 주소</label>
                   <div className="email-input">
-                    <input type="text2" name="email" value={formData.email} onChange={handleChange} required={!isReadOnly} readOnly={isReadOnly} className="email-full" />
+                    <input type="text2" name="email" value={formData.email} onChange={handleDetailChange} required={!isReadOnly} readOnly={isReadOnly} className="email-full" />
                     <span>@ kmi.or.kr</span>
                   </div>
                 </div>

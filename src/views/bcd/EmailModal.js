@@ -49,7 +49,6 @@ const EmailModal = ({ show, onClose, onSend }) => {
       body,
       fileName: fileToSend,
     };
-    console.log('Sending email data: ', emailData);
     onSend(emailData)
       .finally(() => {
         setIsLoading(false);

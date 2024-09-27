@@ -37,7 +37,7 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
     } catch (error) {
       console.error('Error fetching admin data:', error);
     }
-  }, [adminData]);
+  }, [adminData, setIsStandardChecked, setQueryResult, setRole]);
 
   useEffect(() => {
     if (show) {
