@@ -87,3 +87,39 @@ export const SealCheckbox = ({ sealName, sealData, onSealChange, onQuantityChang
         </div>
     </label>
 );
+
+export const sealRegistrationData = {
+    seal: '',
+    sealImage: null,
+    department: '',
+    purpose: '',
+    manager: '',
+    subManager: '',
+    date: '',
+}
+
+export const applicationData = {
+    submission: '',
+    useDept: '',
+    expNm: '',
+    expDate: '',
+    returnDate: '',
+    purpose: '',
+    file: null,
+    fileName: '',  
+    filePath: '',  
+    isFileDeleted: false,
+}
+
+export const applicationDetailData = {
+    submission: '',
+    useDate: '',
+    purpose: '',
+    notes: '',
+}
+
+export const sealSelectionData = {
+    corporateSeal: { selected: false, quantity: '' },
+    facsimileSeal: { selected: false, quantity: '' },
+    companySeal: { selected: false, quantity: '' },
+}

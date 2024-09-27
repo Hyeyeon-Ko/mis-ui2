@@ -8,7 +8,63 @@ import axios from 'axios';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import '../../styles/seal/SealExportList.css';
 
-
+const SealTable = ({ filteredApplications, handleFileDownload, handleRowClick, clickedRows }) => {
+  return (
+      <table className="table">
+          <thead>
+              <tr>
+                  <th rowSpan="2">일련번호</th>
+                  <th rowSpan="2">반출일자</th>
+                  <th rowSpan="2">반납일자</th>
+                  <th rowSpan="2">사용목적</th>
+                  <th colSpan="3">인장구분</th>
+                  <th rowSpan="2">첨부파일</th>
+                  <th rowSpan="2">결재</th>
+              </tr>
+              <tr>
+                  <th>법인인감</th>
+                  <th>사용인감</th>
+                  <th>회사인</th>
+              </tr>
+          </thead>
+          <tbody>
+              {filteredApplications.length > 0 ? (
+                  filteredApplications.map((app, index) => (
+                      <tr key={index}>
+                          <td>{index + 1}</td>
+                          <td>{app.expDate}</td>
+                          <td>{app.returnDate}</td>
+                          <td>{app.purpose}</td>
+                          <td>{app.sealType.corporateSeal}</td>
+                          <td>{app.sealType.facsimileSeal}</td>
+                          <td>{app.sealType.companySeal}</td>
+                          <td>
+                              {app.fileName && app.fileUrl ? (
+                                  <button
+                                      onClick={() => handleFileDownload(app.fileUrl, app.fileName)}
+                                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                                  >
+                                      <img src={downloadIcon} alt="파일 다운로드" />
+                                  </button>
+                              ) : null}
+                          </td>
+                          <td
+                              className={`status-${app.status.replace(/\s+/g, '-').toLowerCase()} clickable ${clickedRows.includes(app.id) ? 'confirmed' : ''}`}
+                              onClick={() => handleRowClick(app.status, app)}
+                          >
+                              {app.status}
+                          </td>
+                      </tr>
+                  ))
+              ) : (
+                  <tr>
+                      <td colSpan="9">데이터가 없습니다.</td>
+                  </tr>
+              )}
+          </tbody>
+      </table>
+  );
+};
 
 function SealExportList() {
   const { auth } = useContext(AuthContext);
@@ -172,63 +228,12 @@ function SealExportList() {
           setDocumentType={() => {}}
         />
 
-        <table className="table">
-          <thead>
-            <tr>
-              <th rowSpan="2">일련번호</th>
-              <th rowSpan="2">반출일자</th>
-              <th rowSpan="2">반납일자</th>
-              <th rowSpan="2">사용목적</th>
-              <th colSpan="3">인장구분</th>
-              <th rowSpan="2">첨부파일</th>
-              <th rowSpan="2">결재</th>
-            </tr>
-            <tr>
-              <th>법인인감</th>
-              <th>사용인감</th>
-              <th>회사인</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredApplications.length > 0 ? (
-              filteredApplications.map((app, index) => (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>{app.expDate}</td>
-                  <td>{app.returnDate}</td>
-                  <td>{app.purpose}</td>
-                  <td>{app.sealType.corporateSeal}</td>
-                  <td>{app.sealType.facsimileSeal}</td>
-                  <td>{app.sealType.companySeal}</td>
-                  <td>
-                    {app.fileName && app.fileUrl ? (
-                      <button
-                        onClick={() => handleFileDownload(app.fileUrl, app.fileName)}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                      >
-                        <img src={downloadIcon} alt="파일 다운로드" />
-                      </button>
-                    ) : (
-                      ""
-                    )}
-                  </td>
-                  <td
-                    className={`status-${app.status.replace(/\s+/g, '-').toLowerCase()} clickable ${
-                      clickedRows.includes(app.id) ? 'confirmed' : ''
-                    }`}
-                    onClick={() => handleRowClick(app.status, app)}
-                  >
-                    {app.status}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="9">데이터가 없습니다.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        <SealTable 
+          filteredApplications={filteredApplications} 
+          handleFileDownload={handleFileDownload} 
+          handleRowClick={handleRowClick} 
+          clickedRows={clickedRows} 
+        />
       </div>
       {modalVisible && selectedDocumentDetails && (
         <SealApprovalModal

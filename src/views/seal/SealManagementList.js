@@ -8,20 +8,61 @@ import SignitureImage from '../../assets/images/signiture.png';
 import '../../styles/seal/SealManagementList.css';
 import { AuthContext } from '../../components/AuthContext';
 
-
+const SealManagementTable = ({ filteredApplications, handleRowClick, clickedRows }) => {
+  return (
+      <table className="table">
+          <thead>
+              <tr>
+                  <th>일자</th>
+                  <th>제출처</th>
+                  <th>사용목적</th>
+                  <th>법인인감</th>
+                  <th>사용인감</th>
+                  <th>회사인</th>
+                  <th>결재</th>
+              </tr>
+          </thead>
+          <tbody>
+              {filteredApplications.length > 0 ? (
+                  filteredApplications.map((app, index) => (
+                      <tr key={index}>
+                          <td>{app.date}</td>
+                          <td>{app.submitter}</td>
+                          <td>{app.purpose}</td>
+                          <td>{app.sealType.corporateSeal}</td>
+                          <td>{app.sealType.facsimileSeal}</td>
+                          <td>{app.sealType.companySeal}</td>
+                          <td
+                              className={`status-${app.status.replace(/\s+/g, '-').toLowerCase()} clickable ${clickedRows.includes(app.id) ? 'confirmed' : ''}`}
+                              onClick={() => handleRowClick(app.status, app)}
+                          >
+                              {app.status}
+                          </td>
+                      </tr>
+                  ))
+              ) : (
+                  <tr>
+                      <td colSpan="7">데이터가 없습니다.</td>
+                  </tr>
+              )}
+          </tbody>
+      </table>
+  );
+};
 
 function SealManagementList() {
-  const { auth } = useContext(AuthContext); 
+
   const [applications, setApplications] = useState([]);
-  const [filteredApplications, setFilteredApplications] = useState([]);
+  const { auth } = useContext(AuthContext); 
+  const [clickedRows, setClickedRows] = useState([]);
   const [filterInputs, setFilterInputs] = useState({
     searchType: '전체',
     keyword: '',
   });
+  const [filteredApplications, setFilteredApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
-  const [clickedRows, setClickedRows] = useState([]);
 
   const fetchSealManagementList = useCallback(async () => {
     try {
@@ -57,7 +98,7 @@ function SealManagementList() {
     } catch (error) {
       console.error('Error fetching seal management list:', error);
     }
-  }, [auth]);
+  }, [auth, setApplications, setFilteredApplications]);
 
   useEffect(() => {
     fetchSealManagementList();
@@ -90,24 +131,7 @@ function SealManagementList() {
     }
 
     setFilteredApplications(filteredData);
-  }, [applications, filterInputs]);
-
-  const handleReset = () => {
-    setFilterInputs({
-      searchType: '전체',
-      keyword: '',
-    });
-    setFilteredApplications(applications); 
-  };
-
-  const handleConfirmDelete = () => {
-    setShowDeleteModal(false);
-  };
-  
-  const closeModal = () => {
-    setModalVisible(false);
-    setSelectedDocumentDetails(null);
-  };
+  }, [applications, filterInputs, setFilteredApplications]);
 
   const handleRowClick = (status, document) => {
     if (status === '결재진행중' || status === '결재완료') {
@@ -126,6 +150,24 @@ function SealManagementList() {
       });
       setModalVisible(true);
     }
+  };
+
+
+  const handleReset = () => {
+    setFilterInputs({
+      searchType: '전체',
+      keyword: '',
+    });
+    setFilteredApplications(applications); 
+  };
+
+  const handleConfirmDelete = () => {
+      setShowDeleteModal(false);
+  };
+    
+  const closeModal = () => {
+      setModalVisible(false);
+      setSelectedDocumentDetails(null);
   };
 
   return (
@@ -154,45 +196,11 @@ function SealManagementList() {
           setDocumentType={() => {}}
         />
 
-        <table className="table">
-          <thead>
-            <tr>
-              <th>일자</th>
-              <th>제출처</th>
-              <th>사용목적</th>
-              <th>법인인감</th>
-              <th>사용인감</th>
-              <th>회사인</th>
-              <th>결재</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredApplications.length > 0 ? (
-              filteredApplications.map((app, index) => (
-                <tr key={index}>
-                  <td>{app.date}</td>
-                  <td>{app.submitter}</td>
-                  <td>{app.purpose}</td>
-                  <td>{app.sealType.corporateSeal}</td>
-                  <td>{app.sealType.facsimileSeal}</td>
-                  <td>{app.sealType.companySeal}</td>
-                  <td
-                    className={`status-${app.status.replace(/\s+/g, '-').toLowerCase()} clickable ${
-                      clickedRows.includes(app.id) ? 'confirmed' : ''
-                    }`}
-                    onClick={() => handleRowClick(app.status, app)}
-                  >
-                    {app.status}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7">데이터가 없습니다.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        <SealManagementTable 
+               filteredApplications={filteredApplications} 
+               handleRowClick={handleRowClick} 
+               clickedRows={clickedRows} 
+            />
         {showDeleteModal && (
           <ConfirmModal
             message="이 문서를 삭제하시겠습니까?"

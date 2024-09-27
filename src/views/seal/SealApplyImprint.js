@@ -51,6 +51,8 @@ function SealApplyImprint() {
                 alert('인장 신청 중 오류가 발생했습니다. 다시 시도해주세요.');
             });
     };
+
+    
     
     return (
         <div className="content">
