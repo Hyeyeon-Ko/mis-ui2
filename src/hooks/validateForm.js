@@ -43,10 +43,15 @@ export const requiredSelection = (type, selected) => {
     return { isValid: true, message: '' };
 }
 
-export const requiredInput = (inputValues) => {
+export const requiredInput = (inputValues, type) => {
     for (const [field, value] of Object.entries(inputValues)) {
         
-        const fieldName = getFieldName(field);
+        // alert 문에 띄울 fieldName 불러오기
+        let fieldInput = field;
+        if (type === 'DOCA' || type === 'DOCB') {
+            fieldInput = (type === 'DOCA') ? 'receiver' : 'sender';
+        }
+        const fieldName = getFieldName(fieldInput);
 
         // input, select box 값 선택 안한 경우
         if (typeof value === 'string') {
@@ -54,7 +59,7 @@ export const requiredInput = (inputValues) => {
                 return {
                     isValid: false,
                     message: (field !== 'type') ? `${fieldName} 입력해주세요.` : `${fieldName} 선택해주세요.`
-                    }
+                }
             }
         } // 첨부파일 업로드 안한 경우
         else if (!value) {
@@ -73,22 +78,28 @@ export const requiredInput = (inputValues) => {
 export const validateForm = (type, inputs, selectedValues, inputDates) => {
 
     // 1. 필수 입력값 검사
-    const requiredInputCheck = requiredInput(inputs);
-    if (!requiredInputCheck.isValid) {
-        return requiredInputCheck;
+    if(inputs && Object.keys(inputs).length > 0) {
+        const requiredInputCheck = requiredInput(inputs, type);
+        if (!requiredInputCheck.isValid) {
+            return requiredInputCheck;
+        }
     }
 
     // 2. 날짜 입력형식 검사
-    const dateValidationResults = validateUseDate(inputDates);
-    const invalidDate = dateValidationResults.find(result => !result.isValid);
-    if (invalidDate) {
-        return { isValid: false, message: invalidDate.message };
+    if(inputDates && Object.keys(inputDates).length > 0) {
+        const dateValidationResults = validateUseDate(inputDates);
+        const invalidDate = dateValidationResults.find(result => !result.isValid);
+        if (invalidDate) {
+            return { isValid: false, message: invalidDate.message };
+        }
     }
 
     // 3. 체크박스 선택 및 수량 입력형식 검사
-    const missedSelection = requiredSelection(type, selectedValues);
-    if (!missedSelection.isValid) {
-        return { isValid: false, message: missedSelection.message };
+    if(selectedValues && Object.keys(selectedValues).length > 0) {
+        const missedSelection = requiredSelection(type, selectedValues);
+        if (!missedSelection.isValid) {
+            return { isValid: false, message: missedSelection.message };
+        }
     }
 
     return { isValid: true, message: '' };

@@ -22,6 +22,31 @@ export const getFieldName = (key) => {
             return '근거서류를';
         case 'type':
             return '원본/pdf를';
+        // 문서수발신 신청
+        case 'receiver':
+            return '발신처를';
+        case 'sender':
+            return '수신처를';
+        case 'title':
+            return '제목을';
+        // 문서보관항목 추가
+        case 'teamNm':
+            return "팀명을";
+        case 'docId':
+            return "문서관리번호를";
+        case 'docNm':
+            return "문서명을";
+        case 'manager':
+            return "관리자(정)을";
+        case 'subManager':
+            return "관리자(부)를";
+        case 'storageYear':
+            return "보존연한을";
+        case 'createDate':
+            return "생성일자를";
+        case 'disposalDate':
+            return "폐기일자를";
+
         default:
             return key;
     }

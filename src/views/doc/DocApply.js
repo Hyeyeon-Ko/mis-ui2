@@ -1,7 +1,8 @@
 import React, { useContext, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
+import { validateForm } from '../../hooks/validateForm';
+import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import OrgChartModal from './../../components/OrgChartModal';
@@ -24,7 +25,7 @@ function DocApply() {
   });
 
   const [attachment, setAttachment] = useState(null);
-  const [activeTab, setActiveTab] = useState('reception');
+  const [activeTab, setActiveTab] = useState('reception');  // reception : 문서수신 신청
   const [showOrgChart, setShowOrgChart] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [orgData, setOrgData] = useState([]);
@@ -61,34 +62,21 @@ function DocApply() {
     setAttachment(e.target.files[0]);
   };
 
-  const validateForm = () => {
-    const requiredFields = ['drafter', 'title', 'purpose'];
-    if (activeTab === 'reception') {
-      requiredFields.push('receiver');
-    } else {
-      requiredFields.push('sender');
-    }
-
-    const missingFields = requiredFields.filter((field) => formData[field].trim() === '');
-  
-    if (missingFields.length > 0) {
-      alert('모든 필수 항목을 입력해주세요.');
-      return false;
-    }
-
-    if (!attachment) {
-      alert('첨부파일이 필요합니다.');
-      return false;
-    }
-
-    return true;
-  };
-
   const handleApplyRequest = (e) => {
     e.preventDefault();
   
-    if (!validateForm()) {
-      return;
+    const requiredInputs = {
+      to: activeTab === 'reception' ? formData.receiver : formData.sender,
+      title: formData.title,
+      purpose: formData.purpose,
+      file: attachment
+    }
+
+    const type = activeTab === 'reception' ? 'DOCA' : 'DOCB';
+    const { isValid, message } = validateForm(type, requiredInputs, '', '');
+    if (!isValid) {
+        alert(message);
+        return;
     }
   
     if (formData.division === 'A') {
@@ -423,7 +411,7 @@ const autoSelectApproversAndSubmit = async () => {
                 />
               </div>
               <div className="doc-form-group">
-                <label>{activeTab === 'reception' ? '발신처' : '수신처'}</label>
+                <label>{activeTab === 'reception' ? '발신처' : '수신처'} <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
                   name={activeTab === 'reception' ? 'receiver' : 'sender'}
@@ -433,7 +421,7 @@ const autoSelectApproversAndSubmit = async () => {
                 />
               </div>
               <div className="doc-form-group">
-                <label>제 목</label>
+                <label>제 목 <span style={{ color: 'red' }}>*</span></label>
                 <textarea
                   name="title"
                   value={formData.title}
@@ -442,7 +430,7 @@ const autoSelectApproversAndSubmit = async () => {
                 />
               </div>
               <div className="doc-form-group">
-                <label>사용 용도</label>
+                <label>사용목적 <span style={{ color: 'red' }}>*</span></label>
                 <textarea
                   name="purpose"
                   value={formData.purpose}
@@ -451,7 +439,8 @@ const autoSelectApproversAndSubmit = async () => {
                 />
               </div>
               <div className='doc-form-group'>
-                <label>첨부파일</label>
+                <label>첨부파일 <span style={{ color: 'red' }}>*</span></label>
+                <text> 접수문서 첫 페이지를 스캔해 첨부해주세요.</text>
                 <input
                   type="file"
                   name="attachment"
