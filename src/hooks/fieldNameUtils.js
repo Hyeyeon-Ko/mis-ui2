@@ -24,9 +24,9 @@ export const getFieldName = (key) => {
             return '원본/pdf를';
         // 문서수발신 신청
         case 'receiver':
-            return '발신처를';
-        case 'sender':
             return '수신처를';
+        case 'sender':
+            return '발신처를';
         case 'title':
             return '제목을';
         // 문서보관항목 추가

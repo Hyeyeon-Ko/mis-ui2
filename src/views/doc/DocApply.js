@@ -87,6 +87,8 @@ function DocApply() {
       file: attachment
     }
 
+    console.log("requiredInputs: ", requiredInputs)
+
     const { isValid, message } = validateForm(activeTab, requiredInputs, '', '');
     if (!isValid) {
         alert(message);

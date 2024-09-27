@@ -49,7 +49,9 @@ export const requiredInput = (inputValues, type) => {
         // alert 문에 띄울 fieldName 불러오기
         let fieldInput = field;
         if (type === 'DocA' || type === 'DocB') {
-            fieldInput = (type === 'DocA') ? 'receiver' : 'sender';
+            if(fieldInput === 'to') {
+                fieldInput = (type === 'DocA') ? 'sender' : 'receiver';
+            }
         }
         const fieldName = getFieldName(fieldInput);
 
