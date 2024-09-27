@@ -13,7 +13,7 @@ import '../../styles/common/Page.css';
 import backImageEng from '../../assets/images/backimage_eng.png';
 import backImageCompany from '../../assets/images/backimage_company.png';
 import Form from '../../components/common/Form';
-import { inputValue } from '../../datas/bdcDatas';
+import { bcdInfoData, bcdMapData, inputValue } from '../../datas/bdcDatas';
 
 
 function BcdApplySecond() {
@@ -23,23 +23,11 @@ function BcdApplySecond() {
   const isOwn = location.pathname === '/bcd/own';
 
   const [formData, setFormData] = useState(inputValue);
-
+  const [bcdData, setBcdData] = useState(bcdInfoData);
+  const [mappings, setMappings] = useState(bcdMapData);
   const [userIdInput, setUserIdInput] = useState('');
   const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false);
-  const [bcdData, setBcdData] = useState({
-    instInfo: [],
-    deptInfo: [],
-    teamInfo: [],
-    gradeInfo: [],
-  });
-
-  const [mappings, setMappings] = useState({
-    instMap: {},
-    deptMap: {},
-    teamMap: {},
-    gradeMap: {},
-  });
 
   const [addressOptions, setAddressOptions] = useState([]);
   const [floor, setFloor] = useState('');

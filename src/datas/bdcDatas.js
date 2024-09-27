@@ -30,3 +30,17 @@ export const inputValue = {
     addEngTeamNm: '',
     engPosition: '',
   }
+
+  export const bcdInfoData = {
+    instInfo: [],
+    deptInfo: [],
+    teamInfo: [],
+    gradeInfo: [],
+  }
+  
+  export const bcdMapData = {
+    instMap: {},
+    deptMap: {},
+    teamMap: {},
+    gradeMap: {},
+  }
