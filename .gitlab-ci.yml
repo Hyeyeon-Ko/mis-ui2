@@ -61,6 +61,8 @@ deploy:
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
+    - ls -la ~/.ssh  # 키 파일이 생성되었는지 확인
+    - cat ~/.ssh/id_rsa  # 키 파일 내용 확인    
     - ssh-keyscan $DEPLOY_SERVER >> ~/.ssh/known_hosts
   script:
     - echo "Docker  Deploy!!"
