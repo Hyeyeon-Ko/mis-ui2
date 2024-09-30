@@ -47,7 +47,7 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
         resetForm();
       }
     }
-  }, [show, adminData, fetchAdminData]);
+  }, [show, adminData, fetchAdminData, resetForm]);
 
   const resetForm = () => {
     setRole('');
