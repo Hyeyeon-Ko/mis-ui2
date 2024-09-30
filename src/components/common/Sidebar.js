@@ -10,6 +10,7 @@ import axios from 'axios';
 function Sidebar() {
   const location = useLocation();
   const { auth, sidebarUpdate } = useContext(AuthContext);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const [pendingCounts, setPendingCounts] = useState({
     bcdPendingCount: 0,
@@ -19,6 +20,10 @@ function Sidebar() {
     corpDocIssuePendingCount: 0,
     orderPendingCount: 0, 
   });
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  }
 
   useEffect(() => {
     const fetchPendingCounts = async () => {
@@ -151,7 +156,10 @@ function Sidebar() {
   };
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
+      <div className="sidebar-toggle-button" onClick={toggleSidebar}> {/* 사이드바 토글 버튼 */}
+        {isSidebarOpen ? '≡' : '≡'}
+      </div>
       <Link to="/">
         <img src={logo} alt="KMI Logo" className="logo" />
       </Link>
@@ -207,7 +215,7 @@ function Sidebar() {
   );
 }
 
-function SidebarSection({ title, items, isActive, location, defaultOpen }) {
+function SidebarSection({ title, items, isActive, defaultOpen }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   useEffect(() => {

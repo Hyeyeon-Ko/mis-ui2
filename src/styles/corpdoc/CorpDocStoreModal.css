@@ -29,7 +29,7 @@
   
   .corpDoc-store-modal-header h3 {
     margin-bottom: 35px;
-    font-size: 28px;
+    font-size: 25px;
     font-weight: bold;
   }
   
@@ -48,7 +48,7 @@
   }
   
   .corpDoc-store-form-group label {
-    font-size: 16px;
+    font-size: 14.5px;
     flex: 0 0 170px;
     margin-right: 10px;
   }
@@ -56,9 +56,9 @@
   .corpDoc-store-form-group input,
   .corpDoc-store-form-group textarea {
     width: calc(100% - 200px);
-    height: 40px;
+    height: 38px;
     padding: 8px 13px;
-    font-size: 14px;
+    font-size: 12.5px;
     border: 1px solid #ccc;
     border-radius: 5px;
     box-sizing: border-box;
@@ -79,7 +79,6 @@
   .corpDoc-store-modal-buttons {
     display: flex;
     justify-content: flex-end;
-    margin-top: 20px;
   }
   
   .corpDoc-store-button {

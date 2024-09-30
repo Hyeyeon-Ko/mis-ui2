@@ -2,7 +2,7 @@
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 16px;
-  font-size: 13px;
+  font-size: 11px;
   border-left: none;
   border-right: none; 
 }
@@ -10,7 +10,7 @@
 .custom-table th, .custom-table td {
   border: none;
   padding: 11px 8px;
-  font-size: 14.5px;
+  font-size: 13px;
   letter-spacing: 0.5px;
   text-align: center;
 }
@@ -24,7 +24,7 @@
 
 .custom-table td {
   border-bottom: 0.1px solid #ebebeb;
-  padding: 13px 8px;
+  padding: 10px 8px;
 }
 
 .button-cell {
@@ -61,14 +61,12 @@
 }
 
 .modify-button, .cancel-button {
-  width: 56px;
-  height: 28px;
   background-color: #BDC6CF;
   color: black;
   border: none;
-  padding: 4px 8px;
+  padding: 7px 13px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: bold;
   margin: 0 4px;
 }

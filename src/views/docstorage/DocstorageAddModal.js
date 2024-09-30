@@ -4,6 +4,7 @@ import axios from 'axios';
 import * as XLSX from 'xlsx';
 import '../../styles/docstorage/DocstorageAddModal.css';
 import { AuthContext } from '../../components/AuthContext';
+import { validateForm } from '../../hooks/validateForm';
 
 const DocstorageAddModal = ({ show, onClose, onSave }) => {
   const { auth } = useContext(AuthContext);
@@ -60,9 +61,9 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
     });
   };
 
-  const validateDateFormat = (dateStr) => {
-    return /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
-  };
+  // const validateDateFormat = (dateStr) => {
+  //   return /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
+  // };
 
   const handleSaveClick = () => {
     if (activeTab === 'file') {
@@ -125,52 +126,42 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
       };
       reader.readAsArrayBuffer(file);
     } else if (activeTab === 'text') {
-      const {
-        teamNm,
-        docId,
-        docNm,
-        manager,
-        storageYear,
-        createDate,
-        disposalDate,
-      } = formData;
 
-      if (
-        !teamNm ||
-        !docId ||
-        !docNm ||
-        !manager ||
-        !storageYear ||
-        !createDate ||
-        !disposalDate
-      ) {
-        alert('모든 항목을 입력해 주세요.');
-        return;
+      const requiredInputs = {
+        teamNm: formData.teamNm,
+        docId: formData.docId,
+        docNm: formData.docNm,
+        manager: formData.manager,
+        subManager: formData.subManager,
+        storageYear: formData.storageYear,
+        createDate: formData.createDate,
+        disposalDate: formData.disposalDate,
       }
 
-      if (!validateDateFormat(createDate)) {
-        alert('생성일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
-        return;
+      const inputDates = {
+        createDate: formData.createDate,
+        disposalDate: formData.disposalDate,
       }
 
-      if (!validateDateFormat(disposalDate)) {
-        alert('폐기일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
-        return;
+      const { isValid, message } = validateForm('DocStorage', requiredInputs, '', inputDates);
+      if (!isValid) {
+          alert(message);
+          return;
       }
 
       const payload = {
         deptCd: auth.deptCd,
-        teamNm,
-        docId,
-        docNm,
-        manager,
+        teamNm: formData.teamNm,
+        docId: formData.docId,
+        docNm: formData.docNm,
+        manager: formData.manager,
         subManager: formData.subManager,
-        storageYear,
-        createDate,
+        storageYear: formData.storageYear,
+        createDate: formData.createDate,
         location: formData.location,
         transferDate: formData.transferDate,
         tsdNum: formData.tsdNum,
-        disposalDate,
+        disposalDate: formData.disposalDate,
         dpdNum: formData.dpdNum,
       };
 
@@ -245,7 +236,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
           {activeTab === 'text' && (
             <div className="docstorage-add-section">
               <div className="docstorage-add-detail-row">
-                <label>팀명</label>
+                <label>팀명 <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
                   name="teamNm"
@@ -254,7 +245,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>문서관리번호</label>
+                <label>문서관리번호 <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
                   name="docId"
@@ -274,7 +265,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>문서명</label>
+                <label>문서명 <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
                   name="docNm"
@@ -283,7 +274,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>관리자(정)</label>
+                <label>관리자(정) <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
                   name="manager"
@@ -292,7 +283,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>관리자(부)</label>
+                <label>관리자(부) <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
                   name="subManager"
@@ -301,16 +292,17 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>보존연한</label>
+                <label>보존연한 <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
                   name="storageYear"
                   value={formData.storageYear}
                   onChange={handleChange}
+                  placeholder='5년'
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>생성일자</label>
+                <label>생성일자 <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
                   name="createDate"
@@ -342,7 +334,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>폐기일자</label>
+                <label>폐기일자 <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
                   name="disposalDate"

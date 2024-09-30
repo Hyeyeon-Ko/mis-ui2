@@ -1,8 +1,8 @@
 .custom-button {
   border-radius: 7px;
-  padding: 10px 12px; 
+  padding: 9px 11px; 
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: bold;
   letter-spacing: 0.4px;
   color: white;
@@ -44,9 +44,7 @@
   background-color: #2789FE;
   margin-top: 50px;
   letter-spacing: 5px;
-  width: 100px;
-  height: 40px;
-  padding-left: 15px;
+  padding: 15px;
 }
 
 .authority-add-button:hover {
@@ -80,7 +78,7 @@
   height: 32px;
   background-color: #e2e5e9;
   font-size: 11px;
-  margin-left: 78px;
+  margin-left: 94px;
   margin-top: 23px;
   color: rgb(126, 125, 125)
 }
@@ -142,7 +140,7 @@
 
 .store-button {
   border-radius: 7px;
-  padding: 10px 12px;
+  padding: 9px 11px;
   cursor: pointer;
   font-size: 12px;
   font-weight: bold;
@@ -150,13 +148,21 @@
   color: rgb(126, 125, 125);
 }
 
-.save-button {
+.save-button, .add-button, .data-reset-button {
   background-color: #2789FE;
-  margin-top: 40px;
+  margin-top: 20px;
   letter-spacing: 5px;
-  width: 100px;
-  height: 40px;
-  padding-left: 15px;
+  padding: 11px 19px 11px 22px; 
+  font-size: 12.5px;
+}
+
+.add-button {
+  background-color: #07AF5A;
+}
+
+.data-reset-button {
+  background-color: #BDC6CF;
+  color: rgb(95, 95, 95);
 }
 
 .white-button {

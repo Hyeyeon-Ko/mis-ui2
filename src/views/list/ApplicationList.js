@@ -16,7 +16,6 @@ function ApplicationsList() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const documentTypeFromUrl = queryParams.get('documentType');
-
   const { auth } = useContext(AuthContext);
   const instCd = auth.instCd;
 
@@ -67,6 +66,21 @@ function ApplicationsList() {
     }
   };
 
+  const convertDocumentType = (type) => {
+    switch (type) {
+      case '명함신청':
+        return 'A';
+      case '문서수발신':
+        return 'B';
+      case '법인서류':
+        return 'C';
+      case '인장신청':
+        return 'D';
+      default:
+        return null;
+    }
+  };
+
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
@@ -74,24 +88,15 @@ function ApplicationsList() {
 
   const getStatusText = (status) => {
     switch (status) {
-      case 'A':
-        return '승인대기';
-      case 'B':
-        return '승인완료';
-      case 'C':
-        return '반려';
-      case 'D':
-        return '발주완료';
-      case 'E':
-        return '처리완료';
-      case 'F':
-        return '신청취소';
-      case 'G':
-        return '발급완료';
-      case 'X':
-        return '상태없음';
-      default:
-        return status;
+      case 'A': return '승인대기';
+      case 'B': return '승인완료';
+      case 'C': return '반려';
+      case 'D': return '발주완료';
+      case 'E': return '처리완료';
+      case 'F': return '신청취소';
+      case 'G': return '발급완료';
+      case 'X': return '상태없음';
+      default: return status;
     }
   };
 
@@ -154,16 +159,23 @@ function ApplicationsList() {
     setFilteredApplications(filtered);
   }, [filters]);
         
-  const fetchApplications = useCallback(async (filterParams = {}) => {
+  const fetchApplications = useCallback(async (filterParams = {}, searchType = '전체', keyword = '', startDate = null, endDate = null) => {
     setLoading(true);
     setError(null);
     try {
+      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : '';
+      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : '';
+
       const response = await axios.get('/api/applyList', {
         params: {
-          documentType: filterParams.documentType || documentTypeFromUrl || null,
+          documentType: convertDocumentType(filterParams.documentType) || convertDocumentType(documentTypeFromUrl) || null,
+          searchType,
+          keyword,
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
           instCd: instCd || '',
           userId: auth.userId || '',
-          instNm: selectedCenter || '',
+          instNm: selectedCenter || '',  
         },
       });
 
@@ -203,6 +215,18 @@ function ApplicationsList() {
     }
   }, [applyStatusFilters, auth.userId, documentTypeFromUrl, instCd, selectedCenter]);
 
+  useEffect(() => {
+    const centerFilteredData = selectedCenter === '전체' 
+      ? applications 
+      : applications.filter(app => app.instNm === selectedCenter);
+
+    setFilteredApplications(centerFilteredData);
+  }, [selectedCenter, applications]);
+
+  useEffect(() => {
+    fetchApplications();
+  }, [fetchApplications]);
+
   const fetchSealImprintDetail = async (draftId) => {
     try {
       const response = await axios.get(`/api/seal/imprint/${draftId}`);
@@ -223,12 +247,6 @@ function ApplicationsList() {
     }
   };
 
-  
-
-  useEffect(() => {
-    applyFilters(); 
-  }, [filters, applyFilters]);  
-  
   const resetFilters = useCallback(() => {
     const defaultStartDate = new Date();
     defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
@@ -248,13 +266,10 @@ function ApplicationsList() {
     setSelectedCenter('전체');
   }, [documentTypeFromUrl]);
 
-  
   useEffect(() => {
     resetFilters();
-    fetchApplications();
-  }, [documentTypeFromUrl, fetchApplications, resetFilters]);
-
-
+  }, [documentTypeFromUrl, resetFilters]);
+  
   useEffect(() => {
     if (documentTypeFromUrl === '명함신청') {
       const isShowExcelButton = filters.statusClosed && selectedApplications.length > 0;

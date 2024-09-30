@@ -3,29 +3,30 @@
 }
 
 .totalDocstorage-content-inner h2 {
-    font-size: 28px;
+    font-size: 26px;
     margin-bottom: 16px;
 }
 
 .totalDocstorage-category-section {
     margin-top: 25px;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
     font-size: 16px;
 }
 
 .totalDocstorage-category-label {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
 }
 
 .totalDocstorage-category-dropdown {
     padding: 6px;
-    font-size: 14px;
+    font-size: 12px;
     border-radius: 5px;
     border: 1px solid #ccc;
     width: 165px;
     margin-left: 10px;
     margin-right: 20px;
+    letter-spacing: 0.5px;
 }
 
 .totalDocstorage-tables-section {
@@ -45,7 +46,7 @@
 }
 
 .totalDocstorage-detail-content-label {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
     margin-right: 10px;
 }

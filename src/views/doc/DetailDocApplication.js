@@ -6,10 +6,9 @@ import axios from 'axios';
 import '../../styles/doc/DocApply.css';
 import '../../styles/common/Page.css';
 import { AuthContext } from '../../components/AuthContext';
+import { validateForm } from '../../hooks/validateForm';
 import downloadIcon from '../../assets/images/download.png';
 import deleteIcon from '../../assets/images/delete2.png'; 
-
-
 
 function DetailDocApplication() {
   const { draftId } = useParams();
@@ -27,7 +26,7 @@ function DetailDocApplication() {
   const [initialData, setInitialData] = useState(null);
   const [file, setFile] = useState(null); 
   const [existingFile, setExistingFile] = useState(null); 
-  const [activeTab, setActiveTab] = useState('reception');
+  const [activeTab, setActiveTab] = useState('DocA');
   const [isEdit, setIsEdit] = useState(false);
 
   const fetchDocDetail = useCallback(async (id) => {
@@ -46,7 +45,7 @@ function DetailDocApplication() {
         };
         setFormData(fetchedData);
         setInitialData(fetchedData);
-        setActiveTab(division === 'A' ? 'reception' : 'sending');
+        setActiveTab(division === 'A' ? 'DocA' : 'DocB');
         setExistingFile(fileName && filePath ? { name: fileName, path: filePath } : null); 
       }
     } catch (error) {
@@ -61,7 +60,7 @@ function DetailDocApplication() {
     } else {
       setFormData((prevFormData) => ({
         ...prevFormData,
-        drafter: auth.hngNm || ''
+        drafter: auth.hngNm || '' 
       }));
     }
   }, [draftId, auth.hngNm, fetchDocDetail]);
@@ -89,9 +88,14 @@ function DetailDocApplication() {
   const handleFileDownload = async () => {
     if (existingFile) {
       try {
-        const response = await axios.get(`/api/doc/download/${encodeURIComponent(existingFile.name)}`, {
-          responseType: 'blob',
-        });
+        const documentType = "doc";
+        
+        const response = await axios.get(
+          `/api/file/download/${encodeURIComponent(existingFile.name)}?documentType=${encodeURIComponent(documentType)}`, 
+          {
+            responseType: 'blob',
+          }
+        );
   
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
@@ -106,11 +110,26 @@ function DetailDocApplication() {
       }
     }
   };
-    
+      
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const isFileDeleted = !file && !existingFile;
+
+    const requiredInputs = {
+      to: (activeTab === 'DocA') ? formData.sender : formData.receiver,
+      title: formData.title,
+      purpose: formData.purpose,
+      file: file || existingFile,
+    };
+
+    // validation
+    const { isValid, message } = validateForm(activeTab, requiredInputs, '', '');
+    
+    if (!isValid) {
+        alert(message);
+        return;
+    }
 
     if (JSON.stringify(formData) === JSON.stringify(initialData) && !file && !isFileDeleted) {
         alert('수정된 사항이 없습니다.');
@@ -123,8 +142,8 @@ function DetailDocApplication() {
         formDataToSend.append('docUpdateRequest', new Blob([JSON.stringify({
             drafter: formData.drafter,
             division: formData.division, 
-            receiver: activeTab === 'reception' ? null : formData.receiver,
-            sender: activeTab === 'reception' ? formData.sender : null,
+            receiver: activeTab === 'DocA' ? null : formData.receiver,
+            sender: activeTab === 'DocA' ? formData.sender : null,
             docTitle: formData.title,
             purpose: formData.purpose,
         })], { type: 'application/json' }));
@@ -155,15 +174,15 @@ function DetailDocApplication() {
         <div className="doc-main">
           <div className="tab-container">
             <button
-              className={`tab-button ${activeTab === 'reception' ? 'active' : ''}`}
-              onClick={() => setActiveTab('reception')}
+              className={`tab-button ${activeTab === 'DocA' ? 'active' : ''}`}
+              onClick={() => setActiveTab('DocA')}
               disabled
             >
               문서 수신 신청
             </button>
             <button
-              className={`tab-button ${activeTab === 'sending' ? 'active' : ''}`}
-              onClick={() => setActiveTab('sending')}
+              className={`tab-button ${activeTab === 'DocB' ? 'active' : ''}`}
+              onClick={() => setActiveTab('DocB')}
               disabled
             >
               문서 발신 신청
@@ -190,35 +209,33 @@ function DetailDocApplication() {
                 />
               </div>
               <div className="doc-form-group">
-                <label>{activeTab === 'reception' ? '발신처' : '수신처'}</label>
+                <label>{activeTab === 'DocA' ? '발신처' : '수신처'} <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
-                  name={activeTab === 'reception' ? 'sender' : 'receiver'}
-                  value={activeTab === 'reception' ? formData.sender : formData.receiver}
+                  name={activeTab === 'DocA' ? 'sender' : 'receiver'}
+                  value={activeTab === 'DocA' ? formData.sender : formData.receiver}
                   onChange={handleChange}
-                  required
                 />
               </div>
               <div className="doc-form-group">
-                <label>제 목</label>
+                <label>제 목 <span style={{ color: 'red' }}>*</span></label>
                 <textarea
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  required
                 />
               </div>
               <div className="doc-form-group">
-                <label>사용 용도</label>
+                <label>사용목적 <span style={{ color: 'red' }}>*</span></label>
                 <textarea
                   name="purpose"
                   value={formData.purpose}
                   onChange={handleChange}
-                  required
                 />
               </div>
               <div className="doc-form-group file-group">
-                <label>첨부 파일</label>
+                <label>첨부 파일 <span style={{ color: 'red' }}>*</span></label>
+                <text> 접수문서 첫 페이지를 스캔해 첨부해주세요.</text>
                 {existingFile ? (
                     <div className="file-display">
                         <span className="file-name">{existingFile.name}</span>

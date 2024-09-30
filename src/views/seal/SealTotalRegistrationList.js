@@ -25,7 +25,7 @@ function SealTotalRegistrationList() {
     const fetchTotalRegistrationList = async () => {
       try {
         const response = await axios.get(`/api/seal/totalRegistrationList`);
-        setFilteredApplications(response.data.data); 
+        setFilteredApplications(response.data.data);
       } catch (error) {
         console.error('Error fetching total registration list:', error);
         alert('데이터를 불러오는 중 오류가 발생했습니다.');
@@ -43,12 +43,12 @@ function SealTotalRegistrationList() {
         <Breadcrumb items={['인장 대장', '전국 인장 등록대장']} />
         <div className="seal-total-category-section">
           <div className="seal-total-category">
-            <label htmlFor="center" className="seal-total-category-label">센 터&gt;&gt;</label>
+            <label htmlFor="center" className="seal-total-category-label">센터&gt;&gt;</label>
             <select
               id="center"
               className="seal-total-category-dropdown"
-              value={selectedCenter} 
-              onChange={handleCenterChange} 
+              value={selectedCenter}
+              onChange={handleCenterChange}
             >
               {centerData.map(center => (
                 <option key={center.detailCd} value={center.detailCd}>

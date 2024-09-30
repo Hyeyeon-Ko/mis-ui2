@@ -143,22 +143,22 @@ function MyPendingList() {
             let path;
             switch (row.docType) {
               case '명함신청':
-                path = `/api/bcd/${row.draftId}`;
+                path = `/bcd/${row.draftId}`;
                 break;
               case '문서수발신':
-                path = `/api/doc/${row.draftId}`;
+                path = `/doc/${row.draftId}`;
                 break;
               case '법인서류':
-                path = `/api/corpDoc/${row.draftId}`;
+                path = `/corpDoc/${row.draftId}`;
                 break;
               case '인장신청(날인)':
-                path = `/api/seal/imprint/${row.draftId}`;
+                path = `/seal/imprint/${row.draftId}`;
                 break;
               case '인장신청(반출)':
-                path = `/api/seal/export/${row.draftId}`;
+                path = `/seal/export/${row.draftId}`;
                 break;
               default:
-                path = `/api/doc/${row.draftId}`; 
+                path = `/doc/${row.draftId}`; 
             }
             navigate(path, { state: { returnTo: '/api/myPendingList' } });
           }}

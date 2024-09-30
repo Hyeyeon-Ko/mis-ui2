@@ -11,18 +11,28 @@ import '../../styles/bcd/ApplicationHistoryModal.css';
 const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
-  const fetchHistory = useCallback(async (draftId) => {
+  const getOneMonthAgo = () => {
+    const today = new Date();
+    const oneMonthAgo = new Date(today);
+    oneMonthAgo.setMonth(today.getMonth() - 1);
+    return oneMonthAgo;
+  };
+
+  const fetchHistory = useCallback(async (draftId, startDate, endDate) => {
     try {
-      const response = await axios.get(`/api/bcd/applyList/history/${draftId}`);
+      const response = await axios.get(`/api/bcd/applyList/history/${draftId}`, {
+        params: {
+          startDate: startDate ? startDate.toISOString().split('T')[0] : null,
+          endDate: endDate ? endDate.toISOString().split('T')[0] : null,
+        },
+      });
       const transformedData = response.data.data.map((item) => ({
         ...item,
         applyStatus: getStatusText(item.applyStatus),
-        draftDate: parseDateTime(item.draftDate), 
+        draftDate: parseDateTime(item.draftDate),
       }));
-      setData(transformedData);
       setFilteredData(transformedData); 
     } catch (error) {
       console.error('Error fetching application history:', error);
@@ -30,20 +40,22 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   }, []);
 
   useEffect(() => {
-    if (draftId) {
-      fetchHistory(draftId);
+    if (draftId && show) {
+      const defaultStartDate = getOneMonthAgo();
+      const defaultEndDate = new Date(); 
+      setStartDate(defaultStartDate);
+      setEndDate(defaultEndDate);
+      fetchHistory(draftId, defaultStartDate, defaultEndDate);
     }
-  }, [draftId, fetchHistory]);
+  }, [draftId, show, fetchHistory]);
 
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
-
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
-
     return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
 
@@ -67,20 +79,15 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   };
 
   const handleSearch = () => {
-    const newData = data.filter((item) => {
-      const itemDate = new Date(item.draftDate);
-      const matchesDate =
-        (!startDate || itemDate >= new Date(startDate)) &&
-        (!endDate || itemDate <= new Date(endDate));
-      return matchesDate;
-    });
-    setFilteredData(newData); 
+    fetchHistory(draftId, startDate, endDate);
   };
 
   const handleReset = () => {
-    setStartDate(null);
-    setEndDate(null);
-    setFilteredData(data); 
+    const defaultStartDate = getOneMonthAgo();
+    const defaultEndDate = new Date(); 
+    setStartDate(defaultStartDate);
+    setEndDate(defaultEndDate);
+    fetchHistory(draftId, defaultStartDate, defaultEndDate); 
   };
 
   if (!show) return null;

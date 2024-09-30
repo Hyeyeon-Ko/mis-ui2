@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../components/AuthContext';
+import { validateForm } from '../../hooks/validateForm';
+import { getTypeName } from '../../hooks/fieldNameUtils';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
-import RejectReasonModal from '../../components/RejectReasonModal';
+import ReasonModal from '../../components/ReasonModal';
 import axios from 'axios';
 import '../../styles/common/Page.css';
 import '../../styles/corpdoc/CorpDocApply.css';
@@ -26,6 +28,7 @@ function DetailCorpDocApplication() {
     const [file, setFile] = useState(null);
     const [showRejectModal, setShowRejectModal] = useState(false);
     const isReadOnly = new URLSearchParams(location.search).get('readonly') === 'true';
+    const [showDownloadReasonModal, setShowDownloadReasonModal] = useState(false);
 
     const fetchCorpDocDetail = useCallback(async (id) => {
         try {
@@ -104,57 +107,72 @@ function DetailCorpDocApplication() {
         setExistingFile(null);
     };
 
-    const handleFileDownload = async () => {
-        if (existingFile) {
-            try {
-                const response = await axios.get(`/api/corpDoc/download/${encodeURIComponent(existingFile.name)}`, {
-                    responseType: 'blob',
-                });
-
-                const url = window.URL.createObjectURL(new Blob([response.data]));
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', existingFile.name);
-                document.body.appendChild(link);
-                link.click();
-                link.parentNode.removeChild(link);
-            } catch (error) {
-                console.error('Error downloading the file:', error);
-                alert('파일 다운로드에 실패했습니다.');
-            }
-        }
+    const handleFileDownloadClick = () => {
+        setShowDownloadReasonModal(true); 
     };
 
+    const handleDownloadModalClose = () => {
+        setShowDownloadReasonModal(false); 
+    };
+        
+    const handleFileDownloadConfirm = async ({ reason, fileType }) => {
+        setShowDownloadReasonModal(false);
+    
+        try {
+            const response = await axios.get(`/api/file/download/${encodeURIComponent(existingFile.name)}`, {
+                params: {
+                    draftId: draftId,
+                    docType: 'corpdoc',
+                    fileType: fileType,
+                    reason: reason,
+                    downloaderNm: auth.hngNm,
+                    downloaderId: auth.userId,
+                },
+                responseType: 'blob',
+            });
+    
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', existingFile.name);
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+        } catch (error) {
+            console.error('Error downloading the file:', error);
+            alert('파일 다운로드에 실패했습니다.');
+        }
+    };
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // 사용일자 입력형식 검증
-        const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-        if (!datePattern.test(formData.useDate)) {
-            alert('사용일자는 YYYY-MM-DD 형식으로 입력해야 합니다.');
-            return;
+        // todo: CorpDocApply.js의 handleSubmit validation 검사 코드 중복성 해결
+        const requiredInputs = {
+            submission: formData.submission,
+            purpose: formData.purpose,
+            useDate: formData.useDate,
+            type: formData.type,
+            docFile: formData.department,
         }
 
-        // 체크박스 선택 여부 검증
-        if (!formData.document1 && !formData.document2 && !formData.document3 && !formData.document4) {
-            alert('필요서류 중 최소 하나를 선택해야 합니다.');
-            return;
+        const selectedCorpDocs = ['document1', 'document2', 'document3', 'document4'].reduce((acc, docType, index) => {
+            const quantityKey = `quantity${index + 1}`;
+            acc[`cert${docType.charAt(0).toUpperCase() + docType.slice(1)}`] = {
+                selected: formData[docType],
+                quantity: formData[docType] ? formData[quantityKey] : '',
+            };
+            return acc;
+        }, {});
+
+        const inputDates = {
+            useDate: formData.useDate
         }
 
-        // 수량 입력형식 검증
-        const quantities = [
-            { document: formData.document1, quantity: formData.quantity1 },
-            { document: formData.document2, quantity: formData.quantity2 },
-            { document: formData.document3, quantity: formData.quantity3 },
-            { document: formData.document4, quantity: formData.quantity4 },
-        ];
-    
-        for (let i = 0; i < quantities.length; i++) {
-            const { document, quantity } = quantities[i];
-            if (document && (!/^\d+$/.test(quantity) || parseInt(quantity) <= 0)) {
-                alert('올바르지 않은 입력값입니다. 수량을 다시 입력해주세요.');
-                return;
-            }
+        const { isValid, message } = validateForm('CorpDoc', requiredInputs, selectedCorpDocs, inputDates);
+        if (!isValid) {
+            alert(message);
+            return;
         }
 
         const isFileDeleted = !file && !existingFile;
@@ -166,21 +184,7 @@ function DetailCorpDocApplication() {
 
         try {
             const formDataToSend = new FormData();
-
-            let typeValue = '';
-            switch (formData.type) {
-                case 'original':
-                    typeValue = 'O';
-                    break;
-                case 'pdf':
-                    typeValue = 'P';
-                    break;
-                case 'both':
-                    typeValue = 'B';
-                    break;
-                default:
-                    typeValue = '';
-            }
+            const typeValue = getTypeName(formData.type);
 
             formDataToSend.append('corpDocUpdateRequest', new Blob([JSON.stringify({
                 drafter: auth.hngNm,
@@ -266,28 +270,26 @@ function DetailCorpDocApplication() {
                                 <label>법인서류 신청서</label>
                             </div>
                             <div className="corpDoc-form-group">
-                                <label>제출처</label>
+                                <label>제출처 <span style={{ color: 'red' }}>*</span></label>
                                 <input
                                     type="text"
                                     name="submission"
                                     value={formData.submission}
                                     onChange={handleChange}
                                     disabled={isReadOnly}
-                                    required
                                 />
                             </div>
                             <div className="corpDoc-form-group">
-                                <label>사용목적</label>
+                                <label>사용목적 <span style={{ color: 'red' }}>*</span></label>
                                 <textarea
                                     name="purpose"
                                     value={formData.purpose}
                                     onChange={handleChange}
                                     disabled={isReadOnly}
-                                    required
                                 />
                             </div>
                             <div className="corpDoc-form-group">
-                                <label>사용일자</label>
+                                <label>사용일자 <span style={{ color: 'red' }}>*</span></label>
                                 <input
                                     type="text"
                                     name="useDate"
@@ -295,11 +297,10 @@ function DetailCorpDocApplication() {
                                     onChange={handleChange}
                                     placeholder="YYYY-MM-DD"
                                     disabled={isReadOnly}
-                                    required
                                 />
                             </div>
                             <div className="corpDoc-form-group">
-                                <label>증빙서류</label>
+                                <label>근거서류 <span style={{ color: 'red' }}>*</span></label>
                                 {existingFile ? (
                                     <div className="file-display">
                                         <span className="file-name">{existingFile.name}</span>
@@ -307,7 +308,7 @@ function DetailCorpDocApplication() {
                                             <button
                                                 type="button"
                                                 className="download-button"
-                                                onClick={handleFileDownload}
+                                                onClick={handleFileDownloadClick}
                                             >
                                                 <img src={downloadIcon} alt="다운로드" />
                                             </button>
@@ -333,7 +334,7 @@ function DetailCorpDocApplication() {
                                 )}
                             </div>
                             <div className="corpDoc-form-group">
-                                <label>필요서류/수량</label>
+                                <label>필요서류/수량 <span style={{ color: 'red' }}>*</span></label>
                                 <div className="corpDoc-form-group-inline">
                                     <input
                                         type="checkbox"
@@ -421,13 +422,12 @@ function DetailCorpDocApplication() {
                                 </div>
                             </div>
                             <div className="corpDoc-form-group">
-                                <label>제출형태</label>
+                                <label>제출형태 <span style={{ color: 'red' }}>*</span></label>
                                 <select
                                     name="type"
                                     value={formData.type}
                                     onChange={handleChange}
                                     disabled={isReadOnly}
-                                    required
                                 >
                                     <option value="">선택</option>
                                     <option value="original">원본</option>
@@ -461,12 +461,18 @@ function DetailCorpDocApplication() {
                             )}
                         </form>    
                         {showRejectModal && (
-                            <RejectReasonModal 
+                            <ReasonModal 
                                 show={showRejectModal}
                                 onConfirm={handleRejectConfirm}
                                 onClose={handleRejectClose}
                             />
                         )}
+                        <ReasonModal 
+                            show={showDownloadReasonModal} 
+                            onClose={handleDownloadModalClose}
+                            onConfirm={handleFileDownloadConfirm} 
+                            modalType="download" 
+                        />
                     </div>
                 </div>
             </div>

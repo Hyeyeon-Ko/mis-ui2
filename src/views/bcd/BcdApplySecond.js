@@ -308,12 +308,15 @@ function BcdApplySecond() {
     };
 
     try {
-      const endpoint = (auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) ? '/bcd/leader' : '/bcd/';
+      const endpoint = (auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) ? '/api/bcd/leader' : '/api/bcd';
+
+      console.log(endpoint);
+      console.log(requestData);
 
       const response = await axios.post(endpoint, requestData);
       if (response.data.code === 200) {
         alert('명함 신청이 완료되었습니다.');
-        navigate('/myPendingList');
+        navigate((auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) ? '/myApplyList' : '/myPendingList');
       } else {
         alert('명함 신청 중 오류가 발생했습니다.');
       }

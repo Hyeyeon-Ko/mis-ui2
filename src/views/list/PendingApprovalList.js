@@ -32,7 +32,7 @@ function PendingApprovalList() {
     return date;
   });
   const [endDate, setEndDate] = useState(new Date());
-    const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState({
     statusApproved: false,
     statusRejected: false,
     statusOrdered: false,
@@ -59,13 +59,28 @@ function PendingApprovalList() {
     }
   };
 
+  const convertDocumentType = (type) => {
+    switch (type) {
+      case '명함신청':
+        return 'A';
+      case '문서수발신':
+        return 'B';
+      case '법인서류':
+        return 'C';
+      case '인장신청':
+        return 'D';
+      default:
+        return null;
+    }
+  };
+
   const fetchPendingList = useCallback(async (filterParams = {}) => {
     setLoading(true);
     setError(null);
     try {
       const response = await axios.get(`/api/pendingList`, {
         params: {
-          documentType,
+          documentType: convertDocumentType(documentType),
           startDate: filterParams.startDate || '',
           endDate: filterParams.endDate || '',
           instCd: instCd || '',
@@ -196,8 +211,10 @@ function PendingApprovalList() {
   };
 
   const handleReset = () => {
-    setStartDate(null);
-    setEndDate(null);
+    const defaultStartDate = new Date();
+    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
+    setStartDate(defaultStartDate);
+    setEndDate(new Date());
     setSelectedCenter('전체');
     setFilters({
       statusApproved: false,
@@ -205,8 +222,9 @@ function PendingApprovalList() {
       statusOrdered: false,
       statusClosed: false,
     });
+    fetchPendingList(); 
   };
-
+  
   const closeModal = () => {
     setModalVisible(false);
     setSelectedDocumentId(null);
@@ -215,7 +233,7 @@ function PendingApprovalList() {
   const approveDocument = async (documentId) => {
     try {
       await axios.put(`/api/doc/confirm`, null, {
-        params: { draftId: documentId },
+        params: { draftId: documentId , userId: auth.userId},
       });
       alert('승인이 완료되었습니다.');
       closeModal();

@@ -29,13 +29,13 @@
 
 .modal-header h3 {
   margin: 0;
-  font-size: 28px;
+  font-size: 25px;
   font-weight: bold;
 }
 
 .edit-modal-header h3 {
   margin: 0;
-  font-size: 28px;
+  font-size: 25px;
   font-weight: bold;
   margin-top: 24px;
 }
@@ -49,12 +49,12 @@
 
 .modal-header-modify h3 {
   margin: 0;
-  font-size: 28px;
+  font-size: 25px;
   font-weight: bold;
 }
 
 .add-modal-container p {
-  font-size: 16px;
+  font-size: 14px;
   margin-top: 8px;
 }
 
@@ -68,7 +68,7 @@
 
 .input-group select {
   padding: 10px;
-  font-size: 14px;
+  font-size: 12px;
   background-color: #f2f5f8;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -84,7 +84,7 @@
 .input-group input {
   width: 180px;
   padding: 10px;
-  font-size: 14px;
+  font-size: 12px;
   background-color: white;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -105,7 +105,7 @@
 
 .input-group .query-button {
   padding: 10px 10px;
-  font-size: 13px;
+  font-size: 11px;
   background-color: #e9ecf0;
   border: none;
   border-radius: 5px;
@@ -128,7 +128,7 @@
   border: none;
   padding: 8px;
   text-align: center;
-  font-size: 14px;
+  font-size: 12px;
   border-bottom: 0.1px solid #F1F4F7;
 }
 
@@ -151,7 +151,7 @@
   border-radius: 5px;
   padding: 10px 0px 10px 6px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   min-width: 80px;
 }
@@ -163,7 +163,7 @@
 .add-modal-button.confirm {
   background-color: #2789FE;
   color: white;
-  font-size: 15px;
+  font-size: 13px;
   border: none;
 }
 
@@ -174,7 +174,7 @@
 .authority-close-button {
   background: none;
   border: none;
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
   align-self: flex-start;
   margin-top: 8px;

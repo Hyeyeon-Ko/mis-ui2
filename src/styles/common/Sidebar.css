@@ -1,6 +1,6 @@
 /* Sidebar.css */
 .sidebar {
-  width: 220px;
+  width: 210px;
   background-color: #EDF1F5;
   color: black;
   padding: 20px 20px 20px 25px;
@@ -10,6 +10,7 @@
   align-items: center;
   overflow-y: auto; 
   user-select: none;
+  transition: width 0.3s ease, padding 0.3s ease;
 }
 
 .toggle-icon {
@@ -24,20 +25,21 @@
 }
 
 .logo {
-  width: 168px;
-  height: 65px;
+  width: 155px;
+  height: 60px;
   margin-top: 32px;
   margin-bottom: 32px;
+  margin-right: 8px;
 }
 
 .sidebar-section {
   width: 100%;
-  margin-left: 35px;
+  margin-left: 45px;
   user-select: none;
 }
 
 .sidebar-section h2 {
-  font-size: 18.5px;
+  font-size: 17px;
   margin: 5px 0px 15px 28px;
   cursor: pointer;
   user-select: none;
@@ -61,7 +63,7 @@
 }
 
 .sidebar-section li {
-  font-size: 16px;
+  font-size: 14.5px;
   margin-bottom: 7px;
   margin-left: 28px;
   cursor: pointer;
@@ -82,7 +84,7 @@
 }
 
 .sidebar-section h3 {
-  font-size: 18.5px;
+  font-size: 17px;
   letter-spacing: 0.5px;
   margin-top: 5px;
   margin-bottom: 15px;
@@ -117,18 +119,51 @@
   align-items: center;
 }
 
-/* TODO: 부탁해요 성아샘~ */
 .pending-count {
   background-color: #D1D5DB; 
   color: #4B5563; 
   border-radius: 50%;
-  padding: 1px 7px 3px 7px; 
-  font-size: 12px; 
-  margin-left: 10px;
-  width: 13px; 
-  height: 20px; 
+  padding: 2px 7px 4px 7px;
+  font-size: 11px; 
+  margin-left: 7px;
+  width: 10px; 
+  height: 18px; 
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-weight: bold; 
+}
+
+/* 사이드바가 닫힌 상태일 때 */
+.sidebar.closed {
+  width: 45px;
+  padding: 20px 10px;
+  background-color: white;
+}
+
+.sidebar.closed .logo,
+.sidebar.closed .sidebar-section {
+  display: none;
+}
+
+.sidebar-toggle-button {
+  color: #8f969e;
+  cursor: pointer;
+  font-size: 20px;
+  position: absolute;
+  top: 15px;
+  z-index: 10;
+  transition: color 0.3s ease;
+}
+
+.sidebar-toggle-button:hover {
+  color: #2789FE;
+}
+
+.sidebar.open .sidebar-toggle-button {
+  left: 20px;
+}
+
+.sidebar.closed .sidebar-toggle-button {
+  left: 20px;
 }

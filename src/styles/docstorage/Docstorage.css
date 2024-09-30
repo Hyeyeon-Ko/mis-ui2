@@ -3,7 +3,7 @@
 }
 
 .docstorage-content-inner h2 {
-    font-size: 28px;
+    font-size: 26px;
     margin-bottom: 16px;
 }
 
@@ -176,7 +176,7 @@
     height: 100%;
     opacity: 0;
     cursor: pointer;
-    font-size: 14.5px;
+    font-size: 13px;
   }  
   
   .custom-table th, td {

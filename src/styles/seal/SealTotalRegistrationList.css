@@ -3,14 +3,14 @@
   }
   
   .seal-total-registration-list h2 {
-    font-size: 28px;
+    font-size: 26px;
     margin-bottom: 16px;
   }
   
   .seal-total-registration-table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed;  /* 고정된 레이아웃 사용 */
+    table-layout: fixed;  
 }
 
 .seal-total-registration-table th, .seal-total-registration-table td {
@@ -19,7 +19,7 @@
     vertical-align: middle;
     border-bottom: 1px solid #ddd;
     overflow: hidden;
-    text-overflow: ellipsis;  /* 내용이 넘칠 경우 생략(...) 표시 */
+    text-overflow: ellipsis;  
 }
 
   .seal-total-registration-table th:nth-child(1), .seal-total-registration-table td:nth-child(2) {
@@ -52,6 +52,7 @@
   }
 
   .seal-total-image {
+      margin-top: 5px;
       width: 50px;
       height: 50px;
   }
@@ -120,16 +121,17 @@
   }
 
 .seal-total-category-label {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
 }
 
 .seal-total-category-dropdown {
     padding: 6px;
-    font-size: 14px;
+    font-size: 12px;
     border-radius: 5px;
     border: 1px solid #ccc;
     width: 165px;
     margin-left: 10px;
     margin-right: 20px;
+    letter-spacing: 0.5px;
 }

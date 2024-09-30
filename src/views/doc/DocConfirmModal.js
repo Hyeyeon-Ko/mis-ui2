@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import ReasonModal from '../../components/ReasonModal';
+import { AuthContext } from '../../components/AuthContext';
 import '../../styles/doc/DocConfirmModal.css';
 import downloadIcon from '../../assets/images/download.png';
-
-
 
 const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, refreshSidebar }) => {
   const [formData, setFormData] = useState({
@@ -16,8 +16,11 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
     purpose: '',
     division: '',
     fileName: '',
-    fileUrl: ''
+    filePath: '',
   });
+
+  const { auth } = useContext(AuthContext);
+  const [showDownloadReasonModal, setShowDownloadReasonModal] = useState(false);
 
   const fetchDocumentData = useCallback(async (id) => {
     try {
@@ -26,6 +29,7 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
         const data = response.data.data;
         setFormData({
           receptionDate: parseDateTime(data.draftDate),
+          draftId: data.draftId,
           drafter: data.drafter,
           receiver: data.receiver,
           sender: data.sender,
@@ -33,7 +37,7 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
           purpose: data.purpose,
           division: data.division,
           fileName: data.fileName,
-          fileUrl: data.filePath ? `/api/doc/download/${encodeURIComponent(data.fileName)}` : ''
+          filePath: data.filePath,
         });
       }
     } catch (error) {
@@ -63,11 +67,28 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
     }
   };
 
-  const handleFileDownload = async () => {
-    if (formData.fileUrl) {
-      try {
-        const response = await axios.get(formData.fileUrl, {
-          responseType: 'blob',
+  const handleFileDownloadClick = () => {
+    setShowDownloadReasonModal(true); 
+};
+
+const handleDownloadModalClose = () => {
+    setShowDownloadReasonModal(false); 
+};
+    
+const handleFileDownloadConfirm = async ({ reason, fileType }) => {
+    setShowDownloadReasonModal(false);
+
+    try {
+        const response = await axios.get(`/api/file/download/${encodeURIComponent(formData.fileName)}`, {
+            params: {
+                draftId: formData.draftId,
+                docType: 'doc',
+                fileType: fileType,
+                reason: reason,
+                downloaderNm: auth.hngNm,
+                downloaderId: auth.userId,
+            },
+            responseType: 'blob',
         });
 
         const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -77,12 +98,11 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
         document.body.appendChild(link);
         link.click();
         link.parentNode.removeChild(link);
-      } catch (error) {
+    } catch (error) {
         console.error('Error downloading the file:', error);
         alert('파일 다운로드에 실패했습니다.');
-      }
     }
-  };
+};
 
   if (!show) return null;
 
@@ -120,11 +140,11 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
           <label>사용 용도</label>
           <textarea value={formData.purpose} readOnly className="doc-confirm-textarea" />
         </div>
-        {formData.fileUrl && (
+        {formData.filePath && (
           <div className="doc-confirm-form-group">
             <label>첨부 파일</label>
             <div className="doc-confirm-file-download">
-              <button onClick={handleFileDownload} style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}>
+              <button onClick={handleFileDownloadClick} style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}>
                 <span>{formData.fileName}</span>
                 <img src={downloadIcon} alt="다운로드" />
               </button>
@@ -139,6 +159,12 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
           </div>
         )}
       </div>
+      <ReasonModal 
+        show={showDownloadReasonModal} 
+        onClose={handleDownloadModalClose}
+        onConfirm={handleFileDownloadConfirm} 
+        modalType="download" 
+      />
     </div>
   );
 };

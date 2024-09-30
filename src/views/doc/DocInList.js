@@ -3,6 +3,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
 import ConfirmModal from '../../components/common/ConfirmModal';
+import ReasonModal from '../../components/ReasonModal';
 import deleteIcon from '../../assets/images/delete2.png';
 import downloadIcon from '../../assets/images/download.png';
 import '../../styles/doc/DocOutList.css';
@@ -11,9 +12,12 @@ import { AuthContext } from '../../components/AuthContext';
 
 function DocInList() {
   const { auth } = useContext(AuthContext);
-  const [applications, setApplications] = useState([]);
+  const [, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const [showDownloadReasonModal, setShowDownloadReasonModal] = useState(false);
+  const [selectedFileName, setSelectedFileName] = useState('');
   const [selectedDraftId, setSelectedDraftId] = useState(null);
 
   const [filterInputs, setFilterInputs] = useState({
@@ -23,12 +27,21 @@ function DocInList() {
     keyword: '',
   });
 
-  const fetchDocInList = useCallback(async () => {
+  const fetchDocInList = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null) => {
     try {
+      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : '';
+      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : '';
+  
       const response = await axios.get('/api/doc/receiveList', {
-        params: { instCd: auth.instCd },
+        params: {
+          instCd: auth.instCd,
+          searchType,
+          keyword,
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+        },
       });
-
+  
       if (response.data && response.data.data) {
         const formattedData = response.data.data.map((item) => ({
           draftId: item.draftId,
@@ -53,22 +66,44 @@ function DocInList() {
     fetchDocInList();
   }, [fetchDocInList]);
 
-  const handleFileDownload = async (fileName) => {
-    try {
-      const response = await axios.get(`/api/doc/download/${encodeURIComponent(fileName)}`, {
-        responseType: 'blob',
-      });
+  const handleFileDownloadClick = (draftId, fileName) => {
+    setSelectedDraftId(draftId);
+    setSelectedFileName(fileName);
+    setShowDownloadReasonModal(true); 
+  };
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', fileName);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
+  const handleDownloadModalClose = () => {
+    setShowDownloadReasonModal(false); 
+    setSelectedDraftId(null);
+    setSelectedFileName('');
+  };
+    
+  const handleFileDownloadConfirm = async ({ reason, fileType }) => {
+    setShowDownloadReasonModal(false);
+
+    try {
+        const response = await axios.get(`/api/file/download/${encodeURIComponent(selectedFileName)}`, {
+            params: {
+                draftId: selectedDraftId,
+                docType: 'doc',
+                fileType: fileType,
+                reason: reason,
+                downloaderNm: auth.hngNm,
+                downloaderId: auth.userId,
+            },
+            responseType: 'blob',
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', selectedFileName);
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
     } catch (error) {
-      console.error('Error downloading the file:', error);
-      alert('파일 다운로드에 실패했습니다.');
+        console.error('Error downloading the file:', error);
+        alert('파일 다운로드에 실패했습니다.');
     }
   };
 
@@ -98,51 +133,61 @@ function DocInList() {
     }
   };
 
-  const handleSearch = () => {
-    const { startDate, endDate, searchType, keyword } = filterInputs;
-    let filteredData = applications;
-
-    if (startDate) {
-      filteredData = filteredData.filter((item) => new Date(item.draftDate) >= new Date(startDate));
-    }
-
-    if (endDate) {
-      filteredData = filteredData.filter((item) => new Date(item.draftDate) <= new Date(endDate));
-    }
-
-    if (keyword.trim() !== '') {
-      filteredData = filteredData.filter((item) => {
-        if (searchType === '전체') {
-          return (
-            item.title.toLowerCase().includes(keyword.toLowerCase()) ||
-            item.drafter.toLowerCase().includes(keyword.toLowerCase()) ||
-            item.resSender.toLowerCase().includes(keyword.toLowerCase())
-          );
-        }
-        if (searchType === '발신처') {
-          return item.resSender.toLowerCase().includes(keyword.toLowerCase());
-        }
-        if (searchType === '제목') {
-          return item.title.toLowerCase().includes(keyword.toLowerCase());
-        }
-        if (searchType === '접수인') {
-          return item.drafter.toLowerCase().includes(keyword.toLowerCase());
-        }
-        return false;
+  const handleSearch = async () => {
+    const { searchType, keyword, startDate, endDate } = filterInputs;
+  
+    const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : null;
+    const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : null;
+  
+    try {
+      const response = await axios.get('/api/doc/receiveList', {
+        params: {
+          instCd: auth.instCd,
+          searchType: searchType,
+          keyword: keyword.trim() !== '' ? keyword : null,
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+        },
       });
+  
+      if (response.data && response.data.data) {
+        const formattedData = response.data.data.map((item) => ({
+          draftId: item.draftId,
+          draftDate: item.draftDate,
+          docId: item.docId,
+          resSender: item.resSender,
+          title: item.title,
+          drafter: item.drafter,
+          status: item.status,
+          fileName: item.fileName,
+          fileUrl: item.fileUrl,
+        }));
+        setApplications(formattedData);
+        setFilteredApplications(formattedData);
+      }
+    } catch (error) {
+      console.error('Error fetching document list:', error);
     }
-
-    setFilteredApplications(filteredData);
   };
 
-  const handleReset = () => {
+  const resetFilters = useCallback(() => {
+    const defaultStartDate = new Date();
+    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
     setFilterInputs({
-      startDate: null,
-      endDate: null,
+      startDate: defaultStartDate,
+      endDate: new Date(),
       searchType: '전체',
       keyword: '',
     });
-    setFilteredApplications(applications);
+  }, []);
+
+  useEffect(() => {
+    resetFilters();
+  }, [resetFilters]);
+
+  const handleReset = () => {
+    resetFilters();
+    fetchDocInList();
   };
 
   const columns = [
@@ -156,7 +201,7 @@ function DocInList() {
       width: '7%',
       Cell: ({ row }) =>
         row.fileName ? (
-          <button className="download-button" onClick={() => handleFileDownload(row.fileName)}>
+          <button className="download-button" onClick={() => handleFileDownloadClick(row.draftId, row.fileName)}>
             <img src={downloadIcon} alt="Download" className="action-icon" />
           </button>
         ) : null,
@@ -187,20 +232,21 @@ function DocInList() {
         <Breadcrumb items={['문서수발신 대장', '문서 수신 대장']} />
         <ConditionFilter
           startDate={filterInputs.startDate}
-          setStartDate={(date) => setFilterInputs((prev) => ({ ...prev, startDate: date }))}
+          setStartDate={(date) => setFilterInputs((prev) => ({ ...prev, startDate: date }))} 
           endDate={filterInputs.endDate}
-          setEndDate={(date) => setFilterInputs((prev) => ({ ...prev, endDate: date }))}
-          onSearch={handleSearch}
+          setEndDate={(date) => setFilterInputs((prev) => ({ ...prev, endDate: date }))} 
+          onSearch={handleSearch} 
           onReset={handleReset}
           showDocumentType={false}
           showSearchCondition={true}
           searchType={filterInputs.searchType}
-          setSearchType={(searchType) => setFilterInputs((prev) => ({ ...prev, searchType }))}
+          setSearchType={(searchType) => setFilterInputs((prev) => ({ ...prev, searchType }))} 
           keyword={filterInputs.keyword}
-          setKeyword={(keyword) => setFilterInputs((prev) => ({ ...prev, keyword }))}
-          searchOptions={['전체', '발신처', '제목', '접수인']} 
-          setDocumentType={() => {}} 
+          setKeyword={(keyword) => setFilterInputs((prev) => ({ ...prev, keyword }))} 
+          searchOptions={['전체', '수신처', '제목', '접수인']}
+          startDateLabel="접수일자"
           setFilters={() => {}}
+          setDocumentType={() => {}}
         />
         <div className="doc-out-content">
           <Table columns={columns} data={filteredApplications} />
@@ -212,6 +258,12 @@ function DocInList() {
             onCancel={() => setShowDeleteModal(false)}
           />
         )}
+        <ReasonModal 
+          show={showDownloadReasonModal} 
+          onClose={handleDownloadModalClose}
+          onConfirm={handleFileDownloadConfirm} 
+          modalType="download" 
+        />
       </div>
     </div>
   );

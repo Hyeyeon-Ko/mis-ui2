@@ -3,14 +3,14 @@
 }
 
 .corpDoc-content h2 {
-  font-size: 28px;
+  font-size: 26px;
   margin-bottom: 16px;
 }
 
 .corpDoc-apply-content {
   background-color: #fff;
   width: 500px;
-  padding: 50px 150px 40px 150px;
+  padding: 50px 130px 40px 130px;
   border-radius: 12px; 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -23,7 +23,7 @@
 
 .corpDoc-bold-label {
   font-weight: bold;
-  font-size: 21px;
+  font-size: 19px;
   margin-bottom: 30px;
 }
 
@@ -70,7 +70,7 @@
   border: 1px solid #e4e1e1;
   border-radius: 6px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .corpDoc-form-group textarea {
@@ -84,7 +84,7 @@
   margin-right: 160px;
   border-radius: 5px;
   padding: 10px 0px 10px 150px;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .corpDoc-form-group-inline {
@@ -97,7 +97,7 @@
 
 .corpDoc-form-group-inline label {
   font-weight: 580;
-  font-size: 14.5px;
+  font-size: 12.5px;
   color: #222121;
   margin-bottom: 3px;
   text-align: left;
@@ -117,12 +117,12 @@
   border: 1px solid #e4e1e1;
   border-radius: 6px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  font-size: 14px;
+  font-size: 12.5px;
   text-align: center;
 }
 
 .corpDoc-form-group-inline-num label {
-  font-size: 14.5px;
+  font-size: 12.5px;
   margin: 5px 10px 3px 3px;
   text-align: left;
   flex: 1;

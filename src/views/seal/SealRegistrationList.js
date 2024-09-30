@@ -1,26 +1,24 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
-import SealRegistrationAddModal from './SealRegistrationAddModal';  
-import SealRegistrationUpdateModal from './SealRegistrationUpdateModal';  
+import SealRegistrationAddModal from './SealRegistrationAddModal';
+import SealRegistrationUpdateModal from './SealRegistrationUpdateModal';
 import '../../styles/seal/SealRegistrationList.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
-
-
 
 function SealRegistrationList() {
   const { auth } = useContext(AuthContext);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [selectedApplications, setSelectedApplications] = useState([]);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false); 
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedDraftId, setSelectedDraftId] = useState(null);
 
   const fetchSealRegistrationList = useCallback(async () => {
     try {
       const response = await axios.get(`/api/seal/registrationList`, {
-        params: { instCd: auth.instCd } 
+        params: { instCd: auth.instCd }
       });
 
       if (response.data.code === 200) {
@@ -28,7 +26,7 @@ function SealRegistrationList() {
           draftId: item.draftId,
           seal: item.sealNm,
           sealImage: item.sealImage, 
-          sealImageUrl: `/api/images/${encodeURIComponent(item.sealImage)}`,
+          sealImageUrl: `data:image/png;base64,${item.sealImage}`, 
           department: item.useDept,
           purpose: item.purpose,
           manager: item.manager,
@@ -50,7 +48,7 @@ function SealRegistrationList() {
   }, [fetchSealRegistrationList]);
 
   const handleAddApplication = () => {
-    setIsAddModalOpen(true); 
+    setIsAddModalOpen(true);
   };
 
   const handleModifyApplication = () => {
@@ -65,7 +63,7 @@ function SealRegistrationList() {
     const selectedIndex = selectedApplications[0];
     const selectedData = filteredApplications[selectedIndex];
     setSelectedDraftId(selectedData.draftId);
-    setIsUpdateModalOpen(true); 
+    setIsUpdateModalOpen(true);
   };
 
   const handleDeleteApplication = () => {
@@ -98,7 +96,7 @@ function SealRegistrationList() {
     fetchSealRegistrationList();
     setIsAddModalOpen(false);
     setIsUpdateModalOpen(false);
-    setSelectedApplications([]); 
+    setSelectedApplications([]);
   };
 
   return (
@@ -179,7 +177,7 @@ function SealRegistrationList() {
           isOpen={isAddModalOpen}
           onClose={() => {
             setIsAddModalOpen(false);
-            setSelectedApplications([]); 
+            setSelectedApplications([]);
           }}
           onSave={handleSave}
         />

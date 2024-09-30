@@ -15,7 +15,7 @@ const Login = () => {
   useEffect(() => {
     if (auth.isAuthenticated) {
       if (auth.role === 'ADMIN' || auth.role === 'MASTER') {
-        navigate('/api/std');
+        navigate('/std');
       } else {
         navigate('/');
       }
@@ -39,7 +39,7 @@ const Login = () => {
         const data = await response.json();
 
         if (data && data.data) {
-          const authorityResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/standardData`, {
+          const authorityResponse = await fetch(`/api/auth/standardData`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ const Login = () => {
             );
 
             if (data.data.role === 'ADMIN' || data.data.role === 'MASTER') {
-              navigate('/api/std');
+              navigate('/std');
             } else {
               navigate('/');
             }

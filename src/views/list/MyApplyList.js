@@ -3,7 +3,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import DateFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
 import ConfirmModal from '../../components/common/ConfirmModal';
-import RejectReasonModal from '../../components/RejectReasonModal'; 
+import RejectReasonModal from '../../components/ReasonModal'; 
 import ApprovalModal from './ApprovalModal';
 import { AuthContext } from '../../components/AuthContext'; 
 import '../../styles/list/MyApplyList.css';
@@ -37,11 +37,29 @@ function MyApplyList() {
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [documentDetails, setDocumentDetails] = useState({});
 
+  const convertDocumentType = (type) => {
+    switch (type) {
+      case '명함신청':
+        return 'A';
+      case '문서수발신':
+        return 'B';
+      case '법인서류':
+        return 'C';
+      case '인장신청':
+        return 'D';
+      default:
+        return null;
+    }
+  };
+
   const fetchApplications = useCallback(async () => {
     try {
       const response = await axios.get(`/api/myApplyList`, {
         params: {
-          userId: auth.userId, 
+          userId: auth.userId,
+          startDate: startDate ? startDate.toISOString().split('T')[0] : null,
+          endDate: endDate ? endDate.toISOString().split('T')[0] : null,
+          documentType: convertDocumentType(documentType),
         },
       });
   
@@ -80,10 +98,14 @@ function MyApplyList() {
     } catch (error) {
       console.error('Error fetching applications:', error.response?.data || error.message);
     }
-  }, [auth.userId]);
+  }, [auth.userId, startDate, endDate, documentType]);
+
+  const applyFilters = () => {
+    fetchApplications();
+  };
 
   useEffect(() => {
-    fetchApplications();  
+    fetchApplications();
   }, [fetchApplications]);
 
   const applyStatusFilters = useCallback(() => {
@@ -110,28 +132,6 @@ function MyApplyList() {
     applyStatusFilters();
   }, [filters, applyStatusFilters]);
 
-  const applyFilters = () => {
-    let filteredData = applications;
-
-    if (startDate) {
-      const startOfDay = new Date(startDate);
-      startOfDay.setHours(0, 0, 0, 0);
-      filteredData = filteredData.filter(application => new Date(application.draftDate) >= startOfDay);
-    }
-
-    if (endDate) {
-      const endOfDay = new Date(endDate);
-      endOfDay.setHours(23, 59, 59, 999);
-      filteredData = filteredData.filter(application => new Date(application.draftDate) <= endOfDay);
-    }
-
-    if (documentType) {
-      filteredData = filteredData.filter(application => application.docType === documentType);
-    }
-
-    setFilteredApplications(filteredData);
-  };
-  
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
   
@@ -170,16 +170,17 @@ function MyApplyList() {
     defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
     setStartDate(defaultStartDate);
     setEndDate(new Date());
-    setDocumentType('');
+    setDocumentType('');  
     setFilters({
       statusApproved: false,
       statusRejected: false,
       statusOrdered: false,
       statusClosed: false,
     });
-    setFilteredApplications(applications); 
+  
+    fetchApplications(); 
   };
-
+  
   const handleButtonClick = (application) => {
     setSelectedApplication(application);
     if (application.applyStatus === '반려') {
@@ -257,8 +258,14 @@ function MyApplyList() {
       Cell: ({ row }) => {
         const allowedDocumentTypes = ['명함신청', '문서수신', '문서발신'];
         const isAllowedDocType = allowedDocumentTypes.includes(row.docType);
-  
-        return (row.applyStatus === '승인대기' || row.applyStatus === '승인완료') && isAllowedDocType ? (
+    
+        const isSpecialRoleAndTeam =
+          (auth.roleNm === '팀장' || auth.roleNm === '본부장') &&
+          (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2');
+    
+        return (row.applyStatus === '승인대기' || row.applyStatus === '승인완료') &&
+          isAllowedDocType &&
+          !isSpecialRoleAndTeam ? (
           <button
             className="status-button"
             style={{ color: '#2789FE', textDecoration: 'underline' }}
@@ -267,10 +274,7 @@ function MyApplyList() {
             {row.applyStatus}
           </button>
         ) : row.applyStatus === '발주완료' || row.applyStatus === '발급완료' ? (
-          <button
-            className="status-button"
-            onClick={() => handleButtonClick(row)}
-          >
+          <button className="status-button" onClick={() => handleButtonClick(row)}>
             수령확인
           </button>
         ) : row.applyStatus === '반려' ? (
@@ -289,7 +293,9 @@ function MyApplyList() {
           <span
             style={{
               fontWeight: row.applyStatus === '처리완료' ? 'bold' : 'normal',
-              color: row.applyStatus === '처리완료' ? 'rgb(169, 169, 169)' : 'rgb(255, 255, 255)',
+              color: row.applyStatus === '처리완료'
+                ? 'rgb(169, 169, 169)'
+                : 'rgb(255, 255, 255)',
             }}
           >
             {row.applyStatus}
@@ -338,6 +344,7 @@ function MyApplyList() {
           onConfirm={() => {}}
           reason={rejectionReason}
           isViewOnly={true}
+          modalType="reject"
         />
       )}
       {showApprovalModal && (
