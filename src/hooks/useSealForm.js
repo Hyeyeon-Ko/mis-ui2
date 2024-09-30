@@ -13,6 +13,7 @@ export const useSealForm = (initialReadOnly = false) => {
     const [isFileDeleted, setIsFileDeleted] = useState(false);
     const [selectedCenter, setSelectedCenter] = useState('all'); 
     const [filteredApplications, setFilteredApplications] = useState([]);
+    const [formData, setFormData] = useState(sealRegistrationData);
 
     const handleSealChange = (sealName) => {
         if (!readOnly) {
@@ -60,26 +61,19 @@ export const useSealForm = (initialReadOnly = false) => {
         }
     };
 
-     // 신청서 데이터를 위한 handleChange
-     const handleApplicationChange = (e) => {
-        const { name, value } = e.target;
-        if (!readOnly) {
-            setApplicationDetails((prev) => ({
-                ...prev,
-                [name]: value,
-            }));
-        }
+    const handleAddModalChange = (e) => {
+      const { name, value } = e.target;
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
     };
-
-    const handleApplicationFileChange = (e) => {
-        if (!readOnly) {
-            setApplicationDetails((prev) => ({
-                ...prev,
-                file: e.target.files[0],
-                fileName: e.target.files[0]?.name || '',
-                isFileDeleted: false,
-            }));
-        }
+  
+    const handleAddModalFileChange = (e) => {
+      setFormData((prev) => ({
+        ...prev,
+        sealImage: e.target.files[0],
+      }));
     };
 
     // 정보 수정 핸들러
@@ -131,6 +125,7 @@ export const useSealForm = (initialReadOnly = false) => {
         isFileDeleted,
         selectedCenter,
         filteredApplications,
+        formData,
 
         file,
         readOnly,
@@ -143,15 +138,16 @@ export const useSealForm = (initialReadOnly = false) => {
         setIsFileDeleted,
         setSelectedCenter,
         setFilteredApplications,
+        setFormData,
 
         handleSealChange,
         handleQuantityChange,
         handleFileChange,
         handleChange,
-        handleApplicationChange,
-        handleApplicationFileChange,
         handleUpdateChange,
         handleFileUpdateChange,
         handleCenterChange,
+        handleAddModalChange,
+        handleAddModalFileChange,
     };
 };

@@ -2,25 +2,48 @@ import React, { useContext } from 'react';
 import '../../styles/seal/SealRegistrationAddModal.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
+import { validateForm } from '../../hooks/validateForm';
 import { useSealForm } from '../../hooks/useSealForm';
+
 
 function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
   const { auth } = useContext(AuthContext);
-  const {handleApplicationChange, handleApplicationFileChange, sealDetails} = useSealForm();
+  const {handleAddModalChange, handleAddModalFileChange, formData} = useSealForm();
 
   const handleSave = async () => {
     const data = new FormData();
     data.append('sealRegisterRequestDTO', new Blob([JSON.stringify({
-      sealNm: sealDetails.seal,
-      useDept: sealDetails.department,
-      purpose: sealDetails.purpose,
-      manager: sealDetails.manager,
-      subManager: sealDetails.subManager,
+      sealNm: formData.seal,
+      useDept: formData.department,
+      purpose: formData.purpose,
+      manager: formData.manager,
+      subManager: formData.subManager,
       drafterId: auth.userId,
-      draftDate: sealDetails.date,
+      draftDate: formData.date,
       instCd: auth.instCd,
     })], { type: 'application/json' }));
-    data.append('sealImage', sealDetails.sealImage);
+    data.append('sealImage', formData.sealImage);
+
+    // SealRegistForm validation
+    const requiredInputs = {
+      sealNm: formData.seal,
+      sealImage: formData.sealImage,
+      useDept: formData.department,
+      usage: formData.purpose,
+      manager: formData.manager,
+      subManager: formData.subManager,
+      draftDate: formData.date
+    }
+
+    const inputDates = {
+      draftDate: formData.date
+    }
+
+    const { isValid, message } = validateForm('SealRegist', requiredInputs, '', inputDates);
+    if (!isValid) {
+        alert(message);
+        return;
+    }
   
     try {
       const response = await axios.post(`/api/seal/register`, data, {
@@ -54,7 +77,7 @@ function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
     {
       label: '인영 이미지',
       type: 'file',
-      onChange: handleApplicationFileChange
+      onChange: handleAddModalFileChange
     },
     {
       label: '사용부서',
@@ -87,6 +110,7 @@ function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
     }
   ];
 
+
   return (
     <div className="seal-regist-overlay">
       <div className="seal-regist-container">
@@ -105,8 +129,8 @@ function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
                   <input
                     type={field.type}
                     name={field.name}
-                    value={sealDetails[field.name] || ''}
-                    onChange={handleApplicationChange}
+                    value={formData[field.name] || ''}
+                    onChange={handleAddModalChange}
                     placeholder={field.placeholder}
                   />
                 )}
@@ -132,5 +156,6 @@ function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
     </div>
   );
 }
+
 
 export default SealRegistrationAddModal;
