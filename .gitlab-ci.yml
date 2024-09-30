@@ -38,7 +38,7 @@ docker-build:
     - echo "FRONTEND_IMAGE: $FRONTEND_IMAGE"
     - echo "SAFE_BRANCH_NAME: $SAFE_BRANCH_NAME"
     # Dockerfile로 Docker 이미지 빌드
-    - docker build -t $REGISTRY_URL/$FRONTEND_IMAGE .
+    - docker build -t $CI_REGISTRY/$FRONTEND_IMAGE .
   tags:
     - mis-runner
   dependencies:
@@ -82,3 +82,4 @@ deploy:
     - mis-runner
   dependencies:
     - docker-push
+    
