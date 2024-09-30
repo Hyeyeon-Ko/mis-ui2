@@ -34,7 +34,7 @@ COPY --from=build /app/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # 컨테이너가 수신 대기할 포트 설정
-EXPOSE 3000
+EXPOSE 3100
 
 # Nginx 실행
 CMD ["nginx", "-g", "daemon off;"]
