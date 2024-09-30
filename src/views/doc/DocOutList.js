@@ -13,7 +13,6 @@ import { AuthContext } from '../../components/AuthContext';
 
 function DocOutList() {
   const { auth } = useContext(AuthContext);
-  const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -73,7 +72,6 @@ function DocOutList() {
           fileUrl: item.fileUrl,
           docType: deriveDocType(item.filePath),
         }));
-        setApplications(formattedData);
         setFilteredApplications(formattedData);
       }
     } catch (error) {
@@ -233,7 +231,6 @@ function DocOutList() {
           fileUrl: item.fileUrl,
           docType: deriveDocType(item.filePath), 
         }));
-        setApplications(formattedData);
         setFilteredApplications(formattedData);
       }
     } catch (error) {
