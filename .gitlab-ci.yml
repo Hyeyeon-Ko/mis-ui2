@@ -1,16 +1,10 @@
-stages:
-  - build
-  - docker-build
-  - docker-push
-  - deploy
-
 variables:
-  SAFE_BRANCH_NAME: "${CI_COMMIT_REF_NAME//\//-}"
+  SAFE_BRANCH_NAME: "${CI_COMMIT_REF_NAME//\//-:-default}"
   DOCKER_IMAGE: frontend-ui
   FRONTEND_IMAGE: $CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$DOCKER_IMAGE:$SAFE_BRANCH_NAME
   DEPLOY_USER: root  # 배포할 사용자 이름
   DEPLOY_SERVER: 101.10.1.87  # 배포할 서버 IP 주소
-  REGISTRY_URL: 101.10.1.100:5000  # GitLab Container Registry URL
+  REGISTRY_URL: 101.10.1.100:5000  # GitLab Container Registry URL (http:// 제거)
   REGISTRY_USER: root  # GitLab 사용자 이름
   REGISTRY_PASSWORD: $REGISTRY_PASSWORD  # Access Token
 
@@ -34,8 +28,11 @@ docker-build:
   image: docker:stable
   script:
     - echo "Docker build start!!"
+    - echo "CI_REGISTRY: $CI_REGISTRY"
+    - echo "FRONTEND_IMAGE: $FRONTEND_IMAGE"
+    - echo "SAFE_BRANCH_NAME: $SAFE_BRANCH_NAME"
     # Dockerfile로 Docker 이미지 빌드
-    - docker build -t $CI_REGISTRY/$FRONTEND_IMAGE .
+    - docker build -t $REGISTRY_URL/$FRONTEND_IMAGE .
   tags:
     - mis-runner
   dependencies:
@@ -79,4 +76,3 @@ deploy:
     - mis-runner
   dependencies:
     - docker-push
-    
