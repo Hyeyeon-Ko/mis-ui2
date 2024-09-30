@@ -5,7 +5,7 @@ stages:
   - deploy
 
 variables:
-  SAFE_BRANCH_NAME: "${CI_COMMIT_REF_NAME//\//-:-default}"
+  SAFE_BRANCH_NAME: dev-ui
   DOCKER_IMAGE: frontend-ui
   FRONTEND_IMAGE: $CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$DOCKER_IMAGE:$SAFE_BRANCH_NAME
   DEPLOY_USER: root  # 배포할 사용자 이름
@@ -35,6 +35,7 @@ docker-build:
   script:
     - echo "Docker build start!!"
     - echo "CI_REGISTRY >> $CI_REGISTRY"
+    - echo "CI_COMMIT_REF_NAME >> $CI_COMMIT_REF_NAME"
     - echo "FRONTEND_IMAGE >> $FRONTEND_IMAGE"
     - echo "SAFE_BRANCH_NAME >> $SAFE_BRANCH_NAME"
     - docker build -t $CI_REGISTRY/$FRONTEND_IMAGE .
