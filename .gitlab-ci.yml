@@ -10,7 +10,7 @@ variables:
   FRONTEND_IMAGE: $CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$DOCKER_IMAGE:$SAFE_BRANCH_NAME
   DEPLOY_USER: root  # 배포할 사용자 이름
   DEPLOY_SERVER: 101.10.1.87  # 배포할 서버 IP 주소
-  REGISTRY_URL: http://101.10.1.100:5000  # GitLab Container Registry URL
+  REGISTRY_URL: 101.10.1.100:5000  # GitLab Container Registry URL
   REGISTRY_USER: root  # GitLab 사용자 이름
   REGISTRY_PASSWORD: $REGISTRY_PASSWORD  # Access Token
 
