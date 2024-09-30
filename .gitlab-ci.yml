@@ -34,10 +34,9 @@ docker-build:
   image: docker:stable
   script:
     - echo "Docker build start!!"
-    - echo "CI_REGISTRY: $CI_REGISTRY"
-    - echo "FRONTEND_IMAGE: $FRONTEND_IMAGE"
-    - echo "SAFE_BRANCH_NAME: $SAFE_BRANCH_NAME"
-    # Dockerfile로 Docker 이미지 빌드
+    - echo "CI_REGISTRY >> $CI_REGISTRY"
+    - echo "FRONTEND_IMAGE >> $FRONTEND_IMAGE"
+    - echo "SAFE_BRANCH_NAME >> $SAFE_BRANCH_NAME"
     - docker build -t $CI_REGISTRY/$FRONTEND_IMAGE .
   tags:
     - mis-runner
