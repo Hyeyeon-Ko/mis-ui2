@@ -1,3 +1,9 @@
+stages:
+  - build
+  - docker-build
+  - docker-push
+  - deploy
+
 variables:
   SAFE_BRANCH_NAME: "${CI_COMMIT_REF_NAME//\//-:-default}"
   DOCKER_IMAGE: frontend-ui
