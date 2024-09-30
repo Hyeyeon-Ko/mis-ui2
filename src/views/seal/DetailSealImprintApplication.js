@@ -9,7 +9,7 @@ import '../../styles/seal/SealApplyImprint.css';
 import corporateSeal from '../../assets/images/corporate_seal.png';
 import facsimileSeal from '../../assets/images/facsimile_seal.png';
 import companySeal from '../../assets/images/company_seal.png';
-import RejectReasonModal from '../../components/RejectReasonModal';
+import ReasonModal from '../../components/ReasonModal';
 
 
 
@@ -351,7 +351,7 @@ function DetailSealImprintApplication() {
                     </div>
                 </div>
             </div>
-            <RejectReasonModal show={showRejectModal} onClose={handleRejectClose} onConfirm={handleRejectConfirm} />
+            <ReasonModal show={showRejectModal} onClose={handleRejectClose} onConfirm={handleRejectConfirm} modalType="reject"/>
         </div>
     );
 }

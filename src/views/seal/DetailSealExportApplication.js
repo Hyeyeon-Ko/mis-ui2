@@ -9,7 +9,7 @@ import '../../styles/seal/SealApplyExport.css';
 import corporateSeal from '../../assets/images/corporate_seal.png';
 import facsimileSeal from '../../assets/images/facsimile_seal.png';
 import companySeal from '../../assets/images/company_seal.png';
-import RejectReasonModal from '../../components/RejectReasonModal';
+import ReasonModal from '../../components/ReasonModal';
 import downloadIcon from '../../assets/images/download.png';
 import deleteIcon from '../../assets/images/delete2.png';
 
@@ -28,6 +28,7 @@ function DetailSealExportApplication() {
         facsimileSeal: { selected: false, quantity: '' },
         companySeal: { selected: false, quantity: '' },
     });
+    const [showDownloadReasonModal, setShowDownloadReasonModal] = useState(false);
 
     const [applicationDetails, setApplicationDetails] = useState({
         submission: '',
@@ -158,27 +159,43 @@ function DetailSealExportApplication() {
         }
     };
 
-    const handleFileDownload = async () => {
-        if (applicationDetails.fileName && applicationDetails.filePath) {
-            try {
-                const response = await axios.get(`/api/doc/download/${encodeURIComponent(applicationDetails.fileName)}`, {
-                    responseType: 'blob',
-                });
-
-                const url = window.URL.createObjectURL(new Blob([response.data]));
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', applicationDetails.fileName);
-                document.body.appendChild(link);
-                link.click();
-                link.parentNode.removeChild(link);
-            } catch (error) {
-                console.error('Error downloading the file:', error);
-                alert('파일 다운로드에 실패했습니다.');
-            }
-        }
+    const handleFileDownloadClick = () => {
+        setShowDownloadReasonModal(true); 
     };
 
+    const handleDownloadModalClose = () => {
+        setShowDownloadReasonModal(false); 
+    };
+        
+    const handleFileDownloadConfirm = async ({ reason, fileType }) => {
+        setShowDownloadReasonModal(false);
+    
+        try {
+            const response = await axios.get(`/api/file/download/${encodeURIComponent(applicationDetails.fileName)}`, {
+                params: {
+                    draftId: draftId,
+                    docType: 'seal',
+                    fileType: fileType,
+                    reason: reason,
+                    downloaderNm: auth.hngNm,
+                    downloaderId: auth.userId,
+                },
+                responseType: 'blob',
+            });
+    
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', applicationDetails.fileName);
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+        } catch (error) {
+            console.error('Error downloading the file:', error);
+            alert('파일 다운로드에 실패했습니다.');
+        }
+    };
+            
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -436,13 +453,13 @@ function DetailSealExportApplication() {
                                     <div className="file-display">
                                         <span className="file-name">{applicationDetails.fileName}</span>
                                         <div className="file-actions">
-                                            <button
-                                                type="button"
-                                                className="download-button"
-                                                onClick={handleFileDownload}
-                                            >
-                                                <img src={downloadIcon} alt="다운로드" />
-                                            </button>
+                                        <button
+                                            type="button"
+                                            className="download-button"
+                                            onClick={handleFileDownloadClick}
+                                        >
+                                            <img src={downloadIcon} alt="다운로드" />
+                                        </button>
                                             {!readOnly && (
                                                 <button
                                                     type="button"
@@ -482,7 +499,18 @@ function DetailSealExportApplication() {
                     </div>
                 </div>
             </div>
-            <RejectReasonModal show={showRejectModal} onClose={handleRejectClose} onConfirm={handleRejectConfirm} />
+            <ReasonModal 
+                show={showRejectModal} 
+                onClose={handleRejectClose} 
+                onConfirm={handleRejectConfirm} 
+                modalType="reject"
+            />
+            <ReasonModal 
+                show={showDownloadReasonModal} 
+                onClose={handleDownloadModalClose}
+                onConfirm={handleFileDownloadConfirm} 
+                modalType="download" 
+            />
         </div>
     );
 }

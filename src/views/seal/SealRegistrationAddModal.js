@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import '../../styles/seal/SealRegistrationAddModal.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
-
+import { validateForm } from '../../hooks/validateForm';
 
 
 function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
@@ -46,6 +46,27 @@ function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
       instCd: auth.instCd,
     })], { type: 'application/json' }));
     data.append('sealImage', formData.sealImage);
+
+    // SealRegistForm validation
+    const requiredInputs = {
+      sealNm: formData.seal,
+      sealImage: formData.sealImage,
+      useDept: formData.department,
+      usage: formData.purpose,
+      manager: formData.manager,
+      subManager: formData.subManager,
+      draftDate: formData.date
+    }
+
+    const inputDates = {
+      draftDate: formData.date
+    }
+
+    const { isValid, message } = validateForm('SealRegist', requiredInputs, '', inputDates);
+    if (!isValid) {
+        alert(message);
+        return;
+    }
   
     try {
       const response = await axios.post(`/api/seal/register`, data, {
@@ -79,7 +100,7 @@ function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
         <div className="seal-regist-content">
           <div className="seal-regist-section">
             <div className="seal-regist-detail-row">
-              <label>인영 종류</label>
+              <label>인영 종류 <span style={{ color: 'red' }}>*</span></label>
               <input
                 type="text"
                 name="seal"
@@ -89,11 +110,11 @@ function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
               />
             </div>
             <div className="seal-regist-detail-row">
-              <label>인영 이미지</label>
+              <label>인영 이미지 <span style={{ color: 'red' }}>*</span></label>
               <input type="file" onChange={handleFileChange} />
             </div>
             <div className="seal-regist-detail-row">
-              <label>사용부서</label>
+              <label>사용부서 <span style={{ color: 'red' }}>*</span></label>
               <input
                 type="text"
                 name="department"
@@ -103,7 +124,7 @@ function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
               />
             </div>
             <div className="seal-regist-detail-row">
-              <label>용도</label>
+              <label>용도 <span style={{ color: 'red' }}>*</span></label>
               <input
                 type="text"
                 name="purpose"
@@ -113,7 +134,7 @@ function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
               />
             </div>
             <div className="seal-regist-detail-row">
-              <label>관리자(정)</label>
+              <label>관리자(정) <span style={{ color: 'red' }}>*</span></label>
               <input
                 type="text"
                 name="manager"
@@ -123,7 +144,7 @@ function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
               />
             </div>
             <div className="seal-regist-detail-row">
-              <label>관리자(부)</label>
+              <label>관리자(부) <span style={{ color: 'red' }}>*</span></label>
               <input
                 type="text"
                 name="subManager"
@@ -133,12 +154,13 @@ function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
               />
             </div>
             <div className="seal-regist-detail-row">
-              <label>등록일</label>
+              <label>등록일자 <span style={{ color: 'red' }}>*</span></label>
               <input
                 type="text"
                 name="date"
                 value={formData.date}
                 onChange={handleChange}
+                placeholder="YYYY-MM-DD"
               />
             </div>
           </div>

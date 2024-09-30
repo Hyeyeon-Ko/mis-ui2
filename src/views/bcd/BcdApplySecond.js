@@ -363,7 +363,10 @@ function BcdApplySecond() {
     };
 
     try {
-      const endpoint = (auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) ? '/bcd/leader' : '/bcd/';
+      const endpoint = (auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) ? '/api/bcd/leader' : '/api/bcd';
+
+      console.log(endpoint);
+      console.log(requestData);
 
       const response = await axios.post(endpoint, requestData);
       if (response.data.code === 200) {

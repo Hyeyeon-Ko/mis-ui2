@@ -1,7 +1,8 @@
 import React, { useContext, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
+import { validateForm } from '../../hooks/validateForm';
+import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import OrgChartModal from './../../components/OrgChartModal';
@@ -23,8 +24,8 @@ function DocApply() {
     division: '',
   });
 
-  const [attachment, setAttachment] = useState(null);
-  const [activeTab, setActiveTab] = useState('reception');
+  const [attachment, setAttachment] = useState(null);  // 첨부파일
+  const [activeTab, setActiveTab] = useState('DocA');  // DocA : 문서수신 신청
   const [showOrgChart, setShowOrgChart] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [orgData, setOrgData] = useState([]);
@@ -39,7 +40,7 @@ function DocApply() {
       receptionDate: dateString,
       drafter: auth.hngNm,
       userId: auth.userId,
-      division: activeTab === 'reception' ? 'A' : 'B',
+      division: activeTab === 'DocA' ? 'A' : 'B',
     }));
   }, [auth.hngNm, auth.userId, activeTab]);
 
@@ -61,36 +62,38 @@ function DocApply() {
     setAttachment(e.target.files[0]);
   };
 
-  const validateForm = () => {
-    const requiredFields = ['drafter', 'title', 'purpose'];
-    if (activeTab === 'reception') {
-      requiredFields.push('receiver');
-    } else {
-      requiredFields.push('sender');
-    }
-
-    const missingFields = requiredFields.filter((field) => formData[field].trim() === '');
+  /**
+   * @handleApplyRequest 문서수발신 신청 요청
+   * 1. 신청폼 validation 진
+   * 2. 신청자 소속팀 및 직급에 따라, 신청 request 유형 총 5가지
+   *    1) 수신 신청
+   *      - handleReceiveLeaderRequest
+   *      - handleReceiveRequest
+   *    2) 발신 신청
+   *      - handleSendLeaderRequest
+   *      - autoSelectApproversAndSubmit
+   *      - fetchOrgChart
+   *  */  
+  //  
   
-    if (missingFields.length > 0) {
-      alert('모든 필수 항목을 입력해주세요.');
-      return false;
-    }
-
-    if (!attachment) {
-      alert('첨부파일이 필요합니다.');
-      return false;
-    }
-
-    return true;
-  };
-
   const handleApplyRequest = (e) => {
     e.preventDefault();
   
-    if (!validateForm()) {
-      return;
+    // 1. DocForm validation
+    const requiredInputs = {
+      to: (activeTab === 'DocA') ? formData.sender : formData.receiver,  // 수신 신청일 땐, 발신처
+      title: formData.title,
+      purpose: formData.purpose,
+      file: attachment
+    }
+
+    const { isValid, message } = validateForm(activeTab, requiredInputs, '', '');
+    if (!isValid) {
+        alert(message);
+        return;
     }
   
+    // 2. Apply Request
     if (formData.division === 'A') {
       if (auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) {
         handleReceiveLeaderRequest();
@@ -110,6 +113,7 @@ function DocApply() {
     }
   };
   
+  // 2-1-1. 문서 수신신청 1
   const handleReceiveRequest = async () => {
     const payload = new FormData();
   
@@ -118,7 +122,7 @@ function DocApply() {
       drafter: formData.drafter,
       division: formData.division,
       receiver: '',
-      sender: formData.receiver, 
+      sender: formData.sender, 
       docTitle: formData.title,
       purpose: formData.purpose,
       instCd: auth.instCd,
@@ -148,6 +152,7 @@ function DocApply() {
     }
   };
 
+  // 2-1-2. 문서 수신신청 2
   const handleReceiveLeaderRequest = async () => {
     const payload = new FormData();
   
@@ -156,7 +161,7 @@ function DocApply() {
       drafter: formData.drafter,
       division: formData.division,
       receiver: '',
-      sender: formData.receiver, 
+      sender: formData.sender, 
       docTitle: formData.title,
       purpose: formData.purpose,
       instCd: auth.instCd,
@@ -195,7 +200,7 @@ function DocApply() {
       drafter: formData.drafter,
       division: formData.division,
       sender: '', 
-      receiver: formData.sender, 
+      receiver: formData.receiver, 
       docTitle: formData.title,
       purpose: formData.purpose,
       instCd: auth.instCd,
@@ -226,57 +231,59 @@ function DocApply() {
     }
   };
   
-const autoSelectApproversAndSubmit = async () => {
-    try {
-      const response = await axios.get('/api/info/confirm', { params: { instCd: auth.instCd } });
+  // 2-2-2. 문서 발신신청 2
+  const autoSelectApproversAndSubmit = async () => {
+      try {
+        const response = await axios.get('/api/info/confirm', { params: { instCd: auth.instCd } });
 
-      if (response.data && response.data.data) {
-        const {
-          teamLeaderId,
-          teamLeaderNm,
-          teamLeaderRoleNm,
-          teamLeaderPositionNm,
-          teamLeaderDept,
-          managerId,
-          managerNm,
-          managerRoleNm,
-          managerPositionNm,
-          managerDept,
-        } = response.data.data[0];
+        if (response.data && response.data.data) {
+          const {
+            teamLeaderId,
+            teamLeaderNm,
+            teamLeaderRoleNm,
+            teamLeaderPositionNm,
+            teamLeaderDept,
+            managerId,
+            managerNm,
+            managerRoleNm,
+            managerPositionNm,
+            managerDept,
+          } = response.data.data[0];
 
-        const teamLeader = {
-          userId: teamLeaderId,
-          userNm: teamLeaderNm,
-          positionNm: teamLeaderPositionNm,
-          roleNm: teamLeaderRoleNm,
-          department: teamLeaderDept,
-          status: '대기',
-          docType: '문서수발신',
-          seq: 1,
-        };
+          const teamLeader = {
+            userId: teamLeaderId,
+            userNm: teamLeaderNm,
+            positionNm: teamLeaderPositionNm,
+            roleNm: teamLeaderRoleNm,
+            department: teamLeaderDept,
+            status: '대기',
+            docType: '문서수발신',
+            seq: 1,
+          };
 
-        const manager = {
-          userId: managerId,
-          userNm: managerNm,
-          positionNm: managerPositionNm,
-          roleNm: managerRoleNm,
-          department: managerDept,
-          status: '대기',
-          docType: '문서수발신',
-          seq: 2,
-        };
+          const manager = {
+            userId: managerId,
+            userNm: managerNm,
+            positionNm: managerPositionNm,
+            roleNm: managerRoleNm,
+            department: managerDept,
+            status: '대기',
+            docType: '문서수발신',
+            seq: 2,
+          };
 
-        const approvers = [manager, teamLeader];
-        setSelectedUsers(approvers); 
-        
-        handleSendRequest(approvers);  
+          const approvers = [manager, teamLeader];
+          setSelectedUsers(approvers); 
+          
+          handleSendRequest(approvers);  
 
+        }
+      } catch (error) {
+        console.error('Error fetching confirm data:', error);
       }
-    } catch (error) {
-      console.error('Error fetching confirm data:', error);
-    }
-  };
+    };
 
+  // 2-2-1. 문서 발신신청 1
   const handleSendLeaderRequest = async () => {
     const payload = new FormData();
   
@@ -285,7 +292,7 @@ const autoSelectApproversAndSubmit = async () => {
       drafter: formData.drafter,
       division: formData.division,
       sender: '',
-      receiver: formData.sender,
+      receiver: formData.receiver,
       docTitle: formData.title,
       purpose: formData.purpose,
       instCd: auth.instCd,
@@ -316,6 +323,7 @@ const autoSelectApproversAndSubmit = async () => {
     }
   };  
 
+  // 2-2-3. 문서 발신신청 3
   const fetchOrgChart = () => {
     const { instCd } = auth;
     axios.get(`/api/std/orgChart`, { params: { instCd } })
@@ -388,14 +396,14 @@ const autoSelectApproversAndSubmit = async () => {
         <div className='doc-main'>
           <div className="tab-container">
             <button
-              className={`tab-button ${activeTab === 'reception' ? 'active' : ''}`}
-              onClick={() => handleTabChange('reception')}
+              className={`tab-button ${activeTab === 'DocA' ? 'active' : ''}`}
+              onClick={() => handleTabChange('DocA')}
             >
               문서 수신 신청
             </button>
             <button
-              className={`tab-button ${activeTab === 'sending' ? 'active' : ''}`}
-              onClick={() => handleTabChange('sending')}
+              className={`tab-button ${activeTab === 'DocB' ? 'active' : ''}`}
+              onClick={() => handleTabChange('DocB')}
             >
               문서 발신 신청
             </button>
@@ -423,17 +431,17 @@ const autoSelectApproversAndSubmit = async () => {
                 />
               </div>
               <div className="doc-form-group">
-                <label>{activeTab === 'reception' ? '발신처' : '수신처'}</label>
+                <label>{activeTab === 'DocA' ? '발신처' : '수신처'} <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
-                  name={activeTab === 'reception' ? 'receiver' : 'sender'}
-                  value={activeTab === 'reception' ? formData.receiver : formData.sender}
+                  name={activeTab === 'DocA' ? 'sender' : 'receiver'}
+                  value={activeTab === 'DocA' ? formData.sender : formData.receiver}
                   onChange={handleChange}
                   required
                 />
               </div>
               <div className="doc-form-group">
-                <label>제 목</label>
+                <label>제 목 <span style={{ color: 'red' }}>*</span></label>
                 <textarea
                   name="title"
                   value={formData.title}
@@ -442,7 +450,7 @@ const autoSelectApproversAndSubmit = async () => {
                 />
               </div>
               <div className="doc-form-group">
-                <label>사용 용도</label>
+                <label>사용목적 <span style={{ color: 'red' }}>*</span></label>
                 <textarea
                   name="purpose"
                   value={formData.purpose}
@@ -451,7 +459,8 @@ const autoSelectApproversAndSubmit = async () => {
                 />
               </div>
               <div className='doc-form-group'>
-                <label>첨부파일</label>
+                <label>첨부파일 <span style={{ color: 'red' }}>*</span></label>
+                <text> 접수문서 첫 페이지를 스캔해 첨부해주세요.</text>
                 <input
                   type="file"
                   name="attachment"
