@@ -45,3 +45,12 @@ export const inputValue = {
     gradeMap: {},
   }
   
+  export const emailModalData = {
+    fromEmail: '',
+    password: '',
+    toEmail: '',
+    subject: '',
+    body: '',
+    fileName: '',
+    isLoading: false,
+  }

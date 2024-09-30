@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { bcdInfoData, inputValue } from "../datas/bdcDatas";
+import { bcdInfoData, emailModalData, inputValue } from "../datas/bdcDatas";
 
 const useBdcChange = () => {
   const [formData, setFormData] = useState(inputValue);
+  const [emailData, setEmailData] = useState(emailModalData);
   const [userIdInput, setUserIdInput] = useState('');
   const [addressOptions, setAddressOptions] = useState([]);
   const [bcdData, setBcdData] = useState(bcdInfoData);
@@ -10,6 +11,14 @@ const useBdcChange = () => {
   const [selectedApplications, setSelectedApplications] = useState([]);
   const [floor, setFloor] = useState('');
 
+  const handleEmailChange = (e) => {
+    const { id, value } = e.target;
+    setEmailData((prevData) => ({
+      ...prevData,
+      [id]: value,
+    }));
+  }
+  
   const handleDetailChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -134,12 +143,12 @@ const useBdcChange = () => {
       
           setFormData({ ...formData, address: updatedAddress, engAddress: updatedEngAddress });
         };
-        
+      
 
   return {
-    handleFloorChange, handleAddressChange, handleDepartmentChange,handleDetailCardTypeChange, handleDetailChange, handleApplyChange, handleCardTypeChange, handleUserIdChange, handleCenterChange, handleSelectAll, handleSelect, handleTeamChange, handlePositionChange,
-    formData, userIdInput, addressOptions, applications, selectedApplications,floor,
-    setFormData, setBcdData, setApplications, setSelectedApplications, setFloor
+    handleEmailChange, handleFloorChange, handleAddressChange, handleDepartmentChange,handleDetailCardTypeChange, handleDetailChange, handleApplyChange, handleCardTypeChange, handleUserIdChange, handleCenterChange, handleSelectAll, handleSelect, handleTeamChange, handlePositionChange,
+    emailData, formData, userIdInput, addressOptions, applications, selectedApplications,floor,
+    setEmailData, setFormData, setBcdData, setApplications, setSelectedApplications, setFloor
   }
 }
 

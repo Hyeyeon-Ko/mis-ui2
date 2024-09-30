@@ -5,15 +5,11 @@ import '../../styles/bcd/PreviewModal.css';
 import frontImageBlank from '../../assets/images/frontimage_blank.png';
 import backImageEngBlank from '../../assets/images/backimage_eng_blank.png';
 import backImageCompany from '../../assets/images/backimage_company.png';
+import { bcdInfoData } from '../../datas/bdcDatas';
 
 const PreviewModal = ({ show, onClose, formData }) => {
   const canvasRef = useRef(null);
-  const [bcdData, setBcdData] = useState({
-    instInfo: [],
-    deptInfo: [],
-    teamInfo: [],
-    gradeInfo: [],
-  });
+  const [bcdData, setBcdData] = useState(bcdInfoData);
 
   // fetchBcdStd 함수
   const fetchBcdStd = async () => {
