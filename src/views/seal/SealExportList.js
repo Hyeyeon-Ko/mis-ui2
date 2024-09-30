@@ -85,7 +85,6 @@ function SealExportList() {
   };
 
   const handleFileDownloadClick = (draftId, fileName) => {
-    console.log(`Download clicked for draftId: ${draftId}, fileName: ${fileName}`);
     setSelectedDraftId(draftId);
     setSelectedFileName(fileName);
     setShowDownloadReasonModal(true); 
@@ -98,7 +97,6 @@ function SealExportList() {
   };
       
   const handleFileDownloadConfirm = async ({ reason, fileType }) => {
-    console.log(`Download Confirmed for draftId: ${selectedDraftId}, fileName: ${selectedFileName}, reason: ${reason}, fileType: ${fileType}`);
     setShowDownloadReasonModal(false);
   
     try {
@@ -141,7 +139,6 @@ function SealExportList() {
         setClickedRows(prevClickedRows => {
           const newClickedRows = [...prevClickedRows, document.id];
           localStorage.setItem('clickedRows', JSON.stringify(newClickedRows));
-          console.log("Updated Clicked Rows:", newClickedRows);
           return newClickedRows;
         });
       }
@@ -211,7 +208,7 @@ function SealExportList() {
                   <td>
                     {app.fileName && app.fileUrl ? (
                       <button
-                        onClick={() => handleFileDownloadClick(app.draftId, app.fileUrl, app.fileName)} 
+                        onClick={() => handleFileDownloadClick(app.draftId, app.fileName)} 
                         style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                       >
                         <img src={downloadIcon} alt="파일 다운로드" />

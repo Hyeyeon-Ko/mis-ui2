@@ -63,8 +63,7 @@ function SealApplyExport() {
         const exportRequestDTO = {
             drafter: auth.hngNm,
             drafterId: auth.userId,
-            submission,
-            useDept: submission,
+            submission: submission,
             expNm: draftNm,
             expDate: exportDate,
             returnDate: returnDate,
@@ -72,6 +71,7 @@ function SealApplyExport() {
             facsimileSeal: selectedSeals.facsimileSeal.quantity,
             companySeal: selectedSeals.companySeal.quantity,
             purpose: purpose,
+            notes: notes,
             instCd: auth.instCd,
         };
 

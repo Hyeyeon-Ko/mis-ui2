@@ -11,6 +11,7 @@ import '../../styles/common/Page.css';
 import '../../styles/corpdoc/CorpDocApply.css';
 import downloadIcon from '../../assets/images/download.png';
 import deleteIcon from '../../assets/images/delete2.png'; 
+import { inputValue } from '../../datas/corpDocDatas';
 
 
 
@@ -21,22 +22,7 @@ function DetailCorpDocApplication() {
     const queryParams = new URLSearchParams(location.search);
     const applyStatus = queryParams.get('applyStatus'); 
     const { auth, refreshSidebar } = useContext(AuthContext);
-    const [formData, setFormData] = useState({
-        submission: '',
-        purpose: '',
-        useDate: '',
-        department: null,
-        document1: false,
-        document2: false,
-        document3: false,
-        document4: false,
-        quantity1: '',
-        quantity2: '',
-        quantity3: '',
-        quantity4: '',
-        type: '',
-        notes: '',
-    });
+    const [formData, setFormData] = useState(inputValue);
     const [initialData, setInitialData] = useState(null);
     const [existingFile, setExistingFile] = useState(null);
     const [file, setFile] = useState(null);

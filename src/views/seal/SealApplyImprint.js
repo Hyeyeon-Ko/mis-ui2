@@ -6,6 +6,7 @@ import { useSealForm } from '../../hooks/seal/useSealForm';
 import { validateForm } from '../../hooks/validateForm';
 import SealFormComponents from '../../components/apply/SealFormComponents';
 
+
 function SealApplyImprint() {
     const { auth } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -57,6 +58,7 @@ function SealApplyImprint() {
             purpose,
             notes,
             instCd: auth.instCd,
+            ...selectedSeals,
         };
 
         console.log("imprint: ", imprintRequestDTO)

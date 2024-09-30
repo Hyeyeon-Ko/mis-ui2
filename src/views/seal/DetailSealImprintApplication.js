@@ -3,18 +3,22 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import { AuthContext } from '../../components/AuthContext';
+import { validateForm } from '../../hooks/validateForm';
 import axios from 'axios';
 import '../../styles/common/Page.css';
 import '../../styles/seal/SealApplyImprint.css';
 import corporateSeal from '../../assets/images/corporate_seal.png';
 import facsimileSeal from '../../assets/images/facsimile_seal.png';
 import companySeal from '../../assets/images/company_seal.png';
+import { applicationDetailData, sealSelectionData } from '../../datas/sealDatas';
+import { useSealForm } from '../../hooks/useSealForm';
 import ReasonModal from '../../components/ReasonModal';
 
 
 
 function DetailSealImprintApplication() {
-    const { auth, refreshSidebar } = useContext(AuthContext);
+    const {handleSealChange, handleQuantityChange, handleChange} = useSealForm();
+    const { refreshSidebar } = useContext(AuthContext);
     const { draftId } = useParams(); 
     const navigate = useNavigate();
     const location = useLocation();
@@ -22,17 +26,8 @@ function DetailSealImprintApplication() {
     const queryParams = new URLSearchParams(location.search);
     const applyStatus = queryParams.get('applyStatus'); 
     const [showRejectModal, setShowRejectModal] = useState(false);
-    const [sealSelections, setSealSelections] = useState({
-        corporateSeal: { selected: false, quantity: '' },
-        facsimileSeal: { selected: false, quantity: '' },
-        companySeal: { selected: false, quantity: '' },
-    });
-    const [applicationDetails, setApplicationDetails] = useState({
-        submission: '',
-        useDate: '',
-        purpose: '',
-        notes: '',
-    });
+    const [sealSelections, setSealSelections] = useState(sealSelectionData);
+    const [applicationDetails, setApplicationDetails] = useState(applicationDetailData);
 
     useEffect(() => {
         if (sealImprintDetails) {
@@ -90,51 +85,43 @@ function DetailSealImprintApplication() {
         }
     }, [draftId, sealImprintDetails]);
 
-    const handleSealChange = (sealName) => {
-        if (!readOnly) {
-            setSealSelections(prevState => ({
-                ...prevState,
-                [sealName]: {
-                    ...prevState[sealName],
-                    selected: !prevState[sealName].selected,
-                }
-            }));
-        }
-    };
-    
-    const handleQuantityChange = (e, sealName) => {
-        const value = e.target.value;
-        if (!readOnly) {
-            setSealSelections(prevState => ({
-                ...prevState,
-                [sealName]: {
-                    ...prevState[sealName],
-                    quantity: value
-                }
-            }));
-        }
-    };
-
     const handleSubmit = (e) => {
         e.preventDefault();
-    
-        const selectedSeals = {
-            corporateSeal: sealSelections.corporateSeal.selected ? sealSelections.corporateSeal.quantity : '',
-            facsimileSeal: sealSelections.facsimileSeal.selected ? sealSelections.facsimileSeal.quantity : '',
-            companySeal: sealSelections.companySeal.selected ? sealSelections.companySeal.quantity : '',
-        };
-    
-        const updatedImprintRequestDTO = {
-            drafter: auth.hngNm,
-            drafterId: auth.userId,
+
+        // 1. SealForm validation
+        const requiredInputs = {
             submission: applicationDetails.submission,
             useDate: applicationDetails.useDate,
-            corporateSeal: selectedSeals.corporateSeal,
-            facsimileSeal: selectedSeals.facsimileSeal,
-            companySeal: selectedSeals.companySeal,
+            purpose: applicationDetails.purpose,
+        }
+
+        const selectedSeals = ['corporateSeal', 'facsimileSeal', 'companySeal'].reduce((acc, sealType) => {
+            const { selected, quantity } = sealSelections[sealType];
+            acc[sealType] = {
+                selected,
+                quantity: selected ? quantity : '',
+            };
+            return acc;
+        }, {});
+
+        const inputDates = {
+            useDate: applicationDetails.useDate
+        }
+
+        const { isValid, message } = validateForm('Seal', requiredInputs, selectedSeals, inputDates);
+        if (!isValid) {
+            alert(message);
+            return;
+        }
+    
+        const updatedImprintRequestDTO = {
+            submission: applicationDetails.submission,
+            useDate: applicationDetails.useDate,
+            corporateSeal: selectedSeals.corporateSeal.quantity,
+            facsimileSeal: selectedSeals.facsimileSeal.quantity,
+            companySeal: selectedSeals.companySeal.quantity,
             purpose: applicationDetails.purpose,
             notes: applicationDetails.notes,
-            instCd: auth.instCd,
         };
     
         axios.post(`/api/seal/imprint/update`, updatedImprintRequestDTO, {
@@ -192,15 +179,6 @@ function DetailSealImprintApplication() {
           alert('인장 반려 중 오류가 발생했습니다.');
         }
     };
-    
-    const handleChange = (e) => {
-        if (!readOnly) {
-            setApplicationDetails({
-                ...applicationDetails,
-                [e.target.name]: e.target.value,
-            });
-        }
-    };
 
     return (
         <div className="content">
@@ -214,7 +192,7 @@ function DetailSealImprintApplication() {
                                 <label>인장 날인 신청서</label>
                             </div>
                             <div className='seal-imprint-form-group'>
-                                <label>제출처</label>
+                                <label>제출처 <span style={{ color: 'red' }}>*</span></label>
                                 <input
                                     type="text"
                                     name="submission"
@@ -224,7 +202,7 @@ function DetailSealImprintApplication() {
                                 />
                             </div>
                             <div className='seal-imprint-form-group'>
-                                <label>사용일자</label>
+                                <label>사용일자 <span style={{ color: 'red' }}>*</span></label>
                                 <input
                                     type="text"
                                     name="useDate"
@@ -234,7 +212,7 @@ function DetailSealImprintApplication() {
                                 />
                             </div>
                             <div className='seal-imprint-form-group'>
-                                <label>사용목적</label>
+                                <label>사용목적 <span style={{ color: 'red' }}>*</span></label>
                                 <textarea
                                     name="purpose"
                                     value={applicationDetails.purpose}
@@ -243,7 +221,7 @@ function DetailSealImprintApplication() {
                                 />
                             </div>
                             <div className='seal-imprint-form-group'>
-                                <label>인장구분</label>
+                                <label>인장구분 <span style={{ color: 'red' }}>*</span></label>
                                 <div className="seal-imprint-options">
                                     <label>
                                         <div className='seal-imprint-detail-option'>

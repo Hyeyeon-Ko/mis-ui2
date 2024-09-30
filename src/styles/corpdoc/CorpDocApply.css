@@ -31,10 +31,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  row-gap: 16px;
 }
 
 .corpDoc-form-group {
-  margin-bottom: 15px;
+  /* margin-bottom: 15px; */
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -42,24 +43,24 @@
 }
 
 .corpDoc-form-group label {
-  font-weight: 600;
-  font-size: 13px;
+  font-weight: 500;
+  font-size: 16px;
   color: #222121;
-  margin-bottom: 5px;
-  margin-right: 10px;
+  margin-bottom: 12px;
+  /* margin-right: 10px; */
   text-align: left;
-  width: 81%;
+  width: 84%;
 }
 
 .corpDoc-form-group input,
 .corpDoc-form-group textarea {
   width: 80%;
   padding: 10px;
-  padding-left: 15px;
+  padding-left: 12px;
   border: 1px solid #e4e1e1;
   border-radius: 6px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .corpDoc-form-group select {
