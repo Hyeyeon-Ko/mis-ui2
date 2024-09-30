@@ -55,7 +55,7 @@ export const requiredInput = (inputValues, type) => {
         }
         const fieldName = getFieldName(fieldInput);
         console.log("field, fieldNAme: ", field, fieldName)
-        console.log("type: ", value)
+        console.log("value: ", value)
 
         // input, select box 값 선택 안한 경우
         if (typeof value === 'string') {

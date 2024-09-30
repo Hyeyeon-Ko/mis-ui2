@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import { AuthContext } from '../../components/AuthContext';
+import { validateForm } from '../../hooks/validateForm';
 import axios from 'axios';
 import '../../styles/common/Page.css';
 import '../../styles/seal/SealApplyExport.css';
@@ -32,11 +33,11 @@ function DetailSealExportApplication() {
 
     const [applicationDetails, setApplicationDetails] = useState({
         submission: '',
-        useDept: '',
         expNm: '',
         expDate: '',
         returnDate: '',
         purpose: '',
+        notes: '',
         file: null,
         fileName: '',  
         filePath: '',  
@@ -44,14 +45,15 @@ function DetailSealExportApplication() {
     });
 
     useEffect(() => {
+        // 인장반출 신청 상세보기
         if (sealExportDetails) {
             setApplicationDetails({
                 submission: sealExportDetails.submission || '',
-                useDept: sealExportDetails.useDept || '',
                 expNm: sealExportDetails.expNm || '',
                 expDate: sealExportDetails.expDate || '',
                 returnDate: sealExportDetails.returnDate || '',
                 purpose: sealExportDetails.purpose || '',
+                notes : sealExportDetails.notes || '',
                 file: sealExportDetails.file || null,
                 fileName: sealExportDetails.fileName || '',  
                 filePath: sealExportDetails.filePath || '',  
@@ -73,20 +75,20 @@ function DetailSealExportApplication() {
                 },
             });
         } else {
+            // 인장반출 수정 시, 상세보기
             axios.get(`/api/seal/export/${draftId}`)
                 .then(response => {
                     const data = response.data.data;
                     setApplicationDetails({
                         submission: data.submission || '',
-                        useDept: data.useDept || '',
                         expNm: data.expNm || '',
                         expDate: data.expDate || '',
                         returnDate: data.returnDate || '',
                         purpose: data.purpose || '',
-                        file: data.file || null,
-                        fileName: data.fileName || '',  
-                        filePath: data.filePath || '',  
-                        isFileDeleted: false, 
+                        notes: data.notes || '',
+                        fileName: data.fileName || '',
+                        filePath: data.filePath || '',
+                        isFileDeleted: false,
                     });
 
                     setSealSelections({
@@ -118,6 +120,7 @@ function DetailSealExportApplication() {
                 [sealName]: {
                     ...prevState[sealName],
                     selected: !prevState[sealName].selected,
+                    quantity: '',
                 }
             }));
         }
@@ -199,11 +202,36 @@ function DetailSealExportApplication() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const selectedSeals = {
-            corporateSeal: sealSelections.corporateSeal.selected ? sealSelections.corporateSeal.quantity : '',
-            facsimileSeal: sealSelections.facsimileSeal.selected ? sealSelections.facsimileSeal.quantity : '',
-            companySeal: sealSelections.companySeal.selected ? sealSelections.companySeal.quantity : '',
-        };
+        // 1. SealForm validation
+        const requiredInputs = {
+            submission: applicationDetails.submission,
+            expNm: applicationDetails.expNm,
+            exportDate: applicationDetails.expDate,
+            returnDate: applicationDetails.returnDate,
+            purpose: applicationDetails.purpose,
+        }
+        // 제출처, 반출자명, 반출일자, 반납일자, 사용목적, 인감구분, 특이사항, 근거서류
+        // 신청부서=제출처, 
+
+        const selectedSeals = ['corporateSeal', 'facsimileSeal', 'companySeal'].reduce((acc, sealType) => {
+            const { selected, quantity } = sealSelections[sealType];
+            acc[sealType] = {
+                selected,
+                quantity: selected ? quantity : '',
+            };
+            return acc;
+        }, {});
+
+        const inputDates = {
+            exportDate: applicationDetails.expDate,
+            returnDate: applicationDetails.returnDate
+        }
+
+        const { isValid, message } = validateForm('Seal', requiredInputs, selectedSeals, inputDates);
+        if (!isValid) {
+            alert(message);
+            return;
+        }
 
         const updatedExportRequestDTO = {
             drafter: auth.hngNm,
@@ -213,11 +241,11 @@ function DetailSealExportApplication() {
             expNm: applicationDetails.expNm,
             expDate: applicationDetails.expDate,
             returnDate: applicationDetails.returnDate,
-            corporateSeal: selectedSeals.corporateSeal,
-            facsimileSeal: selectedSeals.facsimileSeal,
-            companySeal: selectedSeals.companySeal,
+            corporateSeal: selectedSeals.corporateSeal.quantity,
+            facsimileSeal: selectedSeals.facsimileSeal.quantity,
+            companySeal: selectedSeals.companySeal.quantity,
             purpose: applicationDetails.purpose,
-            instCd: auth.instCd,
+            notes:applicationDetails.notes,
         };
 
         const formData = new FormData();
@@ -306,7 +334,7 @@ function DetailSealExportApplication() {
                                 <label>인장 반출 신청서</label>
                             </div>
                             <div className='seal-export-form-group'>
-                                <label>제출처</label>
+                                <label>제출처 <span style={{ color: 'red' }}>*</span></label>
                                 <input
                                     type="text"
                                     name="submission"
@@ -316,17 +344,37 @@ function DetailSealExportApplication() {
                                 />
                             </div>
                             <div className='seal-export-form-group'>
-                                <label>신청부서</label>
+                                <label>반출자명 <span style={{ color: 'red' }}>*</span></label>
                                 <input
                                     type="text"
-                                    name="useDept"
-                                    value={applicationDetails.useDept}
+                                    name="expNm"
+                                    value={applicationDetails.expNm}
                                     onChange={handleChange}
                                     disabled={readOnly}
                                 />
                             </div>
                             <div className='seal-export-form-group'>
-                                <label>사용용도</label>
+                                <label>반출일자 <span style={{ color: 'red' }}>*</span></label>
+                                <input
+                                    type="text"
+                                    name="expDate"
+                                    value={applicationDetails.expDate}
+                                    onChange={handleChange}
+                                    disabled={readOnly}
+                                />
+                            </div>
+                            <div className='seal-export-form-group'>
+                                <label>반납일자 <span style={{ color: 'red' }}>*</span></label>
+                                <input
+                                    type="text"
+                                    name="returnDate"
+                                    value={applicationDetails.returnDate}
+                                    onChange={handleChange}
+                                    disabled={readOnly}
+                                />
+                            </div>
+                            <div className='seal-export-form-group'>
+                                <label>사용목적 <span style={{ color: 'red' }}>*</span></label>
                                 <textarea
                                     name="purpose"
                                     value={applicationDetails.purpose}
@@ -335,7 +383,7 @@ function DetailSealExportApplication() {
                                 />
                             </div>
                             <div className='seal-imprint-form-group'>
-                                <label>인장구분</label>
+                                <label>인장구분 <span style={{ color: 'red' }}>*</span></label>
                                 <div className="seal-imprint-options">
                                     <label>
                                         <div className='seal-imprint-detail-option'>
@@ -417,38 +465,17 @@ function DetailSealExportApplication() {
                                     </label>
                                 </div>
                             </div>
-                            <div className='seal-export-form-group'>
-                                <label>반출자명</label>
-                                <input
-                                    type="text"
-                                    name="expNm"
-                                    value={applicationDetails.expNm}
+                            <div className='seal-imprint-form-group'>
+                                <label>특이사항</label>
+                                <textarea
+                                    name="notes"
+                                    value={applicationDetails.notes}
                                     onChange={handleChange}
                                     disabled={readOnly}
                                 />
                             </div>
                             <div className='seal-export-form-group'>
-                                <label>반출일자</label>
-                                <input
-                                    type="text"
-                                    name="expDate"
-                                    value={applicationDetails.expDate}
-                                    onChange={handleChange}
-                                    disabled={readOnly}
-                                />
-                            </div>
-                            <div className='seal-export-form-group'>
-                                <label>반납일자</label>
-                                <input
-                                    type="text"
-                                    name="returnDate"
-                                    value={applicationDetails.returnDate}
-                                    onChange={handleChange}
-                                    disabled={readOnly}
-                                />
-                            </div>
-                            <div className='seal-export-form-group'>
-                                <label>참조자료</label>
+                                <label>근거서류  <span style={{ color: 'red' }}>*</span></label>
                                 {applicationDetails.fileName && applicationDetails.filePath ? (
                                     <div className="file-display">
                                         <span className="file-name">{applicationDetails.fileName}</span>

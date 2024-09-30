@@ -42,8 +42,8 @@
 }
 
 .seal-imprint-form-group label {
-  font-weight: 580;
-  font-size: 14.5px;
+  font-weight: bold;
+  font-size: 13px;
   color: #222121;
   margin-bottom: 5px;
   margin-right: 10px;
@@ -61,7 +61,7 @@
   border: 1px solid #e4e1e1;
   border-radius: 6px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .seal-imprint-form-group select {

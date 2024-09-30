@@ -104,7 +104,7 @@ function SealFormComponents({
                             )}
 
                             <div className='seal-apply-form-group'>
-                                <label>사용 목적 <span style={{ color: 'red' }}>*</span></label>
+                                <label>사용목적 <span style={{ color: 'red' }}>*</span></label>
                                 <textarea 
                                     name="purpose" 
                                     value={purpose} 
@@ -144,7 +144,6 @@ function SealFormComponents({
                                     *실제 인감이 아닙니다.
                                 </div>
                             </div>
-
                             <div className='seal-apply-form-group'>
                                 <label>특이사항</label>
                                 <textarea 
@@ -153,7 +152,6 @@ function SealFormComponents({
                                     onChange={(e) => setNotes(e.target.value)} 
                                 />
                             </div>
-
                             {isExport && (
                                 <div className='seal-apply-form-group'>
                                     <label>근거서류 <span style={{ color: 'red' }}>*</span></label>
