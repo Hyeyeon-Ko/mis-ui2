@@ -18,7 +18,7 @@ import ReasonModal from '../../components/ReasonModal';
 
 function DetailSealImprintApplication() {
     const {handleSealChange, handleQuantityChange, handleChange} = useSealForm();
-    const { auth, refreshSidebar } = useContext(AuthContext);
+    const { refreshSidebar } = useContext(AuthContext);
     const { draftId } = useParams(); 
     const navigate = useNavigate();
     const location = useLocation();

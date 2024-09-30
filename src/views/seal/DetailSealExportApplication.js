@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
@@ -15,7 +15,6 @@ import downloadIcon from '../../assets/images/download.png';
 import deleteIcon from '../../assets/images/delete2.png';
 import { useSealForm } from '../../hooks/useSealForm';
 import { applicationData } from '../../datas/sealDatas';
-import { AuthContext } from '../../components/AuthContext';
 
 function DetailSealExportApplication() {
     const [applicationDetails, setApplicationDetails] = useState(applicationData);
@@ -37,6 +36,7 @@ function DetailSealExportApplication() {
 
     const queryParams = new URLSearchParams(location.search);
     const applyStatus = queryParams.get('applyStatus'); 
+    const [showDownloadReasonModal, setShowDownloadReasonModal] = useState(false);
 
    
     useEffect(() => {
@@ -108,7 +108,9 @@ function DetailSealExportApplication() {
         }
     }, [draftId, sealExportDetails, setApplicationDetails, setSealSelections]);
 
-    
+    const handleFileDownloadClick = () => {
+        setShowDownloadReasonModal(true); 
+    };
 
     const handleDownloadModalClose = () => {
         setShowDownloadReasonModal(false); 
