@@ -5,11 +5,12 @@ stages:
   - deploy
 
 variables:
+  SAFE_BRANCH_NAME: dev-ui
   DOCKER_IMAGE: frontend-ui
-  FRONTEND_IMAGE: $CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$DOCKER_IMAGE
+  FRONTEND_IMAGE: $CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$DOCKER_IMAGE:$SAFE_BRANCH_NAME
   DEPLOY_USER: root  # 배포할 사용자 이름
-  DEPLOY_SERVER: 101.10.1.87  # 배포할 서버 IP 주소
-  REGISTRY_URL: http://101.10.1.100:5000  # GitLab Container Registry URL
+  DEPLOY_SERVER: 101.10.1.87 # 배포할 서버 IP 주소
+  REGISTRY_URL: 101.10.1.100:5000  # GitLab Container Registry URL (http:// 제거)
   REGISTRY_USER: root  # GitLab 사용자 이름
   REGISTRY_PASSWORD: $REGISTRY_PASSWORD  # Access Token
 
@@ -33,7 +34,10 @@ docker-build:
   image: docker:stable
   script:
     - echo "Docker build start!!"
-    # Dockerfile로 Docker 이미지 빌드
+    - echo "CI_REGISTRY >> $CI_REGISTRY"
+    - echo "CI_COMMIT_REF_NAME >> $CI_COMMIT_REF_NAME"
+    - echo "FRONTEND_IMAGE >> $FRONTEND_IMAGE"
+    - echo "SAFE_BRANCH_NAME >> $SAFE_BRANCH_NAME"
     - docker build -t $CI_REGISTRY/$FRONTEND_IMAGE .
   tags:
     - mis-runner
@@ -59,7 +63,7 @@ deploy:
   before_script:
     - apk add --no-cache openssh-client
     - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - echo "$SSH_PRIVATE_KEY_DEV" | tr -d '\r' > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
     - ssh-keyscan $DEPLOY_SERVER >> ~/.ssh/known_hosts
   script:
