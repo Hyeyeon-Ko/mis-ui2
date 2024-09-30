@@ -249,6 +249,7 @@ function CorpDocIssueList() {
           setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
           searchOptions={['전체', '발급/입고일자', '이름', '제출처', '사용목적']}
           startDateLabel="발급/입고일자"
+          setDocumentType={() => {}}
         />
 
         <table className="corpDoc-issue-table">

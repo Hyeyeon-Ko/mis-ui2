@@ -5,7 +5,7 @@ import { validateForm } from '../../hooks/validateForm';
 import { getTypeName } from '../../hooks/fieldNameUtils';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
-import RejectReasonModal from '../../components/RejectReasonModal';
+import ReasonModal from '../../components/ReasonModal';
 import axios from 'axios';
 import '../../styles/common/Page.css';
 import '../../styles/corpdoc/CorpDocApply.css';
@@ -42,6 +42,7 @@ function DetailCorpDocApplication() {
     const [file, setFile] = useState(null);
     const [showRejectModal, setShowRejectModal] = useState(false);
     const isReadOnly = new URLSearchParams(location.search).get('readonly') === 'true';
+    const [showDownloadReasonModal, setShowDownloadReasonModal] = useState(false);
 
     const fetchCorpDocDetail = useCallback(async (id) => {
         try {
@@ -120,31 +121,42 @@ function DetailCorpDocApplication() {
         setExistingFile(null);
     };
 
-    const handleFileDownload = async () => {
-        if (existingFile) {
-          try {
-            const documentType = "corpdoc";
-            
-            const response = await axios.get(
-              `/api/file/download/${encodeURIComponent(existingFile.name)}?documentType=${encodeURIComponent(documentType)}`, 
-              {
+    const handleFileDownloadClick = () => {
+        setShowDownloadReasonModal(true); 
+    };
+
+    const handleDownloadModalClose = () => {
+        setShowDownloadReasonModal(false); 
+    };
+        
+    const handleFileDownloadConfirm = async ({ reason, fileType }) => {
+        setShowDownloadReasonModal(false);
+    
+        try {
+            const response = await axios.get(`/api/file/download/${encodeURIComponent(existingFile.name)}`, {
+                params: {
+                    draftId: draftId,
+                    docType: 'corpdoc',
+                    fileType: fileType,
+                    reason: reason,
+                    downloaderNm: auth.hngNm,
+                    downloaderId: auth.userId,
+                },
                 responseType: 'blob',
-              }
-            );
-      
+            });
+    
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', existingFile.name); 
+            link.setAttribute('download', existingFile.name);
             document.body.appendChild(link);
             link.click();
             link.parentNode.removeChild(link);
-          } catch (error) {
+        } catch (error) {
             console.error('Error downloading the file:', error);
             alert('파일 다운로드에 실패했습니다.');
-          }
         }
-      };
+    };
     
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -310,7 +322,7 @@ function DetailCorpDocApplication() {
                                             <button
                                                 type="button"
                                                 className="download-button"
-                                                onClick={handleFileDownload}
+                                                onClick={handleFileDownloadClick}
                                             >
                                                 <img src={downloadIcon} alt="다운로드" />
                                             </button>
@@ -463,12 +475,18 @@ function DetailCorpDocApplication() {
                             )}
                         </form>    
                         {showRejectModal && (
-                            <RejectReasonModal 
+                            <ReasonModal 
                                 show={showRejectModal}
                                 onConfirm={handleRejectConfirm}
                                 onClose={handleRejectClose}
                             />
                         )}
+                        <ReasonModal 
+                            show={showDownloadReasonModal} 
+                            onClose={handleDownloadModalClose}
+                            onConfirm={handleFileDownloadConfirm} 
+                            modalType="download" 
+                        />
                     </div>
                 </div>
             </div>

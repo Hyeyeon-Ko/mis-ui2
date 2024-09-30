@@ -6,9 +6,8 @@ import downloadIcon from '../../assets/images/download.png';
 import { AuthContext } from '../../components/AuthContext'; 
 import axios from 'axios';
 import ConditionFilter from '../../components/common/ConditionFilter';
+import ReasonModal from '../../components/ReasonModal'; 
 import '../../styles/seal/SealExportList.css';
-
-
 
 function SealExportList() {
   const { auth } = useContext(AuthContext);
@@ -21,7 +20,11 @@ function SealExportList() {
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
   const [clickedRows, setClickedRows] = useState([]);
   const [initialLoad, setInitialLoad] = useState(true); 
-  
+
+  const [showDownloadReasonModal, setShowDownloadReasonModal] = useState(false);
+  const [selectedFileName, setSelectedFileName] = useState('');
+  const [selectedDraftId, setSelectedDraftId] = useState(null);
+
   const fetchSealExportList = useCallback(async (searchType = null, keyword = null) => {
     try {
       const { instCd } = auth;
@@ -34,7 +37,8 @@ function SealExportList() {
       });
       
       const fetchedData = response.data.data.map((item, index) => ({
-        id: index + 1,
+        id: index + 1, 
+        draftId: item.draftId,
         expDate: item.expDate,
         returnDate: item.returnDate,
         purpose: item.purpose,
@@ -47,15 +51,17 @@ function SealExportList() {
         signitureImage: SignitureImage,
         fileName: item.fileName,
         filePath: item.filePath,
-        fileUrl: `/api/doc/download/${encodeURIComponent(item.fileName)}`,
-        status: '결재진행중',
+        fileUrl: item.filePath ? `/api/file/download/${encodeURIComponent(item.fileName)}` : '',
+        status: '결재진행중', 
       }));
-  
+
       setApplications(fetchedData);
-      const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
-      setClickedRows(clickedRows);
+
+      const storedClickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
+      setClickedRows(storedClickedRows);
     } catch (error) {
       console.error('Error fetching seal export list:', error);
+      alert('인장 반출대장 데이터를 불러오는 중 오류가 발생했습니다.');
     }
   }, [auth]);
 
@@ -78,22 +84,49 @@ function SealExportList() {
     fetchSealExportList(); 
   };
 
-  const handleFileDownload = async (fileUrl, fileName) => {
+  const handleFileDownloadClick = (draftId, fileName) => {
+    console.log(`Download clicked for draftId: ${draftId}, fileName: ${fileName}`);
+    setSelectedDraftId(draftId);
+    setSelectedFileName(fileName);
+    setShowDownloadReasonModal(true); 
+  };
+
+  const handleDownloadModalClose = () => {
+    setShowDownloadReasonModal(false); 
+    setSelectedDraftId(null);
+    setSelectedFileName('');
+  };
+      
+  const handleFileDownloadConfirm = async ({ reason, fileType }) => {
+    console.log(`Download Confirmed for draftId: ${selectedDraftId}, fileName: ${selectedFileName}, reason: ${reason}, fileType: ${fileType}`);
+    setShowDownloadReasonModal(false);
+  
     try {
-      const response = await axios.get(fileUrl, {
+      const response = await axios.get(`/api/file/download/${encodeURIComponent(selectedFileName)}`, {
+        params: {
+          draftId: selectedDraftId,
+          docType: 'seal', 
+          fileType: fileType,
+          reason: reason,
+          downloaderNm: auth.hngNm,
+          downloaderId: auth.userId,
+        },
         responseType: 'blob',
       });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', fileName);
+      link.setAttribute('download', selectedFileName);
       document.body.appendChild(link);
       link.click();
       link.parentNode.removeChild(link);
     } catch (error) {
       console.error('Error downloading the file:', error);
       alert('파일 다운로드에 실패했습니다.');
+    } finally {
+      setSelectedDraftId(null);
+      setSelectedFileName('');
     }
   };
 
@@ -108,6 +141,7 @@ function SealExportList() {
         setClickedRows(prevClickedRows => {
           const newClickedRows = [...prevClickedRows, document.id];
           localStorage.setItem('clickedRows', JSON.stringify(newClickedRows));
+          console.log("Updated Clicked Rows:", newClickedRows);
           return newClickedRows;
         });
       }
@@ -166,7 +200,7 @@ function SealExportList() {
           <tbody>
             {applications.length > 0 ? (
               applications.map((app, index) => (
-                <tr key={index}>
+                <tr key={app.draftId}>
                   <td>{index + 1}</td>
                   <td>{app.expDate}</td>
                   <td>{app.returnDate}</td>
@@ -177,7 +211,7 @@ function SealExportList() {
                   <td>
                     {app.fileName && app.fileUrl ? (
                       <button
-                        onClick={() => handleFileDownload(app.fileUrl, app.fileName)}
+                        onClick={() => handleFileDownloadClick(app.draftId, app.fileUrl, app.fileName)} 
                         style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                       >
                         <img src={downloadIcon} alt="파일 다운로드" />
@@ -188,7 +222,7 @@ function SealExportList() {
                   </td>
                   <td
                     className={`status-${app.status.replace(/\s+/g, '-').toLowerCase()} clickable ${
-                      clickedRows.includes(app.id) ? 'confirmed' : ''
+                      clickedRows.includes(app.draftId) ? 'confirmed' : ''
                     }`}
                     onClick={() => handleRowClick(app.status, app)}
                   >
@@ -204,7 +238,12 @@ function SealExportList() {
           </tbody>
         </table>
       </div>
-
+      <ReasonModal 
+        show={showDownloadReasonModal} 
+        onClose={handleDownloadModalClose}
+        onConfirm={handleFileDownloadConfirm} 
+        modalType="download" 
+      />
       {modalVisible && selectedDocumentDetails && (
         <SealApprovalModal
           show={modalVisible}

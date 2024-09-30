@@ -3,6 +3,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
 import ConfirmModal from '../../components/common/ConfirmModal';
+import ReasonModal from '../../components/ReasonModal';
 import deleteIcon from '../../assets/images/delete2.png';
 import downloadIcon from '../../assets/images/download.png';
 import '../../styles/doc/DocOutList.css';
@@ -11,10 +12,12 @@ import { AuthContext } from '../../components/AuthContext';
 
 function DocOutList() {
   const { auth } = useContext(AuthContext);
-  // const [applications, setApplications] = useState([]);
   const [, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const [showDownloadReasonModal, setShowDownloadReasonModal] = useState(false);
+  const [selectedFileName, setSelectedFileName] = useState('');
   const [selectedDraftId, setSelectedDraftId] = useState(null);
 
   const [filterInputs, setFilterInputs] = useState({
@@ -63,22 +66,44 @@ function DocOutList() {
     fetchDocOutList();
   }, [fetchDocOutList]);
 
-  const handleFileDownload = async (fileName) => {
-    try {
-      const response = await axios.get(`/api/doc/download/${encodeURIComponent(fileName)}`, {
-        responseType: 'blob',
-      });
+  const handleFileDownloadClick = (draftId, fileName) => {
+    setSelectedDraftId(draftId);
+    setSelectedFileName(fileName);
+    setShowDownloadReasonModal(true); 
+  };
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', fileName);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
+  const handleDownloadModalClose = () => {
+    setShowDownloadReasonModal(false); 
+    setSelectedDraftId(null);
+    setSelectedFileName('');
+  };
+    
+  const handleFileDownloadConfirm = async ({ reason, fileType }) => {
+    setShowDownloadReasonModal(false);
+
+    try {
+        const response = await axios.get(`/api/file/download/${encodeURIComponent(selectedFileName)}`, {
+            params: {
+                draftId: selectedDraftId,
+                docType: 'doc',
+                fileType: fileType,
+                reason: reason,
+                downloaderNm: auth.hngNm,
+                downloaderId: auth.userId,
+            },
+            responseType: 'blob',
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', selectedFileName);
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
     } catch (error) {
-      console.error('Error downloading the file:', error);
-      alert('파일 다운로드에 실패했습니다.');
+        console.error('Error downloading the file:', error);
+        alert('파일 다운로드에 실패했습니다.');
     }
   };
 
@@ -177,7 +202,7 @@ function DocOutList() {
       width: '7%',
       Cell: ({ row }) =>
         row.fileName ? (
-          <button className="download-button" onClick={() => handleFileDownload(row.fileName)}>
+          <button className="download-button" onClick={() => handleFileDownloadClick(row.draftId, row.fileName)}>
             <img src={downloadIcon} alt="Download" className="action-icon" />
           </button>
         ) : null,
@@ -208,9 +233,9 @@ function DocOutList() {
         <Breadcrumb items={['문서수발신 대장', '문서 발신 대장']} />
         <ConditionFilter
           startDate={filterInputs.startDate}
-          setStartDate={(date) => setFilterInputs((prev) => ({ ...prev, startDate: date }))}  // 여기서 바로 API 호출 안됨
+          setStartDate={(date) => setFilterInputs((prev) => ({ ...prev, startDate: date }))} 
           endDate={filterInputs.endDate}
-          setEndDate={(date) => setFilterInputs((prev) => ({ ...prev, endDate: date }))}  // 여기서 바로 API 호출 안됨
+          setEndDate={(date) => setFilterInputs((prev) => ({ ...prev, endDate: date }))} 
           onSearch={handleSearch} 
           onReset={handleReset}
           showDocumentType={false}
@@ -221,6 +246,8 @@ function DocOutList() {
           setKeyword={(keyword) => setFilterInputs((prev) => ({ ...prev, keyword }))}
           searchOptions={['전체', '수신처', '제목', '접수인']}
           startDateLabel="접수일자"
+          setFilters={() => {}}
+          setDocumentType={() => {}}
         />
         <div className="doc-out-content">
           <Table columns={columns} data={filteredApplications} />
@@ -232,6 +259,12 @@ function DocOutList() {
             onCancel={() => setShowDeleteModal(false)}
           />
         )}
+        <ReasonModal 
+          show={showDownloadReasonModal} 
+          onClose={handleDownloadModalClose}
+          onConfirm={handleFileDownloadConfirm} 
+          modalType="download" 
+        />
       </div>
     </div>
   );

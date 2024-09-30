@@ -3,7 +3,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import DateFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
 import ConfirmModal from '../../components/common/ConfirmModal';
-import RejectReasonModal from '../../components/RejectReasonModal'; 
+import RejectReasonModal from '../../components/ReasonModal'; 
 import ApprovalModal from './ApprovalModal';
 import { AuthContext } from '../../components/AuthContext'; 
 import '../../styles/list/MyApplyList.css';
@@ -344,6 +344,7 @@ function MyApplyList() {
           onConfirm={() => {}}
           reason={rejectionReason}
           isViewOnly={true}
+          modalType="reject"
         />
       )}
       {showApprovalModal && (

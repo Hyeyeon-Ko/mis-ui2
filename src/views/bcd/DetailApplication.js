@@ -4,7 +4,7 @@ import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import FinalConfirmationModal from './FinalConfirmationModal';
-import RejectReasonModal from '../../components/RejectReasonModal';
+import RejectReasonModal from '../../components/ReasonModal';
 import ApplicationHistoryModal from './ApplicationHistoryModal';
 import PreviewModal from './PreviewModal';
 import { AuthContext } from '../../components/AuthContext';
@@ -677,7 +677,7 @@ function DetailApplication() {
         title="최종 수정 확인"
         confirmButtonText="수 정"
       />
-      <RejectReasonModal show={showRejectModal} onClose={handleRejectClose} onConfirm={handleRejectConfirm} />
+      <RejectReasonModal show={showRejectModal} onClose={handleRejectClose} onConfirm={handleRejectConfirm} modalType="reject"/>
       <ApplicationHistoryModal show={showHistoryModal} onClose={handleHistoryClose} draftId={draftId} />
       <PreviewModal
         show={previewVisible}

@@ -1,6 +1,8 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import ReasonModal from '../../components/ReasonModal';
+import { AuthContext } from '../../components/AuthContext';
 import '../../styles/doc/DocConfirmModal.css';
 import downloadIcon from '../../assets/images/download.png';
 
@@ -17,6 +19,9 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
     filePath: '',
   });
 
+  const { auth } = useContext(AuthContext);
+  const [showDownloadReasonModal, setShowDownloadReasonModal] = useState(false);
+
   const fetchDocumentData = useCallback(async (id) => {
     try {
       const response = await axios.get(`/api/doc/${id}`);
@@ -24,6 +29,7 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
         const data = response.data.data;
         setFormData({
           receptionDate: parseDateTime(data.draftDate),
+          draftId: data.draftId,
           drafter: data.drafter,
           receiver: data.receiver,
           sender: data.sender,
@@ -31,7 +37,7 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
           purpose: data.purpose,
           division: data.division,
           fileName: data.fileName,
-          filePath: data.filePath, // 기존 filePath 정보 추가
+          filePath: data.filePath,
         });
       }
     } catch (error) {
@@ -61,28 +67,42 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
     }
   };
 
-  const handleFileDownload = async () => {
-    if (formData.filePath) {
-      try {
-        const documentType = "doc"; // 필요에 따라 documentType 값을 설정하세요
-        const response = await axios.get(
-          `/api/file/download/${encodeURIComponent(formData.fileName)}?documentType=${encodeURIComponent(documentType)}`,
-          { responseType: 'blob' }
-        );
+  const handleFileDownloadClick = () => {
+    setShowDownloadReasonModal(true); 
+};
+
+const handleDownloadModalClose = () => {
+    setShowDownloadReasonModal(false); 
+};
+    
+const handleFileDownloadConfirm = async ({ reason, fileType }) => {
+    setShowDownloadReasonModal(false);
+
+    try {
+        const response = await axios.get(`/api/file/download/${encodeURIComponent(formData.fileName)}`, {
+            params: {
+                draftId: formData.draftId,
+                docType: 'doc',
+                fileType: fileType,
+                reason: reason,
+                downloaderNm: auth.hngNm,
+                downloaderId: auth.userId,
+            },
+            responseType: 'blob',
+        });
 
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', formData.fileName); // 다운로드 파일 이름 설정
+        link.setAttribute('download', formData.fileName);
         document.body.appendChild(link);
         link.click();
         link.parentNode.removeChild(link);
-      } catch (error) {
+    } catch (error) {
         console.error('Error downloading the file:', error);
         alert('파일 다운로드에 실패했습니다.');
-      }
     }
-  };
+};
 
   if (!show) return null;
 
@@ -124,7 +144,7 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
           <div className="doc-confirm-form-group">
             <label>첨부 파일</label>
             <div className="doc-confirm-file-download">
-              <button onClick={handleFileDownload} style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}>
+              <button onClick={handleFileDownloadClick} style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}>
                 <span>{formData.fileName}</span>
                 <img src={downloadIcon} alt="다운로드" />
               </button>
@@ -139,6 +159,12 @@ const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, re
           </div>
         )}
       </div>
+      <ReasonModal 
+        show={showDownloadReasonModal} 
+        onClose={handleDownloadModalClose}
+        onConfirm={handleFileDownloadConfirm} 
+        modalType="download" 
+      />
     </div>
   );
 };
