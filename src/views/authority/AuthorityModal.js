@@ -39,6 +39,27 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
     }
   }, [adminData, setIsStandardChecked, setQueryResult, setRole]);
 
+  // const resetForm = () => {
+  //   setRole('');
+  //   setUserId('');
+  //   setUserName('');
+  //   setIsStandardChecked(false);
+  //   setInitialRole('');
+  //   setInitialStandardChecked(false);
+  //   setQueryResult([]);
+  // };
+
+  const resetForm = useCallback(() => {
+    setRole('');
+    setUserId('');
+    setUserName('');
+    setIsStandardChecked(false);
+    setInitialRole('');
+    setInitialStandardChecked(false);
+    setQueryResult([]);
+  }, [setRole, setUserId, setUserName, setIsStandardChecked, setInitialRole, setInitialStandardChecked, setQueryResult]);
+  
+
   useEffect(() => {
     if (show) {
       if (adminData) {
@@ -49,15 +70,7 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
     }
   }, [show, adminData, fetchAdminData, resetForm]);
 
-  const resetForm = () => {
-    setRole('');
-    setUserId('');
-    setUserName('');
-    setIsStandardChecked(false);
-    setInitialRole('');
-    setInitialStandardChecked(false);
-    setQueryResult([]);
-  };
+  
 
   const handleQuery = async () => {
     try {
