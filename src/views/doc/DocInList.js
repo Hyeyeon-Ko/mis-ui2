@@ -6,6 +6,7 @@ import ConfirmModal from '../../components/common/ConfirmModal';
 import ReasonModal from '../../components/ReasonModal';
 import deleteIcon from '../../assets/images/delete2.png';
 import downloadIcon from '../../assets/images/download.png';
+import CustomButton from '../../components/common/CustomButton';
 import '../../styles/doc/DocOutList.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
@@ -20,6 +21,9 @@ function DocInList() {
   const [selectedFileName, setSelectedFileName] = useState('');
   const [selectedDraftId, setSelectedDraftId] = useState(null);
 
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [showDownButton, setShowDownButton] = useState(false); 
+
   const [filterInputs, setFilterInputs] = useState({
     startDate: null,
     endDate: null,
@@ -27,11 +31,25 @@ function DocInList() {
     keyword: '',
   });
 
+  const [downloadType, setDownloadType] = useState(null); 
+
+  const deriveDocType = (filePath) => {
+    if (!filePath) return "doc"; 
+    if (filePath.startsWith("/doc/")) {
+      return "doc";
+    } else if (filePath.startsWith("/seal/")) {
+      return "seal";
+    } else if (filePath.startsWith("/corpdoc/")) {
+      return "corpdoc";
+    }
+    return "doc";
+  };
+
   const fetchDocInList = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null) => {
     try {
       const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : '';
       const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : '';
-  
+
       const response = await axios.get('/api/doc/receiveList', {
         params: {
           instCd: auth.instCd,
@@ -41,7 +59,7 @@ function DocInList() {
           endDate: formattedEndDate,
         },
       });
-  
+
       if (response.data && response.data.data) {
         const formattedData = response.data.data.map((item) => ({
           draftId: item.draftId,
@@ -53,6 +71,7 @@ function DocInList() {
           status: item.status,
           fileName: item.fileName,
           fileUrl: item.fileUrl,
+          docType: deriveDocType(item.filePath),
         }));
         setApplications(formattedData);
         setFilteredApplications(formattedData);
@@ -66,32 +85,39 @@ function DocInList() {
     fetchDocInList();
   }, [fetchDocInList]);
 
+  useEffect(() => {
+    setShowDownButton(selectedRows.length > 0);
+  }, [selectedRows]);
+
   const handleFileDownloadClick = (draftId, fileName) => {
     setSelectedDraftId(draftId);
     setSelectedFileName(fileName);
-    setShowDownloadReasonModal(true); 
+    setDownloadType('single'); 
+    setShowDownloadReasonModal(true);
   };
 
   const handleDownloadModalClose = () => {
-    setShowDownloadReasonModal(false); 
+    setShowDownloadReasonModal(false);
     setSelectedDraftId(null);
     setSelectedFileName('');
+    setDownloadType(null);
   };
-    
-  const handleFileDownloadConfirm = async ({ reason, fileType }) => {
+
+  const handleDownloadConfirm = async ({ reason, fileType }) => {
     setShowDownloadReasonModal(false);
 
-    try {
+    if (downloadType === 'single') {
+      try {
         const response = await axios.get(`/api/file/download/${encodeURIComponent(selectedFileName)}`, {
-            params: {
-                draftId: selectedDraftId,
-                docType: 'doc',
-                fileType: fileType,
-                reason: reason,
-                downloaderNm: auth.hngNm,
-                downloaderId: auth.userId,
-            },
-            responseType: 'blob',
+          params: {
+            draftId: selectedDraftId,
+            docType: 'doc',
+            fileType: fileType,
+            reason: reason,
+            downloaderNm: auth.hngNm,
+            downloaderId: auth.userId,
+          },
+          responseType: 'blob',
         });
 
         const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -101,10 +127,45 @@ function DocInList() {
         document.body.appendChild(link);
         link.click();
         link.parentNode.removeChild(link);
-    } catch (error) {
+      } catch (error) {
         console.error('Error downloading the file:', error);
         alert('파일 다운로드에 실패했습니다.');
+      }
+    } else if (downloadType === 'multiple') {
+      const requestData = selectedRows.map((draftId) => {
+        const selectedApp = filteredApplications.find(app => app.draftId === draftId);
+        return {
+          draftId: draftId,
+          docType: selectedApp ? selectedApp.docType : 'doc', 
+          fileName: selectedApp ? selectedApp.fileName : '',
+          fileType: fileType,
+          reason: reason,
+          downloaderNm: auth.hngNm,
+          downloaderId: auth.userId,
+        };
+      });
+
+      try {
+        const response = await axios.post('/api/file/download/multiple', requestData, {
+          responseType: 'blob', 
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'documents.zip'); 
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+
+        setSelectedRows([]);
+      } catch (error) {
+        console.error('파일 다운로드에 실패했습니다:', error);
+        alert('파일 다운로드에 실패했습니다.');
+      }
     }
+
+    setDownloadType(null); 
   };
 
   const handleDeleteClick = (draftId) => {
@@ -135,10 +196,10 @@ function DocInList() {
 
   const handleSearch = async () => {
     const { searchType, keyword, startDate, endDate } = filterInputs;
-  
+
     const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : null;
     const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : null;
-  
+
     try {
       const response = await axios.get('/api/doc/receiveList', {
         params: {
@@ -149,7 +210,7 @@ function DocInList() {
           endDate: formattedEndDate,
         },
       });
-  
+
       if (response.data && response.data.data) {
         const formattedData = response.data.data.map((item) => ({
           draftId: item.draftId,
@@ -161,6 +222,7 @@ function DocInList() {
           status: item.status,
           fileName: item.fileName,
           fileUrl: item.fileUrl,
+          docType: deriveDocType(item.filePath), 
         }));
         setApplications(formattedData);
         setFilteredApplications(formattedData);
@@ -179,6 +241,7 @@ function DocInList() {
       searchType: '전체',
       keyword: '',
     });
+    setSelectedRows([]); 
   }, []);
 
   useEffect(() => {
@@ -190,7 +253,45 @@ function DocInList() {
     fetchDocInList();
   };
 
+  const handleSelectRow = (isChecked, draftId) => {
+    if (isChecked) {
+      setSelectedRows(prevSelected => [...prevSelected, draftId]);
+    } else {
+      setSelectedRows(prevSelected => prevSelected.filter(id => id !== draftId));
+    }
+  };
+
+  const handleSelectAll = (isChecked) => {
+    if (isChecked) {
+      const allDraftIds = filteredApplications.map(app => app.draftId);
+      setSelectedRows(allDraftIds);
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  const handleDownloadFiles = () => {
+    if (selectedRows.length === 0) {
+      alert('다운로드할 파일을 선택하세요.');
+      return;
+    }
+    setDownloadType('multiple');
+    setShowDownloadReasonModal(true);
+  };
+
   const columns = [
+    {
+      header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
+      accessor: 'select',
+      width: '4%',
+      Cell: ({ row }) => (
+        <input
+          type="checkbox"
+          checked={selectedRows.includes(row.draftId)}
+          onChange={(e) => handleSelectRow(e.target.checked, row.draftId)}
+        />
+      ),
+    },
     { header: '접수일자', accessor: 'draftDate', width: '8%' },
     { header: '문서번호', accessor: 'docId', width: '8%' },
     { header: '발신처', accessor: 'resSender', width: '10%' },
@@ -229,20 +330,29 @@ function DocInList() {
     <div className="content">
       <div className="doc-out-list">
         <h2>문서 수신 대장</h2>
-        <Breadcrumb items={['문서수발신 대장', '문서 수신 대장']} />
+        <div className="application-header-row">
+          <Breadcrumb items={['문서수발신 대장', '문서 수신 대장']} />
+          <div className="application-button-container">
+            {showDownButton && (
+              <CustomButton className="finish-excel-button" onClick={handleDownloadFiles}>
+                파일다운
+              </CustomButton>
+            )}
+          </div>
+        </div>
         <ConditionFilter
           startDate={filterInputs.startDate}
-          setStartDate={(date) => setFilterInputs((prev) => ({ ...prev, startDate: date }))} 
+          setStartDate={(date) => setFilterInputs((prev) => ({ ...prev, startDate: date }))}
           endDate={filterInputs.endDate}
-          setEndDate={(date) => setFilterInputs((prev) => ({ ...prev, endDate: date }))} 
-          onSearch={handleSearch} 
+          setEndDate={(date) => setFilterInputs((prev) => ({ ...prev, endDate: date }))}
+          onSearch={handleSearch}
           onReset={handleReset}
           showDocumentType={false}
           showSearchCondition={true}
           searchType={filterInputs.searchType}
-          setSearchType={(searchType) => setFilterInputs((prev) => ({ ...prev, searchType }))} 
+          setSearchType={(searchType) => setFilterInputs((prev) => ({ ...prev, searchType }))}
           keyword={filterInputs.keyword}
-          setKeyword={(keyword) => setFilterInputs((prev) => ({ ...prev, keyword }))} 
+          setKeyword={(keyword) => setFilterInputs((prev) => ({ ...prev, keyword }))}
           searchOptions={['전체', '수신처', '제목', '접수인']}
           startDateLabel="접수일자"
           setFilters={() => {}}
@@ -258,11 +368,11 @@ function DocInList() {
             onCancel={() => setShowDeleteModal(false)}
           />
         )}
-        <ReasonModal 
-          show={showDownloadReasonModal} 
+        <ReasonModal
+          show={showDownloadReasonModal}
           onClose={handleDownloadModalClose}
-          onConfirm={handleFileDownloadConfirm} 
-          modalType="download" 
+          onConfirm={handleDownloadConfirm} 
+          modalType="download"
         />
       </div>
     </div>
