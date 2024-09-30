@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
@@ -37,14 +37,14 @@ function BcdApplySecond() {
   const [expandedNodes, setExpandedNodes] = useState({});
   const [teamMembers, setTeamMembers] = useState([]);
 
-  useEffect(() => {
-    if (isOwn) {
-      fetchUserInfo(auth.userId);
-    }
-    fetchBcdStd();
-  }, [isOwn, auth.userId]);
+  // useEffect(() => {
+  //   if (isOwn) {
+  //     fetchUserInfo(auth.userId);
+  //   }
+  //   fetchBcdStd();
+  // }, [isOwn, auth.userId]);
 
-  const fetchUserInfo = async (userId) => {
+  const fetchUserInfo = useCallback(async (userId) => {
     try {
       const response = await axios.get(`/api/info/${userId}`);
       if (response.data && response.data.data) {
@@ -67,7 +67,18 @@ function BcdApplySecond() {
     } catch (error) {
       alert('사용자 정보를 불러오는 중 오류가 발생했습니다.');
     }
-  };
+  }, [setFormData]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (isOwn) {
+        await fetchUserInfo(auth.userId);
+      }
+      await fetchBcdStd();
+    };
+  
+    fetchData();
+  }, [isOwn, auth.userId, fetchUserInfo]);
 
   const fetchBcdStd = async () => {
     try {
