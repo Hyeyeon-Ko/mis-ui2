@@ -13,28 +13,60 @@ import '../../styles/common/Page.css';
 
 import backImageEng from '../../assets/images/backimage_eng.png';
 import backImageCompany from '../../assets/images/backimage_company.png';
-import { bcdInfoData, inputValue } from '../../datas/bdcDatas';
-import Form from '../../components/common/Form';
-import useBdcChange from '../../hooks/useBdcChange';
 
 function DetailApplication() {
-  const { handleFloorChange, handleAddressChange, handleDepartmentChange, handleTeamChange, handlePositionChange, handleDetailChange, handleDetailCardTypeChange, floor , setFloor} = useBdcChange();
   const { auth, refreshSidebar } = useContext(AuthContext);
   const { draftId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const applyStatus = queryParams.get('applyStatus'); 
-  const [formData, setFormData] = useState(inputValue)
+  const [formData, setFormData] = useState({
+    name: '',
+    firstName: '',
+    lastName: '',
+    center: '',
+    department: '',
+    team: '',
+    teamNm: '',
+    addTeamNm: '',
+    addEngTeamNm: '',
+    position: '',
+    engPosition: '',
+    gradeNm: '',
+    addGradeNm: '',
+    enGradeNm: '',
+    phone1: '',
+    phone2: '',
+    phone3: '',
+    fax1: '',
+    fax2: '',
+    fax3: '',
+    mobile1: '',
+    mobile2: '',
+    mobile3: '',
+    email: '',
+    address: '',
+    quantity: 1,
+    cardType: 'personal',
+    userId: '',
+    engAddress: '',
+  });
 
   const [addressOptions, setAddressOptions] = useState([]);
+  const [floor, setFloor] = useState('');
   const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false);
   const isReadOnly = new URLSearchParams(location.search).get('readonly') === 'true';
 
-  const [bcdData, setBcdData] = useState(bcdInfoData);
+  const [bcdData, setBcdData] = useState({
+    instInfo: [],
+    deptInfo: [],
+    teamInfo: [],
+    gradeInfo: [],
+  });
 
   const addressInputRef = useRef(null);
 
@@ -175,6 +207,14 @@ function DetailApplication() {
     }
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleCardTypeChange = (e) => {
+    setFormData({ ...formData, cardType: e.target.value });
+  };
 
   const validateForm = () => {
     const requiredFields = [
@@ -303,10 +343,51 @@ function DetailApplication() {
     fetchAddressOptions(selectedCenter);
   };
 
+  const handleDepartmentChange = (e) => {
+    setFormData({ ...formData, department: e.target.value, team: '' });
+  };
+
+  const handleTeamChange = (e) => {
+    const selectedTeam = e.target.value;
+    const selectedTeamInfo = bcdData.teamInfo.find((team) => team.detailCd === selectedTeam);
+    const teamNm = selectedTeamInfo ? selectedTeamInfo.detailNm : '';
+
+    setFormData({ ...formData, team: selectedTeam, teamNm: teamNm });
+  };
+
+  const handlePositionChange = (e) => {
+    const selectedPosition = e.target.value;
+    const selectedPositionInfo = bcdData.gradeInfo.find((position) => position.detailCd === selectedPosition);
+    const enGradeNm = selectedPositionInfo ? selectedPositionInfo.etcItem2 : '';
+    setFormData(() => ({
+      ...formData,
+      position: selectedPosition,
+      gradeNm: selectedPosition === '000' ? formData.addGradeNm : selectedPositionInfo.detailNm,
+      enGradeNm: selectedPosition === '000' ? enGradeNm : '',
+    }));
+  };
 
   const handlePreview = (e) => {
     e.preventDefault();
     setPreviewVisible(true);
+  };
+
+  const handleAddressChange = (e) => {
+    const updatedAddress = e.target.value + (floor ? `, ${floor}` : '');
+    setFormData({ ...formData, address: updatedAddress });
+  };
+
+  const handleFloorChange = (e) => {
+    const updatedFloor = e.target.value;
+    setFloor(updatedFloor);
+
+    const baseAddress = formData.address.split(',')[0];
+    const updatedAddress = `${baseAddress}${updatedFloor ? `, ${updatedFloor}` : ''}`;
+
+    const originalEngAddress = bcdData.instInfo.find((inst) => inst.detailCd === formData.center)?.etcItem2 || '';
+    const updatedEngAddress = updatedFloor ? `${updatedFloor}F, ${originalEngAddress}` : originalEngAddress;
+
+    setFormData({ ...formData, address: updatedAddress, engAddress: updatedEngAddress });
   };
 
   const handleNumberInput = (e) => {
@@ -320,260 +401,7 @@ function DetailApplication() {
       <div className="apply-content">
         <h2>{isReadOnly ? '명함 상세보기' : '명함수정'}</h2>
         <Breadcrumb items={isReadOnly ? ['명함 관리', '명함 상세보기'] : ['나의 신청내역', '승인대기 내역', '명함수정']} />
-        <Form className="business-card-form">
-          <div className="form-wrapper">
-              <div className="form-left">
-                <div className="form-group">
-                  <label className="bold-label">명함 대상자 선택</label>
-                  <div className="form-horizontal">
-                    <input type="text" value={`${formData.name} (${formData.userId})`} readOnly />
-                    {isReadOnly && (
-                      <button type="button" className="history-button" onClick={handleHistoryClick}>
-                        신청이력 조회
-                      </button>
-                    )}
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label className="bold-label">명함 종류</label>
-                  <div className="card-type">
-                    <input
-                      type="radio"
-                      id="personal"
-                      name="cardType"
-                      value="personal"
-                      checked={formData.cardType === 'personal'}
-                      onChange={handleDetailCardTypeChange}
-                      disabled={isReadOnly}
-                    />
-                    <label htmlFor="personal">[뒷면] 영문 명함</label>
-                    <input
-                      type="radio"
-                      id="company"
-                      name="cardType"
-                      value="company"
-                      checked={formData.cardType === 'company'}
-                      onChange={handleDetailCardTypeChange}
-                      disabled={isReadOnly}
-                    />
-                    <label htmlFor="company">[뒷면] 회사 정보</label>
-                  </div>
-                  <div className="image-preview">
-                    {formData.cardType === 'personal' && (
-                      <img src={backImageEng} alt="영문 명함" className="card-preview" />
-                    )}
-                    {formData.cardType === 'company' && (
-                      <img src={backImageCompany} alt="회사 정보" className="card-preview" />
-                    )}
-                  </div>
-                  <div className="form-group-horizontal quantity-group">
-                    <label className="bold-label">명함 수량 선택</label>
-                    {isReadOnly ? (
-                      <div className="quantity-display">
-                        {formData.quantity} 통
-                      </div>
-                    ) : (
-                      <div className="quantity-selector">
-                        <button
-                          type="button"
-                          onClick={() => setFormData({ ...formData, quantity: Math.max(formData.quantity - 1, 1) })}
-                        >
-                          −
-                        </button>
-                        <span>{formData.quantity}</span>
-                        <button
-                          type="button"
-                          onClick={() => setFormData({ ...formData, quantity: formData.quantity + 1 })}
-                        >
-                          +
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  <div className="sub-label2">(수량 단위: 1 * 200매)</div>
-                </div>
-              </div>
-              <div className="form-right">
-                <div className="form-group-horizontal">
-                  <label className="bold-label">명함 정보 입력</label>
-                  <CustomButton className="preview-button" onClick={handlePreview}>명함시안미리보기</CustomButton>
-                </div>
-                <div className="form-group-horizontal">
-                  <label className="form-label">이름</label>
-                  <input type="text" name="name" value={formData.name} readOnly />
-                </div>
-                <div className="form-group-horizontal">
-                  <label className="form-label">영문이름</label>
-                  <div className="name-inputs">
-                    <input type="text" name="firstName" placeholder="First name" value={formData.firstName} onChange={handleDetailChange} required={!isReadOnly} readOnly={isReadOnly} className="english-name" />
-                    <input type="text" name="lastName" placeholder="Last name" value={formData.lastName} onChange={handleDetailChange} required={!isReadOnly} readOnly={isReadOnly} className="english-name" />
-                  </div>
-                </div>
-                <div className="form-group-horizontal">
-                  <label className="form-label">센터</label>
-                  <select name="center" value={formData.center} onChange={handleCenterChange} required={!isReadOnly} disabled={isReadOnly}>
-                    <option value="">선택하세요</option>
-                    {bcdData.instInfo.map((center) => (
-                      <option key={center.detailCd} value={center.detailCd}>{center.detailNm}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group-horizontal">
-                  <label className="form-label">부서</label>
-                  <select 
-                    name="department" 
-                    value={formData.department} 
-                    onChange={handleDepartmentChange} 
-                    required={!isReadOnly} 
-                    disabled={isReadOnly}
-                    defaultValue={bcdData.deptInfo.find((dept) => dept.detailCd === formData.department)?.detailCd || ''}
-                  >
-                    <option value="">선택하세요</option>
-                    {bcdData.deptInfo
-                      .filter((dept) => dept.etcItem1 === formData.center)
-                      .map((department) => (
-                        <option key={department.detailCd} value={department.detailCd}>
-                          {department.detailNm}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-                <div className="form-group-horizontal">
-                  <label className="form-label">팀</label>
-                  <select name="team" value={formData.team} onChange={handleTeamChange} required={!isReadOnly} disabled={isReadOnly}>
-                    <option value="">선택하세요</option>
-                    {bcdData.teamInfo
-                      .filter((team) => team.etcItem1 === formData.department || team.detailCd === '000')
-                      .map((team) => (
-                        <option key={team.detailCd} value={team.detailCd}>
-                          {team.detailCd === '000' ? team.detailNm : `${team.detailNm} | ${team.etcItem2}`}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-                {formData.team === '000' && (
-                  <div className="additional-inputs">
-                    <div className="form-group-horizontal">
-                      <label className="form-label">팀 명</label>
-                      <input
-                        type="text"
-                        name="addTeamNm"
-                        value={formData.addTeamNm}
-                        onChange={handleDetailChange}
-                        required
-                        placeholder="팀명"
-                        disabled={isReadOnly}
-                      />
-                    </div>
-                    <div className="form-group-horizontal">
-                      <label className="form-label">영문 팀명</label>
-                      <input
-                        type="text"
-                        name="addEngTeamNm"
-                        value={formData.addEngTeamNm}
-                        onChange={handleDetailChange}
-                        required
-                        placeholder="영문 팀명"
-                        disabled={isReadOnly}
-                      />
-                    </div>
-                  </div>
-                )}
-                <div className="form-group-horizontal">
-                  <label className="form-label">직위 / 직책</label>
-                  <select name="position" value={formData.position} onChange={handlePositionChange} required={!isReadOnly} disabled={isReadOnly}>
-                    <option value="">선택하세요</option>
-                    {bcdData.gradeInfo.map((position) => (
-                      <option key={position.detailCd} value={position.detailCd}>
-                        {position.detailCd === '000' ? position.detailNm: `${position.detailNm}  | ${position.etcItem2}`}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {formData.position === '000' && (
-                  <div className="additional-inputs">
-                  <div className="form-group-horizontal">
-                    <label className="form-label">직위명</label>
-                    <input
-                      type="text"
-                      name="addGradeNm"
-                      value={formData.addGradeNm}
-                      onChange={handleDetailChange}
-                      placeholder="직위"
-                      required={!isReadOnly} 
-                      disabled={isReadOnly}
-                    />
-                  </div>
-                  <div className="form-group-horizontal">
-                    <label className="form-label">영문 직위명</label>
-                    <input
-                      type="text"
-                      name="enGradeNm"
-                      value={formData.enGradeNm}
-                      onChange={handleDetailChange}
-                      placeholder="영문 직위"
-                      required={!isReadOnly} 
-                      disabled={isReadOnly}
-                    />
-                  </div>
-                </div>
-                )}
-                <div className="form-group-horizontal">
-                  <label className="form-label">내선 번호</label>
-                  <div className="phone-inputs">
-                    <input type="tel" name="phone1" value={formData.phone1} onInput={handleNumberInput} maxLength="4" required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
-                    <input type="tel" name="phone2" value={formData.phone2} onInput={handleNumberInput} maxLength="4" required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
-                    <input type="tel" name="phone3" value={formData.phone3} onInput={handleNumberInput} maxLength="4" required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
-                  </div>
-                </div>
-                <div className="form-group-horizontal">
-                  <label className="form-label">팩스 번호</label>
-                  <div className="phone-inputs">
-                    <input type="tel" name="fax1" value={formData.fax1} onInput={handleNumberInput} maxLength="4" required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
-                    <input type="tel" name="fax2" value={formData.fax2} onInput={handleNumberInput} maxLength="4" required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
-                    <input type="tel" name="fax3" value={formData.fax3} onInput={handleNumberInput} maxLength="4" required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
-                  </div>
-                </div>
-                <div className="form-group-horizontal">
-                  <label className="form-label">휴대폰 번호</label>
-                  <div className="phone-inputs">
-                    <input type="tel" name="mobile1" value={formData.mobile1} onInput={handleNumberInput} maxLength="4" required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
-                    <input type="tel" name="mobile2" value={formData.mobile2} onInput={handleNumberInput} maxLength="4" required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
-                    <input type="tel" name="mobile3" value={formData.mobile3} onInput={handleNumberInput} maxLength="4" required={!isReadOnly} readOnly={isReadOnly} className="phone-number" />
-                  </div>
-                </div>
-                <div className="form-group-horizontal">
-                  <label className="form-label">메일 주소</label>
-                  <div className="email-input">
-                    <input type="text2" name="email" value={formData.email} onChange={handleDetailChange} required={!isReadOnly} readOnly={isReadOnly} className="email-full" />
-                    <span>@ kmi.or.kr</span>
-                  </div>
-                </div>
-                <div className="form-group-horizontal">
-                  <label className="form-label">주소</label>
-                  {isReadOnly ? (
-                    <div className="address-floor-input">
-                      <input type="text" name="address" value={formData.address} readOnly className="address-select" ref={addressInputRef} />
-                      <input type="text3" value={floor} readOnly className="floor-input3" />
-                      <span>층</span>
-                    </div>
-                  ) : (
-                    <div className="address-floor-input">
-                      <select name="address" value={formData.address.split(',')[0]} onChange={handleAddressChange} required className="address-select">
-                        {addressOptions.map((address, index) => (
-                          <option key={index} value={address}>{address}</option>
-                        ))}
-                      </select>
-                      <input type="text3" value={floor} onChange={handleFloorChange} required className="floor-input2" />
-                      <span>층</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-          </div>
-        </Form>
-        {/* <div className="form-wrapper">
+        <div className="form-wrapper">
           <form className="business-card-form">
             <div className="form-left">
               <div className="form-group">
@@ -824,7 +652,7 @@ function DetailApplication() {
               </div>
             </div>
           </form>
-        </div> */}
+        </div>
         <div className="apply-buttons-container">
           {applyStatus === '승인대기' && isReadOnly ? (
             <div className="approval-buttons">

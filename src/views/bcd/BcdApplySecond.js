@@ -13,7 +13,7 @@ import '../../styles/common/Page.css';
 import backImageEng from '../../assets/images/backimage_eng.png';
 import backImageCompany from '../../assets/images/backimage_company.png';
 import Form from '../../components/common/Form';
-import { bcdMapData } from '../../datas/bdcDatas';
+import { bcdInfoData, bcdMapData } from '../../datas/bdcDatas';
 import useBdcChange from '../../hooks/useBdcChange';
 
 
@@ -22,8 +22,8 @@ function BcdApplySecond() {
   const location = useLocation();
   const navigate = useNavigate();
   const isOwn = location.pathname === '/bcd/own';
-  const {handleApplyChange, handleCardTypeChange, handleUserIdChange, handleCenterChange, formData, bcdData, userIdInput,addressOptions, setFormData, setBcdData} = useBdcChange();
-
+  const {handleApplyChange, handleCardTypeChange, handleUserIdChange, handleCenterChange, formData, userIdInput,addressOptions, setFormData} = useBdcChange();
+  const [bcdData, setBcdData] = useState(bcdInfoData);
   const [mappings, setMappings] = useState(bcdMapData);
   const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false);
