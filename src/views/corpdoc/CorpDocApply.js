@@ -7,26 +7,49 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import '../../styles/common/Page.css';
 import '../../styles/corpdoc/CorpDocApply.css';
+import { inputValue } from '../../datas/corpDocDatas';
 
 function CorpDocApply() {
     const navigate = useNavigate();
     const { auth } = useContext(AuthContext); 
-    const [formData, setFormData] = useState({
-        submission: '',
-        purpose: '',
-        useDate: '',
-        department: null,
-        document1: false,
-        document2: false,
-        document3: false,
-        document4: false,
-        quantity1: '',
-        quantity2: '',
-        quantity3: '',
-        quantity4: '',
-        type: '',
-        notes: '',
-    });
+    const [formData, setFormData] = useState(inputValue);
+
+    const corpDocGroup = [
+        {
+            id: 1,
+            ckd_name: 'document1',
+            checked: formData.document1,
+            label: '법인인감증명서',
+            qt_name: 'quantity1',
+            quantity: formData.quantity1,
+        },
+        {
+            id: 1,
+            ckd_name: 'document2',
+            checked: formData.document2,
+            label: '법인등기사항전부증명서(등기부등본)',
+            qt_name: 'quantity2',
+            quantity: formData.quantity2,
+        },
+        {
+            id: 1,
+            ckd_name: 'document3',
+            checked: formData.document3,
+            label: '사용인감계',
+            qt_name: 'quantity3',
+            quantity: formData.quantity3,
+        },
+        {
+            id: 1,
+            ckd_name: 'document4',
+            checked: formData.document4,
+            label: '위임장',
+            qt_name: 'quantity4',
+            quantity: formData.quantity4,
+        },
+    
+    ]
+    
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -53,7 +76,7 @@ function CorpDocApply() {
         }));
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e, formData) => {
         e.preventDefault();
 
         // 1. SealForm Validation
@@ -176,89 +199,33 @@ function CorpDocApply() {
                                     <option value="both">원본 + PDF</option>
                                 </select>
                             </div> &nbsp;
+
                             <div className='corpDoc-form-group'>
-                                <label>필요서류/수량 <span style={{ color: 'red' }}>*</span></label>
-                                <div className='corpDoc-form-group-inline'>
-                                    <input 
-                                        type="checkbox" 
-                                        name="document1" 
-                                        checked={formData.document1} 
-                                        onChange={handleChange} 
+                                <label>필요서류/수량</label>
+                                {corpDocGroup.map((doc) => (
+                                <div className='corpDoc-form-group-inline' key={doc.id}>
+                                    <input
+                                        type="checkbox"
+                                        name={doc.ckd_name}
+                                        checked={doc.checked}
+                                        onChange={handleChange}
                                     />
-                                    <label> 법인인감증명서</label>
+                                    <label>{doc.label}</label>
                                     <div className='corpDoc-form-group-inline-num'>
-                                        <label> 수량:</label>
-                                        <input 
-                                            type="text" 
-                                            name="quantity1" 
-                                            value={formData.quantity1}
+                                        <label>수량:</label>
+                                        <input
+                                            type="text"
+                                            name={doc.qt_name}
+                                            value={doc.quantity}
                                             onChange={handleChange}
-                                            disabled={!formData.document1}
+                                            disabled={!doc.checked}
                                         />
-                                        <label> 부</label>
+                                        <label>부</label>
                                     </div>
                                 </div>
-                                <div className='corpDoc-form-group-inline'>
-                                    <input 
-                                        type="checkbox" 
-                                        name="document2" 
-                                        checked={formData.document2} 
-                                        onChange={handleChange} 
-                                    />
-                                    <label> 법인등기사항전부증명서(등기부등본)</label>
-                                    <div className='corpDoc-form-group-inline-num'>
-                                        <label> 수량:</label>
-                                        <input 
-                                            type="text" 
-                                            name="quantity2" 
-                                            value={formData.quantity2}
-                                            onChange={handleChange}
-                                            disabled={!formData.document2}
-                                        />
-                                        <label> 부</label>
-                                    </div>
-                                </div>
-                                <div className='corpDoc-form-group-inline'>
-                                    <input 
-                                        type="checkbox" 
-                                        name="document3" 
-                                        checked={formData.document3} 
-                                        onChange={handleChange} 
-                                    />
-                                    <label> 사용인감계</label>
-                                    <div className='corpDoc-form-group-inline-num'>
-                                        <label> 수량:</label>
-                                        <input 
-                                            type="text" 
-                                            name="quantity3" 
-                                            value={formData.quantity3}
-                                            onChange={handleChange}
-                                            disabled={!formData.document3}
-                                        />
-                                        <label> 부</label>
-                                    </div>
-                                </div>
-                                <div className='corpDoc-form-group-inline'>
-                                    <input 
-                                        type="checkbox" 
-                                        name="document4" 
-                                        checked={formData.document4} 
-                                        onChange={handleChange} 
-                                    />
-                                    <label> 위임장</label>
-                                    <div className='corpDoc-form-group-inline-num'>
-                                        <label> 수량:</label>
-                                        <input 
-                                            type="text" 
-                                            name="quantity4" 
-                                            value={formData.quantity4}
-                                            onChange={handleChange}
-                                            disabled={!formData.document4}
-                                        />
-                                        <label> 부</label>
-                                    </div>
-                                </div>
-                            </div> &nbsp;
+                            ))}
+                            </div> 
+                            &nbsp;
                             <div className='corpDoc-form-group'>
                                 <label>근거서류 <span style={{ color: 'red' }}>*</span></label>
                                 <input
@@ -281,6 +248,7 @@ function CorpDocApply() {
                                 </CustomButton>
                             </div>
                         </form>
+                        
                     </div>
                 </div>
             </div>

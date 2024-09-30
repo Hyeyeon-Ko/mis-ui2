@@ -10,11 +10,14 @@ import '../../styles/seal/SealApplyImprint.css';
 import corporateSeal from '../../assets/images/corporate_seal.png';
 import facsimileSeal from '../../assets/images/facsimile_seal.png';
 import companySeal from '../../assets/images/company_seal.png';
+import { applicationDetailData, sealSelectionData } from '../../datas/sealDatas';
+import { useSealForm } from '../../hooks/useSealForm';
 import ReasonModal from '../../components/ReasonModal';
 
 
 
 function DetailSealImprintApplication() {
+    const {handleSealChange, handleQuantityChange, handleChange} = useSealForm();
     const { refreshSidebar } = useContext(AuthContext);
     const { draftId } = useParams(); 
     const navigate = useNavigate();
@@ -23,17 +26,8 @@ function DetailSealImprintApplication() {
     const queryParams = new URLSearchParams(location.search);
     const applyStatus = queryParams.get('applyStatus'); 
     const [showRejectModal, setShowRejectModal] = useState(false);
-    const [sealSelections, setSealSelections] = useState({
-        corporateSeal: { selected: false, quantity: '' },
-        facsimileSeal: { selected: false, quantity: '' },
-        companySeal: { selected: false, quantity: '' },
-    });
-    const [applicationDetails, setApplicationDetails] = useState({
-        submission: '',
-        useDate: '',
-        purpose: '',
-        notes: '',
-    });
+    const [sealSelections, setSealSelections] = useState(sealSelectionData);
+    const [applicationDetails, setApplicationDetails] = useState(applicationDetailData);
 
     useEffect(() => {
         if (sealImprintDetails) {
@@ -90,32 +84,6 @@ function DetailSealImprintApplication() {
                 });
         }
     }, [draftId, sealImprintDetails]);
-
-    const handleSealChange = (sealName) => {
-        if (!readOnly) {
-            setSealSelections(prevState => ({
-                ...prevState,
-                [sealName]: {
-                    ...prevState[sealName],
-                    selected: !prevState[sealName].selected,
-                    quantity: '',
-                }
-            }));
-        }
-    };
-    
-    const handleQuantityChange = (e, sealName) => {
-        const value = e.target.value;
-        if (!readOnly) {
-            setSealSelections(prevState => ({
-                ...prevState,
-                [sealName]: {
-                    ...prevState[sealName],
-                    quantity: value
-                }
-            }));
-        }
-    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -209,15 +177,6 @@ function DetailSealImprintApplication() {
           }
         } catch (error) {
           alert('인장 반려 중 오류가 발생했습니다.');
-        }
-    };
-    
-    const handleChange = (e) => {
-        if (!readOnly) {
-            setApplicationDetails({
-                ...applicationDetails,
-                [e.target.name]: e.target.value,
-            });
         }
     };
 

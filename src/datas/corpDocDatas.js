@@ -1,0 +1,16 @@
+export const inputValue = {
+    submission: '',
+    purpose: '',
+    useDate: '',
+    department: null,
+    document1: false,
+    document2: false,
+    document3: false,
+    document4: false,
+    quantity1: '',
+    quantity2: '',
+    quantity3: '',
+    quantity4: '',
+    type: '',
+    notes: '',
+}

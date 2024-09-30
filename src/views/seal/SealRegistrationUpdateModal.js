@@ -1,30 +1,16 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import '../../styles/seal/SealRegistrationAddModal.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
-
-
+import { sealRegistrationData } from '../../datas/sealDatas';
+import { useSealForm } from '../../hooks/useSealForm';
 
 function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
   const { auth } = useContext(AuthContext);
-  const [formData, setFormData] = useState({
-    seal: '',
-    sealImage: null,
-    department: '',
-    purpose: '',
-    manager: '',
-    subManager: '',
-    date: '',
-  });
-  const [isFileDeleted, setIsFileDeleted] = useState(false);
+  const [formData, setFormData] = useState(sealRegistrationData);
+  const {handleUpdateChange, handleFileUpdateChange, isFileDeleted, setIsFileDeleted} = useSealForm();
 
-  useEffect(() => {
-    if (draftId) {
-      fetchSealDetail(draftId);
-    }
-  }, [draftId]);
-
-  const fetchSealDetail = async (id) => {
+  const fetchSealDetail = useCallback(async (id) => {
     try {
       const response = await axios.get(`/api/seal/register/${id}`);
       if (response.data.code === 200) {
@@ -38,7 +24,7 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
           subManager: data.subManager,
           date: data.draftDate,
         });
-        setIsFileDeleted(false); 
+        setIsFileDeleted(false);
       } else {
         alert('데이터를 불러오는 중 오류가 발생했습니다.');
       }
@@ -46,23 +32,14 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
       console.error('Error fetching seal detail:', error);
       alert('데이터를 불러오는 중 오류가 발생했습니다.');
     }
-  };
+  }, [setIsFileDeleted]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  useEffect(() => {
+    if (draftId) {
+      fetchSealDetail(draftId);
+    }
+  }, [draftId, fetchSealDetail]);
 
-  const handleFileChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      sealImage: e.target.files[0],
-    }));
-    setIsFileDeleted(false);  
-  };
 
   const handleDeleteFile = () => {
     setFormData((prev) => ({
@@ -112,6 +89,49 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
 
   if (!isOpen) return null;
 
+  const sealRegistFields = [
+    {
+      label: '인영 종류',
+      name: 'seal',
+      type: 'text',
+      placeholder: '인영 종류를 입력하세요',
+    },
+    {
+      label: '인영 이미지',
+      type: 'file',
+      onChange: handleFileUpdateChange,
+    },
+    {
+      label: '사용부서',
+      name: 'department',
+      type: 'text',
+      placeholder: '사용부서를 입력하세요',
+    },
+    {
+      label: '용도',
+      name: 'purpose',
+      type: 'text',
+      placeholder: '용도를 입력하세요',
+    },
+    {
+      label: '관리자(정)',
+      name: 'manager',
+      type: 'text',
+      placeholder: '정 관리자의 이름을 입력하세요',
+    },
+    {
+      label: '관리자(부)',
+      name: 'subManager',
+      type: 'text',
+      placeholder: '부 관리자의 이름을 입력하세요',
+    },
+    {
+      label: '등록일',
+      name: 'date',
+      type: 'text',
+    },
+  ];
+
   return (
     <div className="seal-regist-overlay">
       <div className="seal-regist-container">
@@ -121,74 +141,29 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
         </div>
         <div className="seal-regist-content">
           <div className="seal-regist-section">
-            <div className="seal-regist-detail-row">
-              <label>인영 종류</label>
-              <input
-                type="text"
-                name="seal"
-                value={formData.seal}
-                onChange={handleChange}
-                placeholder="인영 종류를 입력하세요"
-              />
-            </div>
-            <div className="seal-regist-detail-row">
-              <label>인영 이미지</label>
-              <input type="file" onChange={handleFileChange} />
-              {formData.sealImage && (
-                <div>
-                  <button onClick={handleDeleteFile}>기존 파일 삭제</button>
-                </div>
-              )}
-            </div>
-            <div className="seal-regist-detail-row">
-              <label>사용부서</label>
-              <input
-                type="text"
-                name="department"
-                value={formData.department}
-                onChange={handleChange}
-                placeholder="사용부서를 입력하세요"
-              />
-            </div>
-            <div className="seal-regist-detail-row">
-              <label>용도</label>
-              <input
-                type="text"
-                name="purpose"
-                value={formData.purpose}
-                onChange={handleChange}
-                placeholder="용도를 입력하세요"
-              />
-            </div>
-            <div className="seal-regist-detail-row">
-              <label>관리자(정)</label>
-              <input
-                type="text"
-                name="manager"
-                value={formData.manager}
-                onChange={handleChange}
-                placeholder="정 관리자의 이름을 입력하세요"
-              />
-            </div>
-            <div className="seal-regist-detail-row">
-              <label>관리자(부)</label>
-              <input
-                type="text"
-                name="subManager"
-                value={formData.subManager}
-                onChange={handleChange}
-                placeholder="부 관리자의 이름을 입력하세요"
-              />
-            </div>
-            <div className="seal-regist-detail-row">
-              <label>등록일</label>
-              <input
-                type="text"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-              />
-            </div>
+          {sealRegistFields.map((field, index) => (
+              <div className="seal-regist-detail-row" key={index}>
+                <label>{field.label}</label>
+                {field.type === 'file' ? (
+                  <>
+                    <input type="file" onChange={field.onChange} />
+                    {formData.sealImage && (
+                      <div>
+                        <button onClick={handleDeleteFile}>기존 파일 삭제</button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <input
+                    type={field.type}
+                    name={field.name}
+                    value={formData[field.name] || ''}
+                    onChange={handleUpdateChange}
+                    placeholder={field.placeholder}
+                  />
+                )}
+              </div>
+            ))}
           </div>
         </div>
         <div className="seal-regist-buttons">

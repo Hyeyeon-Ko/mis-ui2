@@ -2,18 +2,17 @@ import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import '../../styles/authority/AuthorityModal.css';
+import useAuthority from '../../hooks/useAuthority';
 
 
 
 /* 권한 관리 모달 */
 const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) => {
-  const [role, setRole] = useState('');
+  const {handleRoleChange, handleCheckboxChange, role, isStandardChecked, queryResult, setRole, setIsStandardChecked, setQueryResult} = useAuthority();
   const [userId, setUserId] = useState('');
   const [userName, setUserName] = useState('');
-  const [isStandardChecked, setIsStandardChecked] = useState(false);
   const [initialRole, setInitialRole] = useState('');
   const [initialStandardChecked, setInitialStandardChecked] = useState(false);
-  const [queryResult, setQueryResult] = useState([]);
 
   const fetchAdminData = useCallback(async (authId) => {
     try {
@@ -38,7 +37,28 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
     } catch (error) {
       console.error('Error fetching admin data:', error);
     }
-  }, [adminData]);
+  }, [adminData, setIsStandardChecked, setQueryResult, setRole]);
+
+  // const resetForm = () => {
+  //   setRole('');
+  //   setUserId('');
+  //   setUserName('');
+  //   setIsStandardChecked(false);
+  //   setInitialRole('');
+  //   setInitialStandardChecked(false);
+  //   setQueryResult([]);
+  // };
+
+  const resetForm = useCallback(() => {
+    setRole('');
+    setUserId('');
+    setUserName('');
+    setIsStandardChecked(false);
+    setInitialRole('');
+    setInitialStandardChecked(false);
+    setQueryResult([]);
+  }, [setRole, setUserId, setUserName, setIsStandardChecked, setInitialRole, setInitialStandardChecked, setQueryResult]);
+  
 
   useEffect(() => {
     if (show) {
@@ -48,42 +68,9 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
         resetForm();
       }
     }
-  }, [show, adminData, fetchAdminData]);
+  }, [show, adminData, fetchAdminData, resetForm]);
 
-  const resetForm = () => {
-    setRole('');
-    setUserId('');
-    setUserName('');
-    setIsStandardChecked(false);
-    setInitialRole('');
-    setInitialStandardChecked(false);
-    setQueryResult([]);
-  };
-
-  const handleRoleChange = (e) => {
-    const selectedRole = e.target.value;
-    setRole(selectedRole);
-
-    if (selectedRole === 'MASTER') {
-      setIsStandardChecked(true);
-    } else {
-      setIsStandardChecked(false);
-    }
-
-    setQueryResult(prevResult => {
-      if (prevResult.length > 0) {
-        return [{
-          ...prevResult[0],
-          role: selectedRole,
-          permissions: {
-            standardDataManagement: selectedRole === 'MASTER',
-          }
-        }];
-      } else {
-        return prevResult;
-      }
-    });
-  };
+  
 
   const handleQuery = async () => {
     try {
@@ -123,27 +110,6 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
         console.error('Error fetching user name:', error);
       }
     }
-  };
-
-  const handleCheckboxChange = () => {
-    if (role === 'MASTER') {
-      alert('MASTER 권한의 경우 기준자료관리는 필수입니다.');
-      return;
-    }
-    setIsStandardChecked(!isStandardChecked);
-
-    setQueryResult(prevResult => {
-      if (prevResult.length > 0) {
-        return [{
-          ...prevResult[0],
-          permissions: {
-            standardDataManagement: !isStandardChecked
-          }
-        }];
-      } else {
-        return prevResult;
-      }
-    });
   };
 
   const handleSave = async () => {

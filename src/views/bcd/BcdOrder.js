@@ -10,13 +10,13 @@ import axios from 'axios';
 import fileDownload from 'js-file-download';
 import { FadeLoader } from 'react-spinners';
 import { AuthContext } from '../../components/AuthContext'; 
+import useBdcChange from '../../hooks/useBdcChange';
 
 
 
 function BcdOrder() {
+  const { handleSelectAll, handleSelect, applications, selectedApplications, setApplications, setSelectedApplications} = useBdcChange();
   const { auth, refreshSidebar } = useContext(AuthContext);
-  const [applications, setApplications] = useState([]);
-  const [selectedApplications, setSelectedApplications] = useState([]);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -62,30 +62,12 @@ function BcdOrder() {
     } catch (error) {
       console.error('Error fetching bcdOrder list: ', error);
     }
-  }, [auth.instCd]);
+  }, [auth.instCd, setApplications]);
 
   // 컴포넌트 마운트 시 발주 리스트 가져오기
   useEffect(() => {
     fetchBcdOrderList();
   }, [fetchBcdOrderList]);
-
-  // 전체 선택/해제 핸들러
-  const handleSelectAll = (event) => {
-    if (event.target.checked) {
-      setSelectedApplications(applications.map((app) => app.id));
-    } else {
-      setSelectedApplications([]);
-    }
-  };
-
-  // 개별 선택/해제 핸들러
-  const handleSelect = (event, id) => {
-    if (event.target.checked) {
-      setSelectedApplications([...selectedApplications, id]);
-    } else {
-      setSelectedApplications(selectedApplications.filter((appId) => appId !== id));
-    }
-  };
 
   // 행 클릭 시 체크박스 선택/해제 핸들러
   const handleRowClick = (row) => {

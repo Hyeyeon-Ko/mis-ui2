@@ -5,17 +5,13 @@ import '../../styles/bcd/PreviewModal.css';
 import frontImageBlank from '../../assets/images/frontimage_blank.png';
 import backImageEngBlank from '../../assets/images/backimage_eng_blank.png';
 import backImageCompany from '../../assets/images/backimage_company.png';
+import { bcdInfoData } from '../../datas/bdcDatas';
 
 
 
 const PreviewModal = ({ show, onClose, formData }) => {
   const canvasRef = useRef(null);
-  const [bcdData, setBcdData] = useState({
-    instInfo: [],
-    deptInfo: [],
-    teamInfo: [],
-    gradeInfo: [],
-  });
+  const [bcdData, setBcdData] = useState(bcdInfoData);
 
   const fetchBcdStd = useCallback(async () => {
     try {
@@ -209,7 +205,7 @@ const PreviewModal = ({ show, onClose, formData }) => {
           <button className="preview-close-button" onClick={onClose}>X</button>
         </div>
         <p>입력된 정보를 바탕으로 제작한 명함 시안입니다. 잘못된 정보가 없는지 다시 한번 확인해주세요.</p>
-        <canvas ref={canvasRef} width="1120" height="360"></canvas>
+        <canvas ref={canvasRef} width="900" height="360"></canvas>
         <div className="labels">
           <span>앞 면</span>
           <span>뒷 면</span>

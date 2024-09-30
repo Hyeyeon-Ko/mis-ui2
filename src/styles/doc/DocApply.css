@@ -26,6 +26,7 @@ h2 {
   width: 1000px;
   margin-top: 30px;
   justify-content: center;
+  gap: 1px;
 }
 
 .tab-button {
@@ -63,13 +64,13 @@ h2 {
 }
 
 .doc-form-group label {
-  font-weight: bold;
-  font-size: 13.5px;
+  font-weight: 580;
+  font-size: 16px;
   color:#222121;
   margin-bottom: 5px;
   margin-right: 10px;
   text-align: left;
-  width: 81%;
+  width: 82%;
 }
 
 .doc-form-group text {
@@ -85,17 +86,17 @@ h2 {
 .doc-form-group textarea {
   width: 80%;
   padding: 10px;
-  padding-left: 15px;
+  padding-left: 12px;
   border: 1px solid #e4e1e1;
   border-radius: 6px; 
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .doc-form-group input:focus,
 .doc-form-group textarea:focus {
   border-color: #b1cef1;
   box-shadow: 0 0 2px rgba(0, 123, 255, 0.5);
-outline: none;
+  outline: none;
 }
 
 .doc-form-group textarea {

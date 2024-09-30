@@ -42,8 +42,8 @@
 }
 
 .seal-imprint-form-group label {
-  font-weight: bold;
-  font-size: 13px;
+  font-weight: 500;
+  font-size: 16px;
   color: #222121;
   margin-bottom: 5px;
   margin-right: 10px;
@@ -55,13 +55,13 @@
 .seal-imprint-form-group textarea {
   width: 80%;
   padding: 10px;
-  padding-left: 15px;
+  padding-left: 12px;
   margin-top: 5px;
   margin-bottom: 5px;
   border: 1px solid #e4e1e1;
   border-radius: 6px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .seal-imprint-form-group select {
@@ -190,7 +190,7 @@
 }
 
 .seal-imprint-disclaimer {
-  font-size: 0.7em;
+  font-size: 14px;
   color: #888;
   text-align: right;
   width: 80%;

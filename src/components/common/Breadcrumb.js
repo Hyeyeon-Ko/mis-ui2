@@ -6,7 +6,7 @@ import '../../styles/common/Breadcrumb.css';
 /* 페이지 흐름을 나타내는 component */
 const Breadcrumb = ({ items }) => (
   <div className="breadcrumb">
-    <FaHome />
+    <FaHome className="nav-icon"/>
     {items.map((item, index) => (
       <React.Fragment key={index}>
         <span className="nav-separator"> &gt; </span>
