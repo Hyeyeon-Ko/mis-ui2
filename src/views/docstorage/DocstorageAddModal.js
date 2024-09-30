@@ -1,69 +1,22 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import '../../styles/docstorage/DocstorageAddModal.css';
 import { AuthContext } from '../../components/AuthContext';
 import { validateForm } from '../../hooks/validateForm';
+import { dockStorageFormData } from '../../datas/dockstorageDatas';
+import useDocstorageChange from '../../hooks/useDocstorageChange';
 
 const DocstorageAddModal = ({ show, onClose, onSave }) => {
+  const { file, activeTab, formData, handleTabChange, handleFileChange, handleChange, setFormData, setFile, setActiveTab } = useDocstorageChange();
   const { auth } = useContext(AuthContext);
-  const [activeTab, setActiveTab] = useState('file');
-  const [file, setFile] = useState(null);
-  const [formData, setFormData] = useState({
-    teamNm: '',
-    docId: '',
-    docNm: '',
-    manager: '',
-    subManager: '',
-    storageYear: '',
-    createDate: '',
-    location: '',
-    transferDate: '',
-    tsdNum: '',
-    disposalDate: '',
-    dpdNum: '',
-  });
 
   const resetFormData = () => {
-    setFormData({
-      teamNm: '',
-      docId: '',
-      docNm: '',
-      manager: '',
-      subManager: '',
-      storageYear: '',
-      createDate: '',
-      location: '',
-      transferDate: '',
-      tsdNum: '',
-      disposalDate: '',
-      dpdNum: '',
-    });
+    setFormData(dockStorageFormData);
     setFile(null);
     setActiveTab('file');
   };
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-  };
-
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    setFile(selectedFile);
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  // const validateDateFormat = (dateStr) => {
-  //   return /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
-  // };
 
   const handleSaveClick = () => {
     if (activeTab === 'file') {
