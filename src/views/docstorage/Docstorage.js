@@ -11,10 +11,11 @@ import axios from 'axios';
 import '../../styles/common/Page.css';
 import '../../styles/docstorage/Docstorage.css';
 import { AuthContext } from '../../components/AuthContext';
-
+import useDocstorageChange from '../../hooks/useDocstorageChange';
 
 
 function Docstorage() {
+  const {handleTypeChange, handleStatusChange, handleRowSelect, selectedType, selectedRows,selectedStatus, setSelectedRows} = useDocstorageChange();
   const { auth } = useContext(AuthContext);
   const { userId, deptCd } = auth;
   const [docstorageDetails, setDocstorageDetails] = useState([]);
@@ -22,10 +23,8 @@ function Docstorage() {
   const [showApplyModal, setShowApplyModal] = useState(false); 
   const [showEditModal, setShowEditModal] = useState(false);
   const [showBulkEditModal, setShowBulkEditModal] = useState(false);
-  const [selectedRows, setSelectedRows] = useState([]);
   const [selectedDoc, setSelectedDoc] = useState(null); 
-  const [selectedType, setSelectedType] = useState('전체'); 
-  const [selectedStatus, setSelectedStatus] = useState('전체');  
+ 
   const [types] = useState([
     '전체',
     '이관',
@@ -74,14 +73,6 @@ function Docstorage() {
     fetchDocstorageDetails();
   }, [fetchDocstorageDetails]);
 
-  const handleTypeChange = (event) => {
-    setSelectedType(event.target.value);
-  };
-
-  const handleStatusChange = (event) => {  
-    setSelectedStatus(event.target.value);
-  };
-
   const handleSave = (newData) => {
     fetchDocstorageDetails(); 
     setShowAddModal(false);
@@ -90,18 +81,6 @@ function Docstorage() {
   const handleRowClick = (row, index) => {
     const isChecked = !selectedRows.includes(row.detailId);
     handleRowSelect({ target: { checked: isChecked }, stopPropagation: () => {} }, row, index);
-  };
-
-  const handleRowSelect = (e, row, index) => {
-    if (typeof e.stopPropagation === 'function') {
-      e.stopPropagation(); 
-    }
-    const isChecked = e.target.checked;
-    if (isChecked) {
-      setSelectedRows(prevSelectedRows => [...prevSelectedRows, row.detailId]);
-    } else {
-      setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== row.detailId));
-    }
   };
 
   const handleMouseDown = (index) => {
