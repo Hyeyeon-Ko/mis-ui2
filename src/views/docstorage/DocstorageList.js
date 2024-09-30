@@ -375,9 +375,9 @@ function DocstorageList() {
     { header: '보존연한', accessor: 'storageYear' },
     { header: '생성일자', accessor: 'createDate' },
     { header: '이관일자', accessor: 'transferDate' },
-    { header: '신청번호', accessor: 'tsdNum' },
+    { header: '이관신청번호', accessor: 'tsdNum' },
     { header: '폐기일자', accessor: 'disposalDate' },
-    { header: '신청번호', accessor: 'dpdraftNum' },
+    { header: '폐기신청번호', accessor: 'dpdraftNum' },
   ];
 
   const filteredDocstorageDetails = docstorageDetails
@@ -473,6 +473,7 @@ function DocstorageList() {
                 docData={selectedDoc}
                 selectedDetailIds={selectedRows}
                 onSave={handleUpdate}
+                modalType='admin'
               />
             )}
             {showBulkEditModal && (
@@ -481,6 +482,7 @@ function DocstorageList() {
                 onClose={() => setShowBulkEditModal(false)}
                 selectedDetailIds={selectedRows}
                 onSave={handleBulkUpdate}
+                modalType='admin'
               />
             )}
         </div>

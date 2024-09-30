@@ -5,6 +5,10 @@ export const validateUseDate = (dates) => {
 
     return Object.entries(dates).map(([key, date]) => {
 
+        if (!date) {
+            return { date: key, isValid: true };
+        }
+
         const fieldName = getFieldName(key);
         if (!regex.test(date)) {
             return {
@@ -54,8 +58,6 @@ export const requiredInput = (inputValues, type) => {
             }
         }
         const fieldName = getFieldName(fieldInput);
-        console.log("field, fieldNAme: ", field, fieldName)
-        console.log("value: ", value)
 
         // input, select box 값 선택 안한 경우
         if (typeof value === 'string') {
@@ -90,7 +92,7 @@ export const validateForm = (type, inputs, selectedValues, inputDates) => {
     }
 
     // 2. 날짜 입력형식 검사
-    if(inputDates && Object.keys(inputDates).length > 0) {
+    if(inputDates && Object.values(inputDates).some(date => date !== '')) {
         const dateValidationResults = validateUseDate(inputDates);
         const invalidDate = dateValidationResults.find(result => !result.isValid);
         if (invalidDate) {

@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import * as XLSX from 'xlsx';
 import '../../styles/docstorage/DocstorageAddModal.css';
 import { AuthContext } from '../../components/AuthContext';
+import { validateForm } from '../../hooks/validateForm';
 
-const DocstorageUpdateModal = ({ show, onClose, onSave, docData }) => {
+const DocstorageUpdateModal = ({ show, onClose, onSave, docData, modalType }) => {
   const { auth } = useContext(AuthContext);
   const [file, setFile] = useState(null);
   const [formData, setFormData] = useState({
@@ -54,10 +55,6 @@ const DocstorageUpdateModal = ({ show, onClose, onSave, docData }) => {
     });
   };
 
-  const validateDateFormat = (dateStr) => {
-    return /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
-  };
-
   const handleSaveClick = () => {
     if (!docData) {  
       if (!file) {
@@ -100,52 +97,34 @@ const DocstorageUpdateModal = ({ show, onClose, onSave, docData }) => {
       };
       reader.readAsArrayBuffer(file);
     } else { 
-      const {
-        teamNm,
-        docId,
-        docNm,
-        manager,
-        storageYear,
-        createDate,
-        disposalDate,
-      } = formData;
-  
-      if (
-        !teamNm ||
-        !docId ||
-        !docNm ||
-        !manager ||
-        !storageYear ||
-        !createDate ||
-        !disposalDate
-      ) {
-        alert('모든 항목을 입력해 주세요.');
-        return;
+      const requiredInputs = {
+        teamNm: formData.teamNm,
+        docId: formData.docId,
+        docNm: formData.docNm,
+        manager: formData.manager,
+        subManager: formData.subManager,
+        storageYear: formData.storageYear,
+        createDate: formData.createDate,
+        disposalDate: formData.disposalDate,
       }
-  
-      if (!validateDateFormat(createDate)) {
-        alert('생성일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
-        return;
+
+      const inputDates = {
+        createDate: formData.createDate,
+        disposalDate: formData.disposalDate,
       }
-  
-      if (!validateDateFormat(disposalDate)) {
-        alert('폐기일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
-        return;
+
+      const { isValid, message } = validateForm('DocStorage', requiredInputs, '', inputDates);
+      if (!isValid) {
+          alert(message);
+          return;
       }
   
       const payload = {
+        ...requiredInputs,
         deptCd: auth.deptCd,
-        teamNm,
-        docId,
-        docNm,
-        manager,
-        subManager: formData.subManager,
-        storageYear,
-        createDate,
         location: formData.location,
         transferDate: formData.transferDate,
         tsdNum: formData.tsdNum,
-        disposalDate,
         dpdNum: formData.dpdNum,
       };
   
@@ -155,6 +134,13 @@ const DocstorageUpdateModal = ({ show, onClose, onSave, docData }) => {
   };
   
   if (!show) return null;
+
+  const isDisabled = (field) => {
+    if (modalType === "admin") {
+      return ['location', 'transferDate', 'tsdNum', 'dpdNum'].includes(field) ? false : true;
+    }
+    return ['location', 'transferDate', 'tsdNum', 'dpdNum'].includes(field) ? true : false;
+  };
 
   return (
     <div className="docstorage-modal-overlay">
@@ -174,21 +160,23 @@ const DocstorageUpdateModal = ({ show, onClose, onSave, docData }) => {
           {docData ? (  
             <div className="docstorage-add-section">
               <div className="docstorage-add-detail-row">
-                <label>팀명</label>
+                <label>팀명 <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
                   name="teamNm"
                   value={formData.teamNm}
                   onChange={handleChange}
+                  disabled={isDisabled('teamNm')}
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>문서관리번호</label>
+                <label>문서관리번호 <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
                   name="docId"
                   value={formData.docId}
                   onChange={handleChange}
+                  disabled={isDisabled('docId')}
                 />
               </div>
               <div className="docstorage-add-detail-row">
@@ -197,54 +185,60 @@ const DocstorageUpdateModal = ({ show, onClose, onSave, docData }) => {
                   type="text"
                   name="location"
                   value={formData.location}
-                  placeholder="사후 입력"
+                  placeholder={isDisabled('transferDate') ? "사후 입력" : "ex) 19a-1-1"}
                   onChange={handleChange}
-                  disabled
+                  disabled={isDisabled('location')}
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>문서명</label>
+                <label>문서명 <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
                   name="docNm"
                   value={formData.docNm}
                   onChange={handleChange}
+                  disabled={isDisabled('docNm')}
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>관리자(정)</label>
+                <label>관리자(정) <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
                   name="manager"
                   value={formData.manager}
                   onChange={handleChange}
+                  disabled={isDisabled('manager')}
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>관리자(부)</label>
+                <label>관리자(부) <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
                   name="subManager"
                   value={formData.subManager}
                   onChange={handleChange}
+                  disabled={isDisabled('subManager')}
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>보존연한</label>
+                <label>보존연한 <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
                   name="storageYear"
                   value={formData.storageYear}
                   onChange={handleChange}
+                  disabled={isDisabled('storageYear')}
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>생성일자</label>
+                <label>생성일자 <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
                   name="createDate"
+                  placeholder="YYYY-MM-DD"
                   value={formData.createDate}
                   onChange={handleChange}
+                  disabled={isDisabled('createDate')}
                 />
               </div>
               <div className="docstorage-add-detail-row">
@@ -253,40 +247,42 @@ const DocstorageUpdateModal = ({ show, onClose, onSave, docData }) => {
                   type="text"
                   name="transferDate"
                   value={formData.transferDate}
-                  placeholder="사후 입력"
+                  placeholder={isDisabled('transferDate') ? "사후 입력" : "YYYY-MM-DD"}
                   onChange={handleChange}
-                  disabled
+                  disabled={isDisabled('transferDate')}
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>신청번호</label>
+                <label>이관신청번호</label>
                 <input
                   type="text"
                   name="tsdNum"
                   value={formData.tsdNum}
-                  placeholder="사후 입력"
+                  placeholder={isDisabled('transferDate') ? "사후 입력" : "ex) 한의재단총무파트2300135"}
                   onChange={handleChange}
-                  disabled
+                  disabled={isDisabled('tsdNum')}
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>폐기일자</label>
+                <label>폐기일자 <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
                   name="disposalDate"
+                  placeholder="YYYY-MM-DD"
                   value={formData.disposalDate}
                   onChange={handleChange}
+                  disabled={isDisabled('disposalDate')}
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>신청번호</label>
+                <label>폐기신청번호</label>
                 <input
                   type="text"
                   name="dpdNum"
                   value={formData.dpdNum}
-                  placeholder="사후 입력"
+                  placeholder={isDisabled('transferDate') ? "사후 입력" : ""}
                   onChange={handleChange}
-                  disabled
+                  disabled={isDisabled('dpdNum')}
                 />
               </div>
             </div>

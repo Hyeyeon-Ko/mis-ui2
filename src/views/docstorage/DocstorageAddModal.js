@@ -261,7 +261,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
                   name="createDate"
                   value={formData.createDate}
                   onChange={handleChange}
-                  placeholder="yyyy-mm-dd"
+                  placeholder="YYYY-MM-DD"
                 />
               </div>
               <div className="docstorage-add-detail-row">
@@ -276,7 +276,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>신청번호</label>
+                <label>이관신청번호</label>
                 <input
                   type="text"
                   name="tsdNum"
@@ -293,11 +293,11 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
                   name="disposalDate"
                   value={formData.disposalDate}
                   onChange={handleChange}
-                  placeholder="yyyy-mm-dd"
+                  placeholder="YYYY-MM-DD"
                 />
               </div>
               <div className="docstorage-add-detail-row">
-                <label>신청번호</label>
+                <label>폐기신청번호</label>
                 <input
                   type="text"
                   name="dpdNum"
