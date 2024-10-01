@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { bcdInfoData, emailModalData, inputValue } from "../../datas/bdcDatas";
+// TODO: 사용하지 않는 이벤트 함수 삭제 - 이벤트 분리
 
 const useBdcChange = () => {
   const [formData, setFormData] = useState(inputValue);

@@ -9,10 +9,8 @@ export const useFormHandlers = (auth, bcdData, mappings) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log('Input Name:', name, 'Input Value:', value); // 추가
     if (['phone1', 'phone2', 'phone3', 'fax1', 'fax2', 'fax3', 'mobile1', 'mobile2', 'mobile3'].includes(name)) {
       if (isNaN(value) || value.length > 4) {
-        console.log('Invalid input for:', name); // 추가
         return;
       }
     }
