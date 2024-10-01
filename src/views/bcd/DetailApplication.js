@@ -67,7 +67,7 @@ function DetailApplication() {
         engAddress,
       }));
     }
-  }, [bcdData.instInfo]);
+  }, [bcdData.instInfo, setFormData]);
 
   useEffect(() => {
     fetchBcdStd();
