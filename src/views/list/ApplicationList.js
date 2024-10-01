@@ -11,8 +11,12 @@ import '../../styles/common/Page.css';
 import axios from 'axios';
 import fileDownload from 'js-file-download';
 import { AuthContext } from '../../components/AuthContext';
+import useListChange from '../../hooks/useListChange';
 
 function ApplicationsList() {
+  const {
+    selectedApplications, filteredApplications, setFilteredApplications, handleSelectAll, handleSelect
+  } = useListChange();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const documentTypeFromUrl = queryParams.get('documentType');
@@ -20,7 +24,6 @@ function ApplicationsList() {
   const instCd = auth.instCd;
 
   const [applications, setApplications] = useState([]);
-  const [filteredApplications, setFilteredApplications] = useState([]); 
   const [filterInputs, setFilterInputs] = useState({
     startDate: null,
     endDate: null,
@@ -37,7 +40,6 @@ function ApplicationsList() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showCheckboxColumn, setShowCheckboxColumn] = useState(false);
-  const [selectedApplications, setSelectedApplications] = useState([]);
   const [selectedApplyStatus, setSelectedApplyStatus] = useState(null);
   const [showExcelButton, setShowExcelButton] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -296,17 +298,6 @@ function ApplicationsList() {
   const handleReset = () => {
     resetFilters();
     fetchApplications();
-  };
-
-  const handleSelectAll = (isChecked) => {
-    setSelectedApplications(isChecked ? filteredApplications.map(app => app.draftId) : []);
-  };
-
-  const handleSelect = (isChecked, id) => {
-    setSelectedApplications(isChecked
-      ? [...selectedApplications, id]
-      : selectedApplications.filter(appId => appId !== id)
-    );
   };
 
   const handleExcelDownload = async () => {
