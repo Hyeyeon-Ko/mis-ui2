@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import '../../styles/standard/StandardAddModal.css';
+import useStandardChange from '../../hooks/useStandardChange';
 
 const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory, detailData }) => {
   const [detailCode, setDetailCode] = useState('');
   const [detailName, setDetailName] = useState('');
-  const [items, setItems] = useState([]);
   const [classCd, setClassCode] = useState(selectedCategory);
   const [groupCd, setGroupCode] = useState('');
   const [groupNm, setGroupName] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const {items, setItems, handleItemChange, handleAddItem} = useStandardChange();
 
   useEffect(() => {
     if (mode === 'group') {
@@ -33,21 +34,7 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
       ].filter(item => item !== null && item !== '');
       setItems(initialItems.map(item => ({ value: item })));
     }
-  }, [mode, selectedCategory, detailData]);
-
-  const handleItemChange = (index, value) => {
-    const newItems = [...items];
-    newItems[index].value = value;
-    setItems(newItems);
-  };
-
-  const handleAddItem = () => {
-    if (items.length < 10) {
-      setItems([...items, { value: '' }]);
-    } else {
-      alert('해당 기준자료 항목은 최대 10개까지 추가할 수 있습니다.');
-    }
-  };
+  }, [mode, selectedCategory, detailData, setItems]);
 
   const handleSave = () => {
     if (mode === 'detail' || mode === 'edit') {
