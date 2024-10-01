@@ -117,6 +117,10 @@
     font-size: 15px;
     margin-bottom: 5px; 
   }
+/* TODO: 인라인 스타일 확인하고 수정하기 */
+  .docstorage-add-detail-row label span {
+    color: red;
+  }
   
   .docstorage-add-detail-row input {
     padding: 6px;
