@@ -76,22 +76,23 @@ export const useSealForm = (initialReadOnly = false) => {
       }));
     };
 
-    // 정보 수정 핸들러
-    const handleUpdateChange = (e) => {
-        const { name, value } = e.target;
-        setSealDetails((prev) => ({
-          ...prev,
-          [name]: value,
-        }));
-      };
-    
-      const handleFileUpdateChange = (e) => {
-        setSealDetails((prev) => ({
-          ...prev,
-          sealImage: e.target.files[0],
-        }));
-        setIsFileDeleted(false);  
-      };
+  // 상태 업데이트 함수
+  const handleUpdateChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // 파일 업데이트 함수
+  const handleFileUpdateChange = (e) => {
+    const file = e.target.files[0];
+    setFormData((prev) => ({
+      ...prev,
+      sealImage: file,
+    }));
+  };
 
       const handleCenterChange = async (e) => {
         const selectedCenter = e.target.value;

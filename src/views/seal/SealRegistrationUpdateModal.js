@@ -1,16 +1,15 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useEffect, useContext, useCallback } from 'react';
 import '../../styles/seal/SealRegistrationAddModal.css';
 //import deleteIcon from '../../assets/images/delete2.png'
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
-import { sealRegistrationData } from '../../datas/sealDatas';
 import { useSealForm } from '../../hooks/useSealForm';
 import { validateForm } from '../../hooks/validateForm';
 
 function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
+  const { formData, setFormData, handleUpdateChange, handleFileUpdateChange } = useSealForm();
   const { auth } = useContext(AuthContext);
-  const [formData, setFormData] = useState(sealRegistrationData);
-  const {handleUpdateChange, handleFileUpdateChange, isFileDeleted, setIsFileDeleted} = useSealForm();
+  const { isFileDeleted, setIsFileDeleted } = useSealForm();
 
   const fetchSealDetail = useCallback(async (id) => {
     try {
@@ -35,7 +34,7 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
       console.error('Error fetching seal detail:', error);
       alert('데이터를 불러오는 중 오류가 발생했습니다.');
     }
-  }, [setIsFileDeleted]);
+  }, [setIsFileDeleted, setFormData]);
 
   useEffect(() => {
     if (draftId) {
@@ -43,13 +42,12 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
     }
   }, [draftId, fetchSealDetail]);
 
-
   const handleDeleteFile = () => {
     setFormData((prev) => ({
       ...prev,
       sealImage: null,
     }));
-    setIsFileDeleted(true);  
+    setIsFileDeleted(true);
   };
 
   const handleSave = async () => {
@@ -64,6 +62,7 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
       draftDate: formData.date,
       instCd: auth.instCd,
     })], { type: 'application/json' }));
+    
     if (!isFileDeleted && formData.sealImage) {
       data.append('sealImage', formData.sealImage);
     }
@@ -100,7 +99,7 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
 
       if (response.status === 200) {
         alert('인장 정보가 수정되었습니다.');
-        onSave();  
+        onSave();
         onClose();
       } else {
         alert('인장 정보 수정 중 오류가 발생했습니다.');
@@ -193,16 +192,19 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
         </div>
         <div className="seal-regist-content">
           <div className="seal-regist-section">
-          {sealRegistFields.map((field, index) => (
+            {sealRegistFields.map((field, index) => (
               <div className="seal-regist-detail-row" key={index}>
                 <label>{field.label}</label>
                 {field.type === 'file' ? (
                   <>
-                    <input type="file" onChange={field.onChange} />
-                    {formData.sealImage && (
+                    {/* 파일 제목 표시 */}
+                    {formData.sealImage ? (
                       <div>
+                        <span>{formData.sealImage.name || 'Uploaded Image'}</span>
                         <button onClick={handleDeleteFile}>기존 파일 삭제</button>
                       </div>
+                    ) : (
+                      <input type="file" onChange={handleFileUpdateChange} />
                     )}
                   </>
                 ) : (
