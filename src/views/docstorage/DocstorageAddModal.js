@@ -142,6 +142,21 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
     onClose();
   };
 
+  const inputFields = [
+    { label: '팀명', name: 'teamNm', isRequired: true },
+    { label: '문서관리번호', name: 'docId', isRequired: true },
+    { label: '입고위치', name: 'location', placeholder: '사후 입력', disabled: true },
+    { label: '문서명', name: 'docNm', isRequired: true },
+    { label: '관리자(정)', name: 'manager', isRequired: true },
+    { label: '관리자(부)', name: 'subManager', isRequired: true },
+    { label: '보존연한', name: 'storageYear', placeholder: '5년', isRequired: true },
+    { label: '생성일자', name: 'createDate', placeholder: 'YYYY-MM-DD', isRequired: true },
+    { label: '이관일자', name: 'transferDate', placeholder: '사후 입력', disabled: true },
+    { label: '이관신청번호', name: 'tsdNum', placeholder: '사후 입력', disabled: true },
+    { label: '폐기일자', name: 'disposalDate', placeholder: 'YYYY-MM-DD', isRequired: true },
+    { label: '폐기신청번호', name: 'dpdNum', placeholder: '사후 입력', disabled: true },
+  ];
+
   if (!show) return null;
 
   return (
@@ -188,7 +203,22 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
 
           {activeTab === 'text' && (
             <div className="docstorage-add-section">
-              <div className="docstorage-add-detail-row">
+              {inputFields.map(({ label, name, isRequired, placeholder, disabled }) => (
+              <div className="docstorage-add-detail-row" key={name}>
+                <label>
+                  {label} {isRequired && <span style={{ color: 'red' }}>*</span>}
+                </label>
+                <input
+                  type="text"
+                  name={name}
+                  value={formData[name]}
+                  onChange={handleChange}
+                  placeholder={placeholder || ''}
+                  disabled={disabled || false}
+                />
+              </div>
+            ))}
+              {/* <div className="docstorage-add-detail-row">
                 <label>팀명 <span style={{ color: 'red' }}>*</span></label>
                 <input
                   type="text"
@@ -306,7 +336,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
                   onChange={handleChange}
                   disabled
                 />
-              </div>
+              </div> */}
             </div>
           )}
         </div>

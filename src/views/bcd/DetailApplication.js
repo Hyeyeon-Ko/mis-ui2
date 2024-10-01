@@ -14,7 +14,8 @@ import '../../styles/common/Page.css';
 import backImageEng from '../../assets/images/backimage_eng.png';
 import backImageCompany from '../../assets/images/backimage_company.png';
 import { bcdInfoData, inputValue } from '../../datas/bdcDatas';
-import useBdcChange from '../../hooks/useBdcChange';
+import useBdcChange from '../../hooks/bdc/useBdcChange';
+
 
 function DetailApplication() {
   const { handleDetailChange, handleDetailCardTypeChange, handleDepartmentChange, handleTeamChange, handlePositionChange, handleAddressChange, handleFloorChange  } = useBdcChange();

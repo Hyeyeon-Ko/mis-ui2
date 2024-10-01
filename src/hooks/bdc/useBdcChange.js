@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { bcdInfoData, emailModalData, inputValue } from "../datas/bdcDatas";
+import { bcdInfoData, emailModalData, inputValue } from "../../datas/bdcDatas";
 
 const useBdcChange = () => {
   const [formData, setFormData] = useState(inputValue);
@@ -28,17 +28,17 @@ const useBdcChange = () => {
     setFormData({ ...formData, cardType: e.target.value });
   };
 
-    const handleApplyChange = (e) => {
-        const { name, value } = e.target;
-        if (['phone1', 'phone2', 'phone3', 'fax1', 'fax2', 'fax3', 'mobile1', 'mobile2', 'mobile3'].includes(name)) {
-          if (isNaN(value) || value.length > 4) return;
-        }
-        if (!formData.userId) {
-          alert('사번 조회를 통해 명함 대상자를 선택하세요.');
-          return;
-        }
-        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-      };  
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (['phone1', 'phone2', 'phone3', 'fax1', 'fax2', 'fax3', 'mobile1', 'mobile2', 'mobile3'].includes(name)) {
+      if (isNaN(value) || value.length > 4) return;
+    }
+    if (!formData.userId) {
+      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+      return;
+    }
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+  };
 
     const handleCardTypeChange = (e) => {
       if (!formData.userId) {
@@ -146,7 +146,7 @@ const useBdcChange = () => {
       
 
   return {
-    handleEmailChange, handleFloorChange, handleAddressChange, handleDepartmentChange,handleDetailCardTypeChange, handleDetailChange, handleApplyChange, handleCardTypeChange, handleUserIdChange, handleCenterChange, handleSelectAll, handleSelect, handleTeamChange, handlePositionChange,
+    handleEmailChange, handleFloorChange, handleAddressChange, handleDepartmentChange,handleDetailCardTypeChange, handleDetailChange, handleChange, handleCardTypeChange, handleUserIdChange, handleCenterChange, handleSelectAll, handleSelect, handleTeamChange, handlePositionChange,
     emailData, formData, userIdInput, addressOptions, applications, selectedApplications,floor,
     setEmailData, setFormData, setBcdData, setApplications, setSelectedApplications, setFloor
   }

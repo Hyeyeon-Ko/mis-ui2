@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
@@ -13,21 +13,27 @@ import '../../styles/common/Page.css';
 import backImageEng from '../../assets/images/backimage_eng.png';
 import backImageCompany from '../../assets/images/backimage_company.png';
 import Form from '../../components/common/Form';
-import { bcdInfoData, bcdMapData } from '../../datas/bdcDatas';
-import useBdcChange from '../../hooks/useBdcChange';
+import { bcdInfoData, bcdMapData, inputValue } from '../../datas/bdcDatas';
+import { useFormHandlers } from '../../hooks/bdc/useFormHandler';
 
+// TODO: 로직재분리
 
 function BcdApplySecond() {
+  const {handleCardTypeChange, handleUserIdChange} = useFormHandlers();
   const { auth } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
   const isOwn = location.pathname === '/bcd/own';
-  const {handleApplyChange, handleCardTypeChange, handleUserIdChange, handleCenterChange, formData, userIdInput,addressOptions, setFormData} = useBdcChange();
-  const [bcdData, setBcdData] = useState(bcdInfoData);
-  const [mappings, setMappings] = useState(bcdMapData);
+
+  const [formData, setFormData] = useState(inputValue);
+
+  const [userIdInput, setUserIdInput] = useState('');
   const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false);
+  const [bcdData, setBcdData] = useState(bcdInfoData);
+  const [mappings, setMappings] = useState(bcdMapData);
 
+  const [addressOptions, setAddressOptions] = useState([]);
   const [floor, setFloor] = useState('');
   const [isPreviewChecked, setIsPreviewChecked] = useState(false);
 
@@ -37,14 +43,14 @@ function BcdApplySecond() {
   const [expandedNodes, setExpandedNodes] = useState({});
   const [teamMembers, setTeamMembers] = useState([]);
 
-  // useEffect(() => {
-  //   if (isOwn) {
-  //     fetchUserInfo(auth.userId);
-  //   }
-  //   fetchBcdStd();
-  // }, [isOwn, auth.userId]);
+  useEffect(() => {
+    if (isOwn) {
+      fetchUserInfo(auth.userId);
+    }
+    fetchBcdStd();
+  }, [isOwn, auth.userId]);
 
-  const fetchUserInfo = useCallback(async (userId) => {
+  const fetchUserInfo = async (userId) => {
     try {
       const response = await axios.get(`/api/info/${userId}`);
       if (response.data && response.data.data) {
@@ -67,18 +73,7 @@ function BcdApplySecond() {
     } catch (error) {
       alert('사용자 정보를 불러오는 중 오류가 발생했습니다.');
     }
-  }, [setFormData]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (isOwn) {
-        await fetchUserInfo(auth.userId);
-      }
-      await fetchBcdStd();
-    };
-  
-    fetchData();
-  }, [isOwn, auth.userId, fetchUserInfo]);
+  };
 
   const fetchBcdStd = async () => {
     try {
@@ -144,11 +139,14 @@ function BcdApplySecond() {
   };
 
   const fetchTeamMembers = (detailCd) => {
+    console.log(`Fetching team members for detailCd: ${detailCd}`);
     axios.get(`/api/info/orgChart`, { params: { detailCd } })
       .then(response => {
+        console.log('Team members response:', response.data); 
         setTeamMembers(response.data.data); 
       })
       .catch(error => {
+        console.error('Error fetching team members:', error);
       });
   };
   
@@ -214,6 +212,30 @@ function BcdApplySecond() {
       alert('사용자 정보를 불러오는 중 오류가 발생했습니다.');
     }
   };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (['phone1', 'phone2', 'phone3', 'fax1', 'fax2', 'fax3', 'mobile1', 'mobile2', 'mobile3'].includes(name)) {
+      if (isNaN(value) || value.length > 4) return;
+    }
+    if (!formData.userId) {
+      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+      return;
+    }
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+  };
+
+  // const handleCardTypeChange = (e) => {
+  //   if (!formData.userId) {
+  //     alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+  //     return;
+  //   }
+  //   setFormData((prevFormData) => ({ ...prevFormData, cardType: e.target.value }));
+  // };
+
+  // const handleUserIdChange = (e) => {
+  //   setUserIdInput(e.target.value);
+  // };
 
   const validateForm = () => {
     const requiredFields = [
@@ -308,15 +330,12 @@ function BcdApplySecond() {
     };
 
     try {
-      const endpoint = (auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) ? '/api/bcd/leader' : '/api/bcd';
-
-      console.log(endpoint);
-      console.log(requestData);
+      const endpoint = (auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) ? '/bcd/leader' : '/bcd/';
 
       const response = await axios.post(endpoint, requestData);
       if (response.data.code === 200) {
         alert('명함 신청이 완료되었습니다.');
-        navigate((auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) ? '/myApplyList' : '/myPendingList');
+        navigate('/myPendingList');
       } else {
         alert('명함 신청 중 오류가 발생했습니다.');
       }
@@ -378,6 +397,38 @@ function BcdApplySecond() {
   useEffect(() => {
   }, [formData]);
   
+  const handleCenterChange = (e) => {
+    if (!formData.userId) {
+      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
+      return;
+    }
+    const selectedCenter = e.target.value;
+    const selectedInstInfo = bcdData.instInfo.find((inst) => inst.detailNm === selectedCenter);
+
+    const options = [];
+    if (selectedInstInfo) {
+      if (selectedInstInfo.etcItem1) {
+        options.push({ address: selectedInstInfo.etcItem1, engAddress: selectedInstInfo.etcItem2 });
+      }
+      if (selectedInstInfo.etcItem3) {
+        options.push({ address: selectedInstInfo.etcItem3, engAddress: selectedInstInfo.etcItem4 });
+      }
+      if (selectedInstInfo.etcItem5) {
+        options.push({ address: selectedInstInfo.etcItem5, engAddress: selectedInstInfo.etcItem6 });
+      }
+    }
+
+    setAddressOptions(options);
+    setFormData({
+      ...formData,
+      center: selectedCenter,
+      address: options[0]?.address || '',
+      engAddress: options[0]?.engAddress || '',
+      department: '',
+      team: '',
+    });
+  };
+
   const handleDepartmentChange = (e) => {
     if (!formData.userId) {
       alert('사번 조회를 통해 명함 대상자를 선택하세요.');
@@ -563,13 +614,13 @@ function BcdApplySecond() {
                     </div>
                     <div className="form-group-horizontal">
                       <label className="form-label">이 름</label>
-                      <input type="text" name="name" value={formData.name} onChange={handleApplyChange} required readOnly={!isOwn} />
+                      <input type="text" name="name" value={formData.name} onChange={handleChange} required readOnly={!isOwn} />
                     </div>
                     <div className="form-group-horizontal">
                       <label className="form-label">영문 이름</label>
                       <div className="name-inputs">
-                        <input type="text" name="firstName" placeholder="First name" value={formData.firstName} onChange={handleApplyChange} required className="english-name" />
-                        <input type="text" name="lastName" placeholder="Last name" value={formData.lastName} onChange={handleApplyChange} required className="english-name" />
+                        <input type="text" name="firstName" placeholder="First name" value={formData.firstName} onChange={handleChange} required className="english-name" />
+                        <input type="text" name="lastName" placeholder="Last name" value={formData.lastName} onChange={handleChange} required className="english-name" />
                       </div>
                     </div>
                     <div className="form-group-horizontal">
@@ -622,7 +673,7 @@ function BcdApplySecond() {
                             type="text"
                             name="teamNm"
                             value={formData.teamNm}
-                            onChange={handleApplyChange}
+                            onChange={handleChange}
                             required
                             placeholder="팀명"
                            
@@ -634,7 +685,7 @@ function BcdApplySecond() {
                             type="text"
                             name="engTeam"
                             value={formData.engTeam}
-                            onChange={handleApplyChange}
+                            onChange={handleChange}
                             required
                             placeholder="영문 팀명"
        
@@ -661,7 +712,7 @@ function BcdApplySecond() {
                             type="text"
                             name="gradeNm"
                             value={formData.gradeNm}
-                            onChange={handleApplyChange}
+                            onChange={handleChange}
                             required
                             placeholder="직위"
               
@@ -673,7 +724,7 @@ function BcdApplySecond() {
                             type="text"
                             name="enGradeNm"
                             value={formData.enGradeNm}
-                            onChange={handleApplyChange}
+                            onChange={handleChange}
                             required
                             placeholder="영문 직위"
         
@@ -684,31 +735,31 @@ function BcdApplySecond() {
                     <div className="form-group-horizontal">
                       <label className="form-label">내선 번호</label>
                       <div className="phone-inputs">
-                        <input type="tel" name="phone1" value={formData.phone1} onChange={handleApplyChange} required className="phone-number" />
-                        <input type="tel" name="phone2" value={formData.phone2} onChange={handleApplyChange} required className="phone-number"  />
-                        <input type="tel" name="phone3" value={formData.phone3} onChange={handleApplyChange} required className="phone-number"  />
+                        <input type="tel" name="phone1" value={formData.phone1} onChange={handleChange} required className="phone-number" />
+                        <input type="tel" name="phone2" value={formData.phone2} onChange={handleChange} required className="phone-number"  />
+                        <input type="tel" name="phone3" value={formData.phone3} onChange={handleChange} required className="phone-number"  />
                       </div>
                     </div>
                     <div className="form-group-horizontal">
                       <label className="form-label">팩스 번호</label>
                       <div className="phone-inputs">
-                        <input type="tel" name="fax1" value={formData.fax1} onChange={handleApplyChange} required className="phone-number"  />
-                        <input type="tel" name="fax2" value={formData.fax2} onChange={handleApplyChange} required className="phone-number"  />
-                        <input type="tel" name="fax3" value={formData.fax3} onChange={handleApplyChange} required className="phone-number"  />
+                        <input type="tel" name="fax1" value={formData.fax1} onChange={handleChange} required className="phone-number"  />
+                        <input type="tel" name="fax2" value={formData.fax2} onChange={handleChange} required className="phone-number"  />
+                        <input type="tel" name="fax3" value={formData.fax3} onChange={handleChange} required className="phone-number"  />
                       </div>
                     </div>
                     <div className="form-group-horizontal">
                       <label className="form-label">휴대폰 번호</label>
                       <div className="phone-inputs">
-                        <input type="tel" name="mobile1" value={formData.mobile1} onChange={handleApplyChange} required className="phone-number"  />
-                        <input type="tel" name="mobile2" value={formData.mobile2} onChange={handleApplyChange} required className="phone-number"  />
-                        <input type="tel" name="mobile3" value={formData.mobile3} onChange={handleApplyChange} required className="phone-number"  />
+                        <input type="tel" name="mobile1" value={formData.mobile1} onChange={handleChange} required className="phone-number"  />
+                        <input type="tel" name="mobile2" value={formData.mobile2} onChange={handleChange} required className="phone-number"  />
+                        <input type="tel" name="mobile3" value={formData.mobile3} onChange={handleChange} required className="phone-number"  />
                       </div>
                     </div>
                     <div className="form-group-horizontal">
                       <label className="form-label">메일 주소</label>
                       <div className="email-input">
-                        <input type="text2" name="email" value={formData.email} onChange={handleApplyChange} required className="email-full"  />
+                        <input type="text2" name="email" value={formData.email} onChange={handleChange} required className="email-full"  />
                         <span>@ kmi.or.kr</span>
                       </div>
                     </div>
