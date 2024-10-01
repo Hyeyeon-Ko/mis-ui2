@@ -9,6 +9,7 @@ import '../../styles/list/ApplicationsList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
+import { centerData, filterData } from '../../datas/listDatas';
 
 
 
@@ -19,10 +20,7 @@ function PendingApprovalList() {
   const instCd = auth.instCd;
 
   const [applications, setApplications] = useState([]);
-  const [centers] = useState([
-    '전체', '재단본부', '광화문', '여의도센터', '강남센터',
-    '수원센터', '대구센터', '부산센터', '광주센터', '제주센터', '협력사'
-  ]);
+  const [centers] = useState(centerData);
   const [selectedCenter, setSelectedCenter] = useState('전체');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -32,12 +30,7 @@ function PendingApprovalList() {
     return date;
   });
   const [endDate, setEndDate] = useState(new Date());
-  const [filters, setFilters] = useState({
-    statusApproved: false,
-    statusRejected: false,
-    statusOrdered: false,
-    statusClosed: false,
-  });
+  const [filters, setFilters] = useState(filterData);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState(null);
 
@@ -216,12 +209,7 @@ function PendingApprovalList() {
     setStartDate(defaultStartDate);
     setEndDate(new Date());
     setSelectedCenter('전체');
-    setFilters({
-      statusApproved: false,
-      statusRejected: false,
-      statusOrdered: false,
-      statusClosed: false,
-    });
+    setFilters(filterData);
     fetchPendingList(); 
   };
   

@@ -9,10 +9,13 @@ import { AuthContext } from '../../components/AuthContext';
 import '../../styles/list/MyApplyList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
+import { filterData } from '../../datas/listDatas';
+import useListChange from '../../hooks/useListChange';
 
 
 
 function MyApplyList() {
+  const {handleFilterChange, filters, setFilters } = useListChange();
   const { auth } = useContext(AuthContext); 
   const [applications, setApplications] = useState([]); 
   const [filteredApplications, setFilteredApplications] = useState([]); 
@@ -23,12 +26,6 @@ function MyApplyList() {
   });
   const [endDate, setEndDate] = useState(new Date());
   const [documentType, setDocumentType] = useState('');  
-  const [filters, setFilters] = useState({
-    statusApproved: false,
-    statusRejected: false,
-    statusOrdered: false,
-    statusClosed: false,
-  });
   const [showModal, setShowModal] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showRejectionModal, setShowRejectionModal] = useState(false);
@@ -134,7 +131,6 @@ function MyApplyList() {
 
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
-  
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
@@ -156,14 +152,6 @@ function MyApplyList() {
       default: return status;
     }
   };
-
-  const handleFilterChange = (e) => {
-    const { name } = e.target;
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [name]: !prevFilters[name],
-    }));
-  };
       
   const handleReset = () => {
     const defaultStartDate = new Date();
@@ -171,12 +159,7 @@ function MyApplyList() {
     setStartDate(defaultStartDate);
     setEndDate(new Date());
     setDocumentType('');  
-    setFilters({
-      statusApproved: false,
-      statusRejected: false,
-      statusOrdered: false,
-      statusClosed: false,
-    });
+    setFilters(filterData);
   
     fetchApplications(); 
   };
