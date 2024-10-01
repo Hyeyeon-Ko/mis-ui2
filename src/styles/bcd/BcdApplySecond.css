@@ -35,6 +35,10 @@
     gap: 32px;
 }
 
+.form-group-horizontal .preview-button {
+    margin-left: 136px;
+}
+
 .preview-group {
     display: flex;
     align-items: center;
@@ -77,6 +81,10 @@ input[type="text2"] {
     border-radius: 5px;
     font-size: 12.5px;
     background-color: #fff;
+}
+
+.address-floor-input input[name="address"] {
+    width: 240px !important;
 }
 
 .apply-content input[type="text"].form-name-input {
@@ -231,9 +239,10 @@ input[type="text2"] {
 }
 
 .quantity-group {
+    width: 350px;
     display: flex;
     margin-top: 50px;
-    gap: 80px;
+    justify-content: space-between;
 }
 
 .quantity-selector {
