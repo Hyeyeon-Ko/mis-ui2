@@ -1,61 +1,22 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/rental/RentalAddModal.css';
+import { addFormData } from '../../datas/rentalDatas';
+import useRentalChange from '../../hooks/useRentalChange';
 
 
 
 const RentalAddModal = ({ show, onClose, onSave }) => {
   const { auth } = useContext(AuthContext); 
-  const [activeTab, setActiveTab] = useState('file');
-  const [file, setFile] = useState(null);
-  const [formData, setFormData] = useState({
-    category: '',
-    companyNm: '',
-    contractNum: '',
-    modelNm: '',
-    installDate: '',
-    expiryDate: '',
-    rentalFee: '',
-    location: '',
-    installationSite: '',
-    specialNote: '',
-  });
+  const {handleChange, handleTabChange, handleFileChange, formData, file, activeTab, setFormData, setActiveTab, setFile} = useRentalChange();
 
   const resetFormData = () => {
-    setFormData({
-      category: '',
-      companyNm: '',
-      contractNum: '',
-      modelNm: '',
-      installDate: '',
-      expiryDate: '',
-      rentalFee: '',
-      location: '',
-      installationSite: '',
-      specialNote: '',
-    });
+    setFormData(addFormData);
     setFile(null);
     setActiveTab('file');
-  };
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-  };
-
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    setFile(selectedFile);
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
   };
 
   const validateDateFormat = (dateStr) => {
