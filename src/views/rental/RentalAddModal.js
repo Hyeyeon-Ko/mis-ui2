@@ -4,7 +4,7 @@ import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/rental/RentalAddModal.css';
-import { addFormData } from '../../datas/rentalDatas';
+import { addFormData, formFields } from '../../datas/rentalDatas';
 import useRentalChange from '../../hooks/useRentalChange';
 
 
@@ -183,18 +183,7 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
           )}
           {activeTab === 'text' && (
             <div className="rental-add-section">
-              {[
-                { label: '제품군', name: 'category' },
-                { label: '업체명', name: 'companyNm' },
-                { label: '계약번호', name: 'contractNum' },
-                { label: '모델명', name: 'modelNm' },
-                { label: '설치일자', name: 'installDate', placeholder: 'YYYY-MM-DD' },
-                { label: '만료일자', name: 'expiryDate', placeholder: 'YYYY-MM-DD' },
-                { label: '렌탈료', name: 'rentalFee' },
-                { label: '위치분류', name: 'location' },
-                { label: '설치위치', name: 'installationSite' },
-                { label: '특이사항', name: 'specialNote' },
-              ].map((field, index) => (
+              {formFields.map((field, index) => (
                 <div className="rental-add-detail-row" key={index}>
                   <label>{field.label}</label>
                   <input
