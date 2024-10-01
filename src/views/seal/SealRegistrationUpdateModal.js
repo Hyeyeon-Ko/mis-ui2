@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import '../../styles/seal/SealRegistrationAddModal.css';
+//import deleteIcon from '../../assets/images/delete2.png'
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 import { sealRegistrationData } from '../../datas/sealDatas';
 import { useSealForm } from '../../hooks/useSealForm';
+import { validateForm } from '../../hooks/validateForm';
 
 function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
   const { auth } = useContext(AuthContext);
@@ -15,6 +17,7 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
       const response = await axios.get(`/api/seal/register/${id}`);
       if (response.data.code === 200) {
         const data = response.data.data;
+        console.log("data: ", data)
         setFormData({
           seal: data.sealNm,
           sealImage: data.sealImage,
@@ -66,6 +69,27 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
     }
     data.append('isFileDeleted', isFileDeleted);
 
+    // SealRegistForm validation
+    const requiredInputs = {
+      sealNm: formData.seal,
+      sealImage: formData.sealImage,
+      useDept: formData.department,
+      usage: formData.purpose,
+      manager: formData.manager,
+      subManager: formData.subManager,
+      draftDate: formData.date
+    }
+
+    const inputDates = {
+      draftDate: formData.date
+    }
+
+    const { isValid, message } = validateForm('SealRegist', requiredInputs, '', inputDates);
+    if (!isValid) {
+        alert(message);
+        return;
+    }
+
     try {
       const response = await axios.post(`/api/seal/register/update`, data, {
         headers: {
@@ -91,42 +115,70 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
 
   const sealRegistFields = [
     {
-      label: '인영 종류',
+      label: (
+        <>
+          인영 종류 <span style={{ color: 'red' }}>*</span>
+        </>
+      ),
       name: 'seal',
       type: 'text',
       placeholder: '인영 종류를 입력하세요',
     },
     {
-      label: '인영 이미지',
+      label: (
+        <>
+          인영 이미지 <span style={{ color: 'red' }}>*</span>
+        </>
+      ),
       type: 'file',
       onChange: handleFileUpdateChange,
     },
     {
-      label: '사용부서',
+      label: (
+        <>
+          사용부서 <span style={{ color: 'red' }}>*</span>
+        </>
+      ),
       name: 'department',
       type: 'text',
       placeholder: '사용부서를 입력하세요',
     },
     {
-      label: '용도',
+      label: (
+        <>
+          용도 <span style={{ color: 'red' }}>*</span>
+        </>
+      ),
       name: 'purpose',
       type: 'text',
       placeholder: '용도를 입력하세요',
     },
     {
-      label: '관리자(정)',
+      label: (
+        <>
+          관리자(정) <span style={{ color: 'red' }}>*</span>
+        </>
+      ),
       name: 'manager',
       type: 'text',
       placeholder: '정 관리자의 이름을 입력하세요',
     },
     {
-      label: '관리자(부)',
+      label: (
+        <>
+          관리자(부) <span style={{ color: 'red' }}>*</span>
+        </>
+      ),
       name: 'subManager',
       type: 'text',
       placeholder: '부 관리자의 이름을 입력하세요',
     },
     {
-      label: '등록일',
+      label: (
+        <>
+          등록일자 <span style={{ color: 'red' }}>*</span>
+        </>
+      ),
       name: 'date',
       type: 'text',
     },

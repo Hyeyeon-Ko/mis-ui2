@@ -69,43 +69,72 @@ function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
 
   const sealRegistFields = [
     {
-      label: '인영 종류',
+      label: (
+        <>
+          인영 종류 <span style={{ color: 'red' }}>*</span>
+        </>
+      ),
       name: 'seal',
       placeholder: '인영 종류를 입력하세요',
       type: 'text'
     },
     {
-      label: '인영 이미지',
+      label: (
+        <>
+          인영 이미지 <span style={{ color: 'red' }}>*</span>
+        </>
+      ),
       type: 'file',
       onChange: handleAddModalFileChange
     },
     {
-      label: '사용부서',
+      label: (
+        <>
+          사용부서 <span style={{ color: 'red' }}>*</span>
+        </>
+      ),
       name: 'department',
       placeholder: '사용부서를 입력하세요',
       type: 'text'
     },
     {
-      label: '용도',
+      label: (
+        <>
+          용도 <span style={{ color: 'red' }}>*</span>
+        </>
+      ),
       name: 'purpose',
       placeholder: '용도를 입력하세요',
       type: 'text'
     },
     {
-      label: '관리자(정)',
+      label: (
+        <>
+          관리자(정) <span style={{ color: 'red' }}>*</span>
+        </>
+      ),
       name: 'manager',
       placeholder: '정 관리자의 이름을 입력하세요',
       type: 'text'
     },
     {
-      label: '관리자(부)',
+      label: (
+        <>
+          관리자(부) <span style={{ color: 'red' }}>*</span>
+        </>
+      ),
       name: 'subManager',
       placeholder: '부 관리자의 이름을 입력하세요',
       type: 'text'
     },
     {
-      label: '등록일',
+      label: (
+        <>
+          등록일자 <span style={{ color: 'red' }}>*</span>
+        </>
+      ),
       name: 'date',
+      placeholder: 'YYYY-MM-DD',
       type: 'text'
     }
   ];
