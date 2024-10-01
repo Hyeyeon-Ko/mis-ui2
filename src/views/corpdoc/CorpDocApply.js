@@ -76,9 +76,9 @@ function CorpDocApply() {
         }));
     };
 
-    const handleSubmit = async (e, formData) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         // 1. SealForm Validation
         const requiredInputs = {
             submission: formData.submission,
@@ -86,8 +86,8 @@ function CorpDocApply() {
             useDate: formData.useDate,
             type: formData.type,
             docFile: formData.department,
-        }
-
+        };
+    
         const selectedCorpDocs = ['document1', 'document2', 'document3', 'document4'].reduce((acc, docType, index) => {
             const quantityKey = `quantity${index + 1}`;
             acc[`cert${docType.charAt(0).toUpperCase() + docType.slice(1)}`] = {
@@ -95,22 +95,22 @@ function CorpDocApply() {
                 quantity: formData[docType] ? formData[quantityKey] : '',
             };
             return acc;
-        }, {});        
-
+        }, {});
+    
         const inputDates = {
-            useDate: formData.useDate
-        }
-
+            useDate: formData.useDate,
+        };
+    
         const { isValid, message } = validateForm('CorpDoc', requiredInputs, selectedCorpDocs, inputDates);
         if (!isValid) {
             alert(message);
             return;
         }
-
+    
         // 2. Submit CorpDocForm
         const payload = new FormData();
         const typeValue = getTypeName(formData.type);
-
+    
         payload.append('corpDocRequest', new Blob([JSON.stringify({
             drafter: auth.hngNm,
             drafterId: auth.userId,
@@ -125,17 +125,17 @@ function CorpDocApply() {
             type: typeValue,
             notes: formData.notes,
         })], { type: 'application/json' }));
-
+    
         if (formData.department) {
             payload.append('file', formData.department);
         }
-
+    
         try {
             const response = await fetch('/api/corpDoc/', {
                 method: 'POST',
                 body: payload,
             });
-
+    
             if (response.ok) {
                 alert('서류 신청이 완료되었습니다.');
                 navigate('/myPendingList');
