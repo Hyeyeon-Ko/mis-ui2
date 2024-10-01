@@ -58,7 +58,7 @@ function SealApplyImprint() {
             purpose,
             notes,
             instCd: auth.instCd,
-            ...selectedSeals,
+            // ...selectedSeals,
         };
 
         console.log("imprint: ", imprintRequestDTO)

@@ -5,19 +5,10 @@ import ReasonModal from '../../components/ReasonModal';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/doc/DocConfirmModal.css';
 import downloadIcon from '../../assets/images/download.png';
+import { docFormData } from '../../datas/docDatas';
 
 const DocConfirmModal = ({ show, documentId, onClose, onApprove, applyStatus, refreshSidebar }) => {
-  const [formData, setFormData] = useState({
-    receptionDate: '',
-    drafter: '',
-    receiver: '',
-    sender: '',
-    title: '',
-    purpose: '',
-    division: '',
-    fileName: '',
-    filePath: '',
-  });
+  const [formData, setFormData] = useState(docFormData);
 
   const { auth } = useContext(AuthContext);
   const [showDownloadReasonModal, setShowDownloadReasonModal] = useState(false);
