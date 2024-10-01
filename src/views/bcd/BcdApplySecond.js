@@ -19,7 +19,7 @@ import { useFormHandlers } from '../../hooks/bdc/useFormHandler';
 // TODO: 로직재분리
 
 function BcdApplySecond() {
-  const {handleCardTypeChange, handleUserIdChange} = useFormHandlers();
+  const {handleCardTypeChange, handleUserIdChange,userIdInput} = useFormHandlers();
   const { auth } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ function BcdApplySecond() {
 
   const [formData, setFormData] = useState(inputValue);
 
-  const [userIdInput, setUserIdInput] = useState('');
+  // const [userIdInput, setUserIdInput] = useState('');
   const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [bcdData, setBcdData] = useState(bcdInfoData);
