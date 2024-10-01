@@ -33,6 +33,7 @@ function SealRegistrationList() {
           subManager: item.subManager,
           draftDate: item.draftDate,
         }));
+        console.log(data);
         setFilteredApplications(data);
       } else {
         alert('데이터를 불러오는 중 오류가 발생했습니다.');
