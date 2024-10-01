@@ -5,7 +5,7 @@ const useRentalChange = () => {
     const [selectedRows, setSelectedRows] = useState([]); 
     const [activeTab, setActiveTab] = useState('file');
     const [file, setFile] = useState(null);
-  const [formData, setFormData] = useState(addFormData);
+    const [formData, setFormData] = useState(addFormData);
 
 
 
@@ -22,20 +22,20 @@ const useRentalChange = () => {
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
-      };
+    };
 
-      const handleFileChange = (e) => {
+    const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
         setFile(selectedFile);
-      };
+    };
 
-      const handleChange = (e) => {
+    const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
-          ...formData,
-          [name]: value,
+            ...formData,
+            [name]: value,
         });
-      };
+    };
     
 
     return { formData, file, selectedRows, activeTab, setFormData, setFile, setActiveTab, setSelectedRows, handleRowSelect, handleTabChange, handleFileChange, handleChange}
