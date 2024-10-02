@@ -108,14 +108,11 @@ function BcdApplySecond() {
   };
 
   const fetchTeamMembers = (detailCd) => {
-    console.log(`Fetching team members for detailCd: ${detailCd}`);
     axios.get(`/api/info/orgChart`, { params: { detailCd } })
       .then(response => {
-        console.log('Team members response:', response.data); 
         setTeamMembers(response.data.data); 
       })
       .catch(error => {
-        console.error('Error fetching team members:', error);
       });
   };
   

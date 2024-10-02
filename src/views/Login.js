@@ -25,7 +25,6 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      console.log('Attempting login with:', { userId, userPw });
 
       const response = await fetch('/api/login', {
         method: 'POST',
