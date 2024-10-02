@@ -15,6 +15,9 @@ import axios from 'axios';
  */
 function AuthorityManagement() {
   const [applications, setApplications] = useState([]); // 신청 내역 상태 관리
+  const [, setTotalElements] = useState('')
+  const [, setTotalPages] = useState('')
+  const [, setCurrentPage] = useState('')
   const [showModal, setShowModal] = useState(false); // 권한 추가/수정 모달 표시 상태 관리
   const [showConfirmModal, setShowConfirmModal] = useState(false); // 확인 모달 표시 상태 관리
   const [selectedAdmin, setSelectedAdmin] = useState(null); // 선택된 관리자 상태 관리
@@ -27,18 +30,26 @@ function AuthorityManagement() {
   /**
    * 권한 내역 가져오기
    */
-  const fetchAuthorityList = async () => {
+  // todo: pageIndex랑, pageSize 받아서 넣으면 됨
+  const fetchAuthorityList = async (pageIndex = 1, pageSize = 10) => {
     try {
-      const response = await axios.get(`/api/auth`);
-      const data = response.data.data || response.data;
-      const transformedData = data.map((item) => ({
+      const response = await axios.get(`/api/auth`, {
+        params: { pageIndex, pageSize }
+      });
+
+      const data = response.data.data;
+      const totalElements = data.totalElements;
+      const totalPages = data.totalPages;
+      const currentPage = data.number+1;
+
+      const transformedData = data.content.map((item) => ({
         id: item.userId,
         role: item.userRole,
         centerName: `${item.instNm} (${item.deptNm})`,
         name: `${item.hngNm}(${item.userId})`,
         email: item.email,
         authId: item.authId,
-        detailCd: item.detailCd,
+        // detailCd: item.detailCd,
         permissions: {
           cardManagement: item.cardManagement,
           assetManagement: item.assetManagement,
@@ -46,6 +57,10 @@ function AuthorityManagement() {
       }));
 
       setApplications(transformedData);
+      setTotalPages(totalPages);
+      setCurrentPage(currentPage);
+      setTotalElements(totalElements);
+
     } catch (error) {
       console.error('Error fetching authority list: ', error);
     }
@@ -79,11 +94,13 @@ function AuthorityManagement() {
    */
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`/api/auth/admin/${selectedAdmin.authId}`, {
-        params: {
-          detailCd: selectedAdmin.detailCd,
-        },
-      });
+      await axios.delete(`/api/auth/admin/${selectedAdmin.authId}`
+        // , {
+        // *** todo: pathvariable로 백 단에서 요청하므로 불필요한 코드로 예상! 체크하기
+        // params: {
+        //   detailCd: selectedAdmin.detailCd,
+        // },}
+        );
       fetchAuthorityList();
       setShowConfirmModal(false);
       setSelectedAdmin(null);

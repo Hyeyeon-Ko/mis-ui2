@@ -1,6 +1,5 @@
 import React, { useEffect, useContext, useCallback } from 'react';
 import '../../styles/seal/SealRegistrationAddModal.css';
-//import deleteIcon from '../../assets/images/delete2.png'
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 import { useSealForm } from '../../hooks/useSealForm';
