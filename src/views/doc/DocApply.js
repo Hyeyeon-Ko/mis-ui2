@@ -413,7 +413,7 @@ function DocApply() {
                 />
               </div>
               <div className="doc-form-group">
-                <label>{activeTab === 'DocA' ? '발신처' : '수신처'} <span style={{ color: 'red' }}>*</span></label>
+                <label>{activeTab === 'DocA' ? '발신처' : '수신처'} <span>*</span></label>
                 <input
                   type="text"
                   name={activeTab === 'DocA' ? 'sender' : 'receiver'}
@@ -423,7 +423,7 @@ function DocApply() {
                 />
               </div>
               <div className="doc-form-group">
-                <label>제 목 <span style={{ color: 'red' }}>*</span></label>
+                <label>제 목 <span>*</span></label>
                 <textarea
                   name="title"
                   value={formData.title}
@@ -432,7 +432,7 @@ function DocApply() {
                 />
               </div>
               <div className="doc-form-group">
-                <label>사용목적 <span style={{ color: 'red' }}>*</span></label>
+                <label>사용목적 <span>*</span></label>
                 <textarea
                   name="purpose"
                   value={formData.purpose}
@@ -441,7 +441,7 @@ function DocApply() {
                 />
               </div>
               <div className='doc-form-group'>
-                <label>첨부파일 <span style={{ color: 'red' }}>*</span></label>
+                <label>첨부파일 <span>*</span></label>
                 <text> 접수문서 첫 페이지를 스캔해 첨부해주세요.</text>
                 <input
                   type="file"

@@ -283,7 +283,7 @@ function DetailSealExportApplication() {
                                 <label>인장 반출 신청서</label>
                             </div>
                             <div className='seal-export-form-group'>
-                                <label>제출처 <span style={{ color: 'red' }}>*</span></label>
+                                <label>제출처 <span>*</span></label>
                                 <input
                                     type="text"
                                     name="submission"
@@ -293,7 +293,7 @@ function DetailSealExportApplication() {
                                 />
                             </div>
                             <div className='seal-export-form-group'>
-                                <label>반출자명 <span style={{ color: 'red' }}>*</span></label>
+                                <label>반출자명 <span>*</span></label>
                                 <input
                                     type="text"
                                     name="expNm"
@@ -303,7 +303,7 @@ function DetailSealExportApplication() {
                                 />
                             </div>
                             <div className='seal-export-form-group'>
-                                <label>반출일자 <span style={{ color: 'red' }}>*</span></label>
+                                <label>반출일자 <span>*</span></label>
                                 <input
                                     type="text"
                                     name="expDate"
@@ -313,7 +313,7 @@ function DetailSealExportApplication() {
                                 />
                             </div>
                             <div className='seal-export-form-group'>
-                                <label>반납일자 <span style={{ color: 'red' }}>*</span></label>
+                                <label>반납일자 <span>*</span></label>
                                 <input
                                     type="text"
                                     name="returnDate"
@@ -323,7 +323,7 @@ function DetailSealExportApplication() {
                                 />
                             </div>
                             <div className='seal-export-form-group'>
-                                <label>사용목적 <span style={{ color: 'red' }}>*</span></label>
+                                <label>사용목적 <span>*</span></label>
                                 <textarea
                                     name="purpose"
                                     value={applicationDetails.purpose}
@@ -332,7 +332,7 @@ function DetailSealExportApplication() {
                                 />
                             </div>
                             <div className='seal-imprint-form-group'>
-                                <label>인장구분 <span style={{ color: 'red' }}>*</span></label>
+                                <label>인장구분 <span>*</span></label>
                                 <div className="seal-imprint-options">
                                     <label>
                                         <div className='seal-imprint-detail-option'>
@@ -424,7 +424,7 @@ function DetailSealExportApplication() {
                                 />
                             </div>
                             <div className='seal-export-form-group'>
-                                <label>근거서류  <span style={{ color: 'red' }}>*</span></label>
+                                <label>근거서류  <span>*</span></label>
                                 {applicationDetails.fileName && applicationDetails.filePath ? (
                                     <div className="file-display">
                                         <span className="file-name">{applicationDetails.fileName}</span>
