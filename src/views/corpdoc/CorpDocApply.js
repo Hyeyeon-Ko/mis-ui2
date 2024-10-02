@@ -24,7 +24,7 @@ function CorpDocApply() {
             quantity: formData.quantity1,
         },
         {
-            id: 1,
+            id: 2,
             ckd_name: 'document2',
             checked: formData.document2,
             label: '법인등기사항전부증명서(등기부등본)',
@@ -32,7 +32,7 @@ function CorpDocApply() {
             quantity: formData.quantity2,
         },
         {
-            id: 1,
+            id: 3,
             ckd_name: 'document3',
             checked: formData.document3,
             label: '사용인감계',
@@ -40,7 +40,7 @@ function CorpDocApply() {
             quantity: formData.quantity3,
         },
         {
-            id: 1,
+            id: 4,
             ckd_name: 'document4',
             checked: formData.document4,
             label: '위임장',
@@ -134,7 +134,7 @@ function CorpDocApply() {
                                 <label>법인서류 신청서</label>
                             </div>
                             <div className='corpDoc-form-group'>
-                                <label>제출처 <span style={{ color: 'red' }}>*</span></label>
+                                <label>제출처 <span>*</span></label>
                                 <input
                                     type="text"
                                     name="submission"
@@ -143,7 +143,7 @@ function CorpDocApply() {
                                 />
                             </div>
                             <div className='corpDoc-form-group'>
-                                <label>사용목적 <span style={{ color: 'red' }}>*</span></label>
+                                <label>사용목적 <span>*</span></label>
                                 <textarea
                                     name="purpose"
                                     value={formData.purpose}
@@ -151,7 +151,7 @@ function CorpDocApply() {
                                 />
                             </div>
                             <div className='corpDoc-form-group'>
-                                <label>사용일자 <span style={{ color: 'red' }}>*</span></label>
+                                <label>사용일자 <span>*</span></label>
                                 <input
                                     type="text"
                                     name="useDate"
@@ -161,7 +161,7 @@ function CorpDocApply() {
                                 />
                             </div>
                             <div className='corpDoc-form-group'>
-                                <label>원본 / pdf <span style={{ color: 'red' }}>*</span></label>
+                                <label>원본 / pdf <span>*</span></label>
                                 <select 
                                     name="type" 
                                     value={formData.type}
@@ -180,6 +180,7 @@ function CorpDocApply() {
                                 <div className='corpDoc-form-group-inline' key={doc.id}>
                                     <input
                                         type="checkbox"
+                                        id={doc.ckd_name}
                                         name={doc.ckd_name}
                                         checked={doc.checked}
                                         onChange={handleChange}
@@ -201,7 +202,7 @@ function CorpDocApply() {
                             </div> 
                             &nbsp;
                             <div className='corpDoc-form-group'>
-                                <label>근거서류 <span style={{ color: 'red' }}>*</span></label>
+                                <label>근거서류 <span>*</span></label>
                                 <input
                                     type="file"
                                     name="department"

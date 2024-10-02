@@ -188,7 +188,7 @@ function DetailSealImprintApplication() {
                                 <label>인장 날인 신청서</label>
                             </div>
                             <div className='seal-imprint-form-group'>
-                                <label>제출처 <span style={{ color: 'red' }}>*</span></label>
+                                <label>제출처 <span>*</span></label>
                                 <input
                                     type="text"
                                     name="submission"
@@ -198,7 +198,7 @@ function DetailSealImprintApplication() {
                                 />
                             </div>
                             <div className='seal-imprint-form-group'>
-                                <label>사용일자 <span style={{ color: 'red' }}>*</span></label>
+                                <label>사용일자 <span>*</span></label>
                                 <input
                                     type="text"
                                     name="useDate"
@@ -208,7 +208,7 @@ function DetailSealImprintApplication() {
                                 />
                             </div>
                             <div className='seal-imprint-form-group'>
-                                <label>사용목적 <span style={{ color: 'red' }}>*</span></label>
+                                <label>사용목적 <span>*</span></label>
                                 <textarea
                                     name="purpose"
                                     value={applicationDetails.purpose}
@@ -217,7 +217,7 @@ function DetailSealImprintApplication() {
                                 />
                             </div>
                             <div className='seal-imprint-form-group'>
-                                <label>인장구분 <span style={{ color: 'red' }}>*</span></label>
+                                <label>인장구분 <span>*</span></label>
                                 <div className="seal-imprint-options">
                                     <label>
                                         <div className='seal-imprint-detail-option'>
