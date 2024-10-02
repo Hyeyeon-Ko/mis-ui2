@@ -1,21 +1,17 @@
 .form-wrapper {
     display: flex;
-    padding: 0px 52px;
-    position: relative;
+    width: 100%;
+    justify-content: center;
+    gap: 16%;
+
 }
 
 .business-card-form {
     display: flex;
-    justify-content: space-between;
-    width: 100%;
-}
-
-.form-left, .form-right {
-    flex: 1;
-    position: relative;
-    display: flex;
-    flex-direction: column;
     justify-content: center;
+    gap: 16%;
+    width: 100%;
+    margin-top: 24px;
 }
 
 .form-group {
@@ -303,14 +299,12 @@ input[type="text2"] {
 .apply-buttons-container {
     display: flex;
     justify-content: center;
-    margin-top: 60px;
-    margin-bottom: 16px;
-    margin-right: 160px;
+    margin-top: 36px;
     border-radius: 5px;
-    padding: 10px 0px 10px 6.5px;
-    font-size: 14px;
+    padding: 24px;
+    font-size: 16px;
     font-weight: bold;
-    gap: 12px;
+    gap: 36px;
 }
   
 .form-horizontal {
