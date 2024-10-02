@@ -61,7 +61,6 @@ function SealApplyImprint() {
             // ...selectedSeals,
         };
 
-        console.log("imprint: ", imprintRequestDTO)
 
         try {
             await axios.post('/api/seal/imprint', imprintRequestDTO);

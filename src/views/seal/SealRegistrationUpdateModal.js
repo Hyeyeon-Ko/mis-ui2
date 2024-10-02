@@ -16,7 +16,6 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
       const response = await axios.get(`/api/seal/register/${id}`);
       if (response.data.code === 200) {
         const data = response.data.data;
-        console.log("data: ", data)
         setFormData({
           seal: data.sealNm,
           sealImage: data.sealImage,
