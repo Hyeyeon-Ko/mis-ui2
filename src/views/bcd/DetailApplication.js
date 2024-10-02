@@ -24,10 +24,8 @@ function DetailApplication() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const applyStatus = queryParams.get('applyStatus'); 
-  // const [formData, setFormData] = useState(inputValue);
 
   const [addressOptions, setAddressOptions] = useState([]);
-  // const [floor, setFloor] = useState('');
   const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
@@ -75,6 +73,7 @@ function DetailApplication() {
 
   useEffect(() => {
     fetchApplicationDetail(draftId);
+// eslint-disable-next-line
   }, [draftId]);
 
   useEffect(() => {

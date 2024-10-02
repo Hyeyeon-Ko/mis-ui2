@@ -13,28 +13,35 @@ import '../../styles/common/Page.css';
 import backImageEng from '../../assets/images/backimage_eng.png';
 import backImageCompany from '../../assets/images/backimage_company.png';
 import Form from '../../components/common/Form';
-import { bcdInfoData, bcdMapData, inputValue } from '../../datas/bdcDatas';
-import { useFormHandlers } from '../../hooks/bdc/useFormHandler';
+import useBdcChange from '../../hooks/bdc/useBdcChange';
 
-// TODO: 로직재분리
 
 function BcdApplySecond() {
-  const {handleCardTypeChange, handleUserIdChange,userIdInput} = useFormHandlers();
+  const {
+    formData,
+    userIdInput,
+    addressOptions,
+    floor,
+    setFormData,
+    mappings,
+    fetchBcdStd,
+    bcdData, 
+    handleDepartmentChange, 
+    handleTeamChange, 
+    handlePositionChange, 
+    handleFloorChange, 
+    handleAddressChange,
+    handleUserIdChange,
+    handleChange,
+    handleCardTypeChange,
+    handleCenterChange,
+  } = useBdcChange();
   const { auth } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
   const isOwn = location.pathname === '/bcd/own';
-
-  const [formData, setFormData] = useState(inputValue);
-
-  // const [userIdInput, setUserIdInput] = useState('');
   const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false);
-  const [bcdData, setBcdData] = useState(bcdInfoData);
-  const [mappings, setMappings] = useState(bcdMapData);
-
-  const [addressOptions, setAddressOptions] = useState([]);
-  const [floor, setFloor] = useState('');
   const [isPreviewChecked, setIsPreviewChecked] = useState(false);
 
   const [showOrgChart, setShowOrgChart] = useState(false); 
@@ -48,6 +55,7 @@ function BcdApplySecond() {
       fetchUserInfo(auth.userId);
     }
     fetchBcdStd();
+     // eslint-disable-next-line
   }, [isOwn, auth.userId]);
 
   const fetchUserInfo = async (userId) => {
@@ -72,45 +80,6 @@ function BcdApplySecond() {
       }
     } catch (error) {
       alert('사용자 정보를 불러오는 중 오류가 발생했습니다.');
-    }
-  };
-
-  const fetchBcdStd = async () => {
-    try {
-      const response = await axios.get('/api/std/bcd');
-      if (response.data && response.data.data) {
-        const data = response.data.data;
-
-        data.instInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
-        data.deptInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
-        data.teamInfo.sort((a, b) => {
-          if (a.detailCd === '000') return -1;
-          if (b.detailCd === '000') return 1;
-          return a.detailNm.localeCompare(b.detailNm);
-        });
-
-        const instMap = {};
-        const deptMap = {};
-        const teamMap = {};
-        const gradeMap = {};
-
-        data.instInfo.forEach((inst) => { instMap[inst.detailNm] = inst.detailCd; });
-        data.deptInfo.forEach((dept) => { deptMap[dept.detailNm] = dept.detailCd; });
-        data.teamInfo.forEach((team) => {
-          teamMap[team.detailNm] = team.detailCd;
-        });
-
-        data.gradeInfo.forEach((grade) => {
-          gradeMap[grade.detailNm] = grade.detailCd;
-        });
-
-        setMappings({ instMap, deptMap, teamMap, gradeMap });
-        setBcdData(data);
-      } else {
-        alert('기준자료를 불러오는 중 오류가 발생했습니다.');
-      }
-    } catch (error) {
-      alert('기준자료를 불러오는 중 오류가 발생했습니다.');
     }
   };
 
@@ -213,29 +182,6 @@ function BcdApplySecond() {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (['phone1', 'phone2', 'phone3', 'fax1', 'fax2', 'fax3', 'mobile1', 'mobile2', 'mobile3'].includes(name)) {
-      if (isNaN(value) || value.length > 4) return;
-    }
-    if (!formData.userId) {
-      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
-      return;
-    }
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-  };
-
-  // const handleCardTypeChange = (e) => {
-  //   if (!formData.userId) {
-  //     alert('사번 조회를 통해 명함 대상자를 선택하세요.');
-  //     return;
-  //   }
-  //   setFormData((prevFormData) => ({ ...prevFormData, cardType: e.target.value }));
-  // };
-
-  // const handleUserIdChange = (e) => {
-  //   setUserIdInput(e.target.value);
-  // };
 
   const validateForm = () => {
     const requiredFields = [
@@ -397,92 +343,6 @@ function BcdApplySecond() {
   useEffect(() => {
   }, [formData]);
   
-  const handleCenterChange = (e) => {
-    if (!formData.userId) {
-      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
-      return;
-    }
-    const selectedCenter = e.target.value;
-    const selectedInstInfo = bcdData.instInfo.find((inst) => inst.detailNm === selectedCenter);
-
-    const options = [];
-    if (selectedInstInfo) {
-      if (selectedInstInfo.etcItem1) {
-        options.push({ address: selectedInstInfo.etcItem1, engAddress: selectedInstInfo.etcItem2 });
-      }
-      if (selectedInstInfo.etcItem3) {
-        options.push({ address: selectedInstInfo.etcItem3, engAddress: selectedInstInfo.etcItem4 });
-      }
-      if (selectedInstInfo.etcItem5) {
-        options.push({ address: selectedInstInfo.etcItem5, engAddress: selectedInstInfo.etcItem6 });
-      }
-    }
-
-    setAddressOptions(options);
-    setFormData({
-      ...formData,
-      center: selectedCenter,
-      address: options[0]?.address || '',
-      engAddress: options[0]?.engAddress || '',
-      department: '',
-      team: '',
-    });
-  };
-
-  const handleDepartmentChange = (e) => {
-    if (!formData.userId) {
-      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
-      return;
-    }
-
-    const selectedDepartment = e.target.value;
-    setFormData({ ...formData, department: selectedDepartment, team: '' });
-  };
-
-  const handleTeamChange = (e) => {
-    if (!formData.userId) {
-      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
-      return;
-    }
-  
-    const selectedTeam = e.target.value;
-  
-    if (selectedTeam === '000') { 
-      setFormData({ ...formData, team: selectedTeam, teamNm: '', engTeam: '' });
-    } else {
-      const selectedTeamInfo = bcdData.teamInfo.find((team) => team.detailCd === selectedTeam);
-  
-      if (selectedTeamInfo) {
-        const engTeam = selectedTeamInfo.etcItem2 || '';  
-        setFormData({ ...formData, team: selectedTeam, teamNm: selectedTeamInfo.detailNm, engTeam });
-      } else {
-        setFormData({ ...formData, team: '', teamNm: '', engTeam: '' });  
-      }
-    }
-  };
-  
-  const handlePositionChange = (e) => {
-  if (!formData.userId) {
-    alert('사번 조회를 통해 명함 대상자를 선택하세요.');
-    return;
-  }
-
-  const selectedPosition = e.target.value;
-  const selectedPositionInfo = bcdData.gradeInfo.find((position) => position.detailCd === selectedPosition);
-
-  if (selectedPositionInfo) {
-    const enGradeNm = selectedPositionInfo.etcItem2 || '';
-    setFormData({
-      ...formData,
-      position: selectedPosition,
-      gradeNm: selectedPosition === '000' ? '' : selectedPositionInfo.detailNm,
-      enGradeNm: selectedPosition === '000' ? '' : enGradeNm,
-    });
-  } else {
-    setFormData({ ...formData, position: '', gradeNm: '', enGradeNm: '' });
-  }
-};
-  
   const fetchFilteredGradeInfo = () => {
     const selectedTeamInfo = bcdData.teamInfo.find((team) => team.detailNm === formData.team);
     const selectedEtcItem1 = selectedTeamInfo ? selectedTeamInfo.etcItem1 : '';
@@ -508,32 +368,6 @@ function BcdApplySecond() {
     setPreviewVisible(true);
   };
 
-  const handleAddressChange = (e) => {
-    if (!formData.userId) {
-      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
-      return;
-    }
-    const selectedAddress = addressOptions.find((option) => option.address === e.target.value);
-    const updatedAddress = selectedAddress.address + (floor ? `, ${floor}` : '');
-    setFormData({ ...formData, address: updatedAddress, engAddress: selectedAddress.engAddress });
-  };
-
-  const handleFloorChange = (e) => {
-    if (!formData.userId) {
-      alert('사번 조회를 통해 명함 대상자를 선택하세요.');
-      return;
-    }
-    const updatedFloor = e.target.value;
-    setFloor(updatedFloor);
-
-    const baseAddress = formData.address.split(',')[0];
-    const updatedAddress = `${baseAddress}${updatedFloor ? `, ${updatedFloor}` : ''}`;
-
-    const originalEngAddress = addressOptions.find((option) => option.address === baseAddress)?.engAddress || '';
-    const updatedEngAddress = updatedFloor ? `${updatedFloor}F, ${originalEngAddress}` : originalEngAddress;
-
-    setFormData({ ...formData, address: updatedAddress, engAddress: updatedEngAddress });
-  };
 
   return (
     <div className="content">

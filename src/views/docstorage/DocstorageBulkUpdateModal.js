@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import '../../styles/docstorage/DocstorageAddModal.css';
 import { AuthContext } from '../../components/AuthContext';
@@ -9,14 +9,6 @@ import useDocstorageChange from '../../hooks/useDocstorageChange';
 const DocstorageBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds, modalType }) => {
   const { auth } = useContext(AuthContext);
   const {handleChange, formData, setFormData} = useDocstorageChange();
-
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData({
-  //     ...formData,
-  //     [name]: value,
-  //   });
-  // };
 
   const handleSaveClick = () => {
 

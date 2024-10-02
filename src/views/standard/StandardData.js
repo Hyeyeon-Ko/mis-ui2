@@ -35,6 +35,7 @@ function StandardData() {
   useEffect(() => {
     fetchSubCategories(selectedCategory);
     setSelectedDetails([]);
+     // eslint-disable-next-line
   }, [selectedCategory]);
 
   const fetchSubCategories = async (classCd) => {

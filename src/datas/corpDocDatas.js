@@ -14,3 +14,22 @@ export const inputValue = {
     type: '',
     notes: '',
 }
+
+export const corpFilterData = {
+    searchType: '전체',
+    keyword: '',
+    startDate: null, 
+    endDate: null,  
+}
+
+export const corpFormData = {
+    storeDate: '',
+    purpose: '법인서류 입고',
+    certCorpseal: '',
+    totalCorpseal: '',
+    certCoregister: '',
+    totalCoregister: '',
+    userId: '',
+    userNm: '',
+    instCd: '' 
+}

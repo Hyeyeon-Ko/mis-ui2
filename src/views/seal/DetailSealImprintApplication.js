@@ -10,14 +10,13 @@ import '../../styles/seal/SealApplyImprint.css';
 import corporateSeal from '../../assets/images/corporate_seal.png';
 import facsimileSeal from '../../assets/images/facsimile_seal.png';
 import companySeal from '../../assets/images/company_seal.png';
-import { applicationDetailData, sealSelectionData } from '../../datas/sealDatas';
 import { useSealForm } from '../../hooks/useSealForm';
 import ReasonModal from '../../components/ReasonModal';
 
 
 
 function DetailSealImprintApplication() {
-    const {handleSealChange, handleQuantityChange, handleChange} = useSealForm();
+    const {handleSealChange, handleQuantityChange, handleChange, applicationDetails, setApplicationDetails, sealSelections, setSealSelections} = useSealForm();
     const { refreshSidebar } = useContext(AuthContext);
     const { draftId } = useParams(); 
     const navigate = useNavigate();
@@ -26,8 +25,6 @@ function DetailSealImprintApplication() {
     const queryParams = new URLSearchParams(location.search);
     const applyStatus = queryParams.get('applyStatus'); 
     const [showRejectModal, setShowRejectModal] = useState(false);
-    const [sealSelections, setSealSelections] = useState(sealSelectionData);
-    const [applicationDetails, setApplicationDetails] = useState(applicationDetailData);
 
     useEffect(() => {
         if (sealImprintDetails) {
@@ -83,7 +80,7 @@ function DetailSealImprintApplication() {
                     alert('날인신청 정보를 불러오는 중 오류가 발생했습니다.');
                 });
         }
-    }, [draftId, sealImprintDetails]);
+    }, [draftId, sealImprintDetails, setApplicationDetails, setSealSelections]);
 
     const handleSubmit = (e) => {
         e.preventDefault();

@@ -1,18 +1,17 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, {  useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import '../../styles/rental/RentalAddModal.css';
 import { AuthContext } from '../../components/AuthContext';
-import { addFormData, formFields } from '../../datas/rentalDatas';
+import { formFields } from '../../datas/rentalDatas';
 import useRentalChange from '../../hooks/useRentalChange';
 
 
 
 const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
   const { auth } = useContext(AuthContext);
-  // const [file, setFile] = useState(null);
-  // const [formData, setFormData] = useState(addFormData);
+ 
   const {handleChange, setFormData, formData, handleFileChange, file} = useRentalChange();
 
   useEffect(() => {

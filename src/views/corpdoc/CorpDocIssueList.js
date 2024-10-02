@@ -11,6 +11,7 @@ import SignitureImage from '../../assets/images/signiture.png';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/corpdoc/CorpDocIssueList.css';
+import { corpFilterData } from '../../datas/corpDocDatas';
 
 function CorpDocIssueList() {
   const { refreshSidebar } = useContext(AuthContext);
@@ -18,12 +19,7 @@ function CorpDocIssueList() {
   const [pendingApplications, setPendingApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]); 
   const [filteredPendingApplications, setFilteredPendingApplications] = useState([]); 
-  const [filterInputs, setFilterInputs] = useState({
-    searchType: '전체',
-    keyword: '',
-    startDate: null, 
-    endDate: null,   
-  });
+  const [filterInputs, setFilterInputs] = useState(corpFilterData);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
