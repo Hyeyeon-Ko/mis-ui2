@@ -198,15 +198,17 @@ const useBdcChange = () => {
     const selectedPositionInfo = bcdData.gradeInfo.find(
       (position) => position.detailCd === selectedPosition
     );
-    const enGradeNm = selectedPositionInfo ? selectedPositionInfo.etcItem2 : "";
-    setFormData(() => ({
-      ...formData,
+  
+    const enGradeNm = selectedPositionInfo ? selectedPositionInfo.etcItem2 : ""; 
+  
+    setFormData((prevData) => ({
+      ...prevData,
       position: selectedPosition,
       gradeNm:
         selectedPosition === "000"
-          ? formData.addGradeNm
-          : selectedPositionInfo.detailNm,
-      enGradeNm: selectedPosition === "000" ? enGradeNm : "",
+          ? prevData.addGradeNm
+          : selectedPositionInfo ? selectedPositionInfo.detailNm : "",
+      enGradeNm: selectedPosition === "000" ? prevData.enGradeNm : enGradeNm,
     }));
   };
 
