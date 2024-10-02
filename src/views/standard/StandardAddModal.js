@@ -79,6 +79,7 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
         setClassCode(selectedCategory);
       }
     }
+     // eslint-disable-next-line
   }, [show, mode, selectedCategory]);
 
   const handleMouseDown = (e) => {

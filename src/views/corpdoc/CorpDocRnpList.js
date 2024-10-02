@@ -6,15 +6,13 @@ import ConditionFilter from '../../components/common/ConditionFilter';
 import SignitureImage from '../../assets/images/signiture.png';
 import axios from 'axios';
 import '../../styles/corpdoc/CorpDocRnpList.css';
+import { corpFilterData } from '../../datas/corpDocDatas';
 
 function CorpDocRnpList() {
   const { auth } = useContext(AuthContext);
 
   const [applications, setApplications] = useState([]); 
-  const [filterInputs, setFilterInputs] = useState({
-    searchType: '전체',
-    keyword: '',
-  });
+  const [filterInputs, setFilterInputs] = useState(corpFilterData);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
   const [clickedRows, setClickedRows] = useState([]);

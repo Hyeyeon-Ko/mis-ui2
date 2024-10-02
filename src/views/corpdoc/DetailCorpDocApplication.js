@@ -11,7 +11,7 @@ import '../../styles/common/Page.css';
 import '../../styles/corpdoc/CorpDocApply.css';
 import downloadIcon from '../../assets/images/download.png';
 import deleteIcon from '../../assets/images/delete2.png'; 
-import { inputValue } from '../../datas/corpDocDatas';
+import useCorpChange from '../../hooks/useCorpChange';
 
 
 
@@ -22,13 +22,13 @@ function DetailCorpDocApplication() {
     const queryParams = new URLSearchParams(location.search);
     const applyStatus = queryParams.get('applyStatus'); 
     const { auth, refreshSidebar } = useContext(AuthContext);
-    const [formData, setFormData] = useState(inputValue);
     const [initialData, setInitialData] = useState(null);
-    const [existingFile, setExistingFile] = useState(null);
-    const [file, setFile] = useState(null);
+
     const [showRejectModal, setShowRejectModal] = useState(false);
     const isReadOnly = new URLSearchParams(location.search).get('readonly') === 'true';
     const [showDownloadReasonModal, setShowDownloadReasonModal] = useState(false);
+
+    const {handleChange, handleDetailFileChange, file, existingFile, setFile, setFormData, setExistingFile,  formData} = useCorpChange();
 
     const fetchCorpDocDetail = useCallback(async (id) => {
         try {
@@ -71,36 +71,14 @@ function DetailCorpDocApplication() {
         } catch (error) {
             console.error('Error fetching corporate document details:', error);
         }
-    }, []);
+    }, [setExistingFile, setFormData]);
 
     useEffect(() => {
         if (draftId) {
             fetchCorpDocDetail(draftId);
         }
     }, [draftId, fetchCorpDocDetail]);
-    
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
 
-        if (type === 'checkbox' && !checked) {
-            const quantityField = `quantity${name.slice(-1)}`;
-            setFormData((prevFormData) => ({
-                ...prevFormData,
-                [name]: checked,
-                [quantityField]: '',
-            }));
-        } else {
-            setFormData((prevFormData) => ({
-                ...prevFormData,
-                [name]: type === 'checkbox' ? checked : value,
-            }));
-        }
-    };
-
-    const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
-        setExistingFile(null);
-    };
 
     const handleFileDelete = () => {
         setFile(null);
@@ -269,55 +247,90 @@ function DetailCorpDocApplication() {
                             <div className="corpDoc-bold-label">
                                 <label>법인서류 신청서</label>
                             </div>
-                            <div className="corpDoc-form-group">
-                                <label>제출처 <span style={{ color: 'red' }}>*</span></label>
-                                <input
-                                    type="text"
-                                    name="submission"
-                                    value={formData.submission}
-                                    onChange={handleChange}
-                                    disabled={isReadOnly}
-                                />
-                            </div>
-                            <div className="corpDoc-form-group">
-                                <label>사용목적 <span style={{ color: 'red' }}>*</span></label>
-                                <textarea
-                                    name="purpose"
-                                    value={formData.purpose}
-                                    onChange={handleChange}
-                                    disabled={isReadOnly}
-                                />
-                            </div>
-                            <div className="corpDoc-form-group">
-                                <label>사용일자 <span style={{ color: 'red' }}>*</span></label>
-                                <input
-                                    type="text"
-                                    name="useDate"
-                                    value={formData.useDate}
-                                    onChange={handleChange}
-                                    placeholder="YYYY-MM-DD"
-                                    disabled={isReadOnly}
-                                />
-                            </div>
+                                {[
+                                { label: '제출처', name: 'submission', type: 'text', value: formData.submission, required: true },
+                                { label: '사용목적', name: 'purpose', type: 'textarea', value: formData.purpose, required: true },
+                                { label: '사용일자', name: 'useDate', type: 'text', value: formData.useDate, placeholder: 'YYYY-MM-DD', required: true },
+                                { label: '제출형태', name: 'type', type: 'select', value: formData.type, options: ['선택', '원본', 'PDF', 'PDF+원본'], required: true },
+                                { label: '특이사항', name: 'notes', type: 'textarea', value: formData.notes }
+                            ].map(({ label, name, type, value, placeholder, options, required }) => (
+                                <div key={name} className="corpDoc-form-group">
+                                    <label>{label} {required && <span style={{ color: 'red' }}>*</span>}</label>
+                                    {type === 'textarea' ? (
+                                        <textarea
+                                            name={name}
+                                            value={value}
+                                            onChange={handleChange}
+                                            disabled={isReadOnly}
+                                        />
+                                    ) : type === 'select' ? (
+                                        <select
+                                            name={name}
+                                            value={value}
+                                            onChange={handleChange}
+                                            disabled={isReadOnly}
+                                        >
+                                            {options.map(option => (
+                                                <option key={option} value={option}>
+                                                    {option}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    ) : (
+                                        <input
+                                            type={type}
+                                            name={name}
+                                            value={value}
+                                            onChange={handleChange}
+                                            placeholder={placeholder}
+                                            disabled={isReadOnly}
+                                        />
+                                    )}
+                                </div>
+                            ))}
+    
+                            {/* 체크박스 및 수량 입력 필드 */}
+                            {[
+                                { name: 'document1', label: '법인인감증명서', quantity: 'quantity1' },
+                                { name: 'document2', label: '법인등기사항전부증명서(등기부등본)', quantity: 'quantity2' },
+                                { name: 'document3', label: '사용인감신고증명서', quantity: 'quantity3' },
+                                { name: 'document4', label: '위임장', quantity: 'quantity4' }
+                            ].map(({ name, label, quantity }) => (
+                                <div key={name} className="corpDoc-form-group-inline">
+                                    <input
+                                        type="checkbox"
+                                        name={name}
+                                        checked={formData[name]}
+                                        onChange={handleChange}
+                                        disabled={isReadOnly}
+                                    />
+                                    <label>{label}</label>
+                                    <div className="corpDoc-form-group-inline-num">
+                                        <label> 수량:</label>
+                                        <input
+                                            type="text"
+                                            name={quantity}
+                                            value={formData[quantity]}
+                                            onChange={handleChange}
+                                            disabled={!formData[name] || isReadOnly}
+                                        />
+                                        <label> 부</label>
+                                    </div>
+                                </div>
+                            ))}
+    
+                            {/* 파일 업로드 및 다운로드 */}
                             <div className="corpDoc-form-group">
                                 <label>근거서류 <span style={{ color: 'red' }}>*</span></label>
                                 {existingFile ? (
                                     <div className="file-display">
                                         <span className="file-name">{existingFile.name}</span>
                                         <div className="file-actions">
-                                            <button
-                                                type="button"
-                                                className="download-button"
-                                                onClick={handleFileDownloadClick}
-                                            >
+                                            <button type="button" className="download-button" onClick={handleFileDownloadClick}>
                                                 <img src={downloadIcon} alt="다운로드" />
                                             </button>
                                             {!isReadOnly && (
-                                                <button
-                                                    type="button"
-                                                    className="file-delete-button"
-                                                    onClick={handleFileDelete}
-                                                >
+                                                <button type="button" className="file-delete-button" onClick={handleFileDelete}>
                                                     <img src={deleteIcon} alt="삭제" />
                                                 </button>
                                             )}
@@ -328,129 +341,20 @@ function DetailCorpDocApplication() {
                                         type="file"
                                         name="file"
                                         className="file-input"
-                                        onChange={handleFileChange}
+                                        onChange={handleDetailFileChange}
                                         disabled={isReadOnly}
                                     />
                                 )}
                             </div>
-                            <div className="corpDoc-form-group">
-                                <label>필요서류/수량 <span style={{ color: 'red' }}>*</span></label>
-                                <div className="corpDoc-form-group-inline">
-                                    <input
-                                        type="checkbox"
-                                        name="document1"
-                                        checked={formData.document1}
-                                        onChange={handleChange}
-                                        disabled={isReadOnly}
-                                        
-                                    />
-                                    <label> 법인인감증명서</label>
-                                    <div className="corpDoc-form-group-inline-num">
-                                        <label> 수량:</label>
-                                        <input
-                                            type="text"
-                                            name="quantity1"
-                                            value={formData.quantity1}
-                                            onChange={handleChange}
-                                            disabled={!formData.document1 || isReadOnly}
-                                        />
-                                        <label> 부</label>
-                                    </div>
-                                </div>
-                                <div className="corpDoc-form-group-inline">
-                                    <input
-                                        type="checkbox"
-                                        name="document2"
-                                        checked={formData.document2}
-                                        onChange={handleChange}
-                                        disabled={isReadOnly}
-                                    />
-                                    <label> 법인등기사항전부증명서(등기부등본)</label>
-                                    <div className="corpDoc-form-group-inline-num">
-                                        <label> 수량:</label>
-                                        <input
-                                            type="text"
-                                            name="quantity2"
-                                            value={formData.quantity2}
-                                            onChange={handleChange}
-                                            disabled={!formData.document2 || isReadOnly}
-                                        />
-                                        <label> 부</label>
-                                    </div>
-                                </div>
-                                <div className="corpDoc-form-group-inline">
-                                    <input
-                                        type="checkbox"
-                                        name="document3"
-                                        checked={formData.document3}
-                                        onChange={handleChange}
-                                        disabled={isReadOnly}
-                                    />
-                                    <label> 사용인감신고증명서</label>
-                                    <div className="corpDoc-form-group-inline-num">
-                                        <label> 수량:</label>
-                                        <input
-                                            type="text"
-                                            name="quantity3"
-                                            value={formData.quantity3}
-                                            onChange={handleChange}
-                                            disabled={!formData.document3 || isReadOnly}
-                                        />
-                                        <label> 부</label>
-                                    </div>
-                                </div>
-                                <div className="corpDoc-form-group-inline">
-                                    <input
-                                        type="checkbox"
-                                        name="document4"
-                                        checked={formData.document4}
-                                        onChange={handleChange}
-                                        disabled={isReadOnly}
-                                    />
-                                    <label> 위임장</label>
-                                    <div className="corpDoc-form-group-inline-num">
-                                        <label> 수량:</label>
-                                        <input
-                                            type="text"
-                                            name="quantity4"
-                                            value={formData.quantity4}
-                                            onChange={handleChange}
-                                            disabled={!formData.document4 || isReadOnly}
-                                        />
-                                        <label> 부</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="corpDoc-form-group">
-                                <label>제출형태 <span style={{ color: 'red' }}>*</span></label>
-                                <select
-                                    name="type"
-                                    value={formData.type}
-                                    onChange={handleChange}
-                                    disabled={isReadOnly}
-                                >
-                                    <option value="">선택</option>
-                                    <option value="original">원본</option>
-                                    <option value="pdf">PDF</option>
-                                    <option value="both">PDF+원본</option>
-                                </select>
-                            </div>
-                            <div className="corpDoc-form-group">
-                                <label>특이사항</label>
-                                <textarea
-                                    name="notes"
-                                    value={formData.notes}
-                                    onChange={handleChange}
-                                    disabled={isReadOnly}
-                                />
-                            </div>
-                            { !isReadOnly && (
-                              <div className="edit-buttons">
-                                <CustomButton className="apply-request-button" onClick={handleSubmit}>
-                                    수정하기
-                                </CustomButton>
+    
+                            {!isReadOnly && (
+                                <div className="edit-buttons">
+                                    <CustomButton className="apply-request-button" onClick={handleSubmit}>
+                                        수정하기
+                                    </CustomButton>
                                 </div>
                             )}
+    
                             {applyStatus === '승인대기' && isReadOnly && (
                                 <div className="corpDoc-apply-button-container">
                                     <div className="approval-buttons">
@@ -459,7 +363,8 @@ function DetailCorpDocApplication() {
                                     </div>
                                 </div>
                             )}
-                        </form>    
+                        </form>
+    
                         {showRejectModal && (
                             <ReasonModal 
                                 show={showRejectModal}
@@ -476,7 +381,6 @@ function DetailCorpDocApplication() {
                     </div>
                 </div>
             </div>
-            
         </div>
     );
 }

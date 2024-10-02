@@ -148,6 +148,7 @@ function ApplicationsList() {
     }
 
     setFilteredApplications(filteredData);
+     // eslint-disable-next-line
   }, [applications, filterInputs, filters]);
 
   const applyStatusFilters = useCallback((data) => {
@@ -159,6 +160,7 @@ function ApplicationsList() {
       return !Object.values(filters).some(Boolean); 
     });
     setFilteredApplications(filtered);
+     // eslint-disable-next-line
   }, [filters]);
         
   const fetchApplications = useCallback(async (filterParams = {}, searchType = '전체', keyword = '', startDate = null, endDate = null) => {
@@ -223,6 +225,7 @@ function ApplicationsList() {
       : applications.filter(app => app.instNm === selectedCenter);
 
     setFilteredApplications(centerFilteredData);
+     // eslint-disable-next-line
   }, [selectedCenter, applications]);
 
   useEffect(() => {

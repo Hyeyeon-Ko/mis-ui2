@@ -5,15 +5,14 @@ const useStandardChange = () => {
   const [details, setDetails] = useState([]);
   const [items, setItems] = useState([]);
 
-    const handleSelectAll = () => {
-        if (selectedDetails.length === details.length) {
-            setSelectedDetails([]);
-        } else {
-            setSelectedDetails(details.map(detail => detail.detailCd));
-        }
-    };
+  const handleSelectAll = () => {
+    if (selectedDetails.length === details.length) {
+      setSelectedDetails([]);
+    } else {
+      setSelectedDetails(details.map((detail) => detail.detailCd));
+    }
+  };
 
-    
   const handleDetailSelect = (detailCd) => {
     setSelectedDetails((prevSelectedDetails) => {
       if (prevSelectedDetails.includes(detailCd)) {
@@ -32,15 +31,24 @@ const useStandardChange = () => {
 
   const handleAddItem = () => {
     if (items.length < 10) {
-      setItems([...items, { value: '' }]);
+      setItems([...items, { value: "" }]);
     } else {
-      alert('해당 기준자료 항목은 최대 10개까지 추가할 수 있습니다.');
+      alert("해당 기준자료 항목은 최대 10개까지 추가할 수 있습니다.");
     }
   };
 
-    return {items, selectedDetails,details, setItems, setSelectedDetails, setDetails, handleItemChange, handleAddItem, handleSelectAll, handleDetailSelect, handleItemChange, handleAddItem
+  return {
+    items,
+    selectedDetails,
+    details,
+    setItems,
+    setSelectedDetails,
+    setDetails,
+    handleItemChange,
+    handleAddItem,
+    handleSelectAll,
+    handleDetailSelect,
+  };
+};
 
-    }
-}
-
-export default useStandardChange
+export default useStandardChange;
