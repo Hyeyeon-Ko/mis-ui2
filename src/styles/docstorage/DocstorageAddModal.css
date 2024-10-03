@@ -114,11 +114,11 @@
   }
   
   .docstorage-add-detail-row label {
-    font-size: 15px;
+    font-size: 16px;
     margin-bottom: 5px; 
   }
-/* TODO: 인라인 스타일 확인하고 수정하기 */
-  .docstorage-add-detail-row label span {
+
+  .docstorage-add-detail-row > label > span {
     color: red;
   }
   
