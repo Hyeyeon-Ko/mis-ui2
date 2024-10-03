@@ -14,10 +14,8 @@ import ReasonModal from '../../components/ReasonModal';
 import downloadIcon from '../../assets/images/download.png';
 import deleteIcon from '../../assets/images/delete2.png';
 import { useSealForm } from '../../hooks/useSealForm';
-import { applicationData } from '../../datas/sealDatas';
 
 function DetailSealExportApplication() {
-    const [applicationDetails, setApplicationDetails] = useState(applicationData);
     const [showRejectModal, setShowRejectModal] = useState(false);
     const { auth, refreshSidebar } = useContext(AuthContext);
     const location = useLocation();
@@ -25,6 +23,8 @@ function DetailSealExportApplication() {
     const { draftId } = useParams(); 
     const { sealExportDetails, readOnly: initialReadOnly } = location.state || {};
     const {
+        applicationDetails,
+        setApplicationDetails,
         sealSelections,
         readOnly,
         setSealSelections,

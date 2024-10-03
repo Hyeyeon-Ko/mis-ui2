@@ -206,7 +206,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
               {inputFields.map(({ label, name, isRequired, placeholder, disabled }) => (
               <div className="docstorage-add-detail-row" key={name}>
                 <label>
-                  {label} {isRequired && <span style={{ color: 'red' }}>*</span>}
+                  {label} {isRequired && <span>*</span>}
                 </label>
                 <input
                   type="text"
@@ -218,125 +218,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
                 />
               </div>
             ))}
-              {/* <div className="docstorage-add-detail-row">
-                <label>팀명 <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  type="text"
-                  name="teamNm"
-                  value={formData.teamNm}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>문서관리번호 <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  type="text"
-                  name="docId"
-                  value={formData.docId}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>입고위치</label>
-                <input
-                  type="text"
-                  name="location"
-                  value={formData.location}
-                  placeholder="사후 입력"
-                  onChange={handleChange}
-                  disabled
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>문서명 <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  type="text"
-                  name="docNm"
-                  value={formData.docNm}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>관리자(정) <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  type="text"
-                  name="manager"
-                  value={formData.manager}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>관리자(부) <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  type="text"
-                  name="subManager"
-                  value={formData.subManager}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>보존연한 <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  type="text"
-                  name="storageYear"
-                  value={formData.storageYear}
-                  onChange={handleChange}
-                  placeholder='5년'
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>생성일자 <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  type="text"
-                  name="createDate"
-                  value={formData.createDate}
-                  onChange={handleChange}
-                  placeholder="YYYY-MM-DD"
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>이관일자</label>
-                <input
-                  type="text"
-                  name="transferDate"
-                  value={formData.transferDate}
-                  placeholder="사후 입력"
-                  onChange={handleChange}
-                  disabled
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>이관신청번호</label>
-                <input
-                  type="text"
-                  name="tsdNum"
-                  value={formData.tsdNum}
-                  placeholder="사후 입력"
-                  onChange={handleChange}
-                  disabled
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>폐기일자 <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  type="text"
-                  name="disposalDate"
-                  value={formData.disposalDate}
-                  onChange={handleChange}
-                  placeholder="YYYY-MM-DD"
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>폐기신청번호</label>
-                <input
-                  type="text"
-                  name="dpdNum"
-                  value={formData.dpdNum}
-                  placeholder="사후 입력"
-                  onChange={handleChange}
-                  disabled
-                />
-              </div> */}
+            
             </div>
           )}
         </div>
