@@ -124,16 +124,15 @@ function DetailCorpDocApplication() {
     
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // todo: CorpDocApply.js의 handleSubmit validation 검사 코드 중복성 해결
+    
+        // 필요한 입력 필드와 선택한 문서 확인
         const requiredInputs = {
             submission: formData.submission,
             purpose: formData.purpose,
             useDate: formData.useDate,
             type: formData.type,
-            docFile: formData.department,
-        }
-
+        };
+    
         const selectedCorpDocs = ['document1', 'document2', 'document3', 'document4'].reduce((acc, docType, index) => {
             const quantityKey = `quantity${index + 1}`;
             acc[`cert${docType.charAt(0).toUpperCase() + docType.slice(1)}`] = {
@@ -142,28 +141,32 @@ function DetailCorpDocApplication() {
             };
             return acc;
         }, {});
-
+    
         const inputDates = {
             useDate: formData.useDate
-        }
-
+        };
+    
+        // 유효성 검사
         const { isValid, message } = validateForm('CorpDoc', requiredInputs, selectedCorpDocs, inputDates);
         if (!isValid) {
             alert(message);
             return;
         }
-
+    
+        // 파일 삭제 여부 확인
         const isFileDeleted = !file && !existingFile;
-
+    
+        // 폼 데이터가 수정되지 않았을 경우
         if (JSON.stringify(formData) === JSON.stringify(initialData) && !file && !isFileDeleted) {
             alert('수정된 사항이 없습니다.');
             return;
         }
-
+    
         try {
             const formDataToSend = new FormData();
             const typeValue = getTypeName(formData.type);
-
+    
+            // 법인서류 정보 추가
             formDataToSend.append('corpDocUpdateRequest', new Blob([JSON.stringify({
                 drafter: auth.hngNm,
                 submission: formData.submission,
@@ -176,17 +179,19 @@ function DetailCorpDocApplication() {
                 type: typeValue,
                 notes: formData.notes,
             })], { type: 'application/json' }));
-
+    
+            // 파일이 새로 업로드된 경우에만 추가
             if (file) {
                 formDataToSend.append('file', file);
             }
-
+    
+            // 서버로 데이터 전송
             await axios.post(`/api/corpDoc/update?draftId=${draftId}&isFileDeleted=${isFileDeleted}`, formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-
+    
             alert('법인서류 수정이 완료되었습니다.');
             navigate('/myPendingList');
         } catch (error) {
