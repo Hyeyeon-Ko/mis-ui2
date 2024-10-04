@@ -93,9 +93,12 @@
   padding: 5.5px 10px;
   font-size: 12px;
   font-weight: bold;
+  cursor: pointer;
 }
 
 .search-button:hover {
+  -webkit-transition: .5s ease-in-out;
+	transition: .5s ease-in-out;
   background-color: #1e6fc1;
 }
 

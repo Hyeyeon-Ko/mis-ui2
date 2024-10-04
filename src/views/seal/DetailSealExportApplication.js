@@ -16,6 +16,7 @@ import deleteIcon from '../../assets/images/delete2.png';
 import { useSealForm } from '../../hooks/useSealForm';
 
 function DetailSealExportApplication() {
+    // const [applicationDetails, setApplicationDetails] = useState(applicationData);
     const [showRejectModal, setShowRejectModal] = useState(false);
     const { auth, refreshSidebar } = useContext(AuthContext);
     const location = useLocation();

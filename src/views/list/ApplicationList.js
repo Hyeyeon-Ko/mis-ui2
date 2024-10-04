@@ -183,6 +183,7 @@ function ApplicationsList() {
         },
       });
 
+      console.log('response.data.data', response)
       const { bcdMasterResponses, docMasterResponses, corpDocMasterResponses, sealMasterResponses } = response.data.data;
 
       const combinedData = [
