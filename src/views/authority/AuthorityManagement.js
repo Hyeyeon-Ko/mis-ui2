@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import ReactPaginate from 'react-paginate';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import CustomButton from '../../components/common/CustomButton';
@@ -7,8 +6,8 @@ import AuthorityModal from '../authority/AuthorityModal';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import editIcon from '../../assets/images/edit.png';
 import deleteIcon from '../../assets/images/delete.png';
+import Pagination from '../../components/common/Pagination'; // Import the new Pagination component
 import '../../styles/authority/AuthorityManagement.css';
-import '../../styles/common/Pagination.css'
 import '../../styles/common/Page.css';
 import axios from 'axios';
 
@@ -41,9 +40,7 @@ function AuthorityManagement() {
 
       const data = response.data.data;
       const totalPages = data.totalPages;
-      const currentPage = data.number+1;
-      console.log("responsese: ", response)
-      console.log("totalPages: ", totalPages)
+      const currentPage = data.number + 1;
 
       const transformedData = data.content.map((item) => ({
         id: item.userId,
@@ -194,17 +191,7 @@ function AuthorityManagement() {
           </div>
         </div>
         <Table columns={columns} data={applications} />
-        <ReactPaginate
-          breakLabel="<...>"
-          nextLabel=">"
-          onPageChange={handlePageClick}
-          pageRangeDisplayed={totalPages}
-          pageCount={totalPages}
-          previousLabel="<"
-          renderOnZeroPageCount={null}
-          containerClassName="pagination"
-          activeClassName="active"
-        />
+        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
       </div>
       <AuthorityModal
         show={showModal}
