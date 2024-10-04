@@ -24,23 +24,23 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
         alert('파일을 첨부해주세요.');
         return;
       }
-
+  
       const reader = new FileReader();
       reader.onload = (event) => {
         const data = new Uint8Array(event.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-      
+  
         const jsonOptions = {
           header: 1,
           defval: '',
           raw: false, 
           dateNF: 'yyyy-mm-dd',
         };
-      
+  
         const worksheetData = XLSX.utils.sheet_to_json(worksheet, jsonOptions);
-      
+  
         const extractedData = worksheetData
           .slice(4)
           .filter((row) => row[0])
@@ -60,9 +60,19 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
             disposalDate: row[11] !== undefined ? row[11].toString() : '',
             dpdNum: row[12] !== undefined ? row[12].toString() : '',
           }));
-      
+  
+        const docStorageExcelApplyRequestDTO = {
+          instCd: auth.instCd,
+          deptCd: auth.deptCd,
+          drafter: auth.hngNm,
+          drafterId: auth.userId,
+        };
+  
         axios
-          .post('/api/docstorage/data', extractedData)
+          .post('/api/docstorage/data', {
+            details: extractedData,
+            docStorageExcelApplyRequestDTO: docStorageExcelApplyRequestDTO
+          })
           .then((response) => {
             onSave(response.data);
             resetFormData();

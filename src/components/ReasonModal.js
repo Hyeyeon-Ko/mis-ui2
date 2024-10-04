@@ -27,10 +27,16 @@ const ReasonModal = ({ show, onClose, onConfirm, reason = '', isViewOnly = false
       alert('다운로드 타입을 선택하세요.');
       return;
     }
-    onConfirm({ reason: inputReason, fileType: selectedFileType });
+  
+    const reasonToSubmit = selectedFileType === '기타' ? inputReason : null;
+  
+    console.log('Download Notes:', inputReason);  
+    console.log('Download Type:', selectedFileType); 
+  
+    onConfirm({ downloadNotes: inputReason, downloadType: selectedFileType });
     onClose();
   };
-
+  
   if (!show) return null;
 
   const getTitle = () => {
@@ -67,24 +73,29 @@ const ReasonModal = ({ show, onClose, onConfirm, reason = '', isViewOnly = false
               onChange={handleFileTypeChange}
             >
               <option value="">타입 선택</option>
-              <option value="check">확인용</option>
+              <option value="draft">기안상신용</option>
               <option value="order">발주용</option>
               <option value="approval">승인/반려용</option>
-              <option value="draft">기안상신용</option>
+              <option value="check">확인용</option>
+              <option value="etc">기타</option>
             </select>
           </div>
         )}
-        {isViewOnly ? (
-          <div className="reject-reason-content">
-            {inputReason || "사유가 제공되지 않았습니다."}
-          </div>
-        ) : (
+
+        {(modalType !== 'download' || selectedFileType === '기타') && !isViewOnly && (
           <textarea
             placeholder={getPlaceholder()}
             value={inputReason}
             onChange={handleTextareaChange}
           />
         )}
+
+        {isViewOnly && (
+          <div className="reject-reason-content">
+            {inputReason || "사유가 제공되지 않았습니다."}
+          </div>
+        )}
+
         <div className="reject-modal-buttons">
           <button className="reject-modal-button cancel" onClick={onClose}><span>취소</span></button>
           {!isViewOnly && (

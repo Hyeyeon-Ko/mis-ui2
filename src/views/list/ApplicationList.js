@@ -11,12 +11,10 @@ import '../../styles/common/Page.css';
 import axios from 'axios';
 import fileDownload from 'js-file-download';
 import { AuthContext } from '../../components/AuthContext';
-import useListChange from '../../hooks/useListChange';
+import useDateSet from '../../hooks/apply/useDateSet';
+import Pagination from '../../components/common/Pagination';
 
 function ApplicationsList() {
-  const {
-    selectedApplications, filteredApplications, setFilteredApplications, handleSelectAll, handleSelect
-  } = useListChange();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const documentTypeFromUrl = queryParams.get('documentType');
@@ -24,6 +22,7 @@ function ApplicationsList() {
   const instCd = auth.instCd;
 
   const [applications, setApplications] = useState([]);
+  const [filteredApplications, setFilteredApplications] = useState([]); 
   const [filterInputs, setFilterInputs] = useState({
     startDate: null,
     endDate: null,
@@ -40,11 +39,21 @@ function ApplicationsList() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showCheckboxColumn, setShowCheckboxColumn] = useState(false);
+  const [selectedApplications, setSelectedApplications] = useState([]);
   const [selectedApplyStatus, setSelectedApplyStatus] = useState(null);
   const [showExcelButton, setShowExcelButton] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState(null);
   const [selectedCenter, setSelectedCenter] = useState('전체');
+  const { formattedStartDate: defaultStartDate, formattedEndDate: defaultEndDate } = useDateSet();
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
+
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    fetchApplications(currentPage, itemsPerPage);
+  }, [currentPage]);
 
   const [centers] = useState([
     '전체', '재단본부', '광화문', '여의도센터', '강남센터',
@@ -148,7 +157,6 @@ function ApplicationsList() {
     }
 
     setFilteredApplications(filteredData);
-     // eslint-disable-next-line
   }, [applications, filterInputs, filters]);
 
   const applyStatusFilters = useCallback((data) => {
@@ -160,26 +168,31 @@ function ApplicationsList() {
       return !Object.values(filters).some(Boolean); 
     });
     setFilteredApplications(filtered);
-     // eslint-disable-next-line
   }, [filters]);
         
-  const fetchApplications = useCallback(async (filterParams = {}, searchType = '전체', keyword = '', startDate = null, endDate = null) => {
+  const fetchApplications = useCallback(async (filterParams = {}, searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
     setLoading(true);
     setError(null);
     try {
-      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : '';
-      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : '';
+      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : defaultStartDate;
+      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : defaultEndDate;
 
-      const response = await axios.get('/api/applyList', {
+      const response = await axios.get('/api/applyList2', {
         params: {
+          // ApplyRequestDTO parameters
+          userId: auth.userId || '',
+          instCd: instCd || '',
           documentType: convertDocumentType(filterParams.documentType) || convertDocumentType(documentTypeFromUrl) || null,
+
+          // PostSearchRequestDTO parameters
           searchType,
           keyword,
           startDate: formattedStartDate,
           endDate: formattedEndDate,
-          instCd: instCd || '',
-          userId: auth.userId || '',
-          instNm: selectedCenter || '',  
+
+          // PostPageRequest parameters
+          pageIndex,
+          pageSize
         },
       });
 
@@ -187,13 +200,18 @@ function ApplicationsList() {
       const { bcdMasterResponses, docMasterResponses, corpDocMasterResponses, sealMasterResponses } = response.data.data;
 
       const combinedData = [
-        ...(bcdMasterResponses || []),
-        ...(docMasterResponses || []),
-        ...(corpDocMasterResponses || []),
-        ...(sealMasterResponses || []),
+        bcdMasterResponses,
+        docMasterResponses,
+        corpDocMasterResponses,
+        sealMasterResponses
       ];
 
-      const filteredData = combinedData.filter(application => application.applyStatus !== 'X');
+      const selectedData = combinedData.find(response => response.totalElements > 0);
+
+      const totalPages = selectedData.totalPages;
+      const currentPage = selectedData.number + 1;
+      const content = selectedData.content;
+      const filteredData = content.filter(application => application.applyStatus !== 'X');
 
       const transformedData = filteredData.map(application => ({
         draftId: application.draftId,
@@ -211,7 +229,10 @@ function ApplicationsList() {
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
 
       setApplications(transformedData);
+      setTotalPages(totalPages);
+      setCurrentPage(currentPage);
       applyStatusFilters(transformedData);
+
     } catch (error) {
       console.error('Error fetching applications:', error);
       setError('데이터를 불러오는 중 오류가 발생했습니다.');
@@ -220,13 +241,20 @@ function ApplicationsList() {
     }
   }, [applyStatusFilters, auth.userId, documentTypeFromUrl, instCd, selectedCenter]);
 
+    /**
+   * 페이지 변경 핸들러
+   */
+    const handlePageClick = (event) => {
+      const selectedPage = event.selected + 1;
+      setCurrentPage(selectedPage);
+    };
+
   useEffect(() => {
     const centerFilteredData = selectedCenter === '전체' 
       ? applications 
       : applications.filter(app => app.instNm === selectedCenter);
 
     setFilteredApplications(centerFilteredData);
-     // eslint-disable-next-line
   }, [selectedCenter, applications]);
 
   useEffect(() => {
@@ -302,6 +330,17 @@ function ApplicationsList() {
   const handleReset = () => {
     resetFilters();
     fetchApplications();
+  };
+
+  const handleSelectAll = (isChecked) => {
+    setSelectedApplications(isChecked ? filteredApplications.map(app => app.draftId) : []);
+  };
+
+  const handleSelect = (isChecked, id) => {
+    setSelectedApplications(isChecked
+      ? [...selectedApplications, id]
+      : selectedApplications.filter(appId => appId !== id)
+    );
   };
 
   const handleExcelDownload = async () => {
@@ -458,6 +497,7 @@ function ApplicationsList() {
         ) : (
           <Table columns={columns} data={filteredApplications} onSelect={handleSelect} selectedItems={selectedApplications} />
         )}
+        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
       </div>
       {modalVisible && selectedDocumentId && (
         <DocConfirmModal

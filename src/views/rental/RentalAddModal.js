@@ -29,23 +29,23 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
         alert('파일을 첨부해주세요.');
         return;
       }
-
+  
       const reader = new FileReader();
       reader.onload = (event) => {
         const data = new Uint8Array(event.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-
+  
         const jsonOptions = {
           header: 1,
           defval: '',
           raw: false,
           dateNF: 'yyyy-mm-dd',
         };
-
+  
         const worksheetData = XLSX.utils.sheet_to_json(worksheet, jsonOptions);
-
+  
         const extractedData = worksheetData
           .slice(5)
           .filter((row) => row[1])
@@ -62,7 +62,7 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
             specialNote: row[10] !== undefined ? row[10].toString() : '',
             instCd: auth.instCd, 
           }));
-
+  
         axios.post(`/api/rental/data`, extractedData)
           .then((response) => {
             onSave(response.data); 
@@ -79,57 +79,59 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
       };
       reader.readAsArrayBuffer(file);
     } else if (activeTab === 'text') {
-        const {
-          category,
-          companyNm,
-          contractNum,
-          modelNm,
-          installDate,
-          expiryDate,
-          rentalFee,
-          location,
-          installationSite,
-          specialNote,
-        } = formData;
-      
-        if (
-          !category ||
-          !companyNm ||
-          !contractNum ||
-          !modelNm ||
-          !installDate ||
-          !expiryDate ||
-          !rentalFee ||
-          !location ||
-          !installationSite
-        ) {
-          alert('모든 항목을 입력해 주세요.');
-          return;
-        }
-      
-        if (!validateDateFormat(installDate)) {
-          alert('설치일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
-          return;
-        }
-      
-        if (!validateDateFormat(expiryDate)) {
-          alert('만료일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
-          return;
-        }
-      
-        const payload = {
-          category,
-          companyNm,
-          contractNum,
-          modelNm,
-          installDate,
-          expiryDate,
-          rentalFee,
-          location,
-          installationSite,
-          specialNote,
-        };
-      
+      const {
+        category,
+        companyNm,
+        contractNum,
+        modelNm,
+        installDate,
+        expiryDate,
+        rentalFee,
+        location,
+        installationSite,
+        specialNote,
+      } = formData;
+  
+      const missingFields = [];
+  
+      if (!category) missingFields.push('제품군');
+      if (!companyNm) missingFields.push('업체명');
+      if (!contractNum) missingFields.push('계약번호');
+      if (!modelNm) missingFields.push('모델명');
+      if (!installDate) missingFields.push('설치일자');
+      if (!expiryDate) missingFields.push('만료일자');
+      if (!rentalFee) missingFields.push('렌탈료');
+      if (!location) missingFields.push('위치분류');
+      if (!installationSite) missingFields.push('설치위치');
+  
+      if (missingFields.length > 0) {
+        alert(`다음 항목을 입력해주세요:\n${missingFields.join('\n')}`);
+        return;
+      }
+  
+      if (!validateDateFormat(installDate)) {
+        alert('설치일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
+        return;
+      }
+  
+      if (!validateDateFormat(expiryDate)) {
+        alert('만료일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
+        return;
+      }
+  
+      const payload = {
+        category,
+        companyNm,
+        contractNum,
+        modelNm,
+        installDate,
+        expiryDate,
+        rentalFee,
+        location,
+        installationSite,
+        specialNote,
+      };
+  
       axios.post(`/api/rental/`, payload)
         .then(response => {
           onSave([payload]);
@@ -147,7 +149,7 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
         });
     }
   };
-
+  
   const handleClose = () => {
     resetFormData();
     onClose();

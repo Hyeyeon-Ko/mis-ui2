@@ -61,7 +61,8 @@ function DetailDocApplication() {
     return date.toISOString().split('T')[0];
   };
 
-  const handleFileDownload = async () => {
+  const handleFileDownload = async ({ downloadNotes, downloadType }) => {
+    
     if (existingFile) {
       try {
         const documentType = "doc";

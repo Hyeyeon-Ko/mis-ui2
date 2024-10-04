@@ -3,6 +3,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import SealRegistrationAddModal from './SealRegistrationAddModal';
 import SealRegistrationUpdateModal from './SealRegistrationUpdateModal';
+import ConfirmModal from '../../components/common/ConfirmModal'; 
 import '../../styles/seal/SealRegistrationList.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
@@ -14,6 +15,7 @@ function SealRegistrationList() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedDraftId, setSelectedDraftId] = useState(null);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false); 
 
   const fetchSealRegistrationList = useCallback(async () => {
     try {
@@ -71,7 +73,25 @@ function SealRegistrationList() {
       alert('삭제할 항목을 선택하세요.');
       return;
     }
-    alert('삭제 버튼 클릭됨');
+    setIsConfirmModalOpen(true); 
+  };
+
+  const confirmDelete = async () => {
+    try {
+      const draftIdsToDelete = selectedApplications.map(index => filteredApplications[index].draftId);
+      const deletePromises = draftIdsToDelete.map(draftId => 
+        axios.delete(`/api/seal/register/${draftId}`)
+      );
+      await Promise.all(deletePromises);
+  
+      alert('선택한 항목이 성공적으로 삭제되었습니다.');
+      fetchSealRegistrationList();
+      setSelectedApplications([]);
+    } catch (error) {
+      console.error('Error deleting applications:', error);
+      alert('선택한 항목 삭제 중 오류가 발생했습니다.');
+    }
+    setIsConfirmModalOpen(false); 
   };
 
   const handleSelectApplication = (index) => {
@@ -190,6 +210,13 @@ function SealRegistrationList() {
             }}
             onSave={handleSave}
             draftId={selectedDraftId}
+          />
+        )}
+        {isConfirmModalOpen && (
+          <ConfirmModal
+            message="정말 삭제하시겠습니까?"
+            onConfirm={confirmDelete}
+            onCancel={() => setIsConfirmModalOpen(false)}
           />
         )}
       </div>

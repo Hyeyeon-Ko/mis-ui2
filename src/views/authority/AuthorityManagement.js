@@ -6,6 +6,7 @@ import AuthorityModal from '../authority/AuthorityModal';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import editIcon from '../../assets/images/edit.png';
 import deleteIcon from '../../assets/images/delete.png';
+import Pagination from '../../components/common/Pagination'; // Import the new Pagination component
 import '../../styles/authority/AuthorityManagement.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
@@ -15,32 +16,31 @@ import axios from 'axios';
  */
 function AuthorityManagement() {
   const [applications, setApplications] = useState([]); // 신청 내역 상태 관리
-  const [, setTotalElements] = useState('')
-  const [, setTotalPages] = useState('')
-  const [, setCurrentPage] = useState('')
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
   const [showModal, setShowModal] = useState(false); // 권한 추가/수정 모달 표시 상태 관리
   const [showConfirmModal, setShowConfirmModal] = useState(false); // 확인 모달 표시 상태 관리
   const [selectedAdmin, setSelectedAdmin] = useState(null); // 선택된 관리자 상태 관리
   const [isEditMode, setIsEditMode] = useState(false); // 수정 모드 상태 관리
 
+  const itemsPerPage = 10;
+
   useEffect(() => {
-    fetchAuthorityList();
-  }, []);
+    fetchAuthorityList(currentPage, itemsPerPage);
+  }, [currentPage]);
 
   /**
    * 권한 내역 가져오기
    */
-  // todo: pageIndex랑, pageSize 받아서 넣으면 됨
-  const fetchAuthorityList = async (pageIndex = 1, pageSize = 10) => {
+  const fetchAuthorityList = async (pageIndex = 1, pageSize = itemsPerPage) => {
     try {
-      const response = await axios.get(`/api/auth`, {
+      const response = await axios.get(`/api/auth/`, {
         params: { pageIndex, pageSize }
       });
 
       const data = response.data.data;
-      const totalElements = data.totalElements;
       const totalPages = data.totalPages;
-      const currentPage = data.number+1;
+      const currentPage = data.number + 1;
 
       const transformedData = data.content.map((item) => ({
         id: item.userId,
@@ -49,7 +49,6 @@ function AuthorityManagement() {
         name: `${item.hngNm}(${item.userId})`,
         email: item.email,
         authId: item.authId,
-        // detailCd: item.detailCd,
         permissions: {
           cardManagement: item.cardManagement,
           assetManagement: item.assetManagement,
@@ -59,11 +58,17 @@ function AuthorityManagement() {
       setApplications(transformedData);
       setTotalPages(totalPages);
       setCurrentPage(currentPage);
-      setTotalElements(totalElements);
-
     } catch (error) {
       console.error('Error fetching authority list: ', error);
     }
+  };
+
+  /**
+   * 페이지 변경 핸들러
+   */
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
   };
 
   /**
@@ -94,13 +99,7 @@ function AuthorityManagement() {
    */
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`/api/auth/admin/${selectedAdmin.authId}`
-        // , {
-        // *** todo: pathvariable로 백 단에서 요청하므로 불필요한 코드로 예상! 체크하기
-        // params: {
-        //   detailCd: selectedAdmin.detailCd,
-        // },}
-        );
+      await axios.delete(`/api/auth/admin/${selectedAdmin.authId}`);
       fetchAuthorityList();
       setShowConfirmModal(false);
       setSelectedAdmin(null);
@@ -192,6 +191,7 @@ function AuthorityManagement() {
           </div>
         </div>
         <Table columns={columns} data={applications} />
+        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
       </div>
       <AuthorityModal
         show={showModal}
