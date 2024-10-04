@@ -8,6 +8,7 @@ import ConfirmModal from '../../components/common/ConfirmModal';
 import editIcon from '../../assets/images/edit.png';
 import deleteIcon from '../../assets/images/delete.png';
 import '../../styles/authority/AuthorityManagement.css';
+import '../../styles/common/Pagination.css'
 import '../../styles/common/Page.css';
 import axios from 'axios';
 
@@ -32,7 +33,6 @@ function AuthorityManagement() {
   /**
    * 권한 내역 가져오기
    */
-  // todo: pageIndex랑, pageSize 받아서 넣으면 됨
   const fetchAuthorityList = async (pageIndex = 1, pageSize = itemsPerPage) => {
     try {
       const response = await axios.get(`/api/auth/`, {
@@ -202,8 +202,8 @@ function AuthorityManagement() {
           pageCount={totalPages}
           previousLabel="<"
           renderOnZeroPageCount={null}
-          containerClassName="pagination" // Custom CSS class
-          activeClassName="active" // Active page styling
+          containerClassName="pagination"
+          activeClassName="active"
         />
       </div>
       <AuthorityModal
