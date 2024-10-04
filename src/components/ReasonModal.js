@@ -30,8 +30,8 @@ const ReasonModal = ({ show, onClose, onConfirm, reason = '', isViewOnly = false
   
     const reasonToSubmit = selectedFileType === '기타' ? inputReason : null;
   
-    console.log('Download Notes:', inputReason);  // 입력한 사유 확인
-    console.log('Download Type:', selectedFileType);  // 선택한 타입 확인
+    console.log('Download Notes:', inputReason);  
+    console.log('Download Type:', selectedFileType); 
   
     onConfirm({ downloadNotes: inputReason, downloadType: selectedFileType });
     onClose();
@@ -77,7 +77,7 @@ const ReasonModal = ({ show, onClose, onConfirm, reason = '', isViewOnly = false
               <option value="order">발주용</option>
               <option value="approval">승인/반려용</option>
               <option value="check">확인용</option>
-              <option value="기타">기타</option>
+              <option value="etc">기타</option>
             </select>
           </div>
         )}

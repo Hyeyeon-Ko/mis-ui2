@@ -124,7 +124,7 @@ function DetailSealExportApplication() {
             'order': 'B',
             'approval': 'C',
             'check': 'D',
-            '기타': 'Z',
+            'etc': 'Z',
         };
     
         const convertedFileType = downloadTypeMap[downloadType] || '';    

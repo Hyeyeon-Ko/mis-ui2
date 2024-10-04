@@ -66,20 +66,29 @@ const handleDownloadModalClose = () => {
     setShowDownloadReasonModal(false); 
 };
     
-const handleFileDownloadConfirm = async ({ reason, fileType }) => {
+const handleFileDownloadConfirm = async ({ downloadNotes, downloadType }) => {
     setShowDownloadReasonModal(false);
+
+    const downloadTypeMap = {
+      'draft': 'A',
+      'order': 'B',
+      'approval': 'C',
+      'check': 'D',
+      'etc': 'Z',
+    };
+
+    const convertedFileType = downloadTypeMap[downloadType] || '';    
 
     try {
         const response = await axios.get(`/api/file/download/${encodeURIComponent(formData.fileName)}`, {
             params: {
-                draftId: formData.draftId,
-                docType: 'doc',
-                fileType: fileType,
-                reason: reason,
-                downloaderNm: auth.hngNm,
-                downloaderId: auth.userId,
-            },
-            responseType: 'blob',
+              draftId: formData.draftId,
+              downloadType: convertedFileType,
+              downloadNotes: downloadNotes,
+              downloaderNm: auth.hngNm,
+              downloaderId: auth.userId,
+          },
+      responseType: 'blob',
         });
 
         const url = window.URL.createObjectURL(new Blob([response.data]));
