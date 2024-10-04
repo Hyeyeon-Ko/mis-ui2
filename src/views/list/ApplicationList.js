@@ -12,6 +12,7 @@ import axios from 'axios';
 import fileDownload from 'js-file-download';
 import { AuthContext } from '../../components/AuthContext';
 import useListChange from '../../hooks/useListChange';
+import useDateSet from '../../hooks/apply/useDateSet';
 
 function ApplicationsList() {
   const {
@@ -24,7 +25,7 @@ function ApplicationsList() {
   const instCd = auth.instCd;
 
   const [applications, setApplications] = useState([]);
-  const [filterInputs, setFilterInputs] = useState({
+  const [filterInputs, setFilterInputs] = useState({     // postSearchRequest
     startDate: null,
     endDate: null,
     documentType: documentTypeFromUrl || '',
@@ -45,6 +46,7 @@ function ApplicationsList() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState(null);
   const [selectedCenter, setSelectedCenter] = useState('전체');
+  const { formattedStartDate: defaultStartDate, formattedEndDate: defaultEndDate } = useDateSet();
 
   const [centers] = useState([
     '전체', '재단본부', '광화문', '여의도센터', '강남센터',
@@ -162,37 +164,47 @@ function ApplicationsList() {
     setFilteredApplications(filtered);
      // eslint-disable-next-line
   }, [filters]);
-        
-  const fetchApplications = useCallback(async (filterParams = {}, searchType = '전체', keyword = '', startDate = null, endDate = null) => {
+  
+
+  // 1. 데이터 받아오기
+  const fetchApplications = useCallback(async (filterParams = {}, searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = 10) => {
     setLoading(true);
     setError(null);
     try {
-      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : '';
-      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : '';
+      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : defaultStartDate;
+      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : defaultEndDate;
 
-      const response = await axios.get('/api/applyList', {
+      const response = await axios.get('/api/applyList2', {
         params: {
+          // ApplyRequestDTO parameters
+          userId: auth.userId || '',
+          instCd: instCd || '',
           documentType: convertDocumentType(filterParams.documentType) || convertDocumentType(documentTypeFromUrl) || null,
+
+          // PostSearchRequestDTO parameters
           searchType,
           keyword,
           startDate: formattedStartDate,
           endDate: formattedEndDate,
-          instCd: instCd || '',
-          userId: auth.userId || '',
-          instNm: selectedCenter || '',  
+          
+          // PostPageRequest parameters
+          pageIndex,
+          pageSize
         },
       });
+      console.log("response.data.data: ", response)
 
       const { bcdMasterResponses, docMasterResponses, corpDocMasterResponses, sealMasterResponses } = response.data.data;
 
       const combinedData = [
-        ...(bcdMasterResponses || []),
-        ...(docMasterResponses || []),
-        ...(corpDocMasterResponses || []),
-        ...(sealMasterResponses || []),
+        ...(bcdMasterResponses.content || []),
+        ...(docMasterResponses.content || []),
+        ...(corpDocMasterResponses.content || []),
+        ...(sealMasterResponses.content || []),
       ];
 
       const filteredData = combinedData.filter(application => application.applyStatus !== 'X');
+      console.log("filteredData: ", filteredData)
 
       const transformedData = filteredData.map(application => ({
         draftId: application.draftId,
@@ -211,6 +223,7 @@ function ApplicationsList() {
 
       setApplications(transformedData);
       applyStatusFilters(transformedData);
+
     } catch (error) {
       console.error('Error fetching applications:', error);
       setError('데이터를 불러오는 중 오류가 발생했습니다.');
