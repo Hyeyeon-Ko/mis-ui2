@@ -49,7 +49,6 @@ function AuthorityManagement() {
         name: `${item.hngNm}(${item.userId})`,
         email: item.email,
         authId: item.authId,
-        // detailCd: item.detailCd,
         permissions: {
           cardManagement: item.cardManagement,
           assetManagement: item.assetManagement,
@@ -94,13 +93,7 @@ function AuthorityManagement() {
    */
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`/api/auth/admin/${selectedAdmin.authId}`
-        // , {
-        // *** todo: pathvariable로 백 단에서 요청하므로 불필요한 코드로 예상! 체크하기
-        // params: {
-        //   detailCd: selectedAdmin.detailCd,
-        // },}
-        );
+      await axios.delete(`/api/auth/admin/${selectedAdmin.authId}`);
       fetchAuthorityList();
       setShowConfirmModal(false);
       setSelectedAdmin(null);
