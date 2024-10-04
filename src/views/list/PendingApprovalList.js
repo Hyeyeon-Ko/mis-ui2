@@ -11,25 +11,24 @@ import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 import { centerData, filterData } from '../../datas/listDatas';
 
-
-
 function PendingApprovalList() {
   const location = useLocation();
   const navigate = useNavigate();
   const { auth, refreshSidebar } = useContext(AuthContext);
-  const instCd = auth.instCd;
 
   const [applications, setApplications] = useState([]);
   const [centers] = useState(centerData);
   const [selectedCenter, setSelectedCenter] = useState('전체');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
   const [startDate, setStartDate] = useState(() => {
     const date = new Date();
     date.setMonth(date.getMonth() - 1);
     return date;
   });
-  const [endDate, setEndDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date()); 
+
   const [filters, setFilters] = useState(filterData);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState(null);
@@ -71,19 +70,26 @@ function PendingApprovalList() {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`/api/pendingList`, {
+      const response = await axios.get(`/api/pendingList2`, {
         params: {
           documentType: convertDocumentType(documentType),
-          startDate: filterParams.startDate || '',
-          endDate: filterParams.endDate || '',
-          instCd: instCd || '',
-          userId: auth.userId || '', 
+          startDate: filterParams.startDate || startDate.toISOString().split('T')[0], 
+          endDate: filterParams.endDate || endDate.toISOString().split('T')[0], 
+          instCd: auth.instCd || '',
+          userId: auth.userId || '',
+          pageIndex: 1,
+          pageSize: 10
         },
       });
-
-      const { bcdPendingResponses, docPendingResponses, corpDocPendingResponses, sealPendingResponses } = response.data.data;
-
-      const transformedBcdData = (bcdPendingResponses || []).map(item => ({
+  
+      const { 
+        bcdPendingResponses = { content: [] }, 
+        docPendingResponses = { content: [] }, 
+        corpDocPendingResponses = { content: [] }, 
+        sealPendingResponses = { content: [] } 
+      } = response.data.data || {};
+  
+      const transformedBcdData = (bcdPendingResponses?.content || []).map(item => ({
         draftId: item.draftId,
         title: item.title,
         center: item.instNm || '재단본부',
@@ -92,8 +98,8 @@ function PendingApprovalList() {
         status: '승인대기',
         docType: item.docType || '명함신청'
       }));
-
-      const transformedDocData = (docPendingResponses || []).map(item => ({
+  
+      const transformedDocData = (docPendingResponses?.content || []).map(item => ({
         draftId: item.draftId,
         title: item.title,
         center: item.instNm || '재단본부',
@@ -102,8 +108,8 @@ function PendingApprovalList() {
         status: '승인대기',
         docType: item.docType || '문서수발신'
       }));
-
-      const transformedCorpDocData = (corpDocPendingResponses || []).map(item => ({
+  
+      const transformedCorpDocData = (corpDocPendingResponses?.content || []).map(item => ({
         draftId: item.draftId,
         title: item.title,
         center: item.instNm || '재단본부',
@@ -112,8 +118,8 @@ function PendingApprovalList() {
         status: '승인대기',
         docType: item.docType || '법인서류'
       }));
-
-      const transformedSealData = (sealPendingResponses || []).map(item => ({
+  
+      const transformedSealData = (sealPendingResponses?.content || []).map(item => ({
         draftId: item.draftId,
         title: item.title,
         center: item.instNm || '재단본부',
@@ -122,19 +128,25 @@ function PendingApprovalList() {
         status: '승인대기',
         docType: item.docType || '인장신청'
       }));
-
-      const transformedData = [...transformedBcdData, ...transformedDocData, ...transformedCorpDocData, ...transformedSealData];
-      transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
-
-      setApplications(transformedData);
+  
+      const allTransformedData = [
+        ...transformedBcdData, 
+        ...transformedDocData, 
+        ...transformedCorpDocData, 
+        ...transformedSealData
+      ];
+  
+      allTransformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
+  
+      setApplications(allTransformedData);
     } catch (error) {
       console.error('Error fetching pending list:', error);
       setError('데이터를 불러오는 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
-  }, [documentType, instCd, auth.userId]);
-
+  }, [documentType, auth.instCd, auth.userId, startDate, endDate]);
+      
   useEffect(() => {
     fetchPendingList(filters);
   }, [filters, fetchPendingList]);
@@ -183,12 +195,12 @@ function PendingApprovalList() {
       setModalVisible(true);
     } else if (docType === '명함신청') {
       navigate(`/bcd/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
-    }  else if (docType === '법인서류') {
+    } else if (docType === '법인서류') {
       navigate(`/corpDoc/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
     } else if (docType === '인장신청(날인)') {
       const sealImprintDetails = await fetchSealImprintDetail(draftId);
       navigate(`/seal/imprint/${draftId}?readonly=true&applyStatus=승인대기`, { state: { sealImprintDetails, readOnly: true }});
-    } else if (docType === '인장신청(반출)') {
+    } else if (docType === '인장신청(반출)') { 
       const sealExportDetails = await fetchSealExportDetail(draftId);
       navigate(`/seal/export/${draftId}?readonly=true&applyStatus=승인대기`, { state: { sealExportDetails, readOnly: true }});
     }
@@ -210,7 +222,7 @@ function PendingApprovalList() {
     setEndDate(new Date());
     setSelectedCenter('전체');
     setFilters(filterData);
-    fetchPendingList(); 
+    fetchPendingList();
   };
   
   const closeModal = () => {
@@ -227,7 +239,7 @@ function PendingApprovalList() {
       closeModal();
       
       fetchPendingList(filters);
-  
+
       if (typeof refreshSidebar === 'function') {
         refreshSidebar();  
       }
@@ -247,7 +259,7 @@ function PendingApprovalList() {
   
   const filteredApplications = applications.filter((app) => {
     const draftDate = normalizeDate(app.draftDate); 
-  
+
     if (filters.selectedCenter && filters.selectedCenter !== '전체' && app.center !== filters.selectedCenter) return false;
     if (filters.startDate && draftDate < normalizeDate(filters.startDate)) return false;
     if (filters.endDate && draftDate > normalizeDate(filters.endDate)) return false;
@@ -267,14 +279,14 @@ function PendingApprovalList() {
       Cell: ({ row }) => (
         <span
           className="status-pending clickable" 
-          onClick={() => handleRowClick(row.draftId, row.docType)} 
+          onClick={() => handleRowClick(row.draftId, row.docType, row.status)} 
         >
           {row.title}
         </span>
       ),  
     },
     { header: '신청일시', accessor: 'draftDate', width: '12%' },
-    { header: '신청자', accessor: 'drafter', width: '8%' },
+    { header: '신청자', accessor: 'drafter', width: '8%' }, 
     { header: '문서상태', accessor: 'status', width: '10%' },
   ];
 
