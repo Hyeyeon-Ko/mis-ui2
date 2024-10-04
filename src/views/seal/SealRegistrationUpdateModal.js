@@ -60,11 +60,7 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
       draftDate: formData.date,
       instCd: auth.instCd,
     })], { type: 'application/json' }));
-    
-    if (!isFileDeleted && formData.sealImage) {
-      data.append('sealImage', formData.sealImage);
-    }
-    data.append('isFileDeleted', isFileDeleted);
+    data.append('sealImage', formData.sealImage);
 
     // SealRegistForm validation
     const requiredInputs = {

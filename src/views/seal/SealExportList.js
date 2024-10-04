@@ -96,19 +96,28 @@ function SealExportList() {
     setSelectedFileName('');
   };
       
-  const handleFileDownloadConfirm = async ({ reason, fileType }) => {
+  const handleFileDownloadConfirm = async ({ downloadNotes, downloadType }) => {
     setShowDownloadReasonModal(false);
+
+    const downloadTypeMap = {
+      'draft': 'A',
+      'order': 'B',
+      'approval': 'C',
+      'check': 'D',
+      '기타': 'Z',
+    };
+
+    const convertedFileType = downloadTypeMap[downloadType] || '';    
   
     try {
       const response = await axios.get(`/api/file/download/${encodeURIComponent(selectedFileName)}`, {
         params: {
           draftId: selectedDraftId,
-          docType: 'seal', 
-          fileType: fileType,
-          reason: reason,
+          downloadType: convertedFileType,
+          downloadNotes: downloadNotes,
           downloaderNm: auth.hngNm,
           downloaderId: auth.userId,
-        },
+},
         responseType: 'blob',
       });
 

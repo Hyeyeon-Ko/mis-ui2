@@ -3,7 +3,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import CustomButton from '../../components/common/CustomButton';
 import SealRegistrationAddModal from './SealRegistrationAddModal';
 import SealRegistrationUpdateModal from './SealRegistrationUpdateModal';
-import ConfirmModal from '../../components/common/ConfirmModal'; // ConfirmModal 추가
+import ConfirmModal from '../../components/common/ConfirmModal'; 
 import '../../styles/seal/SealRegistrationList.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
@@ -15,7 +15,7 @@ function SealRegistrationList() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedDraftId, setSelectedDraftId] = useState(null);
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false); // ConfirmModal 상태 추가
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false); 
 
   const fetchSealRegistrationList = useCallback(async () => {
     try {
@@ -73,7 +73,7 @@ function SealRegistrationList() {
       alert('삭제할 항목을 선택하세요.');
       return;
     }
-    setIsConfirmModalOpen(true); // ConfirmModal 열기
+    setIsConfirmModalOpen(true); 
   };
 
   const confirmDelete = async () => {
@@ -91,7 +91,7 @@ function SealRegistrationList() {
       console.error('Error deleting applications:', error);
       alert('선택한 항목 삭제 중 오류가 발생했습니다.');
     }
-    setIsConfirmModalOpen(false); // ConfirmModal 닫기
+    setIsConfirmModalOpen(false); 
   };
 
   const handleSelectApplication = (index) => {

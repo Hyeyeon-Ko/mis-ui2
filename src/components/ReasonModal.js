@@ -27,13 +27,16 @@ const ReasonModal = ({ show, onClose, onConfirm, reason = '', isViewOnly = false
       alert('다운로드 타입을 선택하세요.');
       return;
     }
-
+  
     const reasonToSubmit = selectedFileType === '기타' ? inputReason : null;
-
-    onConfirm({ reason: reasonToSubmit, fileType: selectedFileType });
+  
+    console.log('Download Notes:', inputReason);  // 입력한 사유 확인
+    console.log('Download Type:', selectedFileType);  // 선택한 타입 확인
+  
+    onConfirm({ downloadNotes: inputReason, downloadType: selectedFileType });
     onClose();
   };
-
+  
   if (!show) return null;
 
   const getTitle = () => {

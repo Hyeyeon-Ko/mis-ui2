@@ -116,16 +116,25 @@ function DetailSealExportApplication() {
         setShowDownloadReasonModal(false); 
     };
         
-    const handleFileDownloadConfirm = async ({ reason, fileType }) => {
+    const handleFileDownloadConfirm = async ({ downloadNotes, downloadType }) => {
         setShowDownloadReasonModal(false);
+
+        const downloadTypeMap = {
+            'draft': 'A',
+            'order': 'B',
+            'approval': 'C',
+            'check': 'D',
+            '기타': 'Z',
+        };
+    
+        const convertedFileType = downloadTypeMap[downloadType] || '';    
     
         try {
             const response = await axios.get(`/api/file/download/${encodeURIComponent(applicationDetails.fileName)}`, {
                 params: {
                     draftId: draftId,
-                    docType: 'seal',
-                    fileType: fileType,
-                    reason: reason,
+                    downloadType: convertedFileType,
+                    downloadNotes: downloadNotes,
                     downloaderNm: auth.hngNm,
                     downloaderId: auth.userId,
                 },
