@@ -28,11 +28,6 @@ const ReasonModal = ({ show, onClose, onConfirm, reason = '', isViewOnly = false
       return;
     }
   
-    const reasonToSubmit = selectedFileType === '기타' ? inputReason : null;
-  
-    console.log('Download Notes:', inputReason);  
-    console.log('Download Type:', selectedFileType); 
-  
     onConfirm({ downloadNotes: inputReason, downloadType: selectedFileType });
     onClose();
   };
