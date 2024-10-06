@@ -8,7 +8,7 @@ import { validateForm } from '../../hooks/validateForm';
 function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
   const { formData, setFormData, handleUpdateChange, handleFileUpdateChange } = useSealForm();
   const { auth } = useContext(AuthContext);
-  const { isFileDeleted, setIsFileDeleted } = useSealForm();
+  const { setIsFileDeleted } = useSealForm();
 
   const fetchSealDetail = useCallback(async (id) => {
     try {
