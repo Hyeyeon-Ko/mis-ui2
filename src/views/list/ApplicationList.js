@@ -53,6 +53,7 @@ function ApplicationsList() {
 
   useEffect(() => {
     fetchApplications(currentPage, itemsPerPage);
+  // eslint-disable-next-line
   }, [currentPage]);
 
   const [centers] = useState([
@@ -239,6 +240,7 @@ function ApplicationsList() {
     } finally {
       setLoading(false);
     }
+     // eslint-disable-next-line
   }, [applyStatusFilters, auth.userId, documentTypeFromUrl, instCd, selectedCenter]);
 
     /**

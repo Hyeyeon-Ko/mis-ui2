@@ -1,74 +1,74 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../common/Button';
 import '../../styles/common/ConditionFilter.css';
 
 const ConditionFilter = ({
-  startDate,
-  setStartDate,
-  endDate,
-  setEndDate,
   onSearch,
   onReset,
-  filters = {
+  showStatusFilters,
+  showSearchCondition,
+  showDocumentType = true,
+  searchOptions = [],
+  forceShowAllStatusFilters = false,
+  startDateLabel = '신청일자',
+}) => {
+  // 내부 상태 관리
+  const [startDate, setStartDate] = useState(new Date(new Date().setMonth(new Date().getMonth() - 1)));
+  const [endDate, setEndDate] = useState(new Date());
+  const [filters, setFilters] = useState({
     statusApproved: false,
     statusRejected: false,
     statusOrdered: false,
     statusClosed: false,
-  },
-  setFilters = () => {},
-  onFilterChange,
-  showStatusFilters,
-  showSearchCondition,
-  showDocumentType = true,
-  documentType,
-  setDocumentType,
-  searchType, 
-  setSearchType,
-  keyword,  
-  setKeyword,
-  searchOptions = [], 
-  forceShowAllStatusFilters = false,
-  startDateLabel = '신청일자',
-}) => {
+  });
+  const [documentType, setDocumentType] = useState('');
+  const [searchType, setSearchType] = useState('전체');
+  const [keyword, setKeyword] = useState('');
+
+  // 필터 초기화 함수
   const resetFilters = () => {
     const defaultStartDate = new Date();
     defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
-    setStartDate && setStartDate(defaultStartDate);
-    setEndDate && setEndDate(new Date());
-    
-    if (showSearchCondition) {
-      setSearchType('전체');
-      setKeyword('');
-    }
-
-    if (onReset) onReset();
+    setStartDate(defaultStartDate);
+    setEndDate(new Date());
+    setSearchType('전체');
+    setKeyword('');
     setFilters({
       statusApproved: false,
       statusRejected: false,
       statusOrdered: false,
       statusClosed: false,
     });
+
+    // 외부에서 넘겨받은 리셋 핸들러 호출
+    if (onReset) {
+      onReset();
+    }
   };
 
+  // 날짜 포맷팅 함수
   const formatDate = (date) => {
     return date.toISOString().split('T')[0];
   };
 
-  const handleReset = () => {
-    resetFilters();
+  // 필터 상태 변경 함수
+  const handleFilterChange = (event) => {
+    const { name, checked } = event.target;
+    setFilters((prev) => ({ ...prev, [name]: checked }));
   };
 
+  // 검색 버튼 클릭 시 호출할 함수
   const handleSearch = () => {
     onSearch();
   };
 
   const handleStartDateChange = (event) => {
-    setStartDate && setStartDate(event.target.value ? new Date(event.target.value) : null);
+    setStartDate(new Date(event.target.value));
   };
 
   const handleEndDateChange = (event) => {
-    setEndDate && setEndDate(event.target.value ? new Date(event.target.value) : null);
+    setEndDate(new Date(event.target.value));
   };
 
   const handleDocumentTypeChange = (event) => {
@@ -84,7 +84,7 @@ const ConditionFilter = ({
               type="checkbox"
               name="statusApproved"
               checked={filters.statusApproved}
-              onChange={onFilterChange}
+              onChange={handleFilterChange}
             />
             승인완료
           </label>
@@ -93,7 +93,7 @@ const ConditionFilter = ({
               type="checkbox"
               name="statusRejected"
               checked={filters.statusRejected}
-              onChange={onFilterChange}
+              onChange={handleFilterChange}
             />
             반려
           </label>
@@ -102,7 +102,7 @@ const ConditionFilter = ({
               type="checkbox"
               name="statusOrdered"
               checked={filters.statusOrdered}
-              onChange={onFilterChange}
+              onChange={handleFilterChange}
             />
             발주완료
           </label>
@@ -111,7 +111,7 @@ const ConditionFilter = ({
               type="checkbox"
               name="statusClosed"
               checked={filters.statusClosed}
-              onChange={onFilterChange}
+              onChange={handleFilterChange}
             />
             처리완료
           </label>
@@ -128,7 +128,7 @@ const ConditionFilter = ({
                 type="checkbox"
                 name="statusApproved"
                 checked={filters.statusApproved}
-                onChange={onFilterChange}
+                onChange={handleFilterChange}
               />
               승인완료
             </label>
@@ -137,7 +137,7 @@ const ConditionFilter = ({
                 type="checkbox"
                 name="statusRejected"
                 checked={filters.statusRejected}
-                onChange={onFilterChange}
+                onChange={handleFilterChange}
               />
               반려
             </label>
@@ -146,7 +146,7 @@ const ConditionFilter = ({
                 type="checkbox"
                 name="statusOrdered"
                 checked={filters.statusOrdered}
-                onChange={onFilterChange}
+                onChange={handleFilterChange}
               />
               발주완료
             </label>
@@ -155,7 +155,7 @@ const ConditionFilter = ({
                 type="checkbox"
                 name="statusClosed"
                 checked={filters.statusClosed}
-                onChange={onFilterChange}
+                onChange={handleFilterChange}
               />
               처리완료
             </label>
@@ -168,7 +168,7 @@ const ConditionFilter = ({
               type="checkbox"
               name="statusClosed"
               checked={filters.statusClosed}
-              onChange={onFilterChange}
+              onChange={handleFilterChange}
             />
             처리완료
           </label>
@@ -181,7 +181,7 @@ const ConditionFilter = ({
                 type="checkbox"
                 name="statusRejected"
                 checked={filters.statusRejected}
-                onChange={onFilterChange}
+                onChange={handleFilterChange}
               />
               반려
             </label>
@@ -190,7 +190,7 @@ const ConditionFilter = ({
                 type="checkbox"
                 name="statusClosed"
                 checked={filters.statusClosed}
-                onChange={onFilterChange}
+                onChange={handleFilterChange}
               />
               처리완료
             </label>
@@ -204,24 +204,20 @@ const ConditionFilter = ({
   return (
     <div className="all-application-filter-container">
       <div className="all-application-filter">
-        {(startDate !== null && endDate !== null) && (
-          <>
-            <label>{startDateLabel}</label>
-            <input
-              type="date"
-              value={startDate ? formatDate(startDate) : formatDate(new Date(new Date().setMonth(new Date().getMonth() - 1)))}
-              onChange={handleStartDateChange}
-              className="custom-datepicker"
-            />
-            <span> ~ </span>
-            <input
-              type="date"
-              value={endDate ? formatDate(endDate) : formatDate(new Date())}
-              onChange={handleEndDateChange}
-              className="custom-datepicker"
-            />
-          </>
-        )}
+        <label>{startDateLabel}</label>
+        <input
+          type="date"
+          value={startDate ? formatDate(startDate) : ''}
+          onChange={handleStartDateChange}
+          className="custom-datepicker"
+        />
+        <span> ~ </span>
+        <input
+          type="date"
+          value={endDate ? formatDate(endDate) : ''}
+          onChange={handleEndDateChange}
+          className="custom-datepicker"
+        />
         {showDocumentType && (
           <>
             <label>문서분류</label>
@@ -241,8 +237,8 @@ const ConditionFilter = ({
           <>
             <label>검색 조건</label>
             <select
-              value={searchType}  
-              onChange={(e) => setSearchType(e.target.value)}  
+              value={searchType}
+              onChange={(e) => setSearchType(e.target.value)}
             >
               {searchOptions.map((option) => (
                 <option key={option} value={option}>
@@ -252,13 +248,13 @@ const ConditionFilter = ({
             </select>
             <input
               type="text"
-              value={keyword}  
-              onChange={(e) => setKeyword(e.target.value)} 
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
               placeholder="검색어 입력"
             />
           </>
         )}
-        <button className="reset-button" onClick={handleReset}>
+        <button className="reset-button" onClick={resetFilters}>
           <span className="reset-text">↻ 초기화</span>
         </button>
         <Button onClick={handleSearch} className="search-button">조 회</Button>
@@ -273,25 +269,14 @@ const ConditionFilter = ({
 };
 
 ConditionFilter.propTypes = {
-  startDate: PropTypes.instanceOf(Date),
-  setStartDate: PropTypes.func,
-  endDate: PropTypes.instanceOf(Date),
-  setEndDate: PropTypes.func,
   onSearch: PropTypes.func.isRequired,
   onReset: PropTypes.func.isRequired,
-  filters: PropTypes.object,
-  setFilters: PropTypes.func.isRequired,
-  onFilterChange: PropTypes.func,
   showStatusFilters: PropTypes.bool,
   showSearchCondition: PropTypes.bool,
   showDocumentType: PropTypes.bool,
-  documentType: PropTypes.string,
-  setDocumentType: PropTypes.func.isRequired,
-  searchType: PropTypes.string,  
-  setSearchType: PropTypes.func,  
-  keyword: PropTypes.string, 
-  setKeyword: PropTypes.func,  
   searchOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  forceShowAllStatusFilters: PropTypes.bool,
+  startDateLabel: PropTypes.string,
 };
 
 export default ConditionFilter;
