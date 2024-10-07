@@ -21,21 +21,24 @@ function MyPendingList() {
   const [currentPage, setCurrentPage] = useState('1');
   const navigate = useNavigate();
 
-  const fetchPendingApplications = useCallback(async () => {
+  const fetchPendingApplications = useCallback(async ( pageIndex = 1, pageSize = 10) => {
     try {
-      const response = await axios.get(`/api/myPendingList`, {
+      const response = await axios.get(`/api/myPendingList2`, {
         params: {
           userId: auth.userId, 
+          pageIndex,
+          pageSize
         },
       });
+      // const pagedResult = response.data.data.pagedResult || {}; 
+      // const data = pagedResult.content || []; 
+      // console.log('content', data);
+      // console.log('pagedResult', response.data.data.pagedResult)
       if (response.data && response.data.data) {
-        const data = [
-          ...(response.data.data.bcdPendingResponses || []),
-          ...(response.data.data.docPendingResponses || []),
-          ...(response.data.data.corpDocPendingResponses || []),
-          ...(response.data.data.sealPendingResponses || []),
-        ];
-
+        const pagedResult = response.data.data.pagedResult || {};  
+        const data = pagedResult.content || [];  
+        console.log('content', data);
+  
         const uniqueData = data.reduce((acc, current) => {
           const x = acc.find(item => item.draftId === current.draftId && item.docType === current.docType);
           if (!x) {
@@ -44,20 +47,23 @@ function MyPendingList() {
             return acc;
           }
         }, []);
-
+  
+        console.log('uniqueData', uniqueData);
+  
         const transformedData = uniqueData.map(application => ({
           draftId: application.draftId,
           title: application.title,
           draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
           drafter: application.drafter,
           lastUpdateDate: application.lastUpdateDate ? parseDateTime(application.lastUpdateDate) : '',
-          lastUpdater: application.lastUpdateDate ? application.lastUpdater : '', 
-          docType: application.docType, 
+          lastUpdater: application.lastUpdater || '', 
+          docType: application.docType,
         }));
-
+  
+        // Sort the transformed data by draftDate
         transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
-
-        setPendingApplications(transformedData);
+  
+        setPendingApplications(transformedData);  // Set the transformed data to state
       } else {
         console.error('Unexpected response format:', response.data);
       }
