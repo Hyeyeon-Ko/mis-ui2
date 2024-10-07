@@ -23,6 +23,7 @@ function PendingApprovalList() {
   const [centers] = useState(centerData);
   const [selectedCenter, setSelectedCenter] = useState('전체');
   const [loading, setLoading] = useState(false);
+  // eslint-disable-next-line
   const [error, setError] = useState(null);
 
   const [startDate, setStartDate] = useState(() => {

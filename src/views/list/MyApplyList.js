@@ -89,6 +89,7 @@ function MyApplyList() {
     } finally {
       setLoading(false);
     }
+    // eslint-disable-next-line
   }, [auth.userId, startDate, endDate, documentType]);
 
   const applyFilters = () => {
