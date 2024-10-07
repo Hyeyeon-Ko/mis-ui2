@@ -12,6 +12,7 @@ import { AuthContext } from '../../components/AuthContext';
 import { centerData, filterData } from '../../datas/listDatas';
 import useDateSet from '../../hooks/apply/useDateSet';
 import Pagination from '../../components/common/Pagination';
+import Loading from '../../components/common/Loading';
 
 function PendingApprovalList() {
   const location = useLocation();
@@ -311,13 +312,16 @@ function PendingApprovalList() {
           searchOptions={[]}          
         />
         {loading ? (
-          <p>로딩 중...</p>
+          <Loading />
         ) : error ? (
           <p>{error}</p>
         ) : (
+          <>
           <Table columns={columns} data={filteredApplications} />
+          <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+        </>
+
         )}
-        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
       </div>
       {selectedDocumentId !== null && (
         <DocConfirmModal

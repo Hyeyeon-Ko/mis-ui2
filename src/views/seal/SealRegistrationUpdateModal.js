@@ -195,7 +195,7 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
                     {/* 파일 제목 표시 */}
                     {formData.sealImage ? (
                       <div>
-                        <span>{formData.sealImage.name || 'Uploaded Image'}</span>
+                        <span>{formData.sealImageNm || 'Uploaded Image'}</span>
                         <button onClick={handleDeleteFile}>기존 파일 삭제</button>
                       </div>
                     ) : (
