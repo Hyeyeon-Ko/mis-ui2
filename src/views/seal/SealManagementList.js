@@ -42,7 +42,7 @@ const SealManagementTable = ({ filteredApplications, handleRowClick, clickedRows
                   ))
               ) : (
                   <tr>
-                      <td colSpan="7">데이터가 없습니다.</td>
+                      <td colSpan="7">조회된 데이터가 없습니다.</td>
                   </tr>
               )}
           </tbody>

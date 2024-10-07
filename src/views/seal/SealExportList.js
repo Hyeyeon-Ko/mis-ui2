@@ -238,7 +238,7 @@ function SealExportList() {
               ))
             ) : (
               <tr>
-                <td colSpan="9">데이터가 없습니다.</td>
+                <td colSpan="9">조회된 데이터가 없습니다.</td>
               </tr>
             )}
           </tbody>
