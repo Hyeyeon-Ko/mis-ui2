@@ -11,8 +11,7 @@ import fileDownload from 'js-file-download';
 import { FadeLoader } from 'react-spinners';
 import { AuthContext } from '../../components/AuthContext'; 
 import useBdcChange from '../../hooks/bdc/useBdcChange';
-
-
+import Pagination from '../../components/common/Pagination';
 
 
 function BcdOrder() {
@@ -20,6 +19,20 @@ function BcdOrder() {
   const { auth, refreshSidebar } = useContext(AuthContext);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
+
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    fetchBcdOrderList(currentPage, itemsPerPage);
+  }, [currentPage]);
+
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
+  };
 
   const navigate = useNavigate();
 
@@ -42,15 +55,21 @@ function BcdOrder() {
   };
 
   // 발주 리스트 가져오기
-  const fetchBcdOrderList = useCallback(async () => {
+  const fetchBcdOrderList = useCallback(async (pageIndex = 1, pageSize = itemsPerPage) => {
     try {
-      const response = await axios.get(`/api/bsc/order`, {
+      const response = await axios.get(`/api/bsc/order/get`, {
         params: {
           instCd: auth.instCd,
+          pageIndex,
+          pageSize
         },
       });
       const data = response.data.data || response.data;
-      const transformedData = data.map((item) => ({
+      console.log(data)
+      const totalPages = data.totalPages;
+      const currentPage = data.number + 1;
+
+      const transformedData = data.content.map((item) => ({
         id: item.draftId,
         center: item.instNm,
         title: item.title,
@@ -60,6 +79,8 @@ function BcdOrder() {
         quantity: item.quantity,
       }));
       setApplications(transformedData);
+      setTotalPages(totalPages);
+      setCurrentPage(currentPage);
     } catch (error) {
       console.error('Error fetching bcdOrder list: ', error);
     }
@@ -249,6 +270,7 @@ function BcdOrder() {
           onRowMouseOver={(rowIndex) => handleMouseOver(rowIndex)}  
           onRowMouseUp={handleMouseUp}    
         />
+        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
       </div>
       {isLoading && (
         <div className="loading-overlay">
