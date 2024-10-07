@@ -53,7 +53,6 @@ function ApplicationsList() {
 
   useEffect(() => {
     fetchApplications(currentPage, itemsPerPage);
-  // eslint-disable-next-line
   }, [currentPage]);
 
   const [centers] = useState([

@@ -10,6 +10,8 @@ import '../../styles/common/Page.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 import { centerData, filterData } from '../../datas/listDatas';
+import useDateSet from '../../hooks/apply/useDateSet';
+import Pagination from '../../components/common/Pagination';
 
 function PendingApprovalList() {
   const location = useLocation();
@@ -35,6 +37,22 @@ function PendingApprovalList() {
 
   const queryParams = new URLSearchParams(location.search);
   const documentType = queryParams.get('documentType') || '';
+
+  const { formattedStartDate: defaultStartDate, formattedEndDate: defaultEndDate } = useDateSet();
+
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
+
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    fetchPendingList(currentPage, itemsPerPage);
+  }, [currentPage]);
+
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
+  };
 
   const getBreadcrumbItems = () => {
     switch (documentType) {
@@ -66,79 +84,92 @@ function PendingApprovalList() {
     }
   };
 
-  const fetchPendingList = useCallback(async (filterParams = {}) => {
+  const fetchPendingList = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
     setLoading(true);
     setError(null);
     try {
+
+      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : defaultStartDate;
+      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : defaultEndDate;
+
       const response = await axios.get(`/api/pendingList2`, {
         params: {
-          documentType: convertDocumentType(documentType),
-          startDate: filterParams.startDate || startDate.toISOString().split('T')[0], 
-          endDate: filterParams.endDate || endDate.toISOString().split('T')[0], 
-          instCd: auth.instCd || '',
+          // ApplyRequestDTO parameters
           userId: auth.userId || '',
-          pageIndex: 1,
-          pageSize: 10
+          instCd: auth.instCd || '',
+          documentType: convertDocumentType(documentType),
+          
+          // PostSearchRequestDTO parameters
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+
+          // PostPageRequest parameters
+          pageIndex,
+          pageSize
         },
       });
-  
-      const { 
-        bcdPendingResponses = { content: [] }, 
-        docPendingResponses = { content: [] }, 
-        corpDocPendingResponses = { content: [] }, 
-        sealPendingResponses = { content: [] } 
-      } = response.data.data || {};
-  
-      const transformedBcdData = (bcdPendingResponses?.content || []).map(item => ({
-        draftId: item.draftId,
-        title: item.title,
-        center: item.instNm || '재단본부',
-        draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
-        drafter: item.drafter,
-        status: '승인대기',
-        docType: item.docType || '명함신청'
-      }));
-  
-      const transformedDocData = (docPendingResponses?.content || []).map(item => ({
-        draftId: item.draftId,
-        title: item.title,
-        center: item.instNm || '재단본부',
-        draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
-        drafter: item.drafter,
-        status: '승인대기',
-        docType: item.docType || '문서수발신'
-      }));
-  
-      const transformedCorpDocData = (corpDocPendingResponses?.content || []).map(item => ({
-        draftId: item.draftId,
-        title: item.title,
-        center: item.instNm || '재단본부',
-        draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
-        drafter: item.drafter,
-        status: '승인대기',
-        docType: item.docType || '법인서류'
-      }));
-  
-      const transformedSealData = (sealPendingResponses?.content || []).map(item => ({
-        draftId: item.draftId,
-        title: item.title,
-        center: item.instNm || '재단본부',
-        draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
-        drafter: item.drafter,
-        status: '승인대기',
-        docType: item.docType || '인장신청'
-      }));
-  
-      const allTransformedData = [
-        ...transformedBcdData, 
-        ...transformedDocData, 
-        ...transformedCorpDocData, 
-        ...transformedSealData
+
+      const { bcdPendingResponses, docPendingResponses, corpDocPendingResponses, sealPendingResponses } = response.data.data;
+
+      const combinedData = [
+        bcdPendingResponses || {},
+        docPendingResponses || {},
+        corpDocPendingResponses || {},
+        sealPendingResponses || {}
       ];
+
+      const selectedData = combinedData.find(response => response.totalElements > 0);
+
+      const totalPages = selectedData.totalPages;
+      const currentPage = selectedData.number + 1;
+      const content = selectedData.content;
+      const filteredData = content.filter(application => application.applyStatus !== 'X');
   
-      allTransformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
+      const transformedData = filteredData.map(item => ({
+        draftId: item.draftId,
+        title: item.title,
+        center: item.instNm || '재단본부',
+        draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
+        drafter: item.drafter,
+        status: '승인대기',
+        docType: item.docType
+      }));
   
-      setApplications(allTransformedData);
+      // const transformedDocData = (docPendingResponses?.content || []).map(item => ({
+      //   draftId: item.draftId,
+      //   title: item.title,
+      //   center: item.instNm || '재단본부',
+      //   draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
+      //   drafter: item.drafter,
+      //   status: '승인대기',
+      //   docType: item.docType || '문서수발신'
+      // }));
+  
+      // const transformedCorpDocData = (corpDocPendingResponses?.content || []).map(item => ({
+      //   draftId: item.draftId,
+      //   title: item.title,
+      //   center: item.instNm || '재단본부',
+      //   draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
+      //   drafter: item.drafter,
+      //   status: '승인대기',
+      //   docType: item.docType || '법인서류'
+      // }));
+  
+      // const transformedSealData = (sealPendingResponses?.content || []).map(item => ({
+      //   draftId: item.draftId,
+      //   title: item.title,
+      //   center: item.instNm || '재단본부',
+      //   draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
+      //   drafter: item.drafter,
+      //   status: '승인대기',
+      //   docType: item.docType || '인장신청'
+      // }));
+  
+      transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
+  
+      setApplications(transformedData);
+      setTotalPages(totalPages);
+      setCurrentPage(currentPage);
     } catch (error) {
       console.error('Error fetching pending list:', error);
       setError('데이터를 불러오는 중 오류가 발생했습니다.');
@@ -316,6 +347,7 @@ function PendingApprovalList() {
         ) : (
           <Table columns={columns} data={filteredApplications} />
         )}
+        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
       </div>
       {selectedDocumentId !== null && (
         <DocConfirmModal
