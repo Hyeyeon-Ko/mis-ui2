@@ -26,6 +26,7 @@ function MyPendingList() {
       const response = await axios.get(`/api/myPendingList`, {
         params: {
           userId: auth.userId, 
+          instCd: auth.instCd,
         },
       });
       if (response.data && response.data.data) {

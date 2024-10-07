@@ -144,7 +144,7 @@ function SealRegistrationList() {
                   checked={filteredApplications.length > 0 && selectedApplications.length === filteredApplications.length}
                 />
               </th>
-              <th rowSpan="2">인영</th>
+              <th rowSpan="2">인명</th>
               <th rowSpan="2">인영</th>
               <th rowSpan="2">사용부서</th>
               <th rowSpan="2">용도</th>
