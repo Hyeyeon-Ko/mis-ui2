@@ -20,8 +20,8 @@ function BcdOrder() {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [totalPages, setTotalPages] = useState('1')
-  const [currentPage, setCurrentPage] = useState('1')
+  const [totalPages, setTotalPages] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1)
 
   const itemsPerPage = 10;
 
@@ -62,7 +62,7 @@ function BcdOrder() {
       });
       const data = response.data.data || response.data;
       console.log(data)
-      const totalPages = data.totalPages;
+      const totalPages = Math.max(data.totalPages, 1);
       const currentPage = data.number + 1;
 
       const transformedData = data.content.map((item) => ({
