@@ -30,14 +30,10 @@ function MyPendingList() {
           pageSize
         },
       });
-      // const pagedResult = response.data.data.pagedResult || {}; 
-      // const data = pagedResult.content || []; 
-      // console.log('content', data);
-      // console.log('pagedResult', response.data.data.pagedResult)
+
       if (response.data && response.data.data) {
         const pagedResult = response.data.data.pagedResult || {};  
         const data = pagedResult.content || [];  
-        console.log('content', data);
   
         const uniqueData = data.reduce((acc, current) => {
           const x = acc.find(item => item.draftId === current.draftId && item.docType === current.docType);
@@ -48,7 +44,6 @@ function MyPendingList() {
           }
         }, []);
   
-        console.log('uniqueData', uniqueData);
   
         const transformedData = uniqueData.map(application => ({
           draftId: application.draftId,
@@ -60,7 +55,6 @@ function MyPendingList() {
           docType: application.docType,
         }));
   
-        // Sort the transformed data by draftDate
         transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
   
         setPendingApplications(transformedData);  // Set the transformed data to state
