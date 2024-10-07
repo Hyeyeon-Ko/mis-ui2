@@ -144,7 +144,7 @@ function CorpDocIssueList() {
     } catch (error) {
       console.error("Error fetching issue data:", error);
     }
-  }, []);
+  }, [defaultEndDate, defaultStartDate, setCurrentPendingPage]);
   
   useEffect(() => {
     fetchIssueData(currentPage, itemsPerPage);
@@ -173,7 +173,7 @@ function CorpDocIssueList() {
       searchType: '전체',
       keyword: '',
     });
-  }, [defaultStartDate]);
+  }, []);
 
   useEffect(() => {
     resetFilters();

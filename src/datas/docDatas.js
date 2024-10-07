@@ -15,4 +15,7 @@ export const docFilterData = {
     endDate: null,
     searchType: '전체',
     keyword: '',
+    pageIndex: 1,
+    pageSize: 10,
+    status: '',
 }
