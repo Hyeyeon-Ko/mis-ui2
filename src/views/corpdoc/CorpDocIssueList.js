@@ -43,13 +43,10 @@ function CorpDocIssueList() {
   const [totalPages, setTotalPages] = useState('1')
   const [currentPage, setCurrentPage] = useState('1')
   const [totalPendingPages, setTotalPendingPages] = useState('1')
-  const [currentPendingPage, setCurrentPendingPage] = useState('1')
+  // const [currentPendingPage, setCurrentPendingPage] = useState('1')
+  const [setCurrentPendingPage] = useState('1')
 
   const itemsPerPage = 10;
-
-  useEffect(() => {
-    fetchIssueData(currentPage, itemsPerPage);
-  }, [currentPage]);
 
   const handlePageClick = (event) => {
     const selectedPage = event.selected + 1;
@@ -148,6 +145,10 @@ function CorpDocIssueList() {
       console.error("Error fetching issue data:", error);
     }
   }, []);
+  
+  useEffect(() => {
+    fetchIssueData(currentPage, itemsPerPage);
+  }, [currentPage, fetchIssueData]);
 
   useEffect(() => {
     if (!initialDataLoaded) {
@@ -172,7 +173,7 @@ function CorpDocIssueList() {
       searchType: '전체',
       keyword: '',
     });
-  }, []);
+  }, [defaultStartDate]);
 
   useEffect(() => {
     resetFilters();

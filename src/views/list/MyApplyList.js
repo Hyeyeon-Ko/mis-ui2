@@ -89,7 +89,7 @@ function MyApplyList() {
     } finally {
       setLoading(false);
     }
-  }, [auth.userId, startDate, endDate, documentType]);
+  }, [auth.userId, startDate, endDate, documentType, setTotalPages, setCurrentPage]);
 
   const applyFilters = () => {
     fetchApplications();
