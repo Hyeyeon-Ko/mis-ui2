@@ -13,8 +13,6 @@ import downloadIcon from '../../assets/images/download.png';
 import deleteIcon from '../../assets/images/delete2.png'; 
 import useCorpChange from '../../hooks/useCorpChange';
 
-
-
 function DetailCorpDocApplication() {
     const { draftId } = useParams();
     const navigate = useNavigate();
@@ -30,9 +28,10 @@ function DetailCorpDocApplication() {
 
     const {handleChange, handleDetailFileChange, file, existingFile, setFile, setFormData, setExistingFile,  formData} = useCorpChange();
 
-    const fetchCorpDocDetail = useCallback(async (id) => {
+    const fetchCorpDocDetail = useCallback(async () => {
         try {
-            const response = await axios.get(`/api/corpDoc/${id}`);
+            const response = await axios.get(`/api/corpDoc/${draftId}`);
+
             if (response.data && response.data.data) {
                 const {
                     submission,
@@ -71,7 +70,7 @@ function DetailCorpDocApplication() {
         } catch (error) {
             console.error('Error fetching corporate document details:', error);
         }
-    }, [setExistingFile, setFormData]);
+    }, [draftId, setExistingFile, setFormData]);
 
     useEffect(() => {
         if (draftId) {
@@ -133,7 +132,7 @@ function DetailCorpDocApplication() {
     
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         // 필요한 입력 필드와 선택한 문서 확인
         const requiredInputs = {
             submission: formData.submission,

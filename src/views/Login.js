@@ -22,6 +22,12 @@ const Login = () => {
     }
   }, [auth, navigate]);
 
+  useEffect(() => {
+    if (userIdRef.current) {
+      userIdRef.current.focus();
+    }
+  }, []); 
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import CustomButton from '../../components/common/CustomButton';
@@ -8,7 +9,6 @@ import editIcon from '../../assets/images/edit.png';
 import deleteIcon from '../../assets/images/delete.png';
 import Pagination from '../../components/common/Pagination';
 import '../../styles/authority/AuthorityManagement.css';
-import '../../styles/common/Page.css';
 import axios from 'axios';
 
 /**
@@ -22,6 +22,7 @@ function AuthorityManagement() {
   const [showConfirmModal, setShowConfirmModal] = useState(false); // 확인 모달 표시 상태 관리
   const [selectedAdmin, setSelectedAdmin] = useState(null); // 선택된 관리자 상태 관리
   const [isEditMode, setIsEditMode] = useState(false); // 수정 모드 상태 관리
+  const navigate = useNavigate();
 
   const itemsPerPage = 10;
 
@@ -90,7 +91,13 @@ function AuthorityManagement() {
       setIsEditMode(true);
       setShowModal(true);
     } catch (error) {
-      console.error('Error fetching admin data:', error);
+      // SessionExpiredException 감지 및 처리
+      if (error.response && error.response.status === 401) {
+        alert('세션이 만료되었습니다. 다시 로그인 해주세요.');
+        navigate('/login');
+      } else {
+        console.error('Error fetching authority list: ', error);
+      }
     }
   };
 
