@@ -8,6 +8,7 @@ import { AuthContext } from '../../components/AuthContext';
 import '../../styles/list/MyPendingList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
+import Pagination from '../../components/common/Pagination';
 
 
 
@@ -16,6 +17,8 @@ function MyPendingList() {
   const [pendingApplications, setPendingApplications] = useState([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
+  const [totalPages, setTotalPages] = useState('1');
+  const [currentPage, setCurrentPage] = useState('1');
   const navigate = useNavigate();
 
   const fetchPendingApplications = useCallback(async () => {
@@ -23,6 +26,7 @@ function MyPendingList() {
       const response = await axios.get(`/api/myPendingList`, {
         params: {
           userId: auth.userId, 
+          instCd: auth.instCd,
         },
       });
       if (response.data && response.data.data) {
@@ -58,6 +62,8 @@ function MyPendingList() {
       } else {
         console.error('Unexpected response format:', response.data);
       }
+      setTotalPages(totalPages);
+      setCurrentPage(currentPage);
     } catch (error) {
       console.error('Error fetching pending applications:', error.response ? error.response.data : error.message);
     }
@@ -126,6 +132,11 @@ function MyPendingList() {
     setSelectedApplication(null);
   };
 
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
+  };
+
   const pendingColumns = [
     { header: '제목', accessor: 'title', width: '30%' },
     { header: '신청일시', accessor: 'draftDate', width: '14%' },
@@ -185,6 +196,7 @@ function MyPendingList() {
         <h2>승인대기 내역</h2>
         <Breadcrumb items={['나의 신청내역', '승인대기 내역']} />
         <Table columns={pendingColumns} data={pendingApplications} />
+        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
       </div>
       {showConfirmModal && (
         <ConfirmModal

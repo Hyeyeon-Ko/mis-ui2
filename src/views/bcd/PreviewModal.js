@@ -18,7 +18,6 @@ const PreviewModal = ({ show, onClose, formData }) => {
       if (response.data && response.data.data) {
         const data = response.data.data;
         setBcdData(data);
-        console.log('Fetched BCD data:', data);
       } else {
         console.error('No standard data found');
         alert('기준자료를 불러오는 중 오류가 발생했습니다.');
@@ -162,7 +161,6 @@ const PreviewModal = ({ show, onClose, formData }) => {
 
   useEffect(() => {
     if (show) {
-      console.log('PreviewModal props:', formData);
       drawBusinessCard();
     }
   }, [show, formData, drawBusinessCard]); 

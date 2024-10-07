@@ -22,10 +22,15 @@ const Login = () => {
     }
   }, [auth, navigate]);
 
+  useEffect(() => {
+    if (userIdRef.current) {
+      userIdRef.current.focus();
+    }
+  }, []); 
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      console.log('Attempting login with:', { userId, userPw });
 
       const response = await fetch('/api/login', {
         method: 'POST',

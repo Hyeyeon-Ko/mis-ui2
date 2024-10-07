@@ -114,8 +114,12 @@
   }
   
   .docstorage-add-detail-row label {
-    font-size: 15px;
+    font-size: 16px;
     margin-bottom: 5px; 
+  }
+
+  .docstorage-add-detail-row > label > span {
+    color: red;
   }
   
   .docstorage-add-detail-row input {

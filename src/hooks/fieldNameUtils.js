@@ -46,6 +46,8 @@ export const getFieldName = (key) => {
             return "생성일자를";
         case 'disposalDate':
             return "폐기일자를";
+        case 'transferDate':
+            return "이관일자를";
         // 인장등록
         case 'sealNm':
             return "인영 종류를";

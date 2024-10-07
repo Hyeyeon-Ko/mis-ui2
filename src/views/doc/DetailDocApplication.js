@@ -9,25 +9,16 @@ import { AuthContext } from '../../components/AuthContext';
 import { validateForm } from '../../hooks/validateForm';
 import downloadIcon from '../../assets/images/download.png';
 import deleteIcon from '../../assets/images/delete2.png'; 
+import useDocChange from '../../hooks/useDocChange';
 
 function DetailDocApplication() {
   const { draftId } = useParams();
   const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
-  const [formData, setFormData] = useState({
-    receptionDate: '',
-    drafter: '',
-    receiver: '',
-    sender: '',
-    title: '',
-    purpose: '',
-    division: '',
-  });
   const [initialData, setInitialData] = useState(null);
-  const [file, setFile] = useState(null); 
-  const [existingFile, setExistingFile] = useState(null); 
   const [activeTab, setActiveTab] = useState('DocA');
   const [isEdit, setIsEdit] = useState(false);
+  const { file, formData, existingFile, setExistingFile, setFormData, handleChange, handleFileChange,  handleFileDelete} = useDocChange();
 
   const fetchDocDetail = useCallback(async (id) => {
     try {
@@ -51,7 +42,7 @@ function DetailDocApplication() {
     } catch (error) {
       console.error('Error fetching document details:', error);
     }
-  }, [auth.hngNm]);
+  }, [auth.hngNm, setFormData, setExistingFile]);
 
   useEffect(() => {
     if (draftId) {
@@ -63,29 +54,15 @@ function DetailDocApplication() {
         drafter: auth.hngNm || '' 
       }));
     }
-  }, [draftId, auth.hngNm, fetchDocDetail]);
+  }, [draftId, auth.hngNm, fetchDocDetail, setFormData]);
 
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
     return date.toISOString().split('T')[0];
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-  };
-
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-    setExistingFile(null); 
-  };
-
-  const handleFileDelete = () => {
-    setFile(null);
-    setExistingFile(null);
-  };
-
-  const handleFileDownload = async () => {
+  const handleFileDownload = async ({ downloadNotes, downloadType }) => {
+    
     if (existingFile) {
       try {
         const documentType = "doc";

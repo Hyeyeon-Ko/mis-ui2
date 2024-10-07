@@ -1,6 +1,5 @@
-import React, { createContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { subscribeToNotifications } from './SseSubscribe';
 
 // AuthContext 생성 -> 인증 상태 저장
 export const AuthContext = createContext();
@@ -9,7 +8,6 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
-  const eventSourceRef = useRef(null);
   const [auth, setAuth] = useState({
     userId: '',
     hngNm: '',
@@ -52,19 +50,6 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  useEffect(() => {
-    if (auth.userId && !eventSourceRef.current) {
-      eventSourceRef.current = subscribeToNotifications(auth.userId, setNotifications);
-    }
-
-    return () => {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
-      }
-    };
-  }, [auth.userId]);
-
   // 인증 상태가 변경될 때마다 세션 스토리지에 저장
   useEffect(() => {
     sessionStorage.setItem('userId', auth.userId);
@@ -98,10 +83,6 @@ export const AuthProvider = ({ children }) => {
     };
     setAuth(newAuthState);
 
-    if (!eventSourceRef.current) {
-      eventSourceRef.current = subscribeToNotifications(userId, setNotifications);
-    }
-
     navigate('/');
   };
 
@@ -132,12 +113,6 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.removeItem('roleNm');
     sessionStorage.removeItem('isUserMode');
     sessionStorage.removeItem('originalRole');
-    sessionStorage.removeItem('notifications');
-
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-      eventSourceRef.current = null;
-    }
 
     sessionStorage.clear();
     navigate('/login');

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import '../../styles/bcd/EmailModal.css';
 import { FadeLoader } from 'react-spinners';
-import useBdcChange from '../../hooks/useBdcChange';
+import useBdcChange from '../../hooks/bdc/useBdcChange';
 
 const inputFields = [
   {

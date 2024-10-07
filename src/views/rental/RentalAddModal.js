@@ -1,61 +1,22 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/rental/RentalAddModal.css';
+import { addFormData, formFields } from '../../datas/rentalDatas';
+import useRentalChange from '../../hooks/useRentalChange';
 
 
 
 const RentalAddModal = ({ show, onClose, onSave }) => {
   const { auth } = useContext(AuthContext); 
-  const [activeTab, setActiveTab] = useState('file');
-  const [file, setFile] = useState(null);
-  const [formData, setFormData] = useState({
-    category: '',
-    companyNm: '',
-    contractNum: '',
-    modelNm: '',
-    installDate: '',
-    expiryDate: '',
-    rentalFee: '',
-    location: '',
-    installationSite: '',
-    specialNote: '',
-  });
+  const {handleChange, handleTabChange, handleFileChange, formData, file, activeTab, setFormData, setActiveTab, setFile} = useRentalChange();
 
   const resetFormData = () => {
-    setFormData({
-      category: '',
-      companyNm: '',
-      contractNum: '',
-      modelNm: '',
-      installDate: '',
-      expiryDate: '',
-      rentalFee: '',
-      location: '',
-      installationSite: '',
-      specialNote: '',
-    });
+    setFormData(addFormData);
     setFile(null);
     setActiveTab('file');
-  };
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-  };
-
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    setFile(selectedFile);
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
   };
 
   const validateDateFormat = (dateStr) => {
@@ -68,23 +29,23 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
         alert('파일을 첨부해주세요.');
         return;
       }
-
+  
       const reader = new FileReader();
       reader.onload = (event) => {
         const data = new Uint8Array(event.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-
+  
         const jsonOptions = {
           header: 1,
           defval: '',
           raw: false,
           dateNF: 'yyyy-mm-dd',
         };
-
+  
         const worksheetData = XLSX.utils.sheet_to_json(worksheet, jsonOptions);
-
+  
         const extractedData = worksheetData
           .slice(5)
           .filter((row) => row[1])
@@ -101,7 +62,7 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
             specialNote: row[10] !== undefined ? row[10].toString() : '',
             instCd: auth.instCd, 
           }));
-
+  
         axios.post(`/api/rental/data`, extractedData)
           .then((response) => {
             onSave(response.data); 
@@ -118,57 +79,59 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
       };
       reader.readAsArrayBuffer(file);
     } else if (activeTab === 'text') {
-        const {
-          category,
-          companyNm,
-          contractNum,
-          modelNm,
-          installDate,
-          expiryDate,
-          rentalFee,
-          location,
-          installationSite,
-          specialNote,
-        } = formData;
-      
-        if (
-          !category ||
-          !companyNm ||
-          !contractNum ||
-          !modelNm ||
-          !installDate ||
-          !expiryDate ||
-          !rentalFee ||
-          !location ||
-          !installationSite
-        ) {
-          alert('모든 항목을 입력해 주세요.');
-          return;
-        }
-      
-        if (!validateDateFormat(installDate)) {
-          alert('설치일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
-          return;
-        }
-      
-        if (!validateDateFormat(expiryDate)) {
-          alert('만료일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
-          return;
-        }
-      
-        const payload = {
-          category,
-          companyNm,
-          contractNum,
-          modelNm,
-          installDate,
-          expiryDate,
-          rentalFee,
-          location,
-          installationSite,
-          specialNote,
-        };
-      
+      const {
+        category,
+        companyNm,
+        contractNum,
+        modelNm,
+        installDate,
+        expiryDate,
+        rentalFee,
+        location,
+        installationSite,
+        specialNote,
+      } = formData;
+  
+      const missingFields = [];
+  
+      if (!category) missingFields.push('제품군');
+      if (!companyNm) missingFields.push('업체명');
+      if (!contractNum) missingFields.push('계약번호');
+      if (!modelNm) missingFields.push('모델명');
+      if (!installDate) missingFields.push('설치일자');
+      if (!expiryDate) missingFields.push('만료일자');
+      if (!rentalFee) missingFields.push('렌탈료');
+      if (!location) missingFields.push('위치분류');
+      if (!installationSite) missingFields.push('설치위치');
+  
+      if (missingFields.length > 0) {
+        alert(`다음 항목을 입력해주세요:\n${missingFields.join('\n')}`);
+        return;
+      }
+  
+      if (!validateDateFormat(installDate)) {
+        alert('설치일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
+        return;
+      }
+  
+      if (!validateDateFormat(expiryDate)) {
+        alert('만료일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
+        return;
+      }
+  
+      const payload = {
+        category,
+        companyNm,
+        contractNum,
+        modelNm,
+        installDate,
+        expiryDate,
+        rentalFee,
+        location,
+        installationSite,
+        specialNote,
+      };
+  
       axios.post(`/api/rental/`, payload)
         .then(response => {
           onSave([payload]);
@@ -186,7 +149,7 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
         });
     }
   };
-
+  
   const handleClose = () => {
     resetFormData();
     onClose();
@@ -199,24 +162,14 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
       <div className="rental-modal-container">
         <div className="modal-header">
           <h3>렌탈 항목 추가</h3>
-          <button className="rental-close-button" onClick={handleClose}>
-            X
-          </button>
+          <button className="rental-close-button" onClick={handleClose}>X</button>
         </div>
-        <p className="rental-instructions">
-          엑셀 파일 첨부 혹은 직접 입력으로 렌탈 항목을 추가하세요.
-        </p>
+        <p className="rental-instructions">엑셀 파일 첨부 혹은 직접 입력으로 렌탈 항목을 추가하세요.</p>
         <div className="rental-tab-container">
-          <button
-            className={`rental-tab ${activeTab === 'file' ? 'active' : ''}`}
-            onClick={() => handleTabChange('file')}
-          >
+          <button className={`rental-tab ${activeTab === 'file' ? 'active' : ''}`} onClick={() => handleTabChange('file')}>
             파일 첨부하기
           </button>
-          <button
-            className={`rental-tab ${activeTab === 'text' ? 'active' : ''}`}
-            onClick={() => handleTabChange('text')}
-          >
+          <button className={`rental-tab ${activeTab === 'text' ? 'active' : ''}`} onClick={() => handleTabChange('text')}>
             직접 입력하기
           </button>
         </div>
@@ -226,117 +179,29 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
             <div className="rental-add-section">
               <div className="rental-add-detail-row">
                 <label>첨부파일 선택</label>
-                <input
-                  type="file"
-                  name="file"
-                  accept=".xlsx, .xls"
-                  onChange={handleFileChange}
-                />
+                <input type="file" name="file" accept=".xlsx, .xls" onChange={handleFileChange} />
               </div>
             </div>
           )}
           {activeTab === 'text' && (
             <div className="rental-add-section">
-              <div className="rental-add-detail-row">
-                <label>제품군</label>
-                <input
-                  type="text"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="rental-add-detail-row">
-                <label>업체명</label>
-                <input
-                  type="text"
-                  name="companyNm"
-                  value={formData.companyNm}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="rental-add-detail-row">
-                <label>계약번호</label>
-                <input
-                  type="text"
-                  name="contractNum"
-                  value={formData.contractNum}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="rental-add-detail-row">
-                <label>모델명</label>
-                <input
-                  type="text"
-                  name="modelNm"
-                  value={formData.modelNm}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="rental-add-detail-row">
-                <label>설치일자</label>
-                <input
-                  type="text"
-                  name="installDate"
-                  value={formData.installDate}
-                  onChange={handleChange}
-                  placeholder="YYYY-MM-DD"
-                />
-              </div>
-              <div className="rental-add-detail-row">
-                <label>만료일자</label>
-                <input
-                  type="text"
-                  name="expiryDate"
-                  value={formData.expiryDate}
-                  onChange={handleChange}
-                  placeholder="YYYY-MM-DD"
-                />
-              </div>
-              <div className="rental-add-detail-row">
-                <label>렌탈료</label>
-                <input
-                  type="text"
-                  name="rentalFee"
-                  value={formData.rentalFee}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="rental-add-detail-row">
-                <label>위치분류</label>
-                <input
-                  type="text"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="rental-add-detail-row">
-                <label>설치위치</label>
-                <input
-                  type="text"
-                  name="installationSite"
-                  value={formData.installationSite}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="rental-add-detail-row">
-                <label>특이사항</label>
-                <input
-                  type="text"
-                  name="specialNote"
-                  value={formData.specialNote}
-                  onChange={handleChange}
-                />
-              </div>
+              {formFields.map((field, index) => (
+                <div className="rental-add-detail-row" key={index}>
+                  <label>{field.label}</label>
+                  <input
+                    type="text"
+                    name={field.name}
+                    value={formData[field.name]}
+                    onChange={handleChange}
+                    placeholder={field.placeholder || ''}
+                  />
+                </div>
+              ))}
             </div>
           )}
         </div>
         <div className="rental-modal-buttons">
-          <button
-            className="rental-modal-button confirm"
-            onClick={handleSaveClick}
-          >
+          <button className="rental-modal-button confirm" onClick={handleSaveClick}>
             추가하기
           </button>
         </div>

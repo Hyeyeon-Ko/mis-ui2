@@ -1,51 +1,26 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import '../../styles/docstorage/DocstorageAddModal.css';
 import { AuthContext } from '../../components/AuthContext';
+import { validateForm } from '../../hooks/validateForm';
+import { dockStorageFormData } from '../../datas/dockstorageDatas';
+import useDocstorageChange from '../../hooks/useDocstorageChange';
 
-const DocstorageBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds }) => {
+const DocstorageBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds, modalType }) => {
   const { auth } = useContext(AuthContext);
-  const [formData, setFormData] = useState({
-    teamNm: '',
-    manager: '',
-    subManager: '',
-    storageYear: '',
-    createDate: '',
-    transferDate: '',
-    tsdNum: '',
-    disposalDate: '',
-    dpdNum: '',
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const validateDateFormat = (dateStr) => {
-    return /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
-  };
+  const {handleChange, formData, setFormData} = useDocstorageChange();
 
   const handleSaveClick = () => {
-    const { createDate, transferDate, disposalDate } = formData;
 
-    if (createDate && !validateDateFormat(createDate)) {
-      alert('생성일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
-      return;
+    const inputDates = {
+      transferDate: formData.transferDate,
     }
 
-    if (transferDate && !validateDateFormat(transferDate)) {
-      alert('이관일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
-      return;
-    }
-
-    if (disposalDate && !validateDateFormat(disposalDate)) {
-      alert('폐기일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
-      return;
-    }
+    const { isValid, message } = validateForm('DocStorage', '', '', inputDates);
+      if (!isValid) {
+          alert(message);
+          return;
+      }
 
     const payload = {
       detailIds: selectedDetailIds,  
@@ -58,131 +33,72 @@ const DocstorageBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds })
   };
 
   const handleClose = () => {
-    setFormData({
-      teamNm: '',
-      manager: '',
-      subManager: '',
-      storageYear: '',
-      createDate: '',
-      transferDate: '',
-      tsdNum: '',
-      disposalDate: '',
-      dpdNum: '',
-    });
+    setFormData(dockStorageFormData);
     onClose(); 
   };
 
   if (!show) return null;
 
-  return (
-    <div className="docstorage-modal-overlay">
-      <div className="docstorage-modal-container">
-        <div className="modal-header">
-          <h3>문서보관 항목 일괄 수정</h3>
-          <button className="docstorage-close-button" onClick={handleClose}>
-            X
-          </button>
-        </div>
-        <p className="docstorage-instructions">
+  const isDisabled = (field) => {
+    if (modalType === "admin") {
+      return ['transferDate', 'tsdNum', 'dpdNum'].includes(field) ? false : true;
+    }
+    return ['transferDate', 'tsdNum', 'dpdNum'].includes(field) ? true : false;
+  };
+
+  const fields = [
+    { label: '팀명', name: 'teamNm' },
+    { label: '관리자(정)', name: 'manager' },
+    { label: '관리자(부)', name: 'subManager' },
+    { label: '보존연한', name: 'storageYear' },
+    { label: '생성일자', name: 'createDate', placeholder: 'YYYY-MM-DD' },
+    { label: '이관일자', name: 'transferDate', placeholder: 'YYYY-MM-DD' },
+    { label: '이관신청번호', name: 'tsdNum', placeholder: 'ex) 한의재단총무파트2300135' },
+    { label: '폐기일자', name: 'disposalDate', placeholder: 'YYYY-MM-DD' },
+    { label: '폐기신청번호', name: 'dpdNum' },
+  ];
+  
+    return (
+      <div className="docstorage-modal-overlay">
+        <div className="docstorage-modal-container">
+          <div className="modal-header">
+            <h3>문서보관 항목 일괄 수정</h3>
+            <button className="docstorage-close-button" onClick={handleClose}>
+              X
+            </button>
+          </div>
+          <p className="docstorage-instructions">
             문서 항목을 일괄 수정하세요.
-        </p>
-        <div className="docstorage-modal-content">
-          <div className="docstorage-add-section">
-            <div className="docstorage-add-detail-row">
-              <label>팀명</label>
-              <input
-                type="text"
-                name="teamNm"
-                value={formData.teamNm}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="docstorage-add-detail-row">
-              <label>관리자(정)</label>
-              <input
-                type="text"
-                name="manager"
-                value={formData.manager}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="docstorage-add-detail-row">
-              <label>관리자(부)</label>
-              <input
-                type="text"
-                name="subManager"
-                value={formData.subManager}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="docstorage-add-detail-row">
-              <label>보존연한</label>
-              <input
-                type="text"
-                name="storageYear"
-                value={formData.storageYear}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="docstorage-add-detail-row">
-              <label>생성일자</label>
-              <input
-                type="text"
-                name="createDate"
-                value={formData.createDate}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="docstorage-add-detail-row">
-              <label>이관일자</label>
-              <input
-                type="text"
-                name="transferDate"
-                value={formData.transferDate}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="docstorage-add-detail-row">
-              <label>기안번호</label>
-              <input
-                type="text"
-                name="tsdNum"
-                value={formData.tsdNum}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="docstorage-add-detail-row">
-              <label>폐기일자</label>
-              <input
-                type="text"
-                name="disposalDate"
-                value={formData.disposalDate}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="docstorage-add-detail-row">
-              <label>기안번호</label>
-              <input
-                type="text"
-                name="dpdNum"
-                value={formData.dpdNum}
-                onChange={handleChange}
-              />
+          </p>
+          <div className="docstorage-modal-content">
+            <div className="docstorage-add-section">
+              {fields.map(({ label, name, placeholder }) => (
+                <div className="docstorage-add-detail-row" key={name}>
+                  <label>{label}</label>
+                  <input
+                    type="text"
+                    name={name}
+                    value={formData[name] || ''}
+                    placeholder={placeholder}
+                    onChange={handleChange}
+                    disabled={isDisabled(name)}
+                  />
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-        <div className="docstorage-modal-buttons">
-          <button
-            className="docstorage-modal-button confirm"
-            onClick={handleSaveClick}
-          >
-            수정하기
-          </button>
+          <div className="docstorage-modal-buttons">
+            <button
+              className="docstorage-modal-button confirm"
+              onClick={handleSaveClick}
+            >
+              수정하기
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 DocstorageBulkUpdateModal.propTypes = {
   show: PropTypes.bool.isRequired,

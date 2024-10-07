@@ -1,69 +1,22 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import '../../styles/docstorage/DocstorageAddModal.css';
 import { AuthContext } from '../../components/AuthContext';
 import { validateForm } from '../../hooks/validateForm';
+import { dockStorageFormData } from '../../datas/dockstorageDatas';
+import useDocstorageChange from '../../hooks/useDocstorageChange';
 
 const DocstorageAddModal = ({ show, onClose, onSave }) => {
+  const { file, activeTab, formData, handleTabChange, handleFileChange, handleChange, setFormData, setFile, setActiveTab } = useDocstorageChange();
   const { auth } = useContext(AuthContext);
-  const [activeTab, setActiveTab] = useState('file');
-  const [file, setFile] = useState(null);
-  const [formData, setFormData] = useState({
-    teamNm: '',
-    docId: '',
-    docNm: '',
-    manager: '',
-    subManager: '',
-    storageYear: '',
-    createDate: '',
-    location: '',
-    transferDate: '',
-    tsdNum: '',
-    disposalDate: '',
-    dpdNum: '',
-  });
 
   const resetFormData = () => {
-    setFormData({
-      teamNm: '',
-      docId: '',
-      docNm: '',
-      manager: '',
-      subManager: '',
-      storageYear: '',
-      createDate: '',
-      location: '',
-      transferDate: '',
-      tsdNum: '',
-      disposalDate: '',
-      dpdNum: '',
-    });
+    setFormData(dockStorageFormData);
     setFile(null);
     setActiveTab('file');
   };
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-  };
-
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    setFile(selectedFile);
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  // const validateDateFormat = (dateStr) => {
-  //   return /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
-  // };
 
   const handleSaveClick = () => {
     if (activeTab === 'file') {
@@ -71,23 +24,23 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
         alert('파일을 첨부해주세요.');
         return;
       }
-
+  
       const reader = new FileReader();
       reader.onload = (event) => {
         const data = new Uint8Array(event.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-      
+  
         const jsonOptions = {
           header: 1,
           defval: '',
           raw: false, 
           dateNF: 'yyyy-mm-dd',
         };
-      
+  
         const worksheetData = XLSX.utils.sheet_to_json(worksheet, jsonOptions);
-      
+  
         const extractedData = worksheetData
           .slice(4)
           .filter((row) => row[0])
@@ -107,9 +60,19 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
             disposalDate: row[11] !== undefined ? row[11].toString() : '',
             dpdNum: row[12] !== undefined ? row[12].toString() : '',
           }));
-      
+  
+        const docStorageExcelApplyRequestDTO = {
+          instCd: auth.instCd,
+          deptCd: auth.deptCd,
+          drafter: auth.hngNm,
+          drafterId: auth.userId,
+        };
+  
         axios
-          .post('/api/docstorage/data', extractedData)
+          .post('/api/docstorage/data', {
+            details: extractedData,
+            docStorageExcelApplyRequestDTO: docStorageExcelApplyRequestDTO
+          })
           .then((response) => {
             onSave(response.data);
             resetFormData();
@@ -189,6 +152,21 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
     onClose();
   };
 
+  const inputFields = [
+    { label: '팀명', name: 'teamNm', isRequired: true },
+    { label: '문서관리번호', name: 'docId', isRequired: true },
+    { label: '입고위치', name: 'location', placeholder: '사후 입력', disabled: true },
+    { label: '문서명', name: 'docNm', isRequired: true },
+    { label: '관리자(정)', name: 'manager', isRequired: true },
+    { label: '관리자(부)', name: 'subManager', isRequired: true },
+    { label: '보존연한', name: 'storageYear', placeholder: '5년', isRequired: true },
+    { label: '생성일자', name: 'createDate', placeholder: 'YYYY-MM-DD', isRequired: true },
+    { label: '이관일자', name: 'transferDate', placeholder: '사후 입력', disabled: true },
+    { label: '이관신청번호', name: 'tsdNum', placeholder: '사후 입력', disabled: true },
+    { label: '폐기일자', name: 'disposalDate', placeholder: 'YYYY-MM-DD', isRequired: true },
+    { label: '폐기신청번호', name: 'dpdNum', placeholder: '사후 입력', disabled: true },
+  ];
+
   if (!show) return null;
 
   return (
@@ -235,125 +213,22 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
 
           {activeTab === 'text' && (
             <div className="docstorage-add-section">
-              <div className="docstorage-add-detail-row">
-                <label>팀명 <span style={{ color: 'red' }}>*</span></label>
+              {inputFields.map(({ label, name, isRequired, placeholder, disabled }) => (
+              <div className="docstorage-add-detail-row" key={name}>
+                <label>
+                  {label} {isRequired && <span>*</span>}
+                </label>
                 <input
                   type="text"
-                  name="teamNm"
-                  value={formData.teamNm}
+                  name={name}
+                  value={formData[name]}
                   onChange={handleChange}
+                  placeholder={placeholder || ''}
+                  disabled={disabled || false}
                 />
               </div>
-              <div className="docstorage-add-detail-row">
-                <label>문서관리번호 <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  type="text"
-                  name="docId"
-                  value={formData.docId}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>입고위치</label>
-                <input
-                  type="text"
-                  name="location"
-                  value={formData.location}
-                  placeholder="사후 입력"
-                  onChange={handleChange}
-                  disabled
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>문서명 <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  type="text"
-                  name="docNm"
-                  value={formData.docNm}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>관리자(정) <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  type="text"
-                  name="manager"
-                  value={formData.manager}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>관리자(부) <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  type="text"
-                  name="subManager"
-                  value={formData.subManager}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>보존연한 <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  type="text"
-                  name="storageYear"
-                  value={formData.storageYear}
-                  onChange={handleChange}
-                  placeholder='5년'
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>생성일자 <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  type="text"
-                  name="createDate"
-                  value={formData.createDate}
-                  onChange={handleChange}
-                  placeholder="yyyy-mm-dd"
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>이관일자</label>
-                <input
-                  type="text"
-                  name="transferDate"
-                  value={formData.transferDate}
-                  placeholder="사후 입력"
-                  onChange={handleChange}
-                  disabled
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>신청번호</label>
-                <input
-                  type="text"
-                  name="tsdNum"
-                  value={formData.tsdNum}
-                  placeholder="사후 입력"
-                  onChange={handleChange}
-                  disabled
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>폐기일자 <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  type="text"
-                  name="disposalDate"
-                  value={formData.disposalDate}
-                  onChange={handleChange}
-                  placeholder="yyyy-mm-dd"
-                />
-              </div>
-              <div className="docstorage-add-detail-row">
-                <label>신청번호</label>
-                <input
-                  type="text"
-                  name="dpdNum"
-                  value={formData.dpdNum}
-                  placeholder="사후 입력"
-                  onChange={handleChange}
-                  disabled
-                />
-              </div>
+            ))}
+            
             </div>
           )}
         </div>

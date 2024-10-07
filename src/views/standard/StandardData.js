@@ -6,12 +6,13 @@ import '../../styles/standard/StandardData.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
+import useStandardChange from '../../hooks/useStandardChange';
 
 
 
 function StandardData() {
+  const {selectedDetails, details, setSelectedDetails,setDetails, handleDetailSelect, handleSelectAll} = useStandardChange();
   const [subCategories, setSubCategories] = useState([]);
-  const [details, setDetails] = useState([]);
   const [headerData, setHeaderData] = useState({});
   const [selectedCategory, setSelectedCategory] = useState('A');
   const [selectedSubCategory, setSelectedSubCategory] = useState('');
@@ -19,7 +20,6 @@ function StandardData() {
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('detail');
   const [editDetailData, setEditDetailData] = useState(null);
-  const [selectedDetails, setSelectedDetails] = useState([]);
   const { auth } = useContext(AuthContext);
 
   const dragStartIndex = useRef(null);
@@ -35,6 +35,7 @@ function StandardData() {
   useEffect(() => {
     fetchSubCategories(selectedCategory);
     setSelectedDetails([]);
+     // eslint-disable-next-line
   }, [selectedCategory]);
 
   const fetchSubCategories = async (classCd) => {
@@ -215,15 +216,6 @@ function StandardData() {
     setShowModal(false);
   };
 
-  const handleDetailSelect = (detailCd) => {
-    setSelectedDetails((prevSelectedDetails) => {
-      if (prevSelectedDetails.includes(detailCd)) {
-        return prevSelectedDetails.filter((code) => code !== detailCd);
-      } else {
-        return [...prevSelectedDetails, detailCd];
-      }
-    });
-  };
 
   const handleRowClick = (row) => {
     const detailCd = row.detailCd;
@@ -248,14 +240,6 @@ function StandardData() {
     } catch (error) {
       console.error('상세 정보를 삭제하는 중 에러 발생:', error);
       alert('상세 코드 삭제에 실패했습니다.');
-    }
-  };
-
-  const handleSelectAll = () => {
-    if (selectedDetails.length === details.length) {
-      setSelectedDetails([]);
-    } else {
-      setSelectedDetails(details.map(detail => detail.detailCd));
     }
   };
 

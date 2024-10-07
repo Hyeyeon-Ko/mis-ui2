@@ -72,7 +72,7 @@ function SealTotalRegistrationList() {
               <tr key={index}>
                 <td>{app.sealNm}</td>
                 <td>
-                  <img src={`/api/images/${encodeURIComponent(app.sealImage)}`} alt="Seal" className="seal-total-image" />
+                  <img src={`data:image/png;base64,${app.sealImage}`} alt="Seal" className="seal-total-image" />
                 </td>
                 <td>{app.useDept}</td>
                 <td>{app.purpose}</td>
@@ -83,7 +83,7 @@ function SealTotalRegistrationList() {
             ))
           ) : (
             <tr>
-              <td colSpan="7">데이터가 없습니다.</td>
+              <td colSpan="7">조회된 데이터가 없습니다.</td>
             </tr>
           )}
         </tbody>

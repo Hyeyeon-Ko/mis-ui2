@@ -11,9 +11,7 @@ import '../../styles/common/Page.css';
 import '../../styles/corpdoc/CorpDocApply.css';
 import downloadIcon from '../../assets/images/download.png';
 import deleteIcon from '../../assets/images/delete2.png'; 
-import { inputValue } from '../../datas/corpDocDatas';
-
-
+import useCorpChange from '../../hooks/useCorpChange';
 
 function DetailCorpDocApplication() {
     const { draftId } = useParams();
@@ -22,17 +20,18 @@ function DetailCorpDocApplication() {
     const queryParams = new URLSearchParams(location.search);
     const applyStatus = queryParams.get('applyStatus'); 
     const { auth, refreshSidebar } = useContext(AuthContext);
-    const [formData, setFormData] = useState(inputValue);
     const [initialData, setInitialData] = useState(null);
-    const [existingFile, setExistingFile] = useState(null);
-    const [file, setFile] = useState(null);
+
     const [showRejectModal, setShowRejectModal] = useState(false);
     const isReadOnly = new URLSearchParams(location.search).get('readonly') === 'true';
     const [showDownloadReasonModal, setShowDownloadReasonModal] = useState(false);
 
-    const fetchCorpDocDetail = useCallback(async (id) => {
+    const {handleChange, handleDetailFileChange, file, existingFile, setFile, setFormData, setExistingFile,  formData} = useCorpChange();
+
+    const fetchCorpDocDetail = useCallback(async () => {
         try {
-            const response = await axios.get(`/api/corpDoc/${id}`);
+            const response = await axios.get(`/api/corpDoc/${draftId}`);
+
             if (response.data && response.data.data) {
                 const {
                     submission,
@@ -63,7 +62,7 @@ function DetailCorpDocApplication() {
                     type: type === 'O' ? 'original': type === 'P' ? 'pdf' : 'both',
                     notes: notes || '',
                 };
-
+                
                 setFormData(fetchedData);
                 setInitialData(fetchedData);
                 setExistingFile(fileName && filePath ? { name: fileName, path: filePath } : null);
@@ -71,36 +70,14 @@ function DetailCorpDocApplication() {
         } catch (error) {
             console.error('Error fetching corporate document details:', error);
         }
-    }, []);
+    }, [draftId, setExistingFile, setFormData]);
 
     useEffect(() => {
         if (draftId) {
             fetchCorpDocDetail(draftId);
         }
     }, [draftId, fetchCorpDocDetail]);
-    
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
 
-        if (type === 'checkbox' && !checked) {
-            const quantityField = `quantity${name.slice(-1)}`;
-            setFormData((prevFormData) => ({
-                ...prevFormData,
-                [name]: checked,
-                [quantityField]: '',
-            }));
-        } else {
-            setFormData((prevFormData) => ({
-                ...prevFormData,
-                [name]: type === 'checkbox' ? checked : value,
-            }));
-        }
-    };
-
-    const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
-        setExistingFile(null);
-    };
 
     const handleFileDelete = () => {
         setFile(null);
@@ -115,16 +92,25 @@ function DetailCorpDocApplication() {
         setShowDownloadReasonModal(false); 
     };
         
-    const handleFileDownloadConfirm = async ({ reason, fileType }) => {
+    const handleFileDownloadConfirm = async ({ downloadNotes, downloadType }) => {
         setShowDownloadReasonModal(false);
     
+        const downloadTypeMap = {
+            'draft': 'A',
+            'order': 'B',
+            'approval': 'C',
+            'check': 'D',
+            'etc': 'Z',
+        };
+    
+        const convertedFileType = downloadTypeMap[downloadType] || '';    
+
         try {
             const response = await axios.get(`/api/file/download/${encodeURIComponent(existingFile.name)}`, {
                 params: {
                     draftId: draftId,
-                    docType: 'corpdoc',
-                    fileType: fileType,
-                    reason: reason,
+                    downloadType: convertedFileType,
+                    downloadNotes: downloadNotes,
                     downloaderNm: auth.hngNm,
                     downloaderId: auth.userId,
                 },
@@ -147,15 +133,14 @@ function DetailCorpDocApplication() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // todo: CorpDocApply.js의 handleSubmit validation 검사 코드 중복성 해결
+        // 필요한 입력 필드와 선택한 문서 확인
         const requiredInputs = {
             submission: formData.submission,
             purpose: formData.purpose,
             useDate: formData.useDate,
             type: formData.type,
-            docFile: formData.department,
-        }
-
+        };
+    
         const selectedCorpDocs = ['document1', 'document2', 'document3', 'document4'].reduce((acc, docType, index) => {
             const quantityKey = `quantity${index + 1}`;
             acc[`cert${docType.charAt(0).toUpperCase() + docType.slice(1)}`] = {
@@ -164,28 +149,32 @@ function DetailCorpDocApplication() {
             };
             return acc;
         }, {});
-
+    
         const inputDates = {
             useDate: formData.useDate
-        }
-
+        };
+    
+        // 유효성 검사
         const { isValid, message } = validateForm('CorpDoc', requiredInputs, selectedCorpDocs, inputDates);
         if (!isValid) {
             alert(message);
             return;
         }
-
+    
+        // 파일 삭제 여부 확인
         const isFileDeleted = !file && !existingFile;
-
+    
+        // 폼 데이터가 수정되지 않았을 경우
         if (JSON.stringify(formData) === JSON.stringify(initialData) && !file && !isFileDeleted) {
             alert('수정된 사항이 없습니다.');
             return;
         }
-
+    
         try {
             const formDataToSend = new FormData();
             const typeValue = getTypeName(formData.type);
-
+    
+            // 법인서류 정보 추가
             formDataToSend.append('corpDocUpdateRequest', new Blob([JSON.stringify({
                 drafter: auth.hngNm,
                 submission: formData.submission,
@@ -198,17 +187,19 @@ function DetailCorpDocApplication() {
                 type: typeValue,
                 notes: formData.notes,
             })], { type: 'application/json' }));
-
+    
+            // 파일이 새로 업로드된 경우에만 추가
             if (file) {
                 formDataToSend.append('file', file);
             }
-
+    
+            // 서버로 데이터 전송
             await axios.post(`/api/corpDoc/update?draftId=${draftId}&isFileDeleted=${isFileDeleted}`, formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-
+    
             alert('법인서류 수정이 완료되었습니다.');
             navigate('/myPendingList');
         } catch (error) {
@@ -328,7 +319,7 @@ function DetailCorpDocApplication() {
                                         type="file"
                                         name="file"
                                         className="file-input"
-                                        onChange={handleFileChange}
+                                        onChange={handleDetailFileChange}
                                         disabled={isReadOnly}
                                     />
                                 )}
@@ -480,5 +471,6 @@ function DetailCorpDocApplication() {
         </div>
     );
 }
+
 
 export default DetailCorpDocApplication;

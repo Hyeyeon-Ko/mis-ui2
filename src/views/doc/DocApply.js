@@ -8,29 +8,20 @@ import CustomButton from '../../components/common/CustomButton';
 import OrgChartModal from './../../components/OrgChartModal';
 import '../../styles/doc/DocApply.css';
 import '../../styles/common/Page.css';
+import useDocChange from '../../hooks/useDocChange';
 
 function DocApply() {
   const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
-    receptionDate: '',
-    drafter: '',
-    receiver: '',
-    sender: '',
-    title: '',
-    purpose: '',
-    userId: '',
-    division: '',
-  });
-
-  const [attachment, setAttachment] = useState(null);  // 첨부파일
+  
   const [activeTab, setActiveTab] = useState('DocA');  // DocA : 문서수신 신청
   const [showOrgChart, setShowOrgChart] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [orgData, setOrgData] = useState([]);
   const [expandedNodes, setExpandedNodes] = useState({});
   const [teamMembers, setTeamMembers] = useState([]);
+
+  const {handleChange, handleApplyFileChange, attachment, formData, setFormData} = useDocChange();
 
   const setDefaultValues = useCallback(() => {
     const today = new Date();
@@ -42,7 +33,7 @@ function DocApply() {
       userId: auth.userId,
       division: activeTab === 'DocA' ? 'A' : 'B',
     }));
-  }, [auth.hngNm, auth.userId, activeTab]);
+  }, [auth.hngNm, auth.userId, activeTab, setFormData]);
 
   useEffect(() => {
     setDefaultValues();
@@ -51,15 +42,6 @@ function DocApply() {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setDefaultValues();
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-  };
-
-  const handleFileChange = (e) => {
-    setAttachment(e.target.files[0]);
   };
 
   /**
@@ -431,7 +413,7 @@ function DocApply() {
                 />
               </div>
               <div className="doc-form-group">
-                <label>{activeTab === 'DocA' ? '발신처' : '수신처'} <span style={{ color: 'red' }}>*</span></label>
+                <label>{activeTab === 'DocA' ? '발신처' : '수신처'} <span>*</span></label>
                 <input
                   type="text"
                   name={activeTab === 'DocA' ? 'sender' : 'receiver'}
@@ -441,7 +423,7 @@ function DocApply() {
                 />
               </div>
               <div className="doc-form-group">
-                <label>제 목 <span style={{ color: 'red' }}>*</span></label>
+                <label>제 목 <span>*</span></label>
                 <textarea
                   name="title"
                   value={formData.title}
@@ -450,7 +432,7 @@ function DocApply() {
                 />
               </div>
               <div className="doc-form-group">
-                <label>사용목적 <span style={{ color: 'red' }}>*</span></label>
+                <label>사용목적 <span>*</span></label>
                 <textarea
                   name="purpose"
                   value={formData.purpose}
@@ -459,12 +441,12 @@ function DocApply() {
                 />
               </div>
               <div className='doc-form-group'>
-                <label>첨부파일 <span style={{ color: 'red' }}>*</span></label>
+                <label>첨부파일 <span>*</span></label>
                 <text> 접수문서 첫 페이지를 스캔해 첨부해주세요.</text>
                 <input
                   type="file"
                   name="attachment"
-                  onChange={handleFileChange}
+                  onChange={handleApplyFileChange}
                   required
                 />
               </div>

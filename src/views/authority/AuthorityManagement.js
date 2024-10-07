@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import CustomButton from '../../components/common/CustomButton';
@@ -6,8 +7,8 @@ import AuthorityModal from '../authority/AuthorityModal';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import editIcon from '../../assets/images/edit.png';
 import deleteIcon from '../../assets/images/delete.png';
+import Pagination from '../../components/common/Pagination';
 import '../../styles/authority/AuthorityManagement.css';
-import '../../styles/common/Page.css';
 import axios from 'axios';
 
 /**
@@ -15,30 +16,40 @@ import axios from 'axios';
  */
 function AuthorityManagement() {
   const [applications, setApplications] = useState([]); // 신청 내역 상태 관리
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
   const [showModal, setShowModal] = useState(false); // 권한 추가/수정 모달 표시 상태 관리
   const [showConfirmModal, setShowConfirmModal] = useState(false); // 확인 모달 표시 상태 관리
   const [selectedAdmin, setSelectedAdmin] = useState(null); // 선택된 관리자 상태 관리
   const [isEditMode, setIsEditMode] = useState(false); // 수정 모드 상태 관리
+  const navigate = useNavigate();
+
+  const itemsPerPage = 10;
 
   useEffect(() => {
-    fetchAuthorityList();
-  }, []);
+    fetchAuthorityList(currentPage, itemsPerPage);
+  }, [currentPage]);
 
   /**
    * 권한 내역 가져오기
    */
-  const fetchAuthorityList = async () => {
+  const fetchAuthorityList = async (pageIndex = 1, pageSize = itemsPerPage) => {
     try {
-      const response = await axios.get(`/api/auth`);
-      const data = response.data.data || response.data;
-      const transformedData = data.map((item) => ({
+      const response = await axios.get(`/api/auth/`, {
+        params: { pageIndex, pageSize }
+      });
+
+      const data = response.data.data;
+      const totalPages = data.totalPages;
+      const currentPage = data.number + 1;
+
+      const transformedData = data.content.map((item) => ({
         id: item.userId,
         role: item.userRole,
         centerName: `${item.instNm} (${item.deptNm})`,
         name: `${item.hngNm}(${item.userId})`,
         email: item.email,
         authId: item.authId,
-        detailCd: item.detailCd,
         permissions: {
           cardManagement: item.cardManagement,
           assetManagement: item.assetManagement,
@@ -46,9 +57,19 @@ function AuthorityManagement() {
       }));
 
       setApplications(transformedData);
+      setTotalPages(totalPages);
+      setCurrentPage(currentPage);
     } catch (error) {
       console.error('Error fetching authority list: ', error);
     }
+  };
+
+  /**
+   * 페이지 변경 핸들러
+   */
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
   };
 
   /**
@@ -70,7 +91,13 @@ function AuthorityManagement() {
       setIsEditMode(true);
       setShowModal(true);
     } catch (error) {
-      console.error('Error fetching admin data:', error);
+      // SessionExpiredException 감지 및 처리
+      if (error.response && error.response.status === 401) {
+        alert('세션이 만료되었습니다. 다시 로그인 해주세요.');
+        navigate('/login');
+      } else {
+        console.error('Error fetching authority list: ', error);
+      }
     }
   };
 
@@ -79,11 +106,7 @@ function AuthorityManagement() {
    */
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`/api/auth/admin/${selectedAdmin.authId}`, {
-        params: {
-          detailCd: selectedAdmin.detailCd,
-        },
-      });
+      await axios.delete(`/api/auth/admin/${selectedAdmin.authId}`);
       fetchAuthorityList();
       setShowConfirmModal(false);
       setSelectedAdmin(null);
@@ -175,6 +198,7 @@ function AuthorityManagement() {
           </div>
         </div>
         <Table columns={columns} data={applications} />
+        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
       </div>
       <AuthorityModal
         show={showModal}

@@ -18,7 +18,6 @@ const postData = async (url, data) => {
 
   try {
     const response = await apiClient.post(url, dataToSend);
-    console.log('POST 요청 성공:', response.data);
     return response.data; // 성공적으로 데이터를 받은 경우 데이터 반환
   } catch (error) {
     if (error.response) {
@@ -37,7 +36,6 @@ const deleteData = async (url, data) => {
 
   try {
     const response = await apiClient.deleteData(url, dataToSend);
-    console.log('DELETE 요청 성공:', response.data);
     return response.data; // 성공적으로 데이터를 받은 경우 데이터 반환
   } catch (error) {
     if (error.response) {

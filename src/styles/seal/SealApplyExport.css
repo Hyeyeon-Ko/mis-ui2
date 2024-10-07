@@ -34,7 +34,7 @@
 }
 
 .seal-export-form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -42,13 +42,17 @@
 }
 
 .seal-export-form-group label {
-  font-weight: 500;
+  font-weight: 700;
   font-size: 16px;
   color: #222121;
   margin-bottom: 5px;
   margin-right: 10px;
   text-align: left;
   width: 81%;
+}
+
+.seal-export-form-group > label > span {
+  color: red;
 }
 
 .seal-export-form-group input,

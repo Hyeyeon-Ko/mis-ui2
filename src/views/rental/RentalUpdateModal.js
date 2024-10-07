@@ -1,27 +1,18 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, {  useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import '../../styles/rental/RentalAddModal.css';
 import { AuthContext } from '../../components/AuthContext';
+import { formFields } from '../../datas/rentalDatas';
+import useRentalChange from '../../hooks/useRentalChange';
 
 
 
 const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
   const { auth } = useContext(AuthContext);
-  const [file, setFile] = useState(null);
-  const [formData, setFormData] = useState({
-    category: '',
-    companyNm: '',
-    contractNum: '',
-    modelNm: '',
-    installDate: '',
-    expiryDate: '',
-    rentalFee: '',
-    location: '',
-    installationSite: '',
-    specialNote: '',
-  });
+ 
+  const {handleChange, setFormData, formData, handleFileChange, file} = useRentalChange();
 
   useEffect(() => {
     if (rentalData) {
@@ -38,20 +29,20 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         specialNote: rentalData.specialNote || '',
       });
     }
-  }, [rentalData]);
+  }, [rentalData, setFormData]);
 
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    setFile(selectedFile);
-  };
+  // const handleFileChange = (e) => {
+  //   const selectedFile = e.target.files[0];
+  //   setFile(selectedFile);
+  // };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData({
+  //     ...formData,
+  //     [name]: value,
+  //   });
+  // };
 
   const validateDateFormat = (dateStr) => {
     return /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
@@ -194,98 +185,18 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         <div className="rental-modal-content">
           {rentalData ? (
             <div className="rental-add-section">
-              <div className="rental-add-detail-row">
-                <label>제품군</label>
-                <input
-                  type="text"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="rental-add-detail-row">
-                <label>업체명</label>
-                <input
-                  type="text"
-                  name="companyNm"
-                  value={formData.companyNm}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="rental-add-detail-row">
-                <label>계약번호</label>
-                <input
-                  type="text"
-                  name="contractNum"
-                  value={formData.contractNum}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="rental-add-detail-row">
-                <label>모델명</label>
-                <input
-                  type="text"
-                  name="modelNm"
-                  value={formData.modelNm}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="rental-add-detail-row">
-                <label>설치일자</label>
-                <input
-                  type="text"
-                  name="installDate"
-                  value={formData.installDate}
-                  onChange={handleChange}
-                  placeholder="YYYY-MM-DD"
-                />
-              </div>
-              <div className="rental-add-detail-row">
-                <label>만료일자</label>
-                <input
-                  type="text"
-                  name="expiryDate"
-                  value={formData.expiryDate}
-                  onChange={handleChange}
-                  placeholder="YYYY-MM-DD"
-                />
-              </div>
-              <div className="rental-add-detail-row">
-                <label>렌탈료</label>
-                <input
-                  type="text"
-                  name="rentalFee"
-                  value={formData.rentalFee}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="rental-add-detail-row">
-                <label>위치분류</label>
-                <input
-                  type="text"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="rental-add-detail-row">
-                <label>설치위치</label>
-                <input
-                  type="text"
-                  name="installationSite"
-                  value={formData.installationSite}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="rental-add-detail-row">
-                <label>특이사항</label>
-                <input
-                  type="text"
-                  name="specialNote"
-                  value={formData.specialNote}
-                  onChange={handleChange}
-                />
-              </div>
+              {formFields.map((field) => (
+                <div className="rental-add-detail-row" key={field.name}>
+                  <label>{field.label}</label>
+                  <input
+                    type={field.type}
+                    name={field.name}
+                    value={formData[field.name]}
+                    onChange={handleChange}
+                    placeholder={field.placeholder || ''}
+                  />
+                </div>
+              ))}
             </div>
           ) : (
             <div className="rental-add-section">
@@ -302,10 +213,7 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
           )}
         </div>
         <div className="rental-modal-buttons">
-          <button
-            className="rental-modal-button confirm"
-            onClick={handleSaveClick}
-          >
+          <button className="rental-modal-button confirm" onClick={handleSaveClick}>
             수정하기
           </button>
         </div>

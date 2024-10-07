@@ -9,40 +9,52 @@ import '../../styles/list/ApplicationsList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
-
-
+import { centerData, filterData } from '../../datas/listDatas';
+import useDateSet from '../../hooks/apply/useDateSet';
+import Pagination from '../../components/common/Pagination';
+import Loading from '../../components/common/Loading';
 
 function PendingApprovalList() {
   const location = useLocation();
   const navigate = useNavigate();
   const { auth, refreshSidebar } = useContext(AuthContext);
-  const instCd = auth.instCd;
 
   const [applications, setApplications] = useState([]);
-  const [centers] = useState([
-    '전체', '재단본부', '광화문', '여의도센터', '강남센터',
-    '수원센터', '대구센터', '부산센터', '광주센터', '제주센터', '협력사'
-  ]);
+  const [centers] = useState(centerData);
   const [selectedCenter, setSelectedCenter] = useState('전체');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
   const [startDate, setStartDate] = useState(() => {
     const date = new Date();
     date.setMonth(date.getMonth() - 1);
     return date;
   });
-  const [endDate, setEndDate] = useState(new Date());
-  const [filters, setFilters] = useState({
-    statusApproved: false,
-    statusRejected: false,
-    statusOrdered: false,
-    statusClosed: false,
-  });
+  const [endDate, setEndDate] = useState(new Date()); 
+
+  const [filters, setFilters] = useState(filterData);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState(null);
 
   const queryParams = new URLSearchParams(location.search);
   const documentType = queryParams.get('documentType') || '';
+
+  const { formattedStartDate: defaultStartDate, formattedEndDate: defaultEndDate } = useDateSet();
+
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
+
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    fetchPendingList(currentPage, itemsPerPage);
+    // eslint-disable-next-line
+  }, [currentPage]);
+
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
+  };
 
   const getBreadcrumbItems = () => {
     switch (documentType) {
@@ -74,74 +86,71 @@ function PendingApprovalList() {
     }
   };
 
-  const fetchPendingList = useCallback(async (filterParams = {}) => {
+  const fetchPendingList = useCallback(async (startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`/api/pendingList`, {
+
+      const formattedStartDate = startDate instanceof Date ? startDate.toISOString().split('T')[0] : defaultStartDate;
+      const formattedEndDate = endDate instanceof Date ? endDate.toISOString().split('T')[0] : defaultEndDate;
+
+      const response = await axios.get(`/api/pendingList2`, {
         params: {
+          // ApplyRequestDTO parameters
+          userId: auth.userId || '',
+          instCd: auth.instCd || '',
           documentType: convertDocumentType(documentType),
-          startDate: filterParams.startDate || '',
-          endDate: filterParams.endDate || '',
-          instCd: instCd || '',
-          userId: auth.userId || '', 
+          
+          // PostSearchRequestDTO parameters
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+
+          // PostPageRequest parameters
+          pageIndex,
+          pageSize
         },
       });
 
       const { bcdPendingResponses, docPendingResponses, corpDocPendingResponses, sealPendingResponses } = response.data.data;
 
-      const transformedBcdData = (bcdPendingResponses || []).map(item => ({
+      const combinedData = [
+        bcdPendingResponses || {},
+        docPendingResponses || {},
+        corpDocPendingResponses || {},
+        sealPendingResponses || {}
+      ];
+
+      const selectedData = combinedData.find(response => response.totalElements > 0);
+
+      const totalPages = selectedData.totalPages;
+      const currentPage = selectedData.number + 1;
+      const content = selectedData.content;
+      const filteredData = content.filter(application => application.applyStatus !== 'X');
+  
+      const transformedData = filteredData.map(item => ({
         draftId: item.draftId,
         title: item.title,
         center: item.instNm || '재단본부',
         draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
         drafter: item.drafter,
         status: '승인대기',
-        docType: item.docType || '명함신청'
+        docType: item.docType
       }));
-
-      const transformedDocData = (docPendingResponses || []).map(item => ({
-        draftId: item.draftId,
-        title: item.title,
-        center: item.instNm || '재단본부',
-        draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
-        drafter: item.drafter,
-        status: '승인대기',
-        docType: item.docType || '문서수발신'
-      }));
-
-      const transformedCorpDocData = (corpDocPendingResponses || []).map(item => ({
-        draftId: item.draftId,
-        title: item.title,
-        center: item.instNm || '재단본부',
-        draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
-        drafter: item.drafter,
-        status: '승인대기',
-        docType: item.docType || '법인서류'
-      }));
-
-      const transformedSealData = (sealPendingResponses || []).map(item => ({
-        draftId: item.draftId,
-        title: item.title,
-        center: item.instNm || '재단본부',
-        draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
-        drafter: item.drafter,
-        status: '승인대기',
-        docType: item.docType || '인장신청'
-      }));
-
-      const transformedData = [...transformedBcdData, ...transformedDocData, ...transformedCorpDocData, ...transformedSealData];
+  
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
-
+  
       setApplications(transformedData);
+      setTotalPages(totalPages);
+      setCurrentPage(currentPage);
     } catch (error) {
       console.error('Error fetching pending list:', error);
       setError('데이터를 불러오는 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
-  }, [documentType, instCd, auth.userId]);
-
+    // eslint-disable-next-line
+  }, [documentType, auth.instCd, auth.userId, startDate, endDate]);
+      
   useEffect(() => {
     fetchPendingList(filters);
   }, [filters, fetchPendingList]);
@@ -190,12 +199,12 @@ function PendingApprovalList() {
       setModalVisible(true);
     } else if (docType === '명함신청') {
       navigate(`/bcd/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
-    }  else if (docType === '법인서류') {
+    } else if (docType === '법인서류') {
       navigate(`/corpDoc/applyList/${draftId}?readonly=true&applyStatus=승인대기`);
     } else if (docType === '인장신청(날인)') {
       const sealImprintDetails = await fetchSealImprintDetail(draftId);
       navigate(`/seal/imprint/${draftId}?readonly=true&applyStatus=승인대기`, { state: { sealImprintDetails, readOnly: true }});
-    } else if (docType === '인장신청(반출)') {
+    } else if (docType === '인장신청(반출)') { 
       const sealExportDetails = await fetchSealExportDetail(draftId);
       navigate(`/seal/export/${draftId}?readonly=true&applyStatus=승인대기`, { state: { sealExportDetails, readOnly: true }});
     }
@@ -216,13 +225,8 @@ function PendingApprovalList() {
     setStartDate(defaultStartDate);
     setEndDate(new Date());
     setSelectedCenter('전체');
-    setFilters({
-      statusApproved: false,
-      statusRejected: false,
-      statusOrdered: false,
-      statusClosed: false,
-    });
-    fetchPendingList(); 
+    setFilters(filterData);
+    fetchPendingList();
   };
   
   const closeModal = () => {
@@ -239,7 +243,7 @@ function PendingApprovalList() {
       closeModal();
       
       fetchPendingList(filters);
-  
+
       if (typeof refreshSidebar === 'function') {
         refreshSidebar();  
       }
@@ -259,7 +263,7 @@ function PendingApprovalList() {
   
   const filteredApplications = applications.filter((app) => {
     const draftDate = normalizeDate(app.draftDate); 
-  
+
     if (filters.selectedCenter && filters.selectedCenter !== '전체' && app.center !== filters.selectedCenter) return false;
     if (filters.startDate && draftDate < normalizeDate(filters.startDate)) return false;
     if (filters.endDate && draftDate > normalizeDate(filters.endDate)) return false;
@@ -279,14 +283,14 @@ function PendingApprovalList() {
       Cell: ({ row }) => (
         <span
           className="status-pending clickable" 
-          onClick={() => handleRowClick(row.draftId, row.docType)} 
+          onClick={() => handleRowClick(row.draftId, row.docType, row.status)} 
         >
           {row.title}
         </span>
       ),  
     },
     { header: '신청일시', accessor: 'draftDate', width: '12%' },
-    { header: '신청자', accessor: 'drafter', width: '8%' },
+    { header: '신청자', accessor: 'drafter', width: '8%' }, 
     { header: '문서상태', accessor: 'status', width: '10%' },
   ];
 
@@ -310,11 +314,13 @@ function PendingApprovalList() {
           searchOptions={[]}          
         />
         {loading ? (
-          <p>로딩 중...</p>
-        ) : error ? (
-          <p>{error}</p>
+          <Loading />
         ) : (
+          <>
           <Table columns={columns} data={filteredApplications} />
+          <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+        </>
+
         )}
       </div>
       {selectedDocumentId !== null && (

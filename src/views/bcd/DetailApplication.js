@@ -13,21 +13,19 @@ import '../../styles/common/Page.css';
 
 import backImageEng from '../../assets/images/backimage_eng.png';
 import backImageCompany from '../../assets/images/backimage_company.png';
-import { bcdInfoData, inputValue } from '../../datas/bdcDatas';
-import useBdcChange from '../../hooks/useBdcChange';
+import { bcdInfoData } from '../../datas/bdcDatas';
+import useBdcChange from './../../hooks/bdc/useBdcChange';
 
 function DetailApplication() {
-  const { handleDetailChange, handleDetailCardTypeChange, handleDepartmentChange, handleTeamChange, handlePositionChange, handleAddressChange, handleFloorChange  } = useBdcChange();
+  const { floor, setFloor, formData, setFormData, handleDetailChange, handleDetailCardTypeChange, handleDepartmentChange, handleTeamChange, handlePositionChange, handleAddressChange, handleFloorChange  } = useBdcChange();
   const { auth, refreshSidebar } = useContext(AuthContext);
   const { draftId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const applyStatus = queryParams.get('applyStatus'); 
-  const [formData, setFormData] = useState(inputValue);
 
   const [addressOptions, setAddressOptions] = useState([]);
-  const [floor, setFloor] = useState('');
   const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
@@ -67,7 +65,7 @@ function DetailApplication() {
         engAddress,
       }));
     }
-  }, [bcdData.instInfo]);
+  }, [bcdData.instInfo, setFormData]);
 
   useEffect(() => {
     fetchBcdStd();
@@ -75,6 +73,7 @@ function DetailApplication() {
 
   useEffect(() => {
     fetchApplicationDetail(draftId);
+// eslint-disable-next-line
   }, [draftId]);
 
   useEffect(() => {

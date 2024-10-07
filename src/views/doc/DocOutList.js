@@ -10,27 +10,30 @@ import CustomButton from '../../components/common/CustomButton';
 import '../../styles/doc/DocOutList.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
+import { docFilterData } from '../../datas/docDatas';
+import useDocChange from '../../hooks/useDocChange';
 
 function DocOutList() {
   const { auth } = useContext(AuthContext);
-  const [filteredApplications, setFilteredApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const [showDownloadReasonModal, setShowDownloadReasonModal] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState('');
   const [selectedDraftId, setSelectedDraftId] = useState(null);
 
-  const [selectedRows, setSelectedRows] = useState([]);
   const [showDownButton, setShowDownButton] = useState(false); 
 
-  const [filterInputs, setFilterInputs] = useState({
-    startDate: null,
-    endDate: null,
-    searchType: '전체',
-    keyword: '',
-  });
+  const [filterInputs, setFilterInputs] = useState(docFilterData);
 
   const [downloadType, setDownloadType] = useState(null); 
+  const {
+    handleSelectRow,
+    handleSelectAll,
+    setFilteredApplications,
+    selectedRows,
+    filteredApplications,
+    setSelectedRows,
+  } = useDocChange();
 
   const deriveDocType = (filePath) => {
     if (!filePath) return "doc"; 
@@ -77,7 +80,7 @@ function DocOutList() {
     } catch (error) {
       console.error('Error fetching document list:', error);
     }
-  }, [auth.instCd]);
+  }, [auth.instCd, setFilteredApplications]);
 
   useEffect(() => {
     fetchDocOutList();
@@ -248,7 +251,7 @@ function DocOutList() {
       keyword: '',
     });
     setSelectedRows([]); 
-  }, []);
+  }, [setSelectedRows]);
 
   useEffect(() => {
     resetFilters();
@@ -257,23 +260,6 @@ function DocOutList() {
   const handleReset = () => {
     resetFilters();
     fetchDocOutList();
-  };
-
-  const handleSelectRow = (isChecked, draftId) => {
-    if (isChecked) {
-      setSelectedRows(prevSelected => [...prevSelected, draftId]);
-    } else {
-      setSelectedRows(prevSelected => prevSelected.filter(id => id !== draftId));
-    }
-  };
-
-  const handleSelectAll = (isChecked) => {
-    if (isChecked) {
-      const allDraftIds = filteredApplications.map(app => app.draftId);
-      setSelectedRows(allDraftIds);
-    } else {
-      setSelectedRows([]);
-    }
   };
 
   const columns = [
@@ -356,7 +342,7 @@ function DocOutList() {
           setDocumentType={() => {}}
         />
         <div className="doc-out-content">
-          <Table columns={columns} data={filteredApplications} />
+          <Table columns={columns} data={filteredApplications || []} />
         </div>
         {showDeleteModal && (
           <ConfirmModal

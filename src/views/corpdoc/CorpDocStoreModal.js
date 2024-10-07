@@ -1,27 +1,16 @@
 import axios from 'axios';
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { AuthContext } from '../../components/AuthContext';
 import PropTypes from 'prop-types';
 import '../../styles/corpdoc/CorpDocStoreModal.css';
 import CustomButton from '../../components/common/CustomButton';
+import useCorpChange from './../../hooks/useCorpChange';
 
 
 
 const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregister }) => {
   const { auth } = useContext(AuthContext);
-  const initialFormData = {
-    storeDate: '',
-    purpose: '법인서류 입고',
-    certCorpseal: '',
-    totalCorpseal: '',
-    certCoregister: '',
-    totalCoregister: '',
-    userId: '',
-    userNm: '',
-    instCd: ''
-  };
-
-  const [formData, setFormData] = useState(initialFormData);
+  const {handleStoreChange, formData, setFormData} = useCorpChange();
 
   useEffect(() => { 
     if (show) {
@@ -38,18 +27,10 @@ const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregist
         instCd: auth.instCd
       });
     }
-  }, [show, auth.userId, auth.hngNm, auth.instCd, totalCorpseal, totalCoregister]);
+  }, [show, auth.userId, auth.hngNm, auth.instCd, totalCorpseal, totalCoregister, setFormData]);
 
   useEffect(() => {
   }, [formData]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
-  };
 
   const handleSave = async () => {
     const { storeDate, userId, instCd } = formData;
@@ -104,6 +85,13 @@ const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregist
 
   if (!show) return null;
 
+  const fieldItems = [
+    { label: "입고 일자", name: "storeDate", type: "text", value: formData.storeDate, placeholder: "yyyy-MM-dd", readOnly: true },
+    { label: "사용 목적", name: "purpose", type: "text", value: formData.purpose, readOnly: true },
+    { label: "법인인감 증명서", name: "certCorpseal", type: "number", value: formData.certCorpseal, placeholder: "수량 입력", min: "0", required: true },
+    { label: "법인등기사항전부증명서", name: "certCoregister", type: "number", value: formData.certCoregister, placeholder: "수량 입력", min: "0", required: true }
+  ]
+
   return (
     <div className="corpDoc-store-modal-overlay">
       <div className="corpDoc-store-modal-container">
@@ -111,50 +99,22 @@ const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregist
           <h3>법인 서류 입고 등록</h3>
           <button className="corpDoc-store-close-button" onClick={onClose}>X</button>
         </div>
-        <div className="corpDoc-store-form-group">
-          <label>입고 일자</label>
-          <input
-            type="text"
-            name="storeDate"
-            value={formData.storeDate}
-            onChange={handleChange}
-            placeholder='yyyy-MM-dd'
-            readOnly
-          />
-        </div>
-        <div className="corpDoc-store-form-group">
-          <label>사용 목적</label>
-          <input
-            type="text"
-            name="purpose"
-            value={formData.purpose}
-            readOnly
-          />
-        </div>
-        <div className="corpDoc-store-form-group">
-          <label>법인인감 증명서</label>
-          <input
-            type="number"
-            name="certCorpseal"
-            value={formData.certCorpseal}
-            onChange={handleChange}
-            placeholder='수량 입력'
-            min="0"
-            required
-          />
-        </div>
-        <div className="corpDoc-store-form-group">
-          <label>법인등기사항전부증명서</label>
-          <input
-            type="number"
-            name="certCoregister"
-            value={formData.certCoregister}
-            onChange={handleChange}
-            placeholder='수량 입력'
-            min="0"
-            required
-          />
-        </div>
+        {fieldItems.map(({ label, name, type, value, placeholder, readOnly, min, required }) => (
+          <div key={name} className="corpDoc-store-form-group">
+            <label>{label}</label>
+            <input
+              type={type}
+              name={name}
+              value={value}
+              onChange={handleStoreChange}
+              placeholder={placeholder}
+              readOnly={readOnly}
+              min={min}
+              required={required}
+            />
+          </div>
+        ))}
+  
         <div className="corpDoc-store-modal-buttons">
           <CustomButton className="save-button" onClick={handleSave}>
             등 록

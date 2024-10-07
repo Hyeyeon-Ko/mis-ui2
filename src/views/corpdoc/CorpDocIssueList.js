@@ -11,6 +11,9 @@ import SignitureImage from '../../assets/images/signiture.png';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/corpdoc/CorpDocIssueList.css';
+import { corpFilterData } from '../../datas/corpDocDatas';
+import useDateSet from '../../hooks/apply/useDateSet';
+import Pagination from '../../components/common/Pagination';
 
 function CorpDocIssueList() {
   const { refreshSidebar } = useContext(AuthContext);
@@ -18,12 +21,7 @@ function CorpDocIssueList() {
   const [pendingApplications, setPendingApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]); 
   const [filteredPendingApplications, setFilteredPendingApplications] = useState([]); 
-  const [filterInputs, setFilterInputs] = useState({
-    searchType: '전체',
-    keyword: '',
-    startDate: null, 
-    endDate: null,   
-  });
+  const [filterInputs, setFilterInputs] = useState(corpFilterData);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
@@ -41,25 +39,55 @@ function CorpDocIssueList() {
     '수원센터', '대구센터', '부산센터', '광주센터', '제주센터', '협력사'
   ]);
 
-  const fetchIssueData = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null) => {
+  const { formattedStartDate: defaultStartDate, formattedEndDate: defaultEndDate } = useDateSet();
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
+  const [totalPendingPages, setTotalPendingPages] = useState('1')
+  const [currentPendingPage, setCurrentPendingPage] = useState('1')
+
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    fetchIssueData(currentPage, itemsPerPage);
+  }, [currentPage]);
+
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
+  };
+
+  const fetchIssueData = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
     try {
-      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : '';
-      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : '';
+      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : defaultStartDate;
+      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : defaultEndDate;
 
       const response = await axios.get(`/api/corpDoc/issueList`, {
         params: {
+          // PostSearchRequestDTO parameters
           searchType,
           keyword,
           startDate: formattedStartDate,
           endDate: formattedEndDate,
+
+          // PostPageRequest parameters
+          pageIndex,
+          pageSize
         },
       });
 
       if (response.data) {
-        const issueListData = response.data.data.issueList.map(item => ({
+        const data = response.data.data;
+
+        const issueList = data.issueList;
+        const totalPages = issueList.totalPages;
+        const currentPage = issueList.number + 1;
+
+        const issueListContent = Array.isArray(issueList.content) ? issueList.content : [];
+        const issueListData = issueListContent.map(item => ({
           id: item.draftId,
           date: item.draftDate,
           issueDate: item.issueDate.split("T")[0],
+          drafter: item.drafter,
           submission: item.submission || '', 
           purpose: item.purpose || '',       
           corpSeal: {
@@ -81,7 +109,12 @@ function CorpDocIssueList() {
           signitureImage: SignitureImage,
         }));
 
-        const issuePendingListData = response.data.data.issuePendingList.map(item => ({
+        const issuePendingList = data.issuePendingList;
+        const totalPendingPages = issueList.totalPages;
+        const currentPendingPage = issueList.number + 1;
+
+        const issuePendingListContent = Array.isArray(issuePendingList.content) ? issuePendingList.content : [];
+        const issuePendingListData = issuePendingListContent.map(item => ({
           id: item.draftId,
           useDate: item.useDate,
           submission: item.submission || '',  
@@ -101,11 +134,15 @@ function CorpDocIssueList() {
         setPendingApplications(issuePendingListData);
 
         const totalValues = extractTotalValues(issueListData);
-
         setTotalCorpseal(totalValues.totalCorpseal);
         setTotalCoregister(totalValues.totalCoregister);
 
         setInitialDataLoaded(true);
+
+        setTotalPages(totalPages);
+        setCurrentPage(currentPage);
+        setTotalPendingPages(totalPendingPages);
+        setCurrentPendingPage(currentPendingPage);
       }
     } catch (error) {
       console.error("Error fetching issue data:", error);
@@ -289,7 +326,7 @@ function CorpDocIssueList() {
                   <td>{index + 1}</td>
                   <td>{app.issueDate}</td>
                   <td>{app.center}</td>
-                  <td>{app.status === "X" ? '' : app.applicantName}</td>
+                  <td>{app.status === "X" ? '' : app.drfater}</td>
                   <td>{app.submission}</td>
                   <td>{app.purpose}</td>
                   <td>{app.corpSeal.incoming}</td>
@@ -309,12 +346,12 @@ function CorpDocIssueList() {
               ))
             ) : (
               <tr>
-                <td colSpan="13" style={{ textAlign: 'center' }}>데이터가 없습니다</td>
+                <td colSpan="13" style={{ textAlign: 'center' }}>조회된 데이터가 없습니다</td>
               </tr>
             )}
           </tbody>
         </table>
-
+        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
         <div className='corpDoc-issue-pending-list'>
           <h3>발급 대기 목록</h3>
           <table className="table">
@@ -360,11 +397,12 @@ function CorpDocIssueList() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="11" style={{ textAlign: 'center' }}>데이터가 없습니다</td>
+                  <td colSpan="11" style={{ textAlign: 'center' }}>조회된 데이터가 없습니다</td>
                 </tr>
               )}
             </tbody>
           </table>
+          <Pagination totalPendingPages={totalPendingPages} onPageChange={handlePageClick} />
         </div>
       </div>
       {modalVisible && selectedDocumentDetails && (

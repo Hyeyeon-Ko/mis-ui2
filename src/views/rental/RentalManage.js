@@ -8,15 +8,16 @@ import RentalBulkUpdateModal from './RentalBulkUpdateModal';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/common/Page.css';
 import '../../styles/rental/RentalManage.css';
+import useRentalChange from '../../hooks/useRentalChange';
 
 
 
 function RentalManage() {
+  const { selectedRows, setSelectedRows, handleRowSelect } = useRentalChange();
   const { auth } = useContext(AuthContext);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
   const [isBulkUpdateModalVisible, setIsBulkUpdateModalVisible] = useState(false);
-  const [selectedRows, setSelectedRows] = useState([]); 
   const [selectedRental, setSelectedRental] = useState(null); 
   const [rentalDetails, setRentalDetails] = useState([]);  
 
@@ -52,7 +53,7 @@ function RentalManage() {
     } catch (error) {
       console.error('센터 렌탈현황을 불러오는데 실패했습니다.', error);
     }
-  }, [auth.instCd]);
+  }, [auth.instCd, setSelectedRows]);
 
   useEffect(() => {
     fetchRentalData();
@@ -60,16 +61,6 @@ function RentalManage() {
 
   const handleRowClick = (row, index) => {
     const isChecked = !selectedRows.includes(row.detailId);
-    if (isChecked) {
-      setSelectedRows(prevSelectedRows => [...prevSelectedRows, row.detailId]);
-    } else {
-      setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== row.detailId));
-    }
-  };
-
-  const handleRowSelect = (e, row, index) => {
-    e.stopPropagation(); 
-    const isChecked = e.target.checked;
     if (isChecked) {
       setSelectedRows(prevSelectedRows => [...prevSelectedRows, row.detailId]);
     } else {
