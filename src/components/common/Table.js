@@ -12,31 +12,37 @@ const Table = ({ columns, data, onRowClick = () => {}, onRowMouseDown = () => {}
       </tr>
     </thead>
     <tbody>
-      {data.map((row, rowIndex) => {
-        const isCancelled = row.status === '신청취소' || (row.type === 'B' && row.status === 'E');
-        return (
-          <tr
-            key={rowIndex}
-            className={isCancelled ? 'cancelled' : ''}
-            onClick={() => onRowClick(row, rowIndex)}  
-            onMouseDown={() => onRowMouseDown(rowIndex)}
-            onMouseOver={() => onRowMouseOver(rowIndex)}
-            onMouseUp={onRowMouseUp}
-          >
-            {columns.map((col, colIndex) => (
-              <td key={colIndex}>
-                {col.Cell ? (
-                  <div className={`icon-cell ${isCancelled && (col.accessor === 'file' || col.accessor === 'delete') ? 'disabled' : ''}`}>
-                  {col.Cell({ row: row.original || row })}
-                </div>
-              ) : (
-                  row[col.accessor]
-                )}
-              </td>
-            ))}
-          </tr>
-        );
-      })}
+      {data.length === 0 ? (
+        <tr>
+          <td colSpan={columns.length} style={{ textAlign: 'center' }}>조회된 데이터가 없습니다.</td>
+        </tr>
+      ) : (
+        data.map((row, rowIndex) => {
+          const isCancelled = row.status === '신청취소' || (row.type === 'B' && row.status === 'E');
+          return (
+            <tr
+              key={rowIndex}
+              className={isCancelled ? 'cancelled' : ''}
+              onClick={() => onRowClick(row, rowIndex)}
+              onMouseDown={() => onRowMouseDown(rowIndex)}
+              onMouseOver={() => onRowMouseOver(rowIndex)}
+              onMouseUp={onRowMouseUp}
+            >
+              {columns.map((col, colIndex) => (
+                <td key={colIndex}>
+                  {col.Cell ? (
+                    <div className={`icon-cell ${isCancelled && (col.accessor === 'file' || col.accessor === 'delete') ? 'disabled' : ''}`}>
+                      {col.Cell({ row: row.original || row })}
+                    </div>
+                  ) : (
+                    row[col.accessor]
+                  )}
+                </td>
+              ))}
+            </tr>
+          );
+        })
+      )}
     </tbody>
   </table>
 );
