@@ -11,6 +11,7 @@ import '../../styles/common/Page.css';
 import axios from 'axios';
 import { filterData } from '../../datas/listDatas';
 import useListChange from '../../hooks/useListChange';
+import Pagination from '../../components/common/Pagination';
 
 
 
@@ -33,6 +34,8 @@ function MyApplyList() {
   const [viewedRejections, setViewedRejections] = useState(new Set(JSON.parse(localStorage.getItem('viewedRejections')) || []));
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [documentDetails, setDocumentDetails] = useState({});
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
 
   const convertDocumentType = (type) => {
     switch (type) {
@@ -92,6 +95,8 @@ function MyApplyList() {
   
       setApplications(transformedData);
       setFilteredApplications(transformedData); 
+      setTotalPages(totalPages);
+      setCurrentPage(currentPage);
     } catch (error) {
       console.error('Error fetching applications:', error.response?.data || error.message);
     }
@@ -226,6 +231,11 @@ function MyApplyList() {
       setShowApprovalModal(true);
     }
   };
+
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
+  };
       
   const applicationColumns = [
     { header: '문서분류', accessor: 'docType', width: '11%' },
@@ -312,6 +322,7 @@ function MyApplyList() {
           searchOptions={[]}          
         />
         <Table columns={applicationColumns} data={filteredApplications} />
+        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
       </div>
       {showModal && (
         <ConfirmModal
