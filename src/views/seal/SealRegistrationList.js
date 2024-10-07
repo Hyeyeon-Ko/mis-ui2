@@ -188,7 +188,7 @@ function SealRegistrationList() {
               ))
             ) : (
               <tr>
-                <td colSpan="8">데이터가 없습니다.</td>
+                <td colSpan="8">조회된 데이터가 없습니다.</td>
               </tr>
             )}
           </tbody>

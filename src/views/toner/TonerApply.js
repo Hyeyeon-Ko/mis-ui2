@@ -156,7 +156,7 @@ function TonerApplyFirst() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="9" style={{ textAlign: 'center' }}>데이터가 없습니다</td>
+                    <td colSpan="9" style={{ textAlign: 'center' }}>조회된 데이터가 없습니다</td>
                   </tr>
                 )}
               </tbody>
