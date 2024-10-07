@@ -12,6 +12,7 @@ import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 import { docFilterData } from '../../datas/docDatas';
 import useDocChange from '../../hooks/useDocChange';
+import Pagination from '../../components/common/Pagination';
 
 function DocOutList() {
   const { auth } = useContext(AuthContext);
@@ -26,6 +27,9 @@ function DocOutList() {
   const [filterInputs, setFilterInputs] = useState(docFilterData);
 
   const [downloadType, setDownloadType] = useState(null); 
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
+
   const {
     handleSelectRow,
     handleSelectAll,
@@ -47,18 +51,29 @@ function DocOutList() {
     return "doc";
   };
 
-  const fetchDocOutList = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null) => {
+  const fetchDocOutList = useCallback(async (
+    searchType = "전체",
+    keyword = "",
+    startDate = null,
+    endDate = null,
+    pageIndex = 1, 
+    pageSize = 10,
+    status ="",
+    ) => {
     try {
       const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : '';
       const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : '';
 
-      const response = await axios.get('/api/doc/sendList', {
+      const response = await axios.get('/api/doc/sendList2', {
         params: {
           instCd: auth.instCd,
           searchType,
           keyword,
           startDate: formattedStartDate,
           endDate: formattedEndDate,
+          pageIndex,
+          pageSize,
+          status,
         },
       });
 
@@ -77,9 +92,12 @@ function DocOutList() {
         }));
         setFilteredApplications(formattedData);
       }
+      setTotalPages(totalPages);
+      setCurrentPage(currentPage);
     } catch (error) {
       console.error('Error fetching document list:', error);
     }
+     // eslint-disable-next-line
   }, [auth.instCd, setFilteredApplications]);
 
   useEffect(() => {
@@ -89,6 +107,12 @@ function DocOutList() {
   useEffect(() => {
     setShowDownButton(selectedRows.length > 0);
   }, [selectedRows]);
+
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
+  };
+
 
   const handleFileDownloadClick = (draftId, fileName) => {
     setSelectedDraftId(draftId);
@@ -343,6 +367,8 @@ function DocOutList() {
         />
         <div className="doc-out-content">
           <Table columns={columns} data={filteredApplications || []} />
+        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+
         </div>
         {showDeleteModal && (
           <ConfirmModal

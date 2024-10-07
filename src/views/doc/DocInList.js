@@ -12,6 +12,7 @@ import axios from "axios";
 import { AuthContext } from "../../components/AuthContext";
 import { docFilterData } from "../../datas/docDatas";
 import useDocChange from "../../hooks/useDocChange";
+import Pagination from "../../components/common/Pagination";
 
 function DocInList() {
   const { auth } = useContext(AuthContext);
@@ -27,6 +28,9 @@ function DocInList() {
   const [filterInputs, setFilterInputs] = useState(docFilterData);
 
   const [downloadType, setDownloadType] = useState(null);
+  const [totalPages, setTotalPages] = useState('1');
+  const [currentPage, setCurrentPage] = useState('1');
+
   const {
     handleSelectRow,
     handleSelectAll,
@@ -53,7 +57,10 @@ function DocInList() {
       searchType = "전체",
       keyword = "",
       startDate = null,
-      endDate = null
+      endDate = null,
+      pageIndex = 1, 
+      pageSize = 10,
+      status ="",
     ) => {
       try {
         const formattedStartDate = startDate
@@ -63,13 +70,16 @@ function DocInList() {
           ? endDate.toISOString().split("T")[0]
           : "";
 
-        const response = await axios.get("/api/doc/receiveList", {
+        const response = await axios.get("/api/doc/receiveList2", {
           params: {
             instCd: auth.instCd,
             searchType,
             keyword,
             startDate: formattedStartDate,
             endDate: formattedEndDate,
+            pageIndex,
+            pageSize,
+            status,
           },
         });
 
@@ -89,10 +99,13 @@ function DocInList() {
           setApplications(formattedData);
           setFilteredApplications(formattedData);
         }
+        setTotalPages(totalPages);
+        setCurrentPage(currentPage);
       } catch (error) {
         console.error("Error fetching document list:", error);
       }
     },
+    // eslint-disable-next-line
     [auth.instCd, setFilteredApplications]
   );
 
@@ -103,6 +116,11 @@ function DocInList() {
   useEffect(() => {
     setShowDownButton(selectedRows.length > 0);
   }, [selectedRows]);
+
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
+  };
 
   const handleFileDownloadClick = (draftId, fileName) => {
     setSelectedDraftId(draftId);
@@ -219,7 +237,7 @@ function DocInList() {
   };
 
   const handleSearch = async () => {
-    const { searchType, keyword, startDate, endDate } = filterInputs;
+    const { searchType, keyword, startDate, endDate, pageIndex, pageSize, status } = filterInputs;
 
     const formattedStartDate = startDate
       ? startDate.toISOString().split("T")[0]
@@ -229,13 +247,16 @@ function DocInList() {
       : null;
 
     try {
-      const response = await axios.get("/api/doc/receiveList", {
+      const response = await axios.get("/api/doc/receiveList2", {
         params: {
           instCd: auth.instCd,
-          searchType: searchType,
-          keyword: keyword.trim() !== "" ? keyword : null,
+          searchType,
+          keyword,
           startDate: formattedStartDate,
           endDate: formattedEndDate,
+          pageIndex,
+          pageSize,
+          status,
         },
       });
 
@@ -391,6 +412,8 @@ function DocInList() {
         <div className="doc-out-content">
           {/* <Table columns={columns} data={filteredApplications} /> */}
           <Table columns={columns} data={filteredApplications || []} />
+        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+
         </div>
         {showDeleteModal && (
           <ConfirmModal
