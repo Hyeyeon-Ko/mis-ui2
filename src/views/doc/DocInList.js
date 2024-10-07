@@ -60,7 +60,7 @@ function DocInList() {
       endDate = null,
       pageIndex = 1, 
       pageSize = 10,
-      status ="",
+      status ="A",
     ) => {
       try {
         const formattedStartDate = startDate
@@ -237,7 +237,7 @@ function DocInList() {
   };
 
   const handleSearch = async () => {
-    const { searchType, keyword, startDate, endDate, pageIndex, pageSize, status } = filterInputs;
+    const { searchType, keyword, startDate, endDate} = filterInputs;
 
     const formattedStartDate = startDate
       ? startDate.toISOString().split("T")[0]
@@ -254,9 +254,9 @@ function DocInList() {
           keyword,
           startDate: formattedStartDate,
           endDate: formattedEndDate,
-          pageIndex,
-          pageSize,
-          status,
+          pageIndex: 1,
+          pageSize: 10,
+          status: 'A',
         },
       });
 
