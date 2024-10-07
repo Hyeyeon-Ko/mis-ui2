@@ -13,6 +13,7 @@ import fileDownload from 'js-file-download';
 import { AuthContext } from '../../components/AuthContext';
 import useDateSet from '../../hooks/apply/useDateSet';
 import Pagination from '../../components/common/Pagination';
+import Loading from '../../components/common/Loading';
 
 function ApplicationsList() {
   const location = useLocation();
@@ -491,13 +492,17 @@ function ApplicationsList() {
           searchOptions={['전체', '제목', '신청자']} 
         />
         {loading ? (
-          <p>로딩 중...</p>
+          <Loading />
         ) : error ? (
           <p>{error}</p>
         ) : (
+          <>
           <Table columns={columns} data={filteredApplications} onSelect={handleSelect} selectedItems={selectedApplications} />
-        )}
+
         <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+          
+          </>
+        )}
       </div>
       {modalVisible && selectedDocumentId && (
         <DocConfirmModal
