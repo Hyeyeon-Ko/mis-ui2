@@ -12,6 +12,7 @@ import axios from 'axios';
 import { filterData } from '../../datas/listDatas';
 import useListChange from '../../hooks/useListChange';
 import Pagination from '../../components/common/Pagination';
+import Loading from '../../components/common/Loading';
 
 
 
@@ -36,40 +37,25 @@ function MyApplyList() {
   const [documentDetails, setDocumentDetails] = useState({});
   const [totalPages, setTotalPages] = useState('1')
   const [currentPage, setCurrentPage] = useState('1')
+  const [loading, setLoading] = useState(false);
+  const itemsPerPage = 10;
 
-  const convertDocumentType = (type) => {
-    switch (type) {
-      case '명함신청':
-        return 'A';
-      case '문서수발신':
-        return 'B';
-      case '법인서류':
-        return 'C';
-      case '인장신청':
-        return 'D';
-      default:
-        return null;
-    }
-  };
+  const fetchApplications = useCallback(async (pageIndex = 1,  pageSize = itemsPerPage) => {
+    setLoading(true);
 
-  const fetchApplications = useCallback(async () => {
     try {
-      const response = await axios.get(`/api/myApplyList`, {
+      const response = await axios.get(`/api/myApplyList2`, {
         params: {
           userId: auth.userId,
-          startDate: startDate ? startDate.toISOString().split('T')[0] : null,
-          endDate: endDate ? endDate.toISOString().split('T')[0] : null,
-          documentType: convertDocumentType(documentType),
+          pageIndex,
+          pageSize
         },
       });
   
       const data = response.data?.data || {};
-      const combinedData = [
-        ...(data.myBcdResponses || []),
-        ...(data.myDocResponses || []),
-        ...(data.myCorpDocResponses || []),
-        ...(data.mySealResponses || []),
-      ];
+    
+      const pagedResult = data.pagedResult || {}; 
+      const combinedData = pagedResult.content || []; 
   
       const uniqueData = combinedData.reduce((acc, current) => {
         const x = acc.find(item => item.draftId === current.draftId && item.docType === current.docType);
@@ -79,6 +65,7 @@ function MyApplyList() {
           return acc;
         }
       }, []);
+
   
       const transformedData = uniqueData
         .filter(application => application.applyStatus !== 'X')
@@ -99,6 +86,8 @@ function MyApplyList() {
       setCurrentPage(currentPage);
     } catch (error) {
       console.error('Error fetching applications:', error.response?.data || error.message);
+    } finally {
+      setLoading(false);
     }
   }, [auth.userId, startDate, endDate, documentType]);
 
@@ -321,8 +310,15 @@ function MyApplyList() {
           onFilterChange={handleFilterChange}
           searchOptions={[]}          
         />
-        <Table columns={applicationColumns} data={filteredApplications} />
-        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+          <Table columns={applicationColumns} data={filteredApplications} />
+          <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+        </>
+
+        )}
       </div>
       {showModal && (
         <ConfirmModal
