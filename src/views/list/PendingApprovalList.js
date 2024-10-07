@@ -48,6 +48,7 @@ function PendingApprovalList() {
 
   useEffect(() => {
     fetchPendingList(currentPage, itemsPerPage);
+    // eslint-disable-next-line
   }, [currentPage]);
 
   const handlePageClick = (event) => {
@@ -147,6 +148,7 @@ function PendingApprovalList() {
     } finally {
       setLoading(false);
     }
+    // eslint-disable-next-line
   }, [documentType, auth.instCd, auth.userId, startDate, endDate]);
       
   useEffect(() => {
@@ -313,8 +315,6 @@ function PendingApprovalList() {
         />
         {loading ? (
           <Loading />
-        ) : error ? (
-          <p>{error}</p>
         ) : (
           <>
           <Table columns={columns} data={filteredApplications} />
