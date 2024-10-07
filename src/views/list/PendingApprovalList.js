@@ -84,13 +84,13 @@ function PendingApprovalList() {
     }
   };
 
-  const fetchPendingList = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
+  const fetchPendingList = useCallback(async (startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
     setLoading(true);
     setError(null);
     try {
 
-      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : defaultStartDate;
-      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : defaultEndDate;
+      const formattedStartDate = startDate instanceof Date ? startDate.toISOString().split('T')[0] : defaultStartDate;
+      const formattedEndDate = endDate instanceof Date ? endDate.toISOString().split('T')[0] : defaultEndDate;
 
       const response = await axios.get(`/api/pendingList2`, {
         params: {
