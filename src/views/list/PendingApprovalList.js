@@ -23,7 +23,6 @@ function PendingApprovalList() {
   const [centers] = useState(centerData);
   const [selectedCenter, setSelectedCenter] = useState('전체');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const [startDate, setStartDate] = useState(() => {
     const date = new Date();
@@ -88,7 +87,6 @@ function PendingApprovalList() {
 
   const fetchPendingList = useCallback(async (startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
     setLoading(true);
-    setError(null);
     try {
 
       const formattedStartDate = startDate instanceof Date ? startDate.toISOString().split('T')[0] : defaultStartDate;
@@ -143,8 +141,7 @@ function PendingApprovalList() {
       setTotalPages(totalPages);
       setCurrentPage(currentPage);
     } catch (error) {
-      console.error('Error fetching pending list:', error);
-      setError('데이터를 불러오는 중 오류가 발생했습니다.');
+      console.error('Error fetching pending list: 데이터를 불러오는 중 오류가 발생했습니다.', error);
     } finally {
       setLoading(false);
     }
