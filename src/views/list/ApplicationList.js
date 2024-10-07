@@ -46,7 +46,7 @@ function ApplicationsList() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState(null);
   const [selectedCenter, setSelectedCenter] = useState('전체');
-  const { formattedStartDate: defaultStartDate, formattedEndDate: defaultEndDate } = useDateSet();
+  const { formattedStartDate, formattedEndDate } = useDateSet();
   const [totalPages, setTotalPages] = useState('1')
   const [currentPage, setCurrentPage] = useState('1')
 
@@ -176,8 +176,6 @@ function ApplicationsList() {
     setLoading(true);
     setError(null);
     try {
-      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : defaultStartDate;
-      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : defaultEndDate;
 
       const response = await axios.get('/api/applyList2', {
         params: {

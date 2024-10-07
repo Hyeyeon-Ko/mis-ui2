@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../common/Button';
+import useDateSet from '../../hooks/apply/useDateSet';
+
 import '../../styles/common/ConditionFilter.css';
 
 const ConditionFilter = ({
@@ -13,9 +15,12 @@ const ConditionFilter = ({
   forceShowAllStatusFilters = false,
   startDateLabel = '신청일자',
 }) => {
+  // useDateSet에서 기본 시작일과 종료일을 가져옴
+  const { formattedStartDate, formattedEndDate } = useDateSet();
+
   // 내부 상태 관리
-  const [startDate, setStartDate] = useState(new Date(new Date().setMonth(new Date().getMonth() - 1)));
-  const [endDate, setEndDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(new Date(formattedStartDate));
+  const [endDate, setEndDate] = useState(new Date(formattedEndDate));
   const [filters, setFilters] = useState({
     statusApproved: false,
     statusRejected: false,
@@ -28,10 +33,8 @@ const ConditionFilter = ({
 
   // 필터 초기화 함수
   const resetFilters = () => {
-    const defaultStartDate = new Date();
-    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
-    setStartDate(defaultStartDate);
-    setEndDate(new Date());
+    setStartDate(new Date(formattedStartDate));
+    setEndDate(new Date(formattedEndDate));
     setSearchType('전체');
     setKeyword('');
     setFilters({
