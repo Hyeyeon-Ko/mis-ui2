@@ -228,38 +228,48 @@ function DetailSealExportApplication() {
     };
 
     const handleRejectConfirm = async (reason) => {
+        console.log(auth.userId);
         try {
-          const response = await axios.post(`/api/seal/return/${draftId}`, reason, {
-            headers: {
-              'Content-Type': 'text/plain',
-            },
-          });
-          if (response.data.code === 200) {
-            alert('인장 신청이 반려되었습니다.');
-            await refreshSidebar();
-            navigate(`/pendingList?documentType=인장신청`);  
-          } else {
-            alert('인장 반려 중 오류가 발생했습니다.');
-          }
+            const response = await axios.post(`/api/seal/return/${draftId}`, {
+                userId: auth.userId,    
+                rejectReason: reason     
+            }, {
+                headers: {
+                    'Content-Type': 'application/json', 
+                },
+            });
+            if (response.data.code === 200) {
+                alert('인장 신청이 반려되었습니다.');
+                await refreshSidebar();
+                navigate(`/pendingList?documentType=인장신청`);  
+            } else {
+                alert('인장 반려 중 오류가 발생했습니다.');
+            }
         } catch (error) {
-          alert('인장 반려 중 오류가 발생했습니다.');
+            alert('인장 반려 중 오류가 발생했습니다.');
         }
-    };  
-
+    };
+    
     const handleApproval = async (e) => {
         e.preventDefault();
         try {
-          await axios.post(`/api/seal/${draftId}`);
-          alert('인장 신청이 성공적으로 승인되었습니다.');
-          await refreshSidebar();
-          navigate('/pendingList?documentType=인장신청');
+            await axios.post(`/api/seal/${draftId}`, {
+                userId: auth.userId,
+            }, {
+                headers: {
+                    'Content-Type': 'application/json', 
+                },
+            });
+            alert('인장 신청이 성공적으로 승인되었습니다.');
+            await refreshSidebar();
+            navigate('/pendingList?documentType=인장신청');
         } catch (error) {
-          console.error('Error approving application:', error);
-          alert('인장 신청 승인 중 오류가 발생했습니다.');
-          navigate('/pendingList?documentType=인장신청');
+            console.error('Error approving application:', error);
+            alert('인장 신청 승인 중 오류가 발생했습니다.');
+            navigate('/pendingList?documentType=인장신청');
         }
     };
-
+    
     const handleReject = (e) => {
         e.preventDefault();
         setShowRejectModal(true);

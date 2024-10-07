@@ -220,7 +220,13 @@ function DetailCorpDocApplication() {
     const handleApprove = async (e) => {
         e.preventDefault(); 
         try {
-            await axios.put(`/api/corpDoc/approve?draftId=${draftId}`);
+            await axios.put(`/api/corpDoc/approve?draftId=${draftId}`, {
+                userId: auth.userId,
+            }, {
+                headers: {
+                    'Content-Type': 'application/json', 
+                },
+            });
             alert('문서가 승인되었습니다.');
             await refreshSidebar(); 
             navigate('/pendingList?documentType=법인서류');
@@ -232,9 +238,12 @@ function DetailCorpDocApplication() {
     
     const handleRejectConfirm = async (reason) => {
         try {
-            const response = await axios.put(`/api/corpDoc/reject?draftId=${draftId}`, reason, {
+            const response = await axios.put(`/api/corpDoc/reject?draftId=${draftId}`, {
+                userId: auth.userId,    
+                rejectReason: reason     
+            }, {
                 headers: {
-                    'Content-Type': 'text/plain',
+                    'Content-Type': 'application/json', 
                 },
             });
             if (response.data.code === 200) {
