@@ -16,6 +16,7 @@ import Pagination from '../../components/common/Pagination';
 
 function DocOutList() {
   const { auth } = useContext(AuthContext);
+  const [, setApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const [showDownloadReasonModal, setShowDownloadReasonModal] = useState(false);
@@ -58,13 +59,13 @@ function DocOutList() {
     endDate = null,
     pageIndex = 1, 
     pageSize = 10,
-    status ="",
+    status ="B",
     ) => {
     try {
       const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : '';
       const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : '';
 
-      const response = await axios.get('/api/doc/sendList2', {
+      const response = await axios.get('/api/doc/receiveList2', {
         params: {
           instCd: auth.instCd,
           searchType,
@@ -90,6 +91,7 @@ function DocOutList() {
           fileUrl: item.fileUrl,
           docType: deriveDocType(item.filePath),
         }));
+        setApplications(formattedData);
         setFilteredApplications(formattedData);
       }
       setTotalPages(totalPages);
@@ -235,13 +237,16 @@ function DocOutList() {
     const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : null;
 
     try {
-      const response = await axios.get('/api/doc/sendList', {
+      const response = await axios.get('/api/doc/receiveList2', {
         params: {
           instCd: auth.instCd,
-          searchType: searchType,
-          keyword: keyword.trim() !== '' ? keyword : null,
+          searchType,
+          keyword,
           startDate: formattedStartDate,
           endDate: formattedEndDate,
+          pageIndex: 1,
+          pageSize: 10,
+          status: 'B',
         },
       });
 
@@ -258,6 +263,7 @@ function DocOutList() {
           fileUrl: item.fileUrl,
           docType: deriveDocType(item.filePath), 
         }));
+        setApplications(formattedData);
         setFilteredApplications(formattedData);
       }
     } catch (error) {
