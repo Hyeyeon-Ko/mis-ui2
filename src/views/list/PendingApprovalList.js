@@ -135,36 +135,6 @@ function PendingApprovalList() {
         docType: item.docType
       }));
   
-      // const transformedDocData = (docPendingResponses?.content || []).map(item => ({
-      //   draftId: item.draftId,
-      //   title: item.title,
-      //   center: item.instNm || '재단본부',
-      //   draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
-      //   drafter: item.drafter,
-      //   status: '승인대기',
-      //   docType: item.docType || '문서수발신'
-      // }));
-  
-      // const transformedCorpDocData = (corpDocPendingResponses?.content || []).map(item => ({
-      //   draftId: item.draftId,
-      //   title: item.title,
-      //   center: item.instNm || '재단본부',
-      //   draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
-      //   drafter: item.drafter,
-      //   status: '승인대기',
-      //   docType: item.docType || '법인서류'
-      // }));
-  
-      // const transformedSealData = (sealPendingResponses?.content || []).map(item => ({
-      //   draftId: item.draftId,
-      //   title: item.title,
-      //   center: item.instNm || '재단본부',
-      //   draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
-      //   drafter: item.drafter,
-      //   status: '승인대기',
-      //   docType: item.docType || '인장신청'
-      // }));
-  
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
   
       setApplications(transformedData);
