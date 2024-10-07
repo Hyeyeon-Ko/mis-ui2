@@ -61,7 +61,6 @@ function BcdOrder() {
         },
       });
       const data = response.data.data || response.data;
-      console.log(data)
       const totalPages = Math.max(data.totalPages, 1);
       const currentPage = data.number + 1;
 
