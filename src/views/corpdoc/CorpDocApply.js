@@ -161,19 +161,13 @@ function CorpDocApply() {
                                 />
                             </div>
                             <div className='corpDoc-form-group'>
-                                <label>원본 / pdf <span>*</span></label>
-                                <select 
-                                    name="type" 
-                                    value={formData.type}
-                                    onChange={handleChange}
-                                >
-                                    <option value="">선택하세요</option>
-                                    <option value="original">원본</option>
-                                    <option value="pdf">PDF</option>
-                                    <option value="both">원본 + PDF</option>
-                                </select>
-                            </div> &nbsp;
-
+                                <label>근거서류 <span>*</span></label>
+                                <input
+                                    type="file"
+                                    name="department"
+                                    onChange={handleFileChange}
+                                />
+                            </div>
                             <div className='corpDoc-form-group'>
                                 <label>필요서류/수량</label>
                                 {corpDocGroup.map((doc) => (
@@ -202,13 +196,18 @@ function CorpDocApply() {
                             </div> 
                             &nbsp;
                             <div className='corpDoc-form-group'>
-                                <label>근거서류 <span>*</span></label>
-                                <input
-                                    type="file"
-                                    name="department"
-                                    onChange={handleFileChange}
-                                />
-                            </div>
+                                <label>원본 / pdf <span>*</span></label>
+                                <select 
+                                    name="type" 
+                                    value={formData.type}
+                                    onChange={handleChange}
+                                >
+                                    <option value="">선택하세요</option>
+                                    <option value="original">원본</option>
+                                    <option value="pdf">PDF</option>
+                                    <option value="both">원본 + PDF</option>
+                                </select>
+                            </div> &nbsp;
                             <div className='corpDoc-form-group'>
                                 <label>특이사항</label>
                                 <textarea
