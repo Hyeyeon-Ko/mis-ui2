@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import '../../styles/authority/AuthorityModal.css';
@@ -13,6 +14,7 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
   const [userName, setUserName] = useState('');
   const [initialRole, setInitialRole] = useState('');
   const [initialStandardChecked, setInitialStandardChecked] = useState(false);
+  const navigate = useNavigate();
 
   const fetchAdminData = useCallback(async (authId) => {
     try {
@@ -38,16 +40,6 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
       console.error('Error fetching admin data:', error);
     }
   }, [adminData, setIsStandardChecked, setQueryResult, setRole]);
-
-  // const resetForm = () => {
-  //   setRole('');
-  //   setUserId('');
-  //   setUserName('');
-  //   setIsStandardChecked(false);
-  //   setInitialRole('');
-  //   setInitialStandardChecked(false);
-  //   setQueryResult([]);
-  // };
 
   const resetForm = useCallback(() => {
     setRole('');
@@ -103,12 +95,16 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
       }]);
       setUserName(userName);
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.message) {
-        alert('본인은 조회할 수 없습니다.');
-        resetForm();
-      } else {
-        console.error('Error fetching user name:', error);
-      }
+        // SessionExpiredException 감지 및 처리
+        if (error.response && error.response.status === 401) {
+          alert('세션이 만료되었습니다. 다시 로그인 해주세요.');
+          navigate('/login');
+        } else if (error.response && error.response.data && error.response.data.message) {
+          alert('본인은 조회할 수 없습니다.');
+          resetForm();
+        } else {
+          console.error('Error fetching user name:', error);
+        }
     }
   };
 
@@ -141,7 +137,11 @@ const AuthorityModal = ({ show, onClose, onSave, adminData, existingAdmins }) =>
       onSave();
       onClose();
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.message) {
+      // SessionExpiredException 감지 및 처리
+      if (error.response && error.response.status === 401) {
+        alert('세션이 만료되었습니다. 다시 로그인 해주세요.');
+        navigate('/login');
+      } else if(error.response && error.response.data && error.response.data.message) {
         alert('이미 존재하는 관리자입니다.');
         resetForm();
       } else {
