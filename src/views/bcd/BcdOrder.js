@@ -25,10 +25,6 @@ function BcdOrder() {
 
   const itemsPerPage = 10;
 
-  useEffect(() => {
-    fetchBcdOrderList(currentPage, itemsPerPage);
-  }, [currentPage]);
-
   const handlePageClick = (event) => {
     const selectedPage = event.selected + 1;
     setCurrentPage(selectedPage);
@@ -85,6 +81,11 @@ function BcdOrder() {
       console.error('Error fetching bcdOrder list: ', error);
     }
   }, [auth.instCd, setApplications]);
+
+  
+  useEffect(() => {
+    fetchBcdOrderList(currentPage, itemsPerPage);
+  }, [currentPage, fetchBcdOrderList]);
 
   // 컴포넌트 마운트 시 발주 리스트 가져오기
   useEffect(() => {

@@ -89,8 +89,7 @@ function MyApplyList() {
     } finally {
       setLoading(false);
     }
-    // eslint-disable-next-line
-  }, [auth.userId, startDate, endDate, documentType]);
+  }, [auth.userId, startDate, endDate, documentType, setTotalPages, setCurrentPage]);
 
   const applyFilters = () => {
     fetchApplications();

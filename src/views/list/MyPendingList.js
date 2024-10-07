@@ -66,8 +66,7 @@ function MyPendingList() {
     } catch (error) {
       console.error('Error fetching pending applications:', error.response ? error.response.data : error.message);
     }
-    // eslint-disable-next-line
-  }, [auth.userId]); 
+  }, [auth.userId, setTotalPages, setCurrentPage]); 
 
   useEffect(() => {
     fetchPendingApplications();
