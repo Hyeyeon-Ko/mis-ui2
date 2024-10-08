@@ -37,11 +37,6 @@ function SealTotalRegistrationList() {
     }
   };
 
-  useEffect(() => {
-    fetchTotalRegistrationList(currentPage, itemsPerPage);
-    // eslint-disable-next-line
-  }, [currentPage]);
-
   const handlePageClick = (event) => {
     const selectedPage = event.selected + 1;
     setCurrentPage(selectedPage);
@@ -62,7 +57,6 @@ function SealTotalRegistrationList() {
     };
 
     fetchCenterData(); 
-    fetchTotalRegistrationList(); 
   }, [setFilteredApplications]);
 
   return (

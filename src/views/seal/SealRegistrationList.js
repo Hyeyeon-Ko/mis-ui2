@@ -37,7 +37,6 @@ function SealRegistrationList() {
       const response = await axios.get(`/api/seal/registrationList2`, {
         params: {
           // ApplyRequestDTO parameters
-          userId: auth.userId || '',
           instCd: auth.instCd || '',
 
           // PostPageRequest parameters
