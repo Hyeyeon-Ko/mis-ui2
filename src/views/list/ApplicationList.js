@@ -204,8 +204,8 @@ function ApplicationsList() {
           // PostSearchRequestDTO parameters
           searchType: filters.searchType,
           keyword: filters.keyword,
-          startDate: formattedStartDate ? formattedStartDate : filters.startDate,
-          endDate: formattedEndDate ? formattedEndDate : filters.endDate,
+          startDate: filters.startDate,
+          endDate: filters.endDate,
 
           // PostPageRequest parameters
           pageIndex,
