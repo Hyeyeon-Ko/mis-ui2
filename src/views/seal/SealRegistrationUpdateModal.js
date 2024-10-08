@@ -13,7 +13,6 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
   const fetchSealDetail = useCallback(async (id) => {
     try {
       const response = await axios.get(`/api/seal/register/${id}`);
-      console.log(response);
       if (response.data.code === 200) {
         const data = response.data.data;
         setFormData({

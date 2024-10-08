@@ -228,7 +228,6 @@ function DetailSealExportApplication() {
     };
 
     const handleRejectConfirm = async (reason) => {
-        console.log(auth.userId);
         try {
             const response = await axios.post(`/api/seal/return/${draftId}`, {
                 userId: auth.userId,    

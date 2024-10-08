@@ -97,7 +97,7 @@ function SealExportList() {
       console.error('Error fetching seal export list:', error);
       alert('인장 반출대장 데이터를 불러오는 중 오류가 발생했습니다.');
     }
-  }, [auth]);
+  }, [auth, formattedEndDate, formattedStartDate]);
 
   useEffect(() => {
     if (initialLoad) {

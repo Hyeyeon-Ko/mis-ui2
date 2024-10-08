@@ -224,7 +224,6 @@ function DetailApplication() {
       engAddress: formData.engAddress,
       division: formData.cardType === 'personal' ? 'B' : 'A',
       quantity: formData.quantity,
-      userId: auth.userId,
     };
 
     try {

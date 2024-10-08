@@ -54,7 +54,6 @@ function MyApplyList() {
   
       const data = response.data?.data || {};
 
-      console.log(data);
     
       const pagedResult = data.pagedResult || {}; 
       const combinedData = pagedResult.content || []; 
