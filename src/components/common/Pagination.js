@@ -4,6 +4,7 @@ import '../../styles/common/Pagination.css';
 
 function Pagination({ totalPages, onPageChange }) {
   return (
+    <div className='pagination-layout'>
     <ReactPaginate
       breakLabel="<...>"
       nextLabel=">"
@@ -15,6 +16,7 @@ function Pagination({ totalPages, onPageChange }) {
       containerClassName="pagination"
       activeClassName="active"
     />
+    </div>
   );
 }
 
