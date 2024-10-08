@@ -24,6 +24,7 @@ function SealRegistrationList() {
 
   useEffect(() => {
     fetchSealRegistrationList(currentPage, itemsPerPage);
+    // eslint-disable-next-line
   }, [currentPage]);
 
   const handlePageClick = (event) => {
@@ -71,7 +72,7 @@ function SealRegistrationList() {
       console.error('Error fetching seal registration list:', error);
       alert('데이터를 불러오는 중 오류가 발생했습니다.');
     }
-  }, [auth.instCd]);
+  }, [auth.instCd, auth.userId]);
 
   useEffect(() => {
     fetchSealRegistrationList();
