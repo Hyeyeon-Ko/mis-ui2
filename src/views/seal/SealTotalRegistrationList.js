@@ -3,10 +3,49 @@ import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import '../../styles/seal/SealTotalRegistrationList.css';
 import { useSealForm } from '../../hooks/useSealForm';
+import Pagination from '../../components/common/Pagination';
 
 function SealTotalRegistrationList() {
   const [centerData, setCenterData] = useState([]);
   const {handleCenterChange, selectedCenter, filteredApplications, setFilteredApplications} = useSealForm();
+
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
+  const itemsPerPage = 10;
+
+  const fetchTotalRegistrationList = async (pageIndex = 1, pageSize = itemsPerPage) => {
+    try {
+      const response = await axios.get(`/api/seal/totalRegistrationList2`, {
+        params: {
+          // PostPageRequest parameters
+          pageIndex,
+          pageSize,
+        },
+      });
+
+      const data = response.data.data;
+      const totalPages = data.totalPages;
+      const currentPage = data.number + 1;
+      
+      setFilteredApplications(data);
+      setTotalPages(totalPages);
+      setCurrentPage(currentPage);
+
+    } catch (error) {
+      console.error('Error fetching total registration list:', error);
+      alert('데이터를 불러오는 중 오류가 발생했습니다.');
+    }
+  };
+
+  useEffect(() => {
+    fetchTotalRegistrationList(currentPage, itemsPerPage);
+    // eslint-disable-next-line
+  }, [currentPage]);
+
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
+  };
 
   useEffect(() => {
     const fetchCenterData = async () => {
@@ -19,16 +58,6 @@ function SealTotalRegistrationList() {
       } catch (error) {
         console.error('Error fetching center list:', error);
         alert('센터 목록을 불러오는 중 오류가 발생했습니다.');
-      }
-    };
-
-    const fetchTotalRegistrationList = async () => {
-      try {
-        const response = await axios.get(`/api/seal/totalRegistrationList`);
-        setFilteredApplications(response.data.data);
-      } catch (error) {
-        console.error('Error fetching total registration list:', error);
-        alert('데이터를 불러오는 중 오류가 발생했습니다.');
       }
     };
 
@@ -88,6 +117,7 @@ function SealTotalRegistrationList() {
           )}
         </tbody>
       </table>
+      <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
       </div>
     </div>
   );
