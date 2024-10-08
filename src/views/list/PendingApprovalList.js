@@ -119,27 +119,30 @@ function PendingApprovalList() {
       ];
 
       const selectedData = combinedData.find(response => response.totalElements > 0);
+      
+      if(selectedData) {
+        const totalPages = selectedData.totalPages;
+        const currentPage = selectedData.number + 1;
+        const content = selectedData.content;
+        const filteredData = content.filter(application => application.applyStatus !== 'X');
 
-      const totalPages = selectedData.totalPages;
-      const currentPage = selectedData.number + 1;
-      const content = selectedData.content;
-      const filteredData = content.filter(application => application.applyStatus !== 'X');
+        const transformedData = filteredData.map(item => ({
+          draftId: item.draftId,
+          title: item.title,
+          center: item.instNm || '재단본부',
+          draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
+          drafter: item.drafter,
+          status: '승인대기',
+          docType: item.docType
+        }));
+    
+        transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
+        setApplications(transformedData);
+        setTotalPages(totalPages);
+        setCurrentPage(currentPage);
+      }
   
-      const transformedData = filteredData.map(item => ({
-        draftId: item.draftId,
-        title: item.title,
-        center: item.instNm || '재단본부',
-        draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
-        drafter: item.drafter,
-        status: '승인대기',
-        docType: item.docType
-      }));
-  
-      transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
-  
-      setApplications(transformedData);
-      setTotalPages(totalPages);
-      setCurrentPage(currentPage);
+      
     } catch (error) {
       console.error('Error fetching pending list: 데이터를 불러오는 중 오류가 발생했습니다.', error);
     } finally {
