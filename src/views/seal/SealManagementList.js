@@ -133,7 +133,7 @@ function SealManagementList() {
     } catch (error) {
       console.error('Error fetching seal management list:', error);
     }
-  }, [auth, setApplications, setFilteredApplications]);
+  }, [auth, setApplications, setFilteredApplications, formattedEndDate, formattedStartDate ]);
 
   useEffect(() => {
     fetchSealManagementList();

@@ -37,7 +37,7 @@ function SealRegistrationList() {
         // ApplyRequestDTO parameters
         userId: auth.userId || '',
         instCd: auth.instCd || '',
-        documentType: '',
+       // documentType: '',
 
         // PostPageRequest parameters
         pageIndex,
@@ -49,7 +49,7 @@ function SealRegistrationList() {
       const currentPage = data.number + 1;
 
       if (response.data.code === 200) {
-        const data = data.content.map(item => ({
+        const data2 = data.content.map(item => ({
           draftId: item.draftId,
           seal: item.sealNm,
           sealImage: item.sealImage, 
@@ -61,7 +61,7 @@ function SealRegistrationList() {
           draftDate: item.draftDate,
         }));
 
-        setFilteredApplications(data);
+        setFilteredApplications(data2);
         setTotalPages(totalPages);
         setCurrentPage(currentPage);
       } else {

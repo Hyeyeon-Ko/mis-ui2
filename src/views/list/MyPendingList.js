@@ -31,7 +31,6 @@ function MyPendingList() {
         },
       });
 
-      console.log(response);
 
       if (response.data && response.data.data) {
         const pagedResult = response.data.data.pagedResult || {};  

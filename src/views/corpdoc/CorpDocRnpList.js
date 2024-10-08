@@ -28,6 +28,7 @@ function CorpDocRnpList() {
 
   useEffect(() => {
     fetchRnpData(currentPage, itemsPerPage);
+    // eslint-disable-next-line
   }, [currentPage]);
 
   const handlePageClick = (event) => {
@@ -61,7 +62,6 @@ function CorpDocRnpList() {
         const data = response.data.data
         const totalPages = data.totalPages;
         const currentPage = data.number + 1;
-        console.log("data: ", data)
 
         const rnpListData = data.map(item => ({
           id: item.draftId,
@@ -90,7 +90,7 @@ function CorpDocRnpList() {
     } catch (error) {
       console.error("Error fetching RNP data:", error);
     }
-  }, [auth.instCd]);
+  }, [auth.instCd, defaultEndDate, defaultStartDate]);
 
   useEffect(() => {
     if (!initialDataLoaded) {

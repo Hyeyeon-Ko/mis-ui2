@@ -29,7 +29,7 @@ function DocInList() {
 
   const [downloadType, setDownloadType] = useState(null);
   const [totalPages, setTotalPages] = useState('1');
-  const [currentPage, setCurrentPage] = useState('1');
+  const [, setCurrentPage] = useState('1');
 
   const [filteredApplications, setFilteredApplications] = useState([]);
 
@@ -264,7 +264,6 @@ function DocInList() {
 
       const data = response.data?.data || {};
       const content = data.content || [];
-      console.log(content)
 
       if (response.data && response.data.data) {
         const formattedData = content.map((item) => ({
@@ -279,7 +278,6 @@ function DocInList() {
           fileUrl: item.fileUrl,
           docType: deriveDocType(item.filePath),
         }));
-        console.log(formattedData)
         setApplications(formattedData);
         setFilteredApplications(formattedData);
       }
