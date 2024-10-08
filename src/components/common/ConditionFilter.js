@@ -63,7 +63,14 @@ const ConditionFilter = ({
 
   // 검색 버튼 클릭 시 호출할 함수
   const handleSearch = () => {
-    onSearch();
+    // onSearch();
+    onSearch({
+      startDate,
+      endDate,
+      documentType,
+      filters,
+      keyword,
+    });
   };
 
   const handleStartDateChange = (event) => {
@@ -229,10 +236,10 @@ const ConditionFilter = ({
               onChange={handleDocumentTypeChange}
             >
               <option value="">전체</option>
-              <option value="명함신청">명함신청</option>
-              <option value="문서수발신">문서수발신</option>
-              <option value="법인서류">법인서류</option>
-              <option value="인장신청">인장신청</option>
+              <option value="A">명함신청</option>
+              <option value="B">문서수발신</option>
+              <option value="C">법인서류</option>
+              <option value="D">인장신청</option>
             </select>
           </>
         )}
