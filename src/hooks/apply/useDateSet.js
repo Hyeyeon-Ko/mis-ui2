@@ -17,7 +17,6 @@ const useDateSet = () => {
 
     const formattedToday = formatDate(today);
     const formattedOneMonthAgo = formatDate(oneMonthAgo);
-    console.log(formattedToday, formattedOneMonthAgo)
 
     return { formattedStartDate: formattedOneMonthAgo, formattedEndDate: formattedToday };
   }, []);

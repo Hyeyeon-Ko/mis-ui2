@@ -35,14 +35,16 @@ function SealRegistrationList() {
   const fetchSealRegistrationList = useCallback(async (pageIndex = 1, pageSize = itemsPerPage) => {
     try {
       const response = await axios.get(`/api/seal/registrationList2`, {
-        // ApplyRequestDTO parameters
-        userId: auth.userId || '',
-        instCd: auth.instCd || '',
-       // documentType: '',
+        params: {
+          // ApplyRequestDTO parameters
+          userId: auth.userId || '',
+          instCd: auth.instCd || '',
 
-        // PostPageRequest parameters
-        pageIndex,
-        pageSize
+          // PostPageRequest parameters
+          pageIndex,
+          pageSize
+        }
+        
       });
 
       const data = response.data.data;
@@ -50,7 +52,7 @@ function SealRegistrationList() {
       const currentPage = data.number + 1;
 
       if (response.data.code === 200) {
-        const data2 = data.content.map(item => ({
+        const dataList = data.content.map(item => ({
           draftId: item.draftId,
           seal: item.sealNm,
           sealImage: item.sealImage, 
@@ -62,7 +64,7 @@ function SealRegistrationList() {
           draftDate: item.draftDate,
         }));
 
-        setFilteredApplications(data2);
+        setFilteredApplications(dataList);
         setTotalPages(totalPages);
         setCurrentPage(currentPage);
       } else {
