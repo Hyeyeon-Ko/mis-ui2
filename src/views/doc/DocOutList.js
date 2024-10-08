@@ -183,7 +183,6 @@ const handleDownloadConfirm = async ({ downloadNotes, downloadType }) => {
       }
     } else if (downloadMode === 'multiple') { 
       const requestData = selectedRows.map((draftId) => {
-        const selectedApp = filteredApplications.find(app => app.draftId === draftId);
         return {
           draftId: draftId,
           downloadType: convertedFileType,
