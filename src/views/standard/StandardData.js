@@ -2,13 +2,12 @@ import React, { useEffect, useState, useContext, useRef } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import StandardAddModal from '../standard/StandardAddModal';
+import Pagination from '../../components/common/Pagination';
 import '../../styles/standard/StandardData.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 import useStandardChange from '../../hooks/useStandardChange';
-
-
 
 function StandardData() {
   const {selectedDetails, details, setSelectedDetails,setDetails, handleDetailSelect, handleSelectAll} = useStandardChange();
@@ -20,11 +19,19 @@ function StandardData() {
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('detail');
   const [editDetailData, setEditDetailData] = useState(null);
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
   const { auth } = useContext(AuthContext);
 
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
   const dragMode = useRef('select');
+
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    fetchDetails(currentPage, itemsPerPage);
+  }, [currentPage]);
 
   const categories = [
     { categoryCode: 'A', categoryName: 'A 공통' },
@@ -58,25 +65,37 @@ function StandardData() {
     }
   };
 
-  const fetchDetails = async (groupCd) => {
+  const fetchDetails = async (groupCd, pageIndex = 1, pageSize = itemsPerPage) => {
     try {
-      const response = await axios.get(`/api/std/detailInfo`, { params: { groupCd } });
-      const data = response.data.data || [];
-      if (Array.isArray(data)) {
-        data.sort((a, b) => parseInt(a.detailCd, 10) - parseInt(b.detailCd, 10));
-        setDetails(data);
+      const response = await axios.get(`/api/std/detailInfo2`, { params: { groupCd, pageIndex, pageSize } });
+      const data = response.data.data;
+      const totalPages = data.totalPages;
+      const currentPage = data.number + 1;
+      const detailsData = data.content || [];
+  
+      if (Array.isArray(detailsData)) {
+        detailsData.sort((a, b) => parseInt(a.detailCd, 10) - parseInt(b.detailCd, 10));
+        setDetails(detailsData);
+        setTotalPages(totalPages);
+        setCurrentPage(currentPage);
       } else {
-        console.error('예상치 못한 데이터 형식:', data);
+        console.error('Unexpected data format:', data);
         setDetails([]);
       }
       setSelectedDetails([]);
     } catch (error) {
-      console.error('상세 정보를 가져오는 중 에러 발생:', error);
+      console.error('Error fetching details:', error);
       setDetails([]);
       setSelectedDetails([]);
     }
   };
-
+    
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;  
+    setCurrentPage(selectedPage);
+    fetchDetails(selectedSubCategory, selectedPage, itemsPerPage); 
+  };
+  
   const fetchSelectedDetail = async (groupCd, detailCd) => {
     try {
       const response = await axios.get(`/api/std/detailInfo/${detailCd}`, { params: { groupCd } });
@@ -406,12 +425,13 @@ function StandardData() {
               <Table
                 columns={detailColumns}
                 data={details}
-                onRowClick={handleRowClick}  
-                onRowMouseDown={handleMouseDown}  
-                onRowMouseOver={handleMouseOver}  
-                onRowMouseUp={handleMouseUp}    
+                onRowClick={handleRowClick}
+                onRowMouseDown={handleMouseDown}
+                onRowMouseOver={handleMouseOver}
+                onRowMouseUp={handleMouseUp}
               />
             </div>
+            <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
           </div>
         </div>
       </div>
