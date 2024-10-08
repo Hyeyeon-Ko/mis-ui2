@@ -27,7 +27,7 @@ function DocInList() {
 
   const [filterInputs, setFilterInputs] = useState(docFilterData);
 
-  const [downloadType, setDownloadType] = useState(null);
+  const [downloadMode, setDownloadMode] = useState(null); 
   const [totalPages, setTotalPages] = useState('1');
   const [, setCurrentPage] = useState('1');
 
@@ -127,33 +127,52 @@ function DocInList() {
   const handleFileDownloadClick = (draftId, fileName) => {
     setSelectedDraftId(draftId);
     setSelectedFileName(fileName);
-    setDownloadType("single");
+    setDownloadMode('single'); 
     setShowDownloadReasonModal(true);
-  };
+};
+
+const handleDownloadFiles = () => {
+    if (selectedRows.length === 0) {
+      alert('다운로드할 파일을 선택하세요.');
+      return;
+    }
+    setDownloadMode('multiple'); 
+    setShowDownloadReasonModal(true);
+};
 
   const handleDownloadModalClose = () => {
     setShowDownloadReasonModal(false);
     setSelectedDraftId(null);
     setSelectedFileName("");
-    setDownloadType(null);
+    setDownloadMode(null);
   };
 
-  const handleDownloadConfirm = async ({ reason, fileType }) => {
+  const handleDownloadConfirm = async ({ downloadNotes, downloadType }) => {
     setShowDownloadReasonModal(false);
+    
+    const downloadTypeMap = {
+      'draft': 'A',
+      'order': 'B',
+      'approval': 'C',
+      'check': 'D',
+      'etc': 'Z',
+    };
 
-    if (downloadType === "single") {
+    const convertedFileType = downloadTypeMap[downloadType] || '';
+    const finalDownloadNotes = downloadType === 'etc' ? downloadNotes : null;
+  
+
+    if (downloadMode === "single") {
       try {
-        const response = await axios.get(
-          `/api/file/download/${encodeURIComponent(selectedFileName)}`,
+        const response = await axios.get(`/api/file/download/${encodeURIComponent(selectedFileName)}`,
           {
             params: {
               draftId: selectedDraftId,
-              docType: "doc",
-              fileType: fileType,
-              reason: reason,
+              downloadType: convertedFileType,
+              downloadNotes: finalDownloadNotes, 
               downloaderNm: auth.hngNm,
               downloaderId: auth.userId,
-            },
+              },
             responseType: "blob",
           }
         );
@@ -169,30 +188,22 @@ function DocInList() {
         console.error("Error downloading the file:", error);
         alert("파일 다운로드에 실패했습니다.");
       }
-    } else if (downloadType === "multiple") {
+    } else if (downloadMode === "multiple") {
       const requestData = selectedRows.map((draftId) => {
-        const selectedApp = filteredApplications.find(
-          (app) => app.draftId === draftId
-        );
+        const selectedApp = filteredApplications.find((app) => app.draftId === draftId);
         return {
           draftId: draftId,
-          docType: selectedApp ? selectedApp.docType : "doc",
-          fileName: selectedApp ? selectedApp.fileName : "",
-          fileType: fileType,
-          reason: reason,
+          downloadType: convertedFileType,
+          downloadNotes: finalDownloadNotes,
           downloaderNm: auth.hngNm,
           downloaderId: auth.userId,
         };
       });
 
       try {
-        const response = await axios.post(
-          "/api/file/download/multiple",
-          requestData,
-          {
-            responseType: "blob",
-          }
-        );
+        const response = await axios.post("/api/file/download/multiple", requestData, {
+          responseType: "blob",
+        });
 
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement("a");
@@ -209,7 +220,7 @@ function DocInList() {
       }
     }
 
-    setDownloadType(null);
+    setDownloadMode(null);
   };
 
   const handleDeleteClick = (draftId) => {
@@ -305,15 +316,6 @@ function DocInList() {
   const handleReset = () => {
     resetFilters();
     fetchDocInList();
-  };
-
-  const handleDownloadFiles = () => {
-    if (selectedRows.length === 0) {
-      alert("다운로드할 파일을 선택하세요.");
-      return;
-    }
-    setDownloadType("multiple");
-    setShowDownloadReasonModal(true);
   };
 
   const columns = [
