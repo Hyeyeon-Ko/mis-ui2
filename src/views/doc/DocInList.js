@@ -31,12 +31,12 @@ function DocInList() {
   const [totalPages, setTotalPages] = useState('1');
   const [currentPage, setCurrentPage] = useState('1');
 
+  const [filteredApplications, setFilteredApplications] = useState([]);
+
   const {
     handleSelectRow,
     handleSelectAll,
-    setFilteredApplications,
     selectedRows,
-    filteredApplications,
     setSelectedRows,
   } = useDocChange();
 
@@ -60,17 +60,13 @@ function DocInList() {
       endDate = null,
       pageIndex = 1, 
       pageSize = 10,
-      status ="A",
+      status = "A"
     ) => {
       try {
-        const formattedStartDate = startDate
-          ? startDate.toISOString().split("T")[0]
-          : "";
-        const formattedEndDate = endDate
-          ? endDate.toISOString().split("T")[0]
-          : "";
-
-        const response = await axios.get("/api/doc/receiveList2", {
+        const formattedStartDate = startDate?.toISOString().split('T')[0] || '';
+        const formattedEndDate = endDate?.toISOString().split('T')[0] || '';
+  
+        const response = await axios.get('/api/doc/receiveList2', {
           params: {
             instCd: auth.instCd,
             searchType,
@@ -82,9 +78,13 @@ function DocInList() {
             status,
           },
         });
-
-        if (response.data && response.data.data) {
-          const formattedData = response.data.data.map((item) => ({
+  
+        const content = response.data?.data?.content ?? [];
+        const totalPages = response.data?.data?.totalPages ?? 1;
+        const currentPage = response.data?.data?.number + 1 || 1;
+  
+        if (content.length) {
+          const formattedData = content.map(item => ({
             draftId: item.draftId,
             draftDate: item.draftDate,
             docId: item.docId,
@@ -96,16 +96,18 @@ function DocInList() {
             fileUrl: item.fileUrl,
             docType: deriveDocType(item.filePath),
           }));
+  
           setApplications(formattedData);
           setFilteredApplications(formattedData);
+          setTotalPages(totalPages);
+          setCurrentPage(currentPage);
+        } else {
+          console.warn("No content found in response.");
         }
-        setTotalPages(totalPages);
-        setCurrentPage(currentPage);
       } catch (error) {
         console.error("Error fetching document list:", error);
       }
     },
-    // eslint-disable-next-line
     [auth.instCd, setFilteredApplications]
   );
 
@@ -260,8 +262,12 @@ function DocInList() {
         },
       });
 
+      const data = response.data?.data || {};
+      const content = data.content || [];
+      console.log(content)
+
       if (response.data && response.data.data) {
-        const formattedData = response.data.data.map((item) => ({
+        const formattedData = content.map((item) => ({
           draftId: item.draftId,
           draftDate: item.draftDate,
           docId: item.docId,
@@ -273,6 +279,7 @@ function DocInList() {
           fileUrl: item.fileUrl,
           docType: deriveDocType(item.filePath),
         }));
+        console.log(formattedData)
         setApplications(formattedData);
         setFilteredApplications(formattedData);
       }
@@ -313,14 +320,9 @@ function DocInList() {
 
   const columns = [
     {
-      header: (
-        <input
-          type="checkbox"
-          onChange={(e) => handleSelectAll(e.target.checked)}
-        />
-      ),
-      accessor: "select",
-      width: "4%",
+      header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
+      accessor: 'select',
+      width: '4%',
       Cell: ({ row }) => (
         <input
           type="checkbox"
@@ -329,30 +331,27 @@ function DocInList() {
         />
       ),
     },
-    { header: "접수일자", accessor: "draftDate", width: "8%" },
-    { header: "문서번호", accessor: "docId", width: "8%" },
-    { header: "발신처", accessor: "resSender", width: "10%" },
-    { header: "제목", accessor: "title", width: "20%" },
+    { header: '접수일자', accessor: 'draftDate', width: '12%', Cell: ({ row }) => row.draftDate.split('T')[0] },
+    { header: '문서번호', accessor: 'docId', width: '8%' },
+    { header: '수신처', accessor: 'resSender', width: '10%' },
+    { header: '제목', accessor: 'title', width: '20%' },
     {
-      header: "첨부파일",
-      accessor: "file",
-      width: "7%",
+      header: '첨부파일',
+      accessor: 'fileName',
+      width: '10%',
       Cell: ({ row }) =>
         row.fileName ? (
-          <button
-            className="download-button"
-            onClick={() => handleFileDownloadClick(row.draftId, row.fileName)}
-          >
+          <button className="download-button" onClick={() => handleFileDownloadClick(row.draftId, row.fileName)}>
             <img src={downloadIcon} alt="Download" className="action-icon" />
           </button>
         ) : null,
     },
-    { header: "접수인", accessor: "drafter", width: "8%" },
-    { header: "상태", accessor: "status", width: "8%" },
+    { header: '접수인', accessor: 'drafter', width: '8%' },
+    { header: '상태', accessor: 'status', width: '8%' },
     {
-      header: "신청 삭제",
-      accessor: "delete",
-      width: "7%",
+      header: '신청 삭제',
+      accessor: 'delete',
+      width: '7%',
       Cell: ({ row }) => (
         <div className="icon-cell">
           <img
