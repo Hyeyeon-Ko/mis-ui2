@@ -1,13 +1,20 @@
+.pagination-layout {
+  display: flex;
+  justify-content: center;
+}
+
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
   list-style-type: none;
   padding: 0;
-  margin-top: 50px;
-  position: relative;
+  margin: 0;
+  bottom: 50px;
+  left: 50%; 
+  transform: translateX(30%); 
+  position: fixed;
   z-index: 1000; 
-  width: 100%; 
 }
 
 .pagination li {
