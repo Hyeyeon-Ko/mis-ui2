@@ -68,6 +68,7 @@ const ConditionFilter = ({
       startDate,
       endDate,
       documentType,
+      searchType,
       filters,
       keyword,
     });

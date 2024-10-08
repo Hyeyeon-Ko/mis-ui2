@@ -113,7 +113,22 @@ function ApplicationsList() {
     }
   };
 
-  const applyFilters = useCallback(() => {
+  const applyFilters = (filterValues) => {
+    // filterValues에서 documentType과 기타 필터 값을 가져옴
+    const { startDate, endDate, documentType, searchType, filters, keyword } = filterValues;
+    
+    const params = {
+      startDate: startDate ? startDate.toISOString().split('T')[0] : '', // 시작일
+      endDate: endDate ? endDate.toISOString().split('T')[0] : '', // 종료일
+      documentType: documentType,
+      searchType: searchType,
+      keyword: keyword, // 검색어
+    };
+
+    fetchApplications(1, itemsPerPage, params);
+  };
+
+  const applyFilters2 = useCallback(() => {
     let filteredData = applications;
 
     if (filterInputs.startDate) {
@@ -172,7 +187,8 @@ function ApplicationsList() {
     setFilteredApplications(filtered);
   }, [filters]);
         
-  const fetchApplications = useCallback(async (filterParams = {}, searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
+  // filterParams = {}, searchType = '전체', keyword = '', startDate = null, endDate = null, 
+  const fetchApplications = useCallback(async (pageIndex = 1, pageSize = itemsPerPage, filters= {}) => {
     setLoading(true);
     setError(null);
     try {
@@ -182,13 +198,14 @@ function ApplicationsList() {
           // ApplyRequestDTO parameters
           userId: auth.userId || '',
           instCd: instCd || '',
-          documentType: convertDocumentType(filterParams.documentType) || convertDocumentType(documentTypeFromUrl) || null,
+          // documentType: convertDocumentType(filterParams.documentType) || convertDocumentType(documentTypeFromUrl) || null,
+          documentType: convertDocumentType(filters.documentType) || convertDocumentType(documentTypeFromUrl) || null,
 
           // PostSearchRequestDTO parameters
-          searchType,
-          keyword,
-          startDate: formattedStartDate,
-          endDate: formattedEndDate,
+          searchType: filters.searchType,
+          keyword: filters.keyword,
+          startDate: formattedStartDate ? formattedStartDate : filters.startDate,
+          endDate: formattedEndDate ? formattedEndDate : filters.endDate,
 
           // PostPageRequest parameters
           pageIndex,
@@ -323,9 +340,9 @@ function ApplicationsList() {
     }));
   };
         
-  const handleSearch = () => {
-    applyFilters();
-  };
+  // const handleSearch = () => {
+  //   applyFilters();
+  // };
       
   const handleReset = () => {
     resetFilters();
@@ -479,7 +496,8 @@ function ApplicationsList() {
           filters={filters}
           setFilters={setFilters}
           onFilterChange={handleFilterChange}
-          onSearch={handleSearch}
+          // onSearch={handleSearch}
+          onSearch={applyFilters}
           onReset={handleReset}
           showStatusFilters={showStatusFilters}
           showSearchCondition={true}
