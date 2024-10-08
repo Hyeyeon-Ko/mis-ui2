@@ -79,8 +79,8 @@ function TotalRentalManage() {
           },
       },
       { header: 'NO', accessor: 'no' },
-      { header: '제품군', accessor: 'category' },
       { header: '업체명', accessor: 'companyNm' },
+      { header: '제품군', accessor: 'category' },
       { header: '계약번호', accessor: 'contractNum' },
       { header: '모델명', accessor: 'modelNm' },
       { header: '설치일자', accessor: 'installDate' },
@@ -113,9 +113,10 @@ function TotalRentalManage() {
 
         const centerMapping = {
           "100": centerRentalResponses.foundationResponses,
-          "111": centerRentalResponses.gwanghwamunResponses,
+          "111": centerRentalResponses.bonwonResponses,
           "112": centerRentalResponses.yeouidoResponses,
           "113": centerRentalResponses.gangnamResponses,
+          "119": centerRentalResponses.gwanghwamunResponses,
           "211": centerRentalResponses.suwonResponses,
           "611": centerRentalResponses.daeguResponses,
           "612": centerRentalResponses.busanResponses,

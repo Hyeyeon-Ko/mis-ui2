@@ -12,8 +12,8 @@ export const addFormData = {
 }
 
 export const formFields = [
-    { label: '제품군', name: 'category', type: 'text' },
     { label: '업체명', name: 'companyNm', type: 'text' },
+    { label: '제품군', name: 'category', type: 'text' },
     { label: '계약번호', name: 'contractNum', type: 'text' },
     { label: '모델명', name: 'modelNm', type: 'text' },
     { label: '설치일자', name: 'installDate', type: 'text', placeholder: 'YYYY-MM-DD' },

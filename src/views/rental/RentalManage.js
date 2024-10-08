@@ -128,13 +128,23 @@ function RentalManage() {
         alert("삭제할 항목을 선택하세요.");
         return;
     }
-  
+
+    const completedItems = selectedRows.filter(rowId => {
+        const selectedItem = rentalDetails.find(item => item.detailId === rowId);
+        return selectedItem && selectedItem.status === '완료';
+    });
+
+    if (completedItems.length > 0) {
+        alert("완료된 내역은 삭제할 수 없습니다.");
+        return;
+    }
+
     try {
         for (const detailId of selectedRows) {
             await axios.delete(`/api/rental/`, { params: { detailId } });
         }
         alert('선택된 항목이 삭제되었습니다.');
-  
+
         setRentalDetails(prevDetails => {
             const updatedDetails = prevDetails
                 .filter(item => !selectedRows.includes(item.detailId))
@@ -145,13 +155,13 @@ function RentalManage() {
             
             return updatedDetails;
         });
-  
+
         setSelectedRows([]); 
     } catch (error) {
         console.error('렌탈현황 정보를 삭제하는 중 에러 발생:', error);
         alert('삭제에 실패했습니다.');
     }
-  };
+};
 
   const handleFinishButtonClick = async () => {
     if (selectedRows.length === 0) {
@@ -258,8 +268,8 @@ function RentalManage() {
     },
     { header: 'NO', accessor: 'no' },
     { header: '상태', accessor: 'status' },
-    { header: '제품군', accessor: 'category' },
     { header: '업체명', accessor: 'companyNm' },
+    { header: '제품군', accessor: 'category' },
     { header: '계약번호', accessor: 'contractNum' },
     { header: '모델명', accessor: 'modelNm' },
     { header: '설치일자', accessor: 'installDate' },

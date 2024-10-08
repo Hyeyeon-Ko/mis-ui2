@@ -63,20 +63,20 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
             instCd: auth.instCd, 
           }));
   
-        axios.post(`/api/rental/data`, extractedData)
+          axios.post(`/api/rental/data`, extractedData)
           .then((response) => {
             onSave(response.data); 
             onClose();
           })
           .catch((error) => {
             console.error('Error sending data:', error);
-            if (error.response && error.response.status === 400) {
-              alert("모든 항목을 입력하세요."); 
+            if (error.response && error.response.data && error.response.data.message) {
+              alert(`${error.response.data.message}`);
             } else {
-              alert('데이터 전송 중 오류가 발생했습니다.');
+              alert('데이터 저장 중 오류가 발생했습니다.');
             }
-          });
-      };
+          });        
+    };
       reader.readAsArrayBuffer(file);
     } else if (activeTab === 'text') {
       const {
