@@ -43,7 +43,7 @@ function CorpDocIssueList() {
   const [totalPages, setTotalPages] = useState('1')
   const [currentPage, setCurrentPage] = useState('1')
   const [totalPendingPages, setTotalPendingPages] = useState('1')
-  const [currentPendingPage, setCurrentPendingPage] = useState('1')
+  const [currentPendingPage, setCurrentPendingPage] = useState(1)
 
   const itemsPerPage = 10;
 
@@ -137,6 +137,8 @@ function CorpDocIssueList() {
         const data = response.data.data;
         const totalPendingPages = data.totalPages;
         const currentPendingPage = data.number + 1;
+
+        console.log(currentPendingPage);
 
         const issuePendingListContent = Array.isArray(data.content) ? data.content : [];
         const issuePendingListData = issuePendingListContent.map(item => ({
@@ -431,7 +433,12 @@ function CorpDocIssueList() {
               )}
             </tbody>
           </table>
-          <Pagination type="issuePendingList" totalPendingPages={totalPendingPages} onPageChange={handlePendingPageClick} />
+          <Pagination 
+            type="issuePendingList" 
+            totalPages={totalPendingPages} 
+            currentPage={currentPendingPage} 
+            onPageChange={handlePendingPageClick} 
+          />
         </div>
       </div>
       {modalVisible && selectedDocumentDetails && (
