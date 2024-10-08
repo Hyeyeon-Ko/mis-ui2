@@ -39,12 +39,11 @@ function CorpDocIssueList() {
     '수원센터', '대구센터', '부산센터', '광주센터', '제주센터', '협력사'
   ]);
 
-  const { formattedStartDate: defaultStartDate, formattedEndDate: defaultEndDate } = useDateSet();
+  const { defaultStartDate, defaultEndDate } = useDateSet();
   const [totalPages, setTotalPages] = useState('1')
   const [currentPage, setCurrentPage] = useState('1')
   const [totalPendingPages, setTotalPendingPages] = useState('1')
-  // const [currentPendingPage, setCurrentPendingPage] = useState('1')
-  const [setCurrentPendingPage] = useState('1')
+  const [currentPendingPage, setCurrentPendingPage] = useState('1')
 
   const itemsPerPage = 10;
 
@@ -53,18 +52,21 @@ function CorpDocIssueList() {
     setCurrentPage(selectedPage);
   };
 
+  const handlePendingPageClick = (event) => {
+    const selectedPendingPage = event.selected + 1;
+    setCurrentPendingPage(selectedPendingPage);
+  };
+
   const fetchIssueData = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
     try {
-      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : defaultStartDate;
-      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : defaultEndDate;
 
       const response = await axios.get(`/api/corpDoc/issueList`, {
         params: {
           // PostSearchRequestDTO parameters
           searchType,
           keyword,
-          startDate: formattedStartDate,
-          endDate: formattedEndDate,
+          startDate: defaultStartDate,
+          endDate: defaultEndDate,
 
           // PostPageRequest parameters
           pageIndex,
@@ -75,16 +77,14 @@ function CorpDocIssueList() {
       if (response.data) {
         const data = response.data.data;
 
-        const issueList = data.issueList;
-        const totalPages = issueList.totalPages;
-        const currentPage = issueList.number + 1;
+        const totalPages = data.totalPages;
+        const currentPage = data.number + 1;
 
-        const issueListContent = Array.isArray(issueList.content) ? issueList.content : [];
+        const issueListContent = Array.isArray(data.content) ? data.content : [];
         const issueListData = issueListContent.map(item => ({
           id: item.draftId,
           date: item.draftDate,
           issueDate: item.issueDate.split("T")[0],
-          drafter: item.drafter,
           submission: item.submission || '', 
           purpose: item.purpose || '',       
           corpSeal: {
@@ -106,11 +106,39 @@ function CorpDocIssueList() {
           signitureImage: SignitureImage,
         }));
 
-        const issuePendingList = data.issuePendingList;
-        const totalPendingPages = issueList.totalPages;
-        const currentPendingPage = issueList.number + 1;
+        setApplications(issueListData);
 
-        const issuePendingListContent = Array.isArray(issuePendingList.content) ? issuePendingList.content : [];
+        const totalValues = extractTotalValues(issueListData);
+        setTotalCorpseal(totalValues.totalCorpseal);
+        setTotalCoregister(totalValues.totalCoregister);
+
+        setInitialDataLoaded(true);
+
+        setTotalPages(totalPages);
+        setCurrentPage(currentPage);
+      }
+    } catch (error) {
+      console.error("Error fetching issue data:", error);
+    }
+  }, []);
+
+  const fetchIssuePendingData = useCallback(async (pageIndex = 1, pageSize = itemsPerPage) => {
+    try {
+
+      const response = await axios.get(`/api/corpDoc/issuePendingList`, {
+        params: {
+          // PostPageRequest parameters
+          pageIndex,
+          pageSize
+        },
+      });
+
+      if (response.data) {
+        const data = response.data.data;
+        const totalPendingPages = data.totalPages;
+        const currentPendingPage = data.number + 1;
+
+        const issuePendingListContent = Array.isArray(data.content) ? data.content : [];
         const issuePendingListData = issuePendingListContent.map(item => ({
           id: item.draftId,
           useDate: item.useDate,
@@ -127,22 +155,15 @@ function CorpDocIssueList() {
           signitureImage: SignitureImage,
         }));
 
-        setApplications(issueListData);
         setPendingApplications(issuePendingListData);
-
-        const totalValues = extractTotalValues(issueListData);
-        setTotalCorpseal(totalValues.totalCorpseal);
-        setTotalCoregister(totalValues.totalCoregister);
 
         setInitialDataLoaded(true);
 
-        setTotalPages(totalPages);
-        setCurrentPage(currentPage);
         setTotalPendingPages(totalPendingPages);
         setCurrentPendingPage(currentPendingPage);
       }
     } catch (error) {
-      console.error("Error fetching issue data:", error);
+      console.error("Error fetching issue pending data:", error);
     }
   }, [defaultEndDate, defaultStartDate, setCurrentPendingPage]);
   
@@ -151,10 +172,15 @@ function CorpDocIssueList() {
   }, [currentPage, fetchIssueData]);
 
   useEffect(() => {
+    fetchIssuePendingData(currentPendingPage, itemsPerPage);
+  }, [currentPendingPage, fetchIssuePendingData]);
+
+  useEffect(() => {
     if (!initialDataLoaded) {
-      fetchIssueData();  
+      fetchIssueData();
+      fetchIssuePendingData();
     }
-  }, [fetchIssueData, initialDataLoaded]);
+  }, [fetchIssueData, fetchIssuePendingData, initialDataLoaded]);
 
   useEffect(() => {
     const filteredApps = applications.filter(app => selectedCenter === '전체' || app.center === selectedCenter);
@@ -182,6 +208,7 @@ function CorpDocIssueList() {
   const handleReset = () => {
     resetFilters();
     fetchIssueData();
+    fetchIssuePendingData();
   };
   
   const extractTotalValues = (data) => {
@@ -240,6 +267,7 @@ function CorpDocIssueList() {
   
       if (response.status === 200) {
         fetchIssueData();
+        fetchIssuePendingData();
         setShowIssueModal(false);
         
         refreshSidebar();
@@ -327,7 +355,7 @@ function CorpDocIssueList() {
                   <td>{index + 1}</td>
                   <td>{app.issueDate}</td>
                   <td>{app.center}</td>
-                  <td>{app.status === "X" ? '' : app.drfater}</td>
+                  <td>{app.status === "X" ? '' : app.applicantName}</td>
                   <td>{app.submission}</td>
                   <td>{app.purpose}</td>
                   <td>{app.corpSeal.incoming}</td>
@@ -336,7 +364,7 @@ function CorpDocIssueList() {
                   <td>{app.registry.incoming}</td>
                   <td>{app.registry.used}</td>
                   <td>{app.registry.left}</td>
-                  <td>{app.note}</td>
+                  <td>{app.note === "P" ? 'PDF' : ''}</td>
                   <td
                     className={`status-${app.approveStatus.replace(/\s+/g, '-').toLowerCase()} clickable ${
                       clickedRows.includes(app.id) ? 'confirmed' : ''}`}
@@ -352,7 +380,7 @@ function CorpDocIssueList() {
             )}
           </tbody>
         </table>
-        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+        <Pagination type="issueList" totalPages={totalPages} onPageChange={handlePageClick} />
         <div className='corpDoc-issue-pending-list'>
           <h3>발급 대기 목록</h3>
           <table className="table">
@@ -403,7 +431,7 @@ function CorpDocIssueList() {
               )}
             </tbody>
           </table>
-          <Pagination totalPendingPages={totalPendingPages} onPageChange={handlePageClick} />
+          <Pagination type="issuePendingList" totalPendingPages={totalPendingPages} onPageChange={handlePendingPageClick} />
         </div>
       </div>
       {modalVisible && selectedDocumentDetails && (
