@@ -63,7 +63,7 @@ function CorpDocRnpList() {
         const totalPages = data.totalPages;
         const currentPage = data.number + 1;
 
-        const rnpListData = data.map(item => ({
+        const rnpListData = data.content.map(item => ({
           id: item.draftId,
           date: item.draftDate,
           drafter: item.drafter,
@@ -179,7 +179,7 @@ function CorpDocRnpList() {
             {applications.length > 0 ? (
               applications.map((app, index) => (
                 <tr key={index}>
-                  <td>{app.date}</td>
+                  <td>{app.date.split('T')[0]}</td>
                   <td>{app.drafter}</td>
                   <td>{app.submission}</td>
                   <td>{app.purpose}</td>
