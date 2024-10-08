@@ -31,14 +31,16 @@ function DocOutList() {
   const [totalPages, setTotalPages] = useState('1')
   const [currentPage, setCurrentPage] = useState('1')
 
+  const [filteredApplications, setFilteredApplications] = useState([]);
+
   const {
     handleSelectRow,
     handleSelectAll,
-    setFilteredApplications,
     selectedRows,
-    filteredApplications,
     setSelectedRows,
   } = useDocChange();
+
+  console.log("Filtered Applications: ", filteredApplications);
 
   const deriveDocType = (filePath) => {
     if (!filePath) return "doc"; 
@@ -59,12 +61,12 @@ function DocOutList() {
     endDate = null,
     pageIndex = 1, 
     pageSize = 10,
-    status ="B",
-    ) => {
+    status = "B",
+  ) => {
     try {
       const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : '';
       const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : '';
-
+      
       const response = await axios.get('/api/doc/receiveList2', {
         params: {
           instCd: auth.instCd,
@@ -77,9 +79,9 @@ function DocOutList() {
           status,
         },
       });
-
-      if (response.data && response.data.data) {
-        const formattedData = response.data.data.map((item) => ({
+  
+      if (response.data && response.data.data && Array.isArray(response.data.data.content)) { 
+        const formattedData = response.data.data.content.map((item) => ({
           draftId: item.draftId,
           draftDate: item.draftDate,
           docId: item.docId,
@@ -91,17 +93,19 @@ function DocOutList() {
           fileUrl: item.fileUrl,
           docType: deriveDocType(item.filePath),
         }));
+    
         setApplications(formattedData);
         setFilteredApplications(formattedData);
+        setTotalPages(response.data.data.totalPages); 
+        setCurrentPage(response.data.data.number + 1); 
+      } else {
+        console.error("Unexpected response structure: ", response.data);
       }
-      setTotalPages(totalPages);
-      setCurrentPage(currentPage);
     } catch (error) {
       console.error('Error fetching document list:', error);
     }
-     // eslint-disable-next-line
   }, [auth.instCd, setFilteredApplications]);
-
+      
   useEffect(() => {
     fetchDocOutList();
   }, [fetchDocOutList]);
@@ -305,14 +309,14 @@ function DocOutList() {
         />
       ),
     },
-    { header: '접수일자', accessor: 'draftDate', width: '8%' },
+    { header: '접수일자', accessor: 'draftDate', width: '12%', Cell: ({ row }) => row.draftDate.split('T')[0] },
     { header: '문서번호', accessor: 'docId', width: '8%' },
     { header: '수신처', accessor: 'resSender', width: '10%' },
     { header: '제목', accessor: 'title', width: '20%' },
     {
       header: '첨부파일',
-      accessor: 'file',
-      width: '7%',
+      accessor: 'fileName',
+      width: '10%',
       Cell: ({ row }) =>
         row.fileName ? (
           <button className="download-button" onClick={() => handleFileDownloadClick(row.draftId, row.fileName)}>
@@ -338,7 +342,7 @@ function DocOutList() {
       ),
     },
   ];
-
+    
   return (
     <div className="content">
       <div className="doc-out-list">
