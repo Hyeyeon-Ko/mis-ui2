@@ -7,6 +7,8 @@ import { AuthContext } from '../../components/AuthContext';
 import axios from 'axios';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import ReasonModal from '../../components/ReasonModal'; 
+import useDateSet from '../../hooks/apply/useDateSet';
+import Pagination from '../../components/common/Pagination';
 import '../../styles/seal/SealExportList.css';
 
 function SealExportList() {
@@ -25,18 +27,48 @@ function SealExportList() {
   const [selectedFileName, setSelectedFileName] = useState('');
   const [selectedDraftId, setSelectedDraftId] = useState(null);
 
-  const fetchSealExportList = useCallback(async (searchType = null, keyword = null) => {
+  const { formattedStartDate, formattedEndDate } = useDateSet();
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
+
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    fetchSealExportList(currentPage, itemsPerPage);
+    // eslint-disable-next-line
+  }, [currentPage]);
+
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
+  };
+
+  const fetchSealExportList = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
     try {
       const { instCd } = auth;
-      const response = await axios.get(`/api/seal/exportList`, {
+      const response = await axios.get(`/api/seal/exportList2`, {
         params: {
-          instCd,
+          // ApplyRequestDTO parameters
+          userId: auth.userId || '',
+          instCd: instCd || '',
+
+          // PostSearchRequestDTO parameters
           searchType,
           keyword,
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+
+          // PostPageRequest parameters
+          pageIndex,
+          pageSize
         },
       });
+
+      const data = response.data.data;
+      const totalPages = data.totalPages;
+      const currentPage = data.number + 1;
       
-      const fetchedData = response.data.data.map((item, index) => ({
+      const fetchedData = data.content.map((item, index) => ({
         id: index + 1, 
         draftId: item.draftId,
         expDate: item.expDate,
@@ -56,6 +88,8 @@ function SealExportList() {
       }));
 
       setApplications(fetchedData);
+      setTotalPages(totalPages);
+      setCurrentPage(currentPage);
 
       const storedClickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
       setClickedRows(storedClickedRows);
@@ -243,6 +277,7 @@ function SealExportList() {
             )}
           </tbody>
         </table>
+        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
       </div>
       <ReasonModal 
         show={showDownloadReasonModal} 

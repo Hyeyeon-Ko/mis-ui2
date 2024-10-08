@@ -7,6 +7,8 @@ import SignitureImage from '../../assets/images/signiture.png';
 import axios from 'axios';
 import '../../styles/corpdoc/CorpDocRnpList.css';
 import { corpFilterData } from '../../datas/corpDocDatas';
+import useDateSet from '../../hooks/apply/useDateSet';
+import Pagination from '../../components/common/Pagination';
 
 function CorpDocRnpList() {
   const { auth } = useContext(AuthContext);
@@ -18,18 +20,50 @@ function CorpDocRnpList() {
   const [clickedRows, setClickedRows] = useState([]);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
 
-  const fetchRnpData = useCallback(async (searchType = '전체', keyword = '') => {
+  const { formattedStartDate: defaultStartDate, formattedEndDate: defaultEndDate } = useDateSet();
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
+
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    fetchRnpData(currentPage, itemsPerPage);
+  }, [currentPage]);
+
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
+  };
+
+  const fetchRnpData = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
     try {
+      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : defaultStartDate;
+      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : defaultEndDate;
+
       const response = await axios.get('/api/corpDoc/rnpList', {
         params: {
-          instCd: auth.instCd,
+          // PostSearchRequestDTO parameters
           searchType,
           keyword,
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+
+          // inst parameter
+          instCd: auth.instCd,
+
+          // PostPageRequest parameters
+          pageIndex,
+          pageSize
         },
       });
 
       if (response.data) {
-        const rnpListData = response.data.data.map(item => ({
+        const data = response.data.data
+        const totalPages = data.totalPages;
+        const currentPage = data.number + 1;
+        console.log("data: ", data)
+
+        const rnpListData = data.map(item => ({
           id: item.draftId,
           date: item.draftDate,
           drafter: item.drafter,
@@ -45,6 +79,8 @@ function CorpDocRnpList() {
         }));
 
         setApplications(rnpListData);
+        setTotalPages(totalPages);
+        setCurrentPage(currentPage);
 
         const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
         setClickedRows(clickedRows);
@@ -168,6 +204,7 @@ function CorpDocRnpList() {
             )}
           </tbody>
         </table>
+        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
       </div>
       {modalVisible && selectedDocumentDetails && (
         <CorpDocApprovalModal

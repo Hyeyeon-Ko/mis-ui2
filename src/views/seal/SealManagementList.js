@@ -5,6 +5,8 @@ import ConfirmModal from '../../components/common/ConfirmModal';
 import SealApprovalModal from './SealApprovalModal';
 import ConditionFilter from '../../components/common/ConditionFilter'; 
 import SignitureImage from '../../assets/images/signiture.png';
+import useDateSet from '../../hooks/apply/useDateSet';
+import Pagination from '../../components/common/Pagination';
 import '../../styles/seal/SealManagementList.css';
 import { AuthContext } from '../../components/AuthContext';
 
@@ -63,18 +65,49 @@ function SealManagementList() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
+  const { formattedStartDate, formattedEndDate } = useDateSet();
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
 
-  const fetchSealManagementList = useCallback(async () => {
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    fetchSealManagementList(currentPage, itemsPerPage);
+    // eslint-disable-next-line
+  }, [currentPage]);
+
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
+  };
+
+  const fetchSealManagementList = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
     try {
       const { instCd } = auth;  
 
-      const response = await axios.get(`/api/seal/managementList`, {
+      const response = await axios.get(`/api/seal/managementList2`, {
         params: {
-          instCd,
+          // ApplyRequestDTO parameters
+          userId: auth.userId || '',
+          instCd: instCd || '',
+
+          // PostSearchRequestDTO parameters
+          searchType,
+          keyword,
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+
+          // PostPageRequest parameters
+          pageIndex,
+          pageSize
         },
       });
+
+      const data = response.data.data;
+      const totalPages = data.totalPages;
+      const currentPage = data.number + 1;
     
-      const fetchedData = response.data.data.map(item => ({
+      const fetchedData = data.content.map(item => ({
         id: item.draftId,
         date: item.useDate,
         submitter: item.submission,
@@ -92,6 +125,8 @@ function SealManagementList() {
   
       setApplications(fetchedData);
       setFilteredApplications(fetchedData);
+      setTotalPages(totalPages);
+      setCurrentPage(currentPage);
 
       const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
       setClickedRows(clickedRows);
@@ -201,6 +236,7 @@ function SealManagementList() {
                handleRowClick={handleRowClick} 
                clickedRows={clickedRows} 
             />
+        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
         {showDeleteModal && (
           <ConfirmModal
             message="이 문서를 삭제하시겠습니까?"

@@ -6,6 +6,7 @@ import SealRegistrationUpdateModal from './SealRegistrationUpdateModal';
 import ConfirmModal from '../../components/common/ConfirmModal'; 
 import '../../styles/seal/SealRegistrationList.css';
 import axios from 'axios';
+import Pagination from '../../components/common/Pagination';
 import { AuthContext } from '../../components/AuthContext';
 
 function SealRegistrationList() {
@@ -16,15 +17,39 @@ function SealRegistrationList() {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedDraftId, setSelectedDraftId] = useState(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false); 
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
 
-  const fetchSealRegistrationList = useCallback(async () => {
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    fetchSealRegistrationList(currentPage, itemsPerPage);
+  }, [currentPage]);
+
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
+  };
+
+  const fetchSealRegistrationList = useCallback(async (pageIndex = 1, pageSize = itemsPerPage) => {
     try {
-      const response = await axios.get(`/api/seal/registrationList`, {
-        params: { instCd: auth.instCd }
+      const response = await axios.get(`/api/seal/registrationList2`, {
+        // ApplyRequestDTO parameters
+        userId: auth.userId || '',
+        instCd: auth.instCd || '',
+        documentType: '',
+
+        // PostPageRequest parameters
+        pageIndex,
+        pageSize
       });
 
+      const data = response.data.data;
+      const totalPages = data.totalPages;
+      const currentPage = data.number + 1;
+
       if (response.data.code === 200) {
-        const data = response.data.data.map(item => ({
+        const data = data.content.map(item => ({
           draftId: item.draftId,
           seal: item.sealNm,
           sealImage: item.sealImage, 
@@ -35,7 +60,10 @@ function SealRegistrationList() {
           subManager: item.subManager,
           draftDate: item.draftDate,
         }));
+
         setFilteredApplications(data);
+        setTotalPages(totalPages);
+        setCurrentPage(currentPage);
       } else {
         alert('데이터를 불러오는 중 오류가 발생했습니다.');
       }
@@ -193,6 +221,7 @@ function SealRegistrationList() {
             )}
           </tbody>
         </table>
+        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
         <SealRegistrationAddModal
           isOpen={isAddModalOpen}
           onClose={() => {
