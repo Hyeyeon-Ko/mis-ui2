@@ -138,7 +138,6 @@ function CorpDocIssueList() {
         const totalPendingPages = data.totalPages;
         const currentPendingPage = data.number + 1;
 
-        console.log(currentPendingPage);
 
         const issuePendingListContent = Array.isArray(data.content) ? data.content : [];
         const issuePendingListData = issuePendingListContent.map(item => ({
