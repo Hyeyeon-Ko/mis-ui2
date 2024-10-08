@@ -28,13 +28,15 @@ const ReasonModal = ({ show, onClose, onConfirm, reason = '', isViewOnly = false
       return;
     }
   
+    const downloadNotes = selectedFileType === 'etc' ? inputReason : null;
+  
     if (modalType === 'download') {
-      onConfirm({ downloadNotes: inputReason, downloadType: selectedFileType });
+      onConfirm({ downloadNotes, downloadType: selectedFileType });
     } else {
       onConfirm(inputReason); 
     }
   };
-  
+      
   if (!show) return null;
 
   const getTitle = () => {

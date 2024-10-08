@@ -27,7 +27,7 @@ function DocOutList() {
 
   const [filterInputs, setFilterInputs] = useState(docFilterData);
 
-  const [downloadType, setDownloadType] = useState(null); 
+  const [downloadMode, setDownloadMode] = useState(null); 
   const [totalPages, setTotalPages] = useState('1')
   const [currentPage, setCurrentPage] = useState('1')
 
@@ -40,7 +40,6 @@ function DocOutList() {
     setSelectedRows,
   } = useDocChange();
 
-  console.log("Filtered Applications: ", filteredApplications);
 
   const deriveDocType = (filePath) => {
     if (!filePath) return "doc"; 
@@ -119,41 +118,50 @@ function DocOutList() {
     setCurrentPage(selectedPage);
   };
 
-
-  const handleFileDownloadClick = (draftId, fileName) => {
-    setSelectedDraftId(draftId);
-    setSelectedFileName(fileName);
-    setDownloadType('single'); 
-    setShowDownloadReasonModal(true);
-  };
-
-  const handleDownloadFiles = () => {
-    if (selectedRows.length === 0) {
-      alert('다운로드할 파일을 선택하세요.');
-      return;
-    }
-    setDownloadType('multiple');
-    setShowDownloadReasonModal(true);
-  };
-
   const handleDownloadModalClose = () => {
     setShowDownloadReasonModal(false);
     setSelectedDraftId(null);
     setSelectedFileName('');
-    setDownloadType(null);
+    setDownloadMode(null);
   };
 
-  const handleDownloadConfirm = async ({ reason, fileType }) => {
-    setShowDownloadReasonModal(false);
+  const handleFileDownloadClick = (draftId, fileName) => {
+    setSelectedDraftId(draftId);
+    setSelectedFileName(fileName);
+    setDownloadMode('single'); 
+    setShowDownloadReasonModal(true);
+};
 
-    if (downloadType === 'single') {
+const handleDownloadFiles = () => {
+    if (selectedRows.length === 0) {
+      alert('다운로드할 파일을 선택하세요.');
+      return;
+    }
+    setDownloadMode('multiple'); 
+    setShowDownloadReasonModal(true);
+};
+
+const handleDownloadConfirm = async ({ downloadNotes, downloadType }) => {
+    console.log("Download confirmed with reason:", downloadNotes, "and type:", downloadType);
+
+    const downloadTypeMap = {
+      'draft': 'A',
+      'order': 'B',
+      'approval': 'C',
+      'check': 'D',
+      'etc': 'Z',
+    };
+
+    const convertedFileType = downloadTypeMap[downloadType] || '';
+    const finalDownloadNotes = downloadType === 'etc' ? downloadNotes : null;
+    
+    if (downloadMode === 'single') { 
       try {
         const response = await axios.get(`/api/file/download/${encodeURIComponent(selectedFileName)}`, {
           params: {
             draftId: selectedDraftId,
-            docType: 'doc',
-            fileType: fileType,
-            reason: reason,
+            downloadType: convertedFileType,
+            downloadNotes: finalDownloadNotes, 
             downloaderNm: auth.hngNm,
             downloaderId: auth.userId,
           },
@@ -167,19 +175,19 @@ function DocOutList() {
         document.body.appendChild(link);
         link.click();
         link.parentNode.removeChild(link);
+
+        console.log("File downloaded successfully");
       } catch (error) {
         console.error('Error downloading the file:', error);
         alert('파일 다운로드에 실패했습니다.');
       }
-    } else if (downloadType === 'multiple') {
+    } else if (downloadMode === 'multiple') { 
       const requestData = selectedRows.map((draftId) => {
         const selectedApp = filteredApplications.find(app => app.draftId === draftId);
         return {
           draftId: draftId,
-          docType: selectedApp ? selectedApp.docType : 'doc', 
-          fileName: selectedApp ? selectedApp.fileName : '',
-          fileType: fileType,
-          reason: reason,
+          downloadType: convertedFileType,
+          downloadNotes: finalDownloadNotes,
           downloaderNm: auth.hngNm,
           downloaderId: auth.userId,
         };
@@ -187,27 +195,27 @@ function DocOutList() {
 
       try {
         const response = await axios.post('/api/file/download/multiple', requestData, {
-          responseType: 'blob', 
+          responseType: 'blob',
         });
 
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'documents.zip'); 
+        link.setAttribute('download', 'documents.zip');
         document.body.appendChild(link);
         link.click();
         link.parentNode.removeChild(link);
 
-        setSelectedRows([]);
+        setSelectedRows([]); 
       } catch (error) {
         console.error('파일 다운로드에 실패했습니다:', error);
         alert('파일 다운로드에 실패했습니다.');
       }
     }
 
-    setDownloadType(null); 
+    setDownloadMode(null); 
   };
-
+    
   const handleDeleteClick = (draftId) => {
     if (draftId) {
       setSelectedDraftId(draftId);
