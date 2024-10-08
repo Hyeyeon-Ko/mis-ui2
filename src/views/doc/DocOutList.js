@@ -29,7 +29,7 @@ function DocOutList() {
 
   const [downloadMode, setDownloadMode] = useState(null); 
   const [totalPages, setTotalPages] = useState('1')
-  const [currentPage, setCurrentPage] = useState('1')
+  const [, setCurrentPage] = useState('1')
 
   const [filteredApplications, setFilteredApplications] = useState([]);
 
