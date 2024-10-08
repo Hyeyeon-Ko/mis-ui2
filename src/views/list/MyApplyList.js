@@ -38,7 +38,6 @@ function MyApplyList() {
   const [totalPages, setTotalPages] = useState('1')
   const [currentPage, setCurrentPage] = useState('1')
   const [loading, setLoading] = useState(false);
-  const [keyword, setKeyword] = useState('');
   const itemsPerPage = 10;
 
   const fetchApplications = useCallback(async (pageIndex = 1,  pageSize = itemsPerPage, filters = {}) => {
@@ -185,7 +184,6 @@ function MyApplyList() {
     setStartDate(defaultStartDate);
     setEndDate(new Date());
     setDocumentType('');  
-    setKeyword('');
     setFilters(filterData);
   
     fetchApplications(); 

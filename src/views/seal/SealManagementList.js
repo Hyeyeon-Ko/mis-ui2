@@ -59,6 +59,8 @@ function SealManagementList() {
   const { auth } = useContext(AuthContext); 
   const [clickedRows, setClickedRows] = useState([]);
   const [filterInputs, setFilterInputs] = useState({
+    startDate: null,
+    endDate: null,
     searchType: '전체',
     keyword: '',
   });
@@ -84,8 +86,7 @@ function SealManagementList() {
     setCurrentPage(selectedPage);
   };
 
-  const fetchSealManagementList = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
-    setLoading(true);
+  const fetchSealManagementList = useCallback(async (pageIndex = 1, pageSize = itemsPerPage, filters= {}) => {
     try {
       const { instCd } = auth;  
 
@@ -96,10 +97,10 @@ function SealManagementList() {
           instCd: instCd || '',
 
           // PostSearchRequestDTO parameters
-          searchType,
-          keyword,
-          startDate: formattedStartDate,
-          endDate: formattedEndDate,
+          searchType: filters.searchType,
+          keyword: filters.keyword,
+          startDate: filters.startDate ? filters.startDate : formattedStartDate,
+          endDate: filters.endDate ? filters.endDate : formattedEndDate,
 
           // PostPageRequest parameters
           pageIndex,
@@ -145,34 +146,49 @@ function SealManagementList() {
     fetchSealManagementList();
   }, [fetchSealManagementList]);
 
-  const applyFilters = useCallback(() => {
-    let filteredData = applications;
+  const applyFilters = (filterValues) => {
+    // filterValues에서 documentType과 기타 필터 값을 가져옴
+    const { startDate, endDate, documentType, searchType, filters, keyword } = filterValues;
+    
+    const params = {
+      startDate: startDate ? startDate.toISOString().split('T')[0] : '', // 시작일
+      endDate: endDate ? endDate.toISOString().split('T')[0] : '', // 종료일
+      documentType: documentType,
+      searchType: searchType,
+      keyword: keyword, // 검색어
+    };
 
-    const keyword = filterInputs.keyword.toLowerCase().trim();
-    if (keyword) {
-      if (filterInputs.searchType === '전체') {
-        filteredData = filteredData.filter(application =>
-          application.date.toLowerCase().includes(keyword) ||
-          application.submitter.toLowerCase().includes(keyword) ||
-          application.purpose.toLowerCase().includes(keyword)
-        );
-      } else if (filterInputs.searchType === '일자') {
-        filteredData = filteredData.filter(application => 
-          application.date.toLowerCase().includes(keyword)
-        );
-      } else if (filterInputs.searchType === '제출처') {
-        filteredData = filteredData.filter(application => 
-          application.submitter.toLowerCase().includes(keyword)
-        );
-      } else if (filterInputs.searchType === '사용목적') {
-        filteredData = filteredData.filter(application => 
-          application.purpose.toLowerCase().includes(keyword)
-        );
-      }
-    }
+    fetchSealManagementList(1, itemsPerPage, params);
+  };
 
-    setFilteredApplications(filteredData);
-  }, [applications, filterInputs, setFilteredApplications]);
+  // const applyFilters = useCallback(() => {
+  //   let filteredData = applications;
+
+  //   const keyword = filterInputs.keyword.toLowerCase().trim();
+  //   if (keyword) {
+  //     if (filterInputs.searchType === '전체') {
+  //       filteredData = filteredData.filter(application =>
+  //         application.date.toLowerCase().includes(keyword) ||
+  //         application.submitter.toLowerCase().includes(keyword) ||
+  //         application.purpose.toLowerCase().includes(keyword)
+  //       );
+  //     } else if (filterInputs.searchType === '일자') {
+  //       filteredData = filteredData.filter(application => 
+  //         application.date.toLowerCase().includes(keyword)
+  //       );
+  //     } else if (filterInputs.searchType === '제출처') {
+  //       filteredData = filteredData.filter(application => 
+  //         application.submitter.toLowerCase().includes(keyword)
+  //       );
+  //     } else if (filterInputs.searchType === '사용목적') {
+  //       filteredData = filteredData.filter(application => 
+  //         application.purpose.toLowerCase().includes(keyword)
+  //       );
+  //     }
+  //   }
+
+  //   setFilteredApplications(filteredData);
+  // }, [applications, filterInputs, setFilteredApplications]);
 
   const handleRowClick = (status, document) => {
     if (status === '결재진행중' || status === '결재완료') {
@@ -195,7 +211,11 @@ function SealManagementList() {
 
 
   const handleReset = () => {
+    const defaultStartDate = new Date();
+    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
     setFilterInputs({
+      startDate: defaultStartDate,
+      endDate: new Date(),
       searchType: '전체',
       keyword: '',
     });
