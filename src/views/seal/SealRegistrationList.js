@@ -8,6 +8,7 @@ import '../../styles/seal/SealRegistrationList.css';
 import axios from 'axios';
 import Pagination from '../../components/common/Pagination';
 import { AuthContext } from '../../components/AuthContext';
+import Loading from '../../components/common/Loading';
 
 function SealRegistrationList() {
   const { auth } = useContext(AuthContext);
@@ -19,6 +20,8 @@ function SealRegistrationList() {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false); 
   const [totalPages, setTotalPages] = useState('1')
   const [currentPage, setCurrentPage] = useState('1')
+  const [loading, setLoading] = useState(false);
+
 
   const itemsPerPage = 10;
 
@@ -33,6 +36,7 @@ function SealRegistrationList() {
   };
 
   const fetchSealRegistrationList = useCallback(async (pageIndex = 1, pageSize = itemsPerPage) => {
+    setLoading(true)
     try {
       const response = await axios.get(`/api/seal/registrationList2`, {
         params: {
@@ -72,6 +76,8 @@ function SealRegistrationList() {
     } catch (error) {
       console.error('Error fetching seal registration list:', error);
       alert('데이터를 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false)
     }
   }, [auth.instCd, auth.userId]);
 
@@ -161,6 +167,11 @@ function SealRegistrationList() {
             <CustomButton className="seal-delete-button" onClick={handleDeleteApplication}>삭 제</CustomButton>
           </div>
         </div>
+
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
         <table className="seal-registration-table">
           <thead>
             <tr>
@@ -224,6 +235,9 @@ function SealRegistrationList() {
           </tbody>
         </table>
         <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+        </>
+
+        )}
         <SealRegistrationAddModal
           isOpen={isAddModalOpen}
           onClose={() => {

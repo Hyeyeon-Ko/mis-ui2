@@ -10,6 +10,7 @@ import ReasonModal from '../../components/ReasonModal';
 import useDateSet from '../../hooks/apply/useDateSet';
 import Pagination from '../../components/common/Pagination';
 import '../../styles/seal/SealExportList.css';
+import Loading from '../../components/common/Loading';
 
 function SealExportList() {
   const { auth } = useContext(AuthContext);
@@ -30,6 +31,8 @@ function SealExportList() {
   const { formattedStartDate, formattedEndDate } = useDateSet();
   const [totalPages, setTotalPages] = useState('1')
   const [currentPage, setCurrentPage] = useState('1')
+  const [loading, setLoading] = useState(false);
+
 
   const itemsPerPage = 10;
 
@@ -44,6 +47,7 @@ function SealExportList() {
   };
 
   const fetchSealExportList = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
+    setLoading(true)
     try {
       const { instCd } = auth;
       const response = await axios.get(`/api/seal/exportList2`, {
@@ -96,6 +100,8 @@ function SealExportList() {
     } catch (error) {
       console.error('Error fetching seal export list:', error);
       alert('인장 반출대장 데이터를 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false)
     }
   }, [auth, formattedEndDate, formattedStartDate]);
 
@@ -220,6 +226,11 @@ function SealExportList() {
           setDocumentType={() => {}}
         />
 
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+
         <table className="table">
           <thead>
             <tr>
@@ -278,6 +289,9 @@ function SealExportList() {
           </tbody>
         </table>
         <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+        </>
+
+)}
       </div>
       <ReasonModal 
         show={showDownloadReasonModal} 

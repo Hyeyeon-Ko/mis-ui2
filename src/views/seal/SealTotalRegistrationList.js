@@ -4,6 +4,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import '../../styles/seal/SealTotalRegistrationList.css';
 import { useSealForm } from '../../hooks/useSealForm';
 import Pagination from '../../components/common/Pagination';
+import Loading from '../../components/common/Loading';
 
 function SealTotalRegistrationList() {
   const [centerData, setCenterData] = useState([]);
@@ -11,6 +12,8 @@ function SealTotalRegistrationList() {
 
   const [totalPages, setTotalPages] = useState('1')
   const [currentPage, setCurrentPage] = useState('1')
+  const [loading, setLoading] = useState(false);
+
   const itemsPerPage = 10;
 
   const fetchTotalRegistrationList = async (pageIndex = 1, pageSize = itemsPerPage) => {
@@ -44,6 +47,7 @@ function SealTotalRegistrationList() {
 
   useEffect(() => {
     const fetchCenterData = async () => {
+      setLoading(true)
       try {
         const response = await axios.get(`/api/rentalList/total`);
         const { centerResponses } = response.data.data;
@@ -53,6 +57,8 @@ function SealTotalRegistrationList() {
       } catch (error) {
         console.error('Error fetching center list:', error);
         alert('센터 목록을 불러오는 중 오류가 발생했습니다.');
+      } finally {
+        setLoading(false)
       }
     };
 
@@ -81,6 +87,11 @@ function SealTotalRegistrationList() {
             </select>
           </div>
         </div>
+        
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
         <table className="seal-total-registration-table">
         <thead>
           <tr>
@@ -112,6 +123,9 @@ function SealTotalRegistrationList() {
         </tbody>
       </table>
       <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+      </>
+
+    )}
       </div>
     </div>
   );
