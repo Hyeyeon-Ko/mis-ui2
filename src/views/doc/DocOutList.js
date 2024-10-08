@@ -29,7 +29,7 @@ function DocOutList() {
 
   const [downloadType, setDownloadType] = useState(null); 
   const [totalPages, setTotalPages] = useState('1')
-  const [currentPage, setCurrentPage] = useState('1')
+  const [, setCurrentPage] = useState('1')
 
   const [filteredApplications, setFilteredApplications] = useState([]);
 
@@ -40,7 +40,6 @@ function DocOutList() {
     setSelectedRows,
   } = useDocChange();
 
-  console.log("Filtered Applications: ", filteredApplications);
 
   const deriveDocType = (filePath) => {
     if (!filePath) return "doc"; 
