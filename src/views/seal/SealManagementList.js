@@ -9,6 +9,7 @@ import useDateSet from '../../hooks/apply/useDateSet';
 import Pagination from '../../components/common/Pagination';
 import '../../styles/seal/SealManagementList.css';
 import { AuthContext } from '../../components/AuthContext';
+import Loading from '../../components/common/Loading';
 
 const SealManagementTable = ({ filteredApplications, handleRowClick, clickedRows }) => {
   return (
@@ -68,6 +69,8 @@ function SealManagementList() {
   const { formattedStartDate, formattedEndDate } = useDateSet();
   const [totalPages, setTotalPages] = useState('1')
   const [currentPage, setCurrentPage] = useState('1')
+  const [loading, setLoading] = useState(false);
+
 
   const itemsPerPage = 10;
 
@@ -82,6 +85,7 @@ function SealManagementList() {
   };
 
   const fetchSealManagementList = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
+    setLoading(true);
     try {
       const { instCd } = auth;  
 
@@ -132,6 +136,8 @@ function SealManagementList() {
       setClickedRows(clickedRows);
     } catch (error) {
       console.error('Error fetching seal management list:', error);
+    } finally {
+      setLoading(false);
     }
   }, [auth, setApplications, setFilteredApplications, formattedEndDate, formattedStartDate ]);
 
@@ -230,13 +236,18 @@ function SealManagementList() {
           searchOptions={['전체', '일자', '제출처', '사용목적']}
           setDocumentType={() => {}}
         />
-
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
         <SealManagementTable 
                filteredApplications={filteredApplications} 
                handleRowClick={handleRowClick} 
                clickedRows={clickedRows} 
             />
         <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+        </>
+)}
         {showDeleteModal && (
           <ConfirmModal
             message="이 문서를 삭제하시겠습니까?"
