@@ -13,6 +13,7 @@ import { AuthContext } from '../../components/AuthContext';
 import { docFilterData } from '../../datas/docDatas';
 import useDocChange from '../../hooks/useDocChange';
 import Pagination from '../../components/common/Pagination';
+import Loading from '../../components/common/Loading';
 
 function DocOutList() {
   const { auth } = useContext(AuthContext);
@@ -30,6 +31,7 @@ function DocOutList() {
   const [downloadMode, setDownloadMode] = useState(null); 
   const [totalPages, setTotalPages] = useState('1')
   const [, setCurrentPage] = useState('1')
+  const [loading, setLoading] = useState(false);
 
   const [filteredApplications, setFilteredApplications] = useState([]);
 
@@ -62,6 +64,7 @@ function DocOutList() {
     pageSize = 10,
     status = "B",
   ) => {
+    setLoading(true);
     try {
       const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : '';
       const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : '';
@@ -102,6 +105,8 @@ function DocOutList() {
       }
     } catch (error) {
       console.error('Error fetching document list:', error);
+    } finally {
+      setLoading(false);
     }
   }, [auth.instCd, setFilteredApplications]);
       
@@ -383,9 +388,14 @@ const handleDownloadConfirm = async ({ downloadNotes, downloadType }) => {
           setDocumentType={() => {}}
         />
         <div className="doc-out-content">
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
           <Table columns={columns} data={filteredApplications || []} />
         <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
-
+        </>
+        )}
         </div>
         {showDeleteModal && (
           <ConfirmModal
