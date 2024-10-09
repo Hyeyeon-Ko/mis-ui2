@@ -5,6 +5,7 @@ import DocstorageAddModal from './DocstorageAddModal';
 import '../../styles/common/Page.css';
 import '../../styles/docstorage/TotalDocstorageList.css';
 import axios from 'axios';
+import Loading from '../../components/common/Loading';
 
 
 
@@ -15,6 +16,7 @@ function TotalDocstorageList() {
   const [centerDocstorageResponses, setCenterDocstorageResponses] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false); 
   const [selectedRows, setSelectedRows] = useState([]); 
+  const [loading, setLoading] = useState(false);
 
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
@@ -22,6 +24,7 @@ function TotalDocstorageList() {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const response = await axios.get(`/api/docstorageList/total`);
         const { centerResponses, centerDocstorageResponses } = response.data.data;
@@ -31,6 +34,8 @@ function TotalDocstorageList() {
 
       } catch (error) {
         console.error('데이터를 불러오는데 실패했습니다.', error);
+      } finally {
+        setLoading(false)
       }
     };
     fetchData();
@@ -196,6 +201,10 @@ function TotalDocstorageList() {
                 </select>
               </div>
             </div>
+            {loading ? (
+          <Loading />
+        ) : (
+          <>
             <div className="totalDocstorage-tables-section">
               <div className="totalDocstorage-details-content">
                 <div className="totalDocstorage-header-buttons">
@@ -216,6 +225,8 @@ function TotalDocstorageList() {
                 </div>
               </div>
             </div>
+            </>
+        )}
         </div>
       </div>
       <DocstorageAddModal

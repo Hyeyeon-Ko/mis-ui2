@@ -9,6 +9,7 @@ import { AuthContext } from '../../components/AuthContext';
 import '../../styles/common/Page.css';
 import '../../styles/rental/RentalManage.css';
 import useRentalChange from '../../hooks/useRentalChange';
+import Loading from '../../components/common/Loading';
 
 
 
@@ -20,6 +21,7 @@ function RentalManage() {
   const [isBulkUpdateModalVisible, setIsBulkUpdateModalVisible] = useState(false);
   const [selectedRental, setSelectedRental] = useState(null); 
   const [rentalDetails, setRentalDetails] = useState([]);  
+  const [loading, setLoading] = useState(false);
 
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
@@ -37,6 +39,7 @@ function RentalManage() {
   };
 
   const fetchRentalData = useCallback(async () => {
+    setLoading(true)
     try {
       const response = await axios.get(`/api/rentalList/center`, {
         params: { instCd: auth.instCd },
@@ -52,6 +55,8 @@ function RentalManage() {
       setSelectedRows([]);
     } catch (error) {
       console.error('센터 렌탈현황을 불러오는데 실패했습니다.', error);
+    } finally {
+      setLoading(false)
     }
   }, [auth.instCd, setSelectedRows]);
 
@@ -286,6 +291,10 @@ function RentalManage() {
         <div className="rental-content-inner">
           <h2>렌탈현황 관리표</h2>
           <Breadcrumb items={['자산 관리', '렌탈현황 관리표']} />
+          {loading ? (
+          <Loading />
+        ) : (
+          <>
           <div className="rental-tables-section">
             <div className="rental-details-content">
               <div className="rental-header-buttons">
@@ -310,6 +319,8 @@ function RentalManage() {
               </div>
             </div>
           </div>
+          </>
+        )}
         </div>
       </div>
       <RentalAddModal 
