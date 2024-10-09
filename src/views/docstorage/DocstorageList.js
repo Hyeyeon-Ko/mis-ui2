@@ -9,6 +9,7 @@ import { AuthContext } from '../../components/AuthContext';
 import StatusSelect from '../../components/StatusSelect';  
 import '../../styles/common/Page.css';
 import '../../styles/docstorage/DocstorageList.css';
+import Loading from '../../components/common/Loading';
 
 
 
@@ -30,6 +31,8 @@ function DocstorageList() {
   const [selectedDeptCd, setSelectedDeptCd] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState('전체');
   const [showBulkEditModal, setShowBulkEditModal] = useState(false); 
+  const [loading, setLoading] = useState(false);
+
 
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
@@ -42,6 +45,7 @@ function DocstorageList() {
   ];
 
   const fetchDeptList = useCallback(async () => {
+    setLoading(true)
     try {
       const response = await axios.get(`/api/docstorageList/deptList`, {
         params: { instCd: auth.instCd },
@@ -49,6 +53,8 @@ function DocstorageList() {
       setDeptResponses(response.data.data);
     } catch (error) {
       console.error('부서 리스트를 불러오는데 실패했습니다.', error);
+    } finally {
+      setLoading(false)
     }
   }, [auth.instCd]);
 
@@ -428,6 +434,10 @@ function DocstorageList() {
                 )}
               </div>
             </div>
+            {loading ? (
+          <Loading />
+        ) : (
+          <>
             <div className="docstorage-tables-section">
               <div className="docstorage-details-content">
                 <div className="docstorage-header-buttons">
@@ -454,6 +464,8 @@ function DocstorageList() {
                 </div>
               </div>
             </div>
+            </>
+        )}
             {selectedCategory === 'A' && (
               <div className="docstorage-approve-section">
                 <button className="custom-button docstorage-approve-button" onClick={showConfirm}>승 인</button>
