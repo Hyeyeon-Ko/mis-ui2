@@ -123,7 +123,11 @@ function PendingApprovalList() {
 
       const selectedData = combinedData.find(response => response.totalElements > 0);
       
-      if(selectedData) {
+      if (!selectedData || !selectedData.content.length) {
+        setApplications([]);
+        setTotalPages(1);
+        setCurrentPage(1);
+        } else {
         const totalPages = selectedData.totalPages;
         const currentPage = selectedData.number + 1;
         const content = selectedData.content;
