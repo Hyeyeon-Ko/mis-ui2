@@ -237,13 +237,13 @@ function PendingApprovalList() {
   const approveDocument = async (documentId) => {
     try {
       await axios.put(`/api/doc/confirm`, null, {
-        params: { draftId: documentId , userId: auth.userId},
+        params: { draftId: documentId , userId: auth.userId, rejectReason: null},
       });
       alert('승인이 완료되었습니다.');
       closeModal();
-      
-      fetchPendingList(filters);
 
+      fetchPendingList(currentPage, itemsPerPage); 
+  
       if (typeof refreshSidebar === 'function') {
         refreshSidebar();  
       }
