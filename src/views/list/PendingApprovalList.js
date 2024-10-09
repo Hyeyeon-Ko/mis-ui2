@@ -38,7 +38,7 @@ function PendingApprovalList() {
   const queryParams = new URLSearchParams(location.search);
   const documentType = queryParams.get('documentType') || '';
 
-  const { formattedStartDate: defaultStartDate, formattedEndDate: defaultEndDate } = useDateSet();
+  const { formattedStartDate, formattedEndDate } = useDateSet();
 
   const [totalPages, setTotalPages] = useState('1')
   const [currentPage, setCurrentPage] = useState('1')
@@ -85,12 +85,13 @@ function PendingApprovalList() {
     }
   };
 
-  const fetchPendingList = useCallback(async (startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
+  // const fetchPendingList = useCallback(async (startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
+  const fetchPendingList = useCallback(async (pageIndex = 1, pageSize = itemsPerPage, filters={}) => {
     setLoading(true);
     try {
 
-      const formattedStartDate = startDate instanceof Date ? startDate.toISOString().split('T')[0] : defaultStartDate;
-      const formattedEndDate = endDate instanceof Date ? endDate.toISOString().split('T')[0] : defaultEndDate;
+      // const formattedStartDate = startDate instanceof Date ? startDate.toISOString().split('T')[0] : defaultStartDate;
+      // const formattedEndDate = endDate instanceof Date ? endDate.toISOString().split('T')[0] : defaultEndDate;
 
       const response = await axios.get(`/api/pendingList2`, {
         params: {
@@ -100,8 +101,10 @@ function PendingApprovalList() {
           documentType: convertDocumentType(documentType),
           
           // PostSearchRequestDTO parameters
-          startDate: formattedStartDate,
-          endDate: formattedEndDate,
+          // startDate: formattedStartDate,
+          // endDate: formattedEndDate,
+          startDate: filters.startDate ? filters.startDate : formattedStartDate,
+          endDate: filters.endDate ? filters.endDate : formattedEndDate,
 
           // PostPageRequest parameters
           pageIndex,
@@ -152,8 +155,10 @@ function PendingApprovalList() {
   }, [documentType, auth.instCd, auth.userId, startDate, endDate]);
       
   useEffect(() => {
-    fetchPendingList(filters);
-  }, [filters, fetchPendingList]);
+    // fetchPendingList(filters);
+    fetchPendingList(currentPage, itemsPerPage);
+  // }, [filters, fetchPendingList]);
+  }, [currentPage, fetchPendingList]);
 
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
@@ -217,6 +222,18 @@ function PendingApprovalList() {
       endDate: endDate ? endDate.toISOString().split('T')[0] : '',
       selectedCenter,
     }));
+  };
+
+  const applyFilters = (filterValues) => {
+    const { startDate, endDate } = filterValues;
+    
+    const params = {
+      startDate: startDate ? startDate.toISOString().split('T')[0] : '',
+      endDate: endDate ? endDate.toISOString().split('T')[0] : '',
+      selectedCenter,
+    };
+
+    fetchPendingList(1, itemsPerPage, params);
   };
 
   const handleReset = () => {
@@ -306,7 +323,8 @@ function PendingApprovalList() {
           setEndDate={setEndDate}
           filters={filters}
           setFilters={setFilters}
-          onSearch={handleSearch}
+          // onSearch={handleSearch}
+          onSearch={applyFilters}
           onReset={handleReset}
           showDocumentType={false}
           showSearchCondition={false}
