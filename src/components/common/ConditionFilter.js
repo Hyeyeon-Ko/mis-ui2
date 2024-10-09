@@ -6,6 +6,7 @@ import useDateSet from '../../hooks/apply/useDateSet';
 import '../../styles/common/ConditionFilter.css';
 
 const ConditionFilter = ({
+  setTitle,
   onSearch,
   onReset,
   showStatusFilters,
@@ -13,7 +14,7 @@ const ConditionFilter = ({
   showDocumentType = true,
   searchOptions = [],
   forceShowAllStatusFilters = false,
-  startDateLabel = '신청일자',
+  startDateLabel = setTitle ? setTitle : '신청일자',
 }) => {
   // useDateSet에서 기본 시작일과 종료일을 가져옴
   const { formattedStartDate, formattedEndDate } = useDateSet();
