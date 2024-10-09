@@ -16,6 +16,8 @@ function SealExportList() {
   const { auth } = useContext(AuthContext);
   const [applications, setApplications] = useState([]);
   const [filterInputs, setFilterInputs] = useState({
+    startDate: null,
+    endDate: null,
     searchType: '전체',
     keyword: '',
   });
@@ -46,8 +48,7 @@ function SealExportList() {
     setCurrentPage(selectedPage);
   };
 
-  const fetchSealExportList = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
-    setLoading(true)
+  const fetchSealExportList = useCallback(async (pageIndex = 1, pageSize = itemsPerPage, filters= {}) => {
     try {
       const { instCd } = auth;
       const response = await axios.get(`/api/seal/exportList2`, {
@@ -57,10 +58,10 @@ function SealExportList() {
           instCd: instCd || '',
 
           // PostSearchRequestDTO parameters
-          searchType,
-          keyword,
-          startDate: formattedStartDate,
-          endDate: formattedEndDate,
+          searchType: filters.searchType,
+          keyword: filters.keyword,
+          startDate: filters.startDate ? filters.startDate : formattedStartDate,
+          endDate: filters.endDate ? filters.endDate : formattedEndDate,
 
           // PostPageRequest parameters
           pageIndex,
@@ -112,12 +113,27 @@ function SealExportList() {
     }
   }, [initialLoad, fetchSealExportList]);
 
-  const handleSearch = () => {
-    fetchSealExportList(filterInputs.searchType, filterInputs.keyword);  
+  const handleSearch = (filterValues) => {
+    // fetchSealExportList(filterInputs.searchType, filterInputs.keyword);  
+    // filterValues에서 documentType과 기타 필터 값을 가져옴
+    const { startDate, endDate, documentType, searchType, filters, keyword } = filterValues;
+    
+    const params = {
+      startDate: startDate ? startDate.toISOString().split('T')[0] : '', // 시작일
+      endDate: endDate ? endDate.toISOString().split('T')[0] : '', // 종료일
+      searchType: searchType,
+      keyword: keyword, // 검색어
+    };
+
+    fetchSealExportList(1, itemsPerPage, params);
   };
 
   const handleReset = () => {
+    const defaultStartDate = new Date();
+    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
     setFilterInputs({
+      startDate: defaultStartDate,
+      endDate: new Date(),
       searchType: '전체',
       keyword: '',
     });

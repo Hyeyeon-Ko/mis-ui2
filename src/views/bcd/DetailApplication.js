@@ -249,12 +249,21 @@ function DetailApplication() {
 
   const handleApprove = async () => {
     try {
-      const response = await axios.post(`/api/bcd/applyList/${draftId}`, auth.userId, {
-        headers: {
-          'Content-Type': 'text/plain',
-        },
-      });
-
+      const requestBody = {
+        userId: auth.userId,  
+        rejectReason: null,    
+      };
+  
+      const response = await axios.post(
+        `/api/bcd/applyList/${draftId}`,
+        requestBody,
+        {
+          headers: {
+            'Content-Type': 'application/json', 
+          },
+        }
+      );
+  
       if (response.data.code === 200) {
         alert('명함이 승인되었습니다.');
         refreshSidebar();
@@ -266,15 +275,17 @@ function DetailApplication() {
       alert('명함 승인 중 오류가 발생했습니다.');
     }
   };
-        
+          
   const handleRejectConfirm = async (reason) => {
     try {
-      const response = await axios.post(`/api/bcd/applyList/return/${draftId}`, reason, auth.userId, {
+      const response = await axios.post(`/api/bcd/applyList/return/${draftId}`, {
+        userId: auth.userId,
+        rejectReason: reason
+      }, {
         headers: {
-          'Content-Type': 'text/plain',
+          'Content-Type': 'application/json',
         },
       });
-
       if (response.data.code === 200) {
         alert('명함이 반려되었습니다.');
         await refreshSidebar();
