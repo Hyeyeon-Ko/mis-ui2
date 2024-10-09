@@ -4,6 +4,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import '../../styles/common/Page.css';
 import '../../styles/rental/TotalRentalManage.css';
+import Loading from '../../components/common/Loading';
 
 
 
@@ -14,6 +15,7 @@ function TotalRentalManage() {
     const [centerRentalResponses, setCenterRentalResponses] = useState(null);
     const [nationwideSummary, setNationwideSummary] = useState([]); 
     const [selectedRows, setSelectedRows] = useState([]); 
+    const [loading, setLoading] = useState(false)
 
     const dragStartIndex = useRef(null);
     const dragEndIndex = useRef(null);
@@ -21,6 +23,7 @@ function TotalRentalManage() {
 
     useEffect(() => {
       const fetchRentalData = async () => {
+        setLoading(true)
           try {
               const response = await axios.get(`/api/rentalList/total`);
               const { centerResponses, centerRentalResponses, summaryResponses } = response.data.data;
@@ -44,6 +47,9 @@ function TotalRentalManage() {
   
           } catch (error) {
               console.error("렌탈 데이터를 불러오는 중 오류 발생:", error);
+          } finally {
+            setLoading(false)
+
           }
       };
   
@@ -231,6 +237,10 @@ function TotalRentalManage() {
                             </select>
                         </div>
                     </div>
+                    {loading ? (
+                      <Loading />
+                    ) : (
+                      <>
                     <div className="totalRentalManage-details-content">
                         <div className="totalRentalManage-header-buttons">
                             <label className='totalRentalManage-detail-content-label'>렌탈 현황&gt;&gt;</label>
@@ -254,6 +264,8 @@ function TotalRentalManage() {
                             />
                         </div>
                     </div>
+                    </>
+                    )}
                 </div>
             </div>
         </div>
