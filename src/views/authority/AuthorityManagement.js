@@ -7,7 +7,7 @@ import AuthorityModal from "../authority/AuthorityModal";
 import ConfirmModal from "../../components/common/ConfirmModal";
 import editIcon from "../../assets/images/edit.png";
 import deleteIcon from "../../assets/images/delete.png";
-import Pagination from "../../components/common/Pagination";
+import PaginationSub from "../../components/common/PaginationSub";
 import "../../styles/authority/AuthorityManagement.css";
 import axios from "axios";
 import Loading from "../../components/common/Loading";
@@ -209,9 +209,10 @@ function AuthorityManagement() {
         ) : (
           <>
             <Table columns={columns} data={applications} />
-            <Pagination
+            <PaginationSub
               totalPages={totalPages}
               onPageChange={handlePageClick}
+              currentPage={currentPage}
             />
           </>
         )}
