@@ -42,7 +42,6 @@ function MyApplyList() {
 
   const fetchApplications = useCallback(async (pageIndex = 1,  pageSize = itemsPerPage, filters = {}) => {
     setLoading(true);
-
     try {
       const response = await axios.get(`/api/myApplyList2`, {
         params: {
@@ -55,14 +54,14 @@ function MyApplyList() {
           keyword: filters.keyword,
         },
       });
-
+  
       const data = response.data.data.pagedResult || response.data;
-
-      const totalPages = Math.max(data.totalPages, 1);
+  
+      const totalPages = Math.max(data.totalPages || 1, 1);
       const currentPage = data.number + 1;
-
+  
       const { myBcdResponses, myDocResponses, myCorpDocResponses, mySealResponses, pagedResult } = response.data.data;
-
+  
       let combinedData = [];
       if(!pagedResult) {
         if(myBcdResponses != null) { 
@@ -89,7 +88,6 @@ function MyApplyList() {
           return acc;
         }
       }, []);
-
   
       const transformedData = uniqueData
         .filter(application => application.applyStatus !== 'X')
@@ -106,34 +104,30 @@ function MyApplyList() {
   
       setApplications(transformedData);
       setFilteredApplications(transformedData); 
-      setTotalPages(totalPages);
+      setTotalPages(totalPages);  // 여기에 페이지 설정
       setCurrentPage(currentPage);
     } catch (error) {
       console.error('Error fetching applications:', error.response?.data || error.message);
     } finally {
       setLoading(false);
     }
-  }, [auth.userId, setTotalPages, setCurrentPage]);
+  }, [auth.userId]);
 
-  // const applyFilters = () => {
   const applyFilters = (filterValues) => {
-    // filterValues에서 documentType과 기타 필터 값을 가져옴
     const { startDate, endDate, documentType, keyword } = filterValues;
-    
     const params = {
-      startDate: startDate ? startDate.toISOString().split('T')[0] : '', // 시작일
-      endDate: endDate ? endDate.toISOString().split('T')[0] : '', // 종료일
+      startDate: startDate ? startDate.toISOString().split('T')[0] : '',
+      endDate: endDate ? endDate.toISOString().split('T')[0] : '',
       documentType: documentType,
-      keyword: keyword, // 검색어
+      keyword: keyword,
     };
-
-    // fetchApplications();
-    fetchApplications(1, itemsPerPage, params);
+  
+    fetchApplications(1, itemsPerPage, params); 
   };
 
   useEffect(() => {
     fetchApplications(currentPage);
-  }, [fetchApplications, currentPage]);
+  }, [currentPage]);
 
   const applyStatusFilters = useCallback(() => {
     let filteredData = applications;
@@ -260,6 +254,7 @@ function MyApplyList() {
   const handlePageClick = (event) => {
     const selectedPage = event.selected + 1;
     setCurrentPage(selectedPage);
+    fetchApplications(selectedPage);
     fetchApplications(selectedPage);
   };
       
