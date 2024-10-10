@@ -10,40 +10,8 @@ function SealTotalRegistrationList() {
   const [centerData, setCenterData] = useState([]);
   const {handleCenterChange, selectedCenter, filteredApplications, setFilteredApplications} = useSealForm();
 
-  const [totalPages, setTotalPages] = useState('1')
   const [currentPage, setCurrentPage] = useState('1')
   const [loading, setLoading] = useState(false);
-
-  const itemsPerPage = 10;
-
-  useEffect(() => {
-    fetchTotalRegistrationList(currentPage, itemsPerPage);
-    // eslint-disable-next-line
-  }, [currentPage]);
-
-  const fetchTotalRegistrationList = async (pageIndex = 1, pageSize = itemsPerPage) => {
-    try {
-      const response = await axios.get(`/api/seal/totalRegistrationList2`, {
-        params: {
-          // PostPageRequest parameters
-          pageIndex,
-          pageSize,
-        },
-      });
-
-      const data = response.data.data;
-      const totalPages = data.totalPages;
-      const currentPage = data.number + 1;
-      
-      setFilteredApplications(data);
-      setTotalPages(totalPages);
-      setCurrentPage(currentPage);
-
-    } catch (error) {
-      console.error('Error fetching total registration list:', error);
-      alert('데이터를 불러오는 중 오류가 발생했습니다.');
-    }
-  };
 
   const handlePageClick = (event) => {
     const selectedPage = event.selected + 1;
