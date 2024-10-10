@@ -3,16 +3,19 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
+import Pagination from '../../components/common/Pagination'; // 페이징 컴포넌트 추가
 import '../../styles/bcd/ApplicationHistoryModal.css';
-
-
 
 /* 신청 이력 모달 */
 const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
+  const [currentPage, setCurrentPage] = useState("1"); // 현재 페이지
+  const [totalPages, setTotalPages] = useState("1"); // 총 페이지 수
 
+  const itemsPerPage = 10;
+ 
   const getOneMonthAgo = () => {
     const today = new Date();
     const oneMonthAgo = new Date(today);
@@ -20,34 +23,43 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
     return oneMonthAgo;
   };
 
-  const fetchHistory = useCallback(async (draftId, startDate, endDate) => {
-    try {
-      const response = await axios.get(`/api/bcd/applyList/history/${draftId}`, {
-        params: {
-          startDate: startDate ? startDate.toISOString().split('T')[0] : null,
-          endDate: endDate ? endDate.toISOString().split('T')[0] : null,
-        },
-      });
-      const transformedData = response.data.data.map((item) => ({
-        ...item,
-        applyStatus: getStatusText(item.applyStatus),
-        draftDate: parseDateTime(item.draftDate),
-      }));
-      setFilteredData(transformedData); 
-    } catch (error) {
-      console.error('Error fetching application history:', error);
-    }
-  }, []);
+  const fetchHistory = useCallback(
+    async (draftId, startDate, endDate, pageIndex = 1, pageSize = itemsPerPage) => {
+      try {
+        const response = await axios.get(
+          `/api/bcd/applyList/history2/${draftId}`,
+          {
+            params: {
+              startDate: startDate ? startDate.toISOString().split('T')[0] : null,
+              endDate: endDate ? endDate.toISOString().split('T')[0] : null,
+              pageIndex,
+              pageSize,
+              },
+          }
+        );
+        const transformedData = response.data.data.content.map((item) => ({
+          ...item,
+          applyStatus: getStatusText(item.applyStatus),
+          draftDate: parseDateTime(item.draftDate),
+        }));
+        setFilteredData(transformedData);
+        setTotalPages(response.data.data.totalPages); 
+      } catch (error) {
+        console.error('Error fetching application history:', error);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     if (draftId && show) {
       const defaultStartDate = getOneMonthAgo();
-      const defaultEndDate = new Date(); 
+      const defaultEndDate = new Date();
       setStartDate(defaultStartDate);
       setEndDate(defaultEndDate);
-      fetchHistory(draftId, defaultStartDate, defaultEndDate);
+      fetchHistory(draftId, defaultStartDate, defaultEndDate, currentPage, itemsPerPage);
     }
-  }, [draftId, show, fetchHistory]);
+  }, [draftId, show, fetchHistory, currentPage]);
 
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
@@ -79,15 +91,22 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   };
 
   const handleSearch = () => {
-    fetchHistory(draftId, startDate, endDate);
+    setCurrentPage("1"); 
+    fetchHistory(draftId, startDate, endDate, 1);
   };
 
   const handleReset = () => {
     const defaultStartDate = getOneMonthAgo();
-    const defaultEndDate = new Date(); 
+    const defaultEndDate = new Date();
     setStartDate(defaultStartDate);
     setEndDate(defaultEndDate);
-    fetchHistory(draftId, defaultStartDate, defaultEndDate); 
+    setCurrentPage("1");
+    fetchHistory(draftId, defaultStartDate, defaultEndDate, 1);
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage); 
+    fetchHistory(draftId, startDate, endDate, newPage);
   };
 
   if (!show) return null;
@@ -95,7 +114,7 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   const columns = [
     { header: '제목', accessor: 'title', width: '40%' },
     { header: '신청일시', accessor: 'draftDate', width: '20%' },
-    { header: '수량', accessor: 'quantity', width: '10%' }, 
+    { header: '수량', accessor: 'quantity', width: '10%' },
     { header: '문서상태', accessor: 'applyStatus', width: '18%' },
   ];
 
@@ -126,6 +145,11 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
         </div>
         <div className="table-container">
           <Table columns={columns} data={filteredData} />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         </div>
       </div>
     </div>
