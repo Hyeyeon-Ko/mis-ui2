@@ -7,7 +7,6 @@ import '../../styles/common/Page.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 import useStandardChange from '../../hooks/useStandardChange';
-import Pagination from '../../components/common/Pagination';
 import PaginationSub from '../../components/common/PaginationSub';
 
 

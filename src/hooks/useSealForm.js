@@ -1,10 +1,10 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { applicationData, sealRegistrationData, sealSelectionData } from '../datas/sealDatas';
 import axios from 'axios';
-import { AuthContext } from '../components/AuthContext'; // 추가: AuthContext 사용
+// import { AuthContext } from '../components/AuthContext'; // 추가: AuthContext 사용
 
 export const useSealForm = (initialReadOnly = false) => {
-    const { auth } = useContext(AuthContext); // 추가: auth 정보 사용
+    // const { auth } = useContext(AuthContext); // 추가: auth 정보 사용
     const [applications, setApplications] = useState([]);
     const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
     const [sealSelections, setSealSelections] = useState(sealSelectionData);

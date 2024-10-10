@@ -57,16 +57,36 @@ function CorpDocIssueList() {
     setCurrentPendingPage(selectedPendingPage);
   };
 
-  const fetchIssueData = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
+  const issueSearch = (filterValues) => {
+    // filterValues에서 documentType과 기타 필터 값을 가져옴
+    const { startDate, endDate, searchType, keyword } = filterValues;
+    
+    const params = {
+      startDate: startDate ? startDate.toISOString().split('T')[0] : '', // 시작일
+      endDate: endDate ? endDate.toISOString().split('T')[0] : '', // 종료일
+      searchType: searchType,
+      keyword: keyword, // 검색어
+    };
+
+    fetchIssueData(1, itemsPerPage, params);
+  };
+
+  // const fetchIssueData = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
+  const fetchIssueData = useCallback(async (pageIndex = 1, pageSize = itemsPerPage, filters= {}) => {
     try {
 
       const response = await axios.get(`/api/corpDoc/issueList`, {
         params: {
           // PostSearchRequestDTO parameters
-          searchType,
-          keyword,
-          startDate: defaultStartDate,
-          endDate: defaultEndDate,
+          // searchType,
+          // keyword,
+          // startDate: defaultStartDate,
+          // endDate: defaultEndDate,
+
+          searchType: filters.searchType,
+          keyword: filters.keyword,
+          startDate: filters.startDate ? filters.startDate : defaultStartDate,
+          endDate: filters.endDate ? filters.endDate : defaultEndDate,
 
           // PostPageRequest parameters
           pageIndex,
@@ -120,7 +140,7 @@ function CorpDocIssueList() {
     } catch (error) {
       console.error("Error fetching issue data:", error);
     }
-  }, []);
+  }, [defaultStartDate, defaultEndDate]);
 
   const fetchIssuePendingData = useCallback(async (pageIndex = 1, pageSize = itemsPerPage) => {
     try {
@@ -166,7 +186,7 @@ function CorpDocIssueList() {
     } catch (error) {
       console.error("Error fetching issue pending data:", error);
     }
-  }, [defaultEndDate, defaultStartDate, setCurrentPendingPage]);
+  }, [setCurrentPendingPage]);
   
   useEffect(() => {
     fetchIssueData(currentPage, itemsPerPage);
@@ -305,7 +325,7 @@ function CorpDocIssueList() {
           setEndDate={(endDate) => setFilterInputs(prev => ({ ...prev, endDate }))}
           filters={{}}
           setFilters={() => {}}
-          onSearch={() => fetchIssueData(filterInputs.searchType, filterInputs.keyword, filterInputs.startDate, filterInputs.endDate)} 
+          onSearch={issueSearch} 
           onReset={handleReset}
           showStatusFilters={false}
           showSearchCondition={true}
@@ -314,7 +334,7 @@ function CorpDocIssueList() {
           setSearchType={(searchType) => setFilterInputs(prev => ({ ...prev, searchType }))}
           keyword={filterInputs.keyword}
           setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
-          searchOptions={['전체', '발급/입고일자', '이름', '제출처', '사용목적']}
+          searchOptions={['전체', '이름', '제출처', '사용목적']}
           startDateLabel="발급/입고일자"
           setDocumentType={() => {}}
         />

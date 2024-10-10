@@ -16,6 +16,11 @@ function SealTotalRegistrationList() {
 
   const itemsPerPage = 10;
 
+  useEffect(() => {
+    fetchTotalRegistrationList(currentPage, itemsPerPage);
+    // eslint-disable-next-line
+  }, [currentPage]);
+
   const fetchTotalRegistrationList = async (pageIndex = 1, pageSize = itemsPerPage) => {
     try {
       const response = await axios.get(`/api/seal/totalRegistrationList2`, {
@@ -122,7 +127,7 @@ function SealTotalRegistrationList() {
           )}
         </tbody>
       </table>
-      <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+      <Pagination totalPages={totalPages} currentPage={currentPage} onPageChange={handlePageClick} />
       </>
 
     )}
