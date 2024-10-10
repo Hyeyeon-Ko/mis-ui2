@@ -161,7 +161,7 @@ function CorpDocRnpList() {
         <Breadcrumb items={['법인서류 대장', '서류 수불 대장']} />
 
         <ConditionFilter
-          setTitle="수령일자"
+          startDateLabel="수령일자"
           startDate={null}  
           setStartDate={() => {}} 
           endDate={null} 
