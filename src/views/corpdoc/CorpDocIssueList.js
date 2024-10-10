@@ -140,7 +140,7 @@ function CorpDocIssueList() {
     } catch (error) {
       console.error("Error fetching issue data:", error);
     }
-  }, []);
+  }, [defaultStartDate, defaultEndDate]);
 
   const fetchIssuePendingData = useCallback(async (pageIndex = 1, pageSize = itemsPerPage) => {
     try {
@@ -186,7 +186,7 @@ function CorpDocIssueList() {
     } catch (error) {
       console.error("Error fetching issue pending data:", error);
     }
-  }, [defaultEndDate, defaultStartDate, setCurrentPendingPage]);
+  }, [setCurrentPendingPage]);
   
   useEffect(() => {
     fetchIssueData(currentPage, itemsPerPage);

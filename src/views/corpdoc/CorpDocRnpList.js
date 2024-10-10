@@ -96,8 +96,7 @@ function CorpDocRnpList() {
     } catch (error) {
       console.error("Error fetching RNP data:", error);
     }
-  // }, [auth.instCd, defaultEndDate, defaultStartDate]);
-  }, [auth.instCd]);
+  }, [auth.instCd, formattedStartDate, formattedEndDate]);
 
   useEffect(() => {
     if (!initialDataLoaded) {
@@ -110,8 +109,7 @@ function CorpDocRnpList() {
   // }, [fetchRnpData, filterInputs]);
 
   const applyFilters = (filterValues) => {
-    // filterValues에서 documentType과 기타 필터 값을 가져옴
-    const { startDate, endDate, documentType, searchType, filters, keyword } = filterValues;
+    const { startDate, endDate, documentType, searchType, keyword } = filterValues;
     
     const params = {
       startDate: startDate ? startDate.toISOString().split('T')[0] : '', // 시작일

@@ -113,7 +113,7 @@ function MyApplyList() {
   // const applyFilters = () => {
   const applyFilters = (filterValues) => {
     // filterValues에서 documentType과 기타 필터 값을 가져옴
-    const { startDate, endDate, documentType, filters, keyword } = filterValues;
+    const { startDate, endDate, documentType, keyword } = filterValues;
     
     const params = {
       startDate: startDate ? startDate.toISOString().split('T')[0] : '', // 시작일

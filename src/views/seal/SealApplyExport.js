@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import SealFormComponents from '../../components/apply/SealFormComponents';
-import { useSealForm } from '../../hooks/seal/useSealForm';
+import { useSealForm } from '../../hooks/useSealForm';
 import { AuthContext } from '../../components/AuthContext';
 import { validateForm } from '../../hooks/validateForm';
 

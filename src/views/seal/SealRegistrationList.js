@@ -79,7 +79,8 @@ function SealRegistrationList() {
     } finally {
       setLoading(false)
     }
-  }, [auth.instCd, auth.userId]);
+  // }, [auth.instCd, auth.userId]);
+  }, [auth.instCd]);
 
   useEffect(() => {
     fetchSealRegistrationList();

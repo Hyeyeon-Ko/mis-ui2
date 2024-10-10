@@ -219,14 +219,14 @@ function PendingApprovalList() {
     }
   };
 
-  const handleSearch = () => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      startDate: startDate ? startDate.toISOString().split('T')[0] : '',
-      endDate: endDate ? endDate.toISOString().split('T')[0] : '',
-      selectedCenter,
-    }));
-  };
+  // const handleSearch = () => {
+  //   setFilters((prevFilters) => ({
+  //     ...prevFilters,
+  //     startDate: startDate ? startDate.toISOString().split('T')[0] : '',
+  //     endDate: endDate ? endDate.toISOString().split('T')[0] : '',
+  //     selectedCenter,
+  //   }));
+  // };
 
   const applyFilters = (filterValues) => {
     const { startDate, endDate } = filterValues;

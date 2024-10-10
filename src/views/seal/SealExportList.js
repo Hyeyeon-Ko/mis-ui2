@@ -32,7 +32,7 @@ function SealExportList() {
 
   const { formattedStartDate, formattedEndDate } = useDateSet();
   const [totalPages, setTotalPages] = useState('1')
-  const [currentPage, setCurrentPage] = useState('1')
+  const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
 
@@ -115,8 +115,7 @@ function SealExportList() {
 
   const handleSearch = (filterValues) => {
     // fetchSealExportList(filterInputs.searchType, filterInputs.keyword);  
-    // filterValues에서 documentType과 기타 필터 값을 가져옴
-    const { startDate, endDate, documentType, searchType, filters, keyword } = filterValues;
+    const { startDate, endDate, searchType, keyword } = filterValues;
     
     const params = {
       startDate: startDate ? startDate.toISOString().split('T')[0] : '', // 시작일
