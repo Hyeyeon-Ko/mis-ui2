@@ -8,7 +8,7 @@ import { AuthContext } from '../../components/AuthContext';
 import '../../styles/list/MyPendingList.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
-import Pagination from '../../components/common/Pagination';
+import PaginationSub from '../../components/common/PaginationSub';
 
 
 
@@ -21,57 +21,49 @@ function MyPendingList() {
   const [currentPage, setCurrentPage] = useState('1');
   const navigate = useNavigate();
 
-  const fetchPendingApplications = useCallback(async ( pageIndex = 1, pageSize = 10) => {
+  const fetchPendingApplications = useCallback(async (pageIndex = 1, pageSize = 10) => {
     try {
       const response = await axios.get(`/api/myPendingList2`, {
         params: {
-          userId: auth.userId, 
+          userId: auth.userId,
           pageIndex,
-          pageSize
+          pageSize,
         },
       });
-
-
-      if (response.data && response.data.data) {
-        const pagedResult = response.data.data.pagedResult || {};  
-        const data = pagedResult.content || [];  
+      const pagedResult = response.data.data.pagedResult || {};
+      const data = pagedResult.content || [];
   
-        const uniqueData = data.reduce((acc, current) => {
-          const x = acc.find(item => item.draftId === current.draftId && item.docType === current.docType);
-          if (!x) {
-            return acc.concat([current]);
-          } else {
-            return acc;
-          }
-        }, []);
+      const uniqueData = data.reduce((acc, current) => {
+        const x = acc.find(item => item.draftId === current.draftId && item.docType === current.docType);
+        if (!x) {
+          return acc.concat([current]);
+        } else {
+          return acc;
+        }
+      }, []);
   
+      const transformedData = uniqueData.map(application => ({
+        draftId: application.draftId,
+        title: application.title,
+        draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
+        drafter: application.drafter,
+        lastUpdateDate: application.lastUpdateDate ? parseDateTime(application.lastUpdateDate) : '',
+        lastUpdater: application.lastUpdater || '',
+        docType: application.docType,
+      }));
   
-        const transformedData = uniqueData.map(application => ({
-          draftId: application.draftId,
-          title: application.title,
-          draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
-          drafter: application.drafter,
-          lastUpdateDate: application.lastUpdateDate ? parseDateTime(application.lastUpdateDate) : '',
-          lastUpdater: application.lastUpdater || '', 
-          docType: application.docType,
-        }));
+      transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
   
-        transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
-  
-        setPendingApplications(transformedData);  // Set the transformed data to state
-      } else {
-        console.error('Unexpected response format:', response.data);
-      }
-      setTotalPages(totalPages);
-      setCurrentPage(currentPage);
+      setPendingApplications(transformedData);
+      setTotalPages(Math.max(pagedResult.totalPages, 1));  // Set total pages once
     } catch (error) {
       console.error('Error fetching pending applications:', error.response ? error.response.data : error.message);
     }
-  }, [auth.userId, setTotalPages, setCurrentPage, currentPage, totalPages]); 
+  }, [auth.userId]);
 
   useEffect(() => {
-    fetchPendingApplications();
-  }, [fetchPendingApplications]); 
+    fetchPendingApplications(currentPage);
+  }, [fetchPendingApplications, currentPage]); 
 
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
@@ -196,7 +188,7 @@ function MyPendingList() {
         <h2>승인대기 내역</h2>
         <Breadcrumb items={['나의 신청내역', '승인대기 내역']} />
         <Table columns={pendingColumns} data={pendingApplications} />
-        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+        <PaginationSub totalPages={totalPages} onPageChange={handlePageClick} currentPage={currentPage} />
       </div>
       {showConfirmModal && (
         <ConfirmModal
