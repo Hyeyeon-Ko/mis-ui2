@@ -2,9 +2,9 @@ import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../components/AuthContext';
-import { useSealForm } from '../../hooks/seal/useSealForm';
 import { validateForm } from '../../hooks/validateForm';
 import SealFormComponents from '../../components/apply/SealFormComponents';
+import { useSealForm } from '../../hooks/useSealForm';
 
 
 function SealApplyImprint() {
