@@ -255,6 +255,7 @@ function MyApplyList() {
     const selectedPage = event.selected + 1;
     setCurrentPage(selectedPage);
     fetchApplications(selectedPage);
+    fetchApplications(selectedPage);
   };
       
   const applicationColumns = [
