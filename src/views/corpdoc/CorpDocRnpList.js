@@ -1,19 +1,19 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { AuthContext } from '../../components/AuthContext';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import CorpDocApprovalModal from '../../views/corpdoc/CorpDocApprovalModal';
-import ConditionFilter from '../../components/common/ConditionFilter';
-import SignitureImage from '../../assets/images/signiture.png';
-import axios from 'axios';
-import '../../styles/corpdoc/CorpDocRnpList.css';
-import { corpFilterData } from '../../datas/corpDocDatas';
-import useDateSet from '../../hooks/apply/useDateSet';
-import Pagination from '../../components/common/Pagination';
+import React, { useState, useEffect, useContext, useCallback } from "react";
+import { AuthContext } from "../../components/AuthContext";
+import Breadcrumb from "../../components/common/Breadcrumb";
+import CorpDocApprovalModal from "../../views/corpdoc/CorpDocApprovalModal";
+import ConditionFilter from "../../components/common/ConditionFilter";
+import SignitureImage from "../../assets/images/signiture.png";
+import axios from "axios";
+import "../../styles/corpdoc/CorpDocRnpList.css";
+import { corpFilterData } from "../../datas/corpDocDatas";
+import useDateSet from "../../hooks/apply/useDateSet";
+import Pagination from "../../components/common/Pagination";
 
 function CorpDocRnpList() {
   const { auth } = useContext(AuthContext);
 
-  const [applications, setApplications] = useState([]); 
+  const [applications, setApplications] = useState([]);
   const [filterInputs, setFilterInputs] = useState(corpFilterData);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentDetails, setSelectedDocumentDetails] = useState(null);
@@ -22,8 +22,8 @@ function CorpDocRnpList() {
 
   // const { formattedStartDate: defaultStartDate, formattedEndDate: defaultEndDate } = useDateSet();
   const { formattedStartDate, formattedEndDate } = useDateSet();
-  const [totalPages, setTotalPages] = useState('1')
-  const [currentPage, setCurrentPage] = useState('1')
+  const [totalPages, setTotalPages] = useState("1");
+  const [currentPage, setCurrentPage] = useState("1");
 
   const itemsPerPage = 10;
 
@@ -38,96 +38,103 @@ function CorpDocRnpList() {
   };
 
   // const fetchRnpData = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
-  const fetchRnpData = useCallback(async (pageIndex = 1, pageSize = itemsPerPage, filters={}) => {
-    try {
-      // const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : defaultStartDate;
-      // const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : defaultEndDate;
+  const fetchRnpData = useCallback(
+    async (pageIndex = 1, pageSize = itemsPerPage, filters = {}) => {
+      try {
+        // const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : defaultStartDate;
+        // const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : defaultEndDate;
 
-      const response = await axios.get('/api/corpDoc/rnpList', {
-        params: {
-          // PostSearchRequestDTO parameters
-          // searchType,
-          // keyword,
-          // startDate: formattedStartDate,
-          // endDate: formattedEndDate,
-          searchType: filters.searchType,
-          keyword: filters.keyword,
-          startDate: filters.startDate ? filters.startDate : formattedStartDate,
-          endDate: filters.endDate ? filters.endDate : formattedEndDate,
+        const response = await axios.get("/api/corpDoc/rnpList", {
+          params: {
+            // PostSearchRequestDTO parameters
+            // searchType,
+            // keyword,
+            // startDate: formattedStartDate,
+            // endDate: formattedEndDate,
+            searchType: filters.searchType,
+            keyword: filters.keyword,
+            startDate: filters.startDate
+              ? filters.startDate
+              : formattedStartDate,
+            endDate: filters.endDate ? filters.endDate : formattedEndDate,
 
-          // inst parameter
-          instCd: auth.instCd,
+            // inst parameter
+            instCd: auth.instCd,
 
-          // PostPageRequest parameters
-          pageIndex,
-          pageSize
-        },
-      });
+            // PostPageRequest parameters
+            pageIndex,
+            pageSize,
+          },
+        });
 
-      if (response.data) {
-        const data = response.data.data
-        const totalPages = data.totalPages;
-        const currentPage = data.number + 1;
+        if (response.data) {
+          const data = response.data.data;
+          const totalPages = data.totalPages || 1;
+          const currentPage = data.number + 1;
 
-        const rnpListData = data.content.map(item => ({
-          id: item.draftId,
-          date: item.draftDate,
-          drafter: item.drafter,
-          submission: item.submission,
-          purpose: item.purpose,
-          corpSeal: item.certCorpseal,
-          registry: item.certCoregister,
-          usesignet: item.certUsesignet,
-          warrant: item.warrant,
-          status: '결재진행중',
-          signitureImage: SignitureImage,
-          approvers: [],
-        }));
+          const rnpListData = data.content.map((item) => ({
+            id: item.draftId,
+            date: item.draftDate,
+            drafter: item.drafter,
+            submission: item.submission,
+            purpose: item.purpose,
+            corpSeal: item.certCorpseal,
+            registry: item.certCoregister,
+            usesignet: item.certUsesignet,
+            warrant: item.warrant,
+            status: "결재진행중",
+            signitureImage: SignitureImage,
+            approvers: [],
+          }));
 
-        setApplications(rnpListData);
-        setTotalPages(totalPages);
-        setCurrentPage(currentPage);
+          setApplications(rnpListData);
+          setTotalPages(totalPages);
+          setCurrentPage(currentPage);
 
-        const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
-        setClickedRows(clickedRows);
+          const clickedRows =
+            JSON.parse(localStorage.getItem("clickedRows")) || [];
+          setClickedRows(clickedRows);
 
-        setInitialDataLoaded(true);
+          setInitialDataLoaded(true);
+        }
+      } catch (error) {
+        console.error("Error fetching RNP data:", error);
       }
-    } catch (error) {
-      console.error("Error fetching RNP data:", error);
-    }
-  }, [auth.instCd, formattedStartDate, formattedEndDate]);
+    },
+    [auth.instCd, formattedStartDate, formattedEndDate]
+  );
 
   useEffect(() => {
     if (!initialDataLoaded) {
-      fetchRnpData();  
+      fetchRnpData();
     }
   }, [fetchRnpData, initialDataLoaded]);
 
   // const applyFilters = useCallback(() => {
-  //   fetchRnpData(filterInputs.searchType, filterInputs.keyword); 
+  //   fetchRnpData(filterInputs.searchType, filterInputs.keyword);
   // }, [fetchRnpData, filterInputs]);
 
   const applyFilters = (filterValues) => {
-    const { startDate, endDate, documentType, searchType, keyword } = filterValues;
-    
+    const { startDate, endDate, documentType, searchType, keyword } =
+      filterValues;
+
     const params = {
-      startDate: startDate ? startDate.toISOString().split('T')[0] : '', // 시작일
-      endDate: endDate ? endDate.toISOString().split('T')[0] : '', // 종료일
+      startDate: startDate ? startDate.toISOString().split("T")[0] : "", // 시작일
+      endDate: endDate ? endDate.toISOString().split("T")[0] : "", // 종료일
       documentType: documentType,
       searchType: searchType,
       keyword: keyword, // 검색어
     };
-    
+
     fetchRnpData(1, itemsPerPage, params);
   };
 
   const handleReset = () => {
     setFilterInputs({
-      searchType: '전체',
-      keyword: '',
+      searchType: "전체",
+      keyword: "",
     });
-    fetchRnpData(); 
+    fetchRnpData();
   };
 
   const closeModal = () => {
@@ -136,11 +143,11 @@ function CorpDocRnpList() {
   };
 
   const handleRowClick = (status, document) => {
-    if (status === '결재진행중' || status === '결재완료') {
-      if (status === '결재완료') {
-        setClickedRows(prevClickedRows => {
+    if (status === "결재진행중" || status === "결재완료") {
+      if (status === "결재완료") {
+        setClickedRows((prevClickedRows) => {
           const newClickedRows = [...prevClickedRows, document.id];
-          localStorage.setItem('clickedRows', JSON.stringify(newClickedRows));
+          localStorage.setItem("clickedRows", JSON.stringify(newClickedRows));
           return newClickedRows;
         });
       }
@@ -153,29 +160,33 @@ function CorpDocRnpList() {
   };
 
   return (
-    <div className='content'>
-      <div className='corpDoc-rnp-list'>
+    <div className="content">
+      <div className="corpDoc-rnp-list">
         <h2>서류 수불 대장</h2>
-        <Breadcrumb items={['법인서류 대장', '서류 수불 대장']} />
+        <Breadcrumb items={["법인서류 대장", "서류 수불 대장"]} />
 
         <ConditionFilter
           startDateLabel="수령일자"
-          startDate={null}  
-          setStartDate={() => {}} 
-          endDate={null} 
-          setEndDate={() => {}}         
+          startDate={null}
+          setStartDate={() => {}}
+          endDate={null}
+          setEndDate={() => {}}
           filters={{}}
           setFilters={() => {}}
-          onSearch={applyFilters}  
-          onReset={handleReset}   
+          onSearch={applyFilters}
+          onReset={handleReset}
           showStatusFilters={false}
           showSearchCondition={true}
           showDocumentType={false}
           searchType={filterInputs.searchType}
-          setSearchType={(searchType) => setFilterInputs(prev => ({ ...prev, searchType }))}
+          setSearchType={(searchType) =>
+            setFilterInputs((prev) => ({ ...prev, searchType }))
+          }
           keyword={filterInputs.keyword}
-          setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
-          searchOptions={['전체', '신청자', '제출처', '사용목적']}
+          setKeyword={(keyword) =>
+            setFilterInputs((prev) => ({ ...prev, keyword }))
+          }
+          searchOptions={["전체", "신청자", "제출처", "사용목적"]}
           setDocumentType={() => {}}
         />
 
@@ -200,7 +211,7 @@ function CorpDocRnpList() {
             {applications.length > 0 ? (
               applications.map((app, index) => (
                 <tr key={index}>
-                  <td>{app.date.split('T')[0]}</td>
+                  <td>{app.date.split("T")[0]}</td>
                   <td>{app.drafter}</td>
                   <td>{app.submission}</td>
                   <td>{app.purpose}</td>
@@ -209,8 +220,10 @@ function CorpDocRnpList() {
                   <td>{app.usesignet}</td>
                   <td>{app.warrant}</td>
                   <td
-                    className={`status-${app.status.replace(/\s+/g, '-').toLowerCase()} clickable ${
-                      clickedRows.includes(app.id) ? 'confirmed' : ''
+                    className={`status-${app.status
+                      .replace(/\s+/g, "-")
+                      .toLowerCase()} clickable ${
+                      clickedRows.includes(app.id) ? "confirmed" : ""
                     }`}
                     onClick={() => handleRowClick(app.status, app)}
                   >
@@ -220,7 +233,9 @@ function CorpDocRnpList() {
               ))
             ) : (
               <tr>
-                <td colSpan="9" style={{ textAlign: 'center' }}>조회된 데이터가 없습니다</td>
+                <td colSpan="9" style={{ textAlign: "center" }}>
+                  조회된 데이터가 없습니다
+                </td>
               </tr>
             )}
           </tbody>
