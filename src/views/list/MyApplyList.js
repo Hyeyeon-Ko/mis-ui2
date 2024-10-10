@@ -55,30 +55,47 @@ function MyApplyList() {
         },
       });
   
-      const data = response.data.data.pagedResult || response.data;
+      const data = response.data.data.pagedResult || response.data.data;
   
-      const totalPages = Math.max(data.totalPages || 1, 1);
-      const currentPage = data.number + 1;
+      // const totalPages = Math.max(data.totalPages || 1, 1);
+      // const currentPage = data.number + 1;
   
       const { myBcdResponses, myDocResponses, myCorpDocResponses, mySealResponses, pagedResult } = response.data.data;
+
+      
   
       let combinedData = [];
+      let totalPages;
+      let currentPage;
       if(!pagedResult) {
         if(myBcdResponses != null) { 
           combinedData = combinedData.concat(myBcdResponses.content);
+          totalPages = Math.max(data.myBcdResponses.totalPages || 1, 1);
+          currentPage = data.myBcdResponses.number + 1;
         }
         if(myDocResponses != null) { 
           combinedData = combinedData.concat(myDocResponses.content);
+          totalPages = Math.max(data.myDocResponses.totalPages || 1, 1);
+          currentPage = data.myDocResponses.number + 1;
         }
         if(myCorpDocResponses != null) { 
           combinedData = combinedData.concat(myCorpDocResponses.content);
+          totalPages = Math.max(data.myCorpDocResponses.totalPages || 1, 1);
+          currentPage = data.myCorpDocResponses.number + 1;
         }
         if(mySealResponses != null) { 
           combinedData = combinedData.concat(mySealResponses.content);
+          totalPages = Math.max(data.mySealResponses.totalPages || 1, 1);
+          currentPage = data.mySealResponses.number + 1;
         }
+        
       } else {
         combinedData = pagedResult.content || []; 
+        
+        totalPages = Math.max(data.totalPages || 1, 1);
+        currentPage = data.number + 1;
       }
+
   
       const uniqueData = combinedData.reduce((acc, current) => {
         const x = acc.find(item => item.draftId === current.draftId && item.docType === current.docType);
