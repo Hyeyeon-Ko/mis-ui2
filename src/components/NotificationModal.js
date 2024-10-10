@@ -44,7 +44,7 @@ const NotificationModal = ({ onClose, position }) => {
     } catch (error) {
       console.error("Error fetching notifications from DB:", error);
     }
-  }, [auth.userId]);
+  }, [auth.userId, setNotifications]);
 
   useEffect(() => {
     fetchNotificationsFromDB();
