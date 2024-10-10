@@ -432,7 +432,7 @@ function StandardData() {
         </div>
         
       </div>
-      <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+      <Pagination totalPages={totalPages} currentPage={currentPage} onPageChange={handlePageClick} />
       <StandardAddModal
         show={showModal}
         onClose={resetModal}

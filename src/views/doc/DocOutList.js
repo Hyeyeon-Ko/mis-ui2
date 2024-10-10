@@ -134,7 +134,7 @@ function DocOutList() {
     } finally {
       setLoading(false);
     }
-  }, [auth.instCd, setFilteredApplications]);
+  }, [auth.instCd, setFilteredApplications, formattedStartDate, formattedEndDate]);
       
   useEffect(() => {
     fetchDocOutList();
@@ -272,46 +272,46 @@ const handleDownloadConfirm = async ({ downloadNotes, downloadType }) => {
     }
   };
 
-  const handleSearch = async () => {
-    const { searchType, keyword, startDate, endDate } = filterInputs;
+  // const handleSearch = async () => {
+  //   const { searchType, keyword, startDate, endDate } = filterInputs;
 
-    const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : null;
-    const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : null;
+  //   const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : null;
+  //   const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : null;
 
-    try {
-      const response = await axios.get('/api/doc/receiveList2', {
-        params: {
-          instCd: auth.instCd,
-          searchType,
-          keyword,
-          startDate: formattedStartDate,
-          endDate: formattedEndDate,
-          pageIndex: 1,
-          pageSize: 10,
-          status: 'B',
-        },
-      });
+  //   try {
+  //     const response = await axios.get('/api/doc/receiveList2', {
+  //       params: {
+  //         instCd: auth.instCd,
+  //         searchType,
+  //         keyword,
+  //         startDate: formattedStartDate,
+  //         endDate: formattedEndDate,
+  //         pageIndex: 1,
+  //         pageSize: 10,
+  //         status: 'B',
+  //       },
+  //     });
 
-      if (response.data && response.data.data) {
-        const formattedData = response.data.data.map((item) => ({
-          draftId: item.draftId,
-          draftDate: item.draftDate,
-          docId: item.docId,
-          resSender: item.resSender,
-          title: item.title,
-          drafter: item.drafter,
-          status: item.status,
-          fileName: item.fileName,
-          fileUrl: item.fileUrl,
-          docType: deriveDocType(item.filePath), 
-        }));
-        setApplications(formattedData);
-        setFilteredApplications(formattedData);
-      }
-    } catch (error) {
-      console.error('Error fetching document list:', error);
-    }
-  };
+  //     if (response.data && response.data.data) {
+  //       const formattedData = response.data.data.map((item) => ({
+  //         draftId: item.draftId,
+  //         draftDate: item.draftDate,
+  //         docId: item.docId,
+  //         resSender: item.resSender,
+  //         title: item.title,
+  //         drafter: item.drafter,
+  //         status: item.status,
+  //         fileName: item.fileName,
+  //         fileUrl: item.fileUrl,
+  //         docType: deriveDocType(item.filePath), 
+  //       }));
+  //       setApplications(formattedData);
+  //       setFilteredApplications(formattedData);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching document list:', error);
+  //   }
+  // };
 
   const resetFilters = useCallback(() => {
     const defaultStartDate = new Date();

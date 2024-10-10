@@ -140,7 +140,7 @@ function DocInList() {
         setLoading(false)
       }
     },
-    [auth.instCd, setFilteredApplications]
+    [auth.instCd, setFilteredApplications, formattedStartDate, formattedEndDate]
   );
 
   useEffect(() => {
