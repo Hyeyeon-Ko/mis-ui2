@@ -7,7 +7,7 @@ import '../../styles/common/Page.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 import useStandardChange from '../../hooks/useStandardChange';
-import Pagination from '../../components/common/Pagination';
+import PaginationSub from '../../components/common/PaginationSub';
 
 
 
@@ -432,7 +432,7 @@ function StandardData() {
         </div>
         
       </div>
-      <Pagination totalPages={totalPages} currentPage={currentPage} onPageChange={handlePageClick} />
+      <PaginationSub totalPages={totalPages} onPageChange={handlePageClick} currentPage={currentPage} />
       <StandardAddModal
         show={showModal}
         onClose={resetModal}
