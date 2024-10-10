@@ -10,7 +10,8 @@ function SealTotalRegistrationList() {
   const [centerData, setCenterData] = useState([]);
   const {handleCenterChange, selectedCenter, filteredApplications, setFilteredApplications} = useSealForm();
 
-  const [currentPage, setCurrentPage] = useState('1')
+  const [totalPages] = useState('1')
+  const [setCurrentPage] = useState('1')
   const [loading, setLoading] = useState(false);
 
   const handlePageClick = (event) => {
@@ -95,7 +96,7 @@ function SealTotalRegistrationList() {
           )}
         </tbody>
       </table>
-      <Pagination totalPages={totalPages} currentPage={currentPage} onPageChange={handlePageClick} />
+      <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
       </>
 
     )}
