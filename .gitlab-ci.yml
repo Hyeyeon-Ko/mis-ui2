@@ -1,0 +1,80 @@
+stages:
+  - build
+  - docker-build
+  - docker-push
+  - deploy
+
+variables:
+  DOCKER_IMAGE: frontend
+  FRONTEND_IMAGE: $CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$DOCKER_IMAGE:$CI_COMMIT_REF_NAME
+  DEPLOY_USER: root  # 배포할 사용자 이름
+  DEPLOY_SERVER: 101.10.1.87  # 배포할 서버 IP 주소
+  REGISTRY_URL: $REGISTRY_URL  # GitLab Container Registry URL
+  REGISTRY_USER: $REGISTRY_USER  # GitLab 사용자 이름
+  REGISTRY_PASSWORD: $REGISTRY_PASSWORD  # Access Token
+
+before_script:
+  - echo "Docker build start!!"
+  - apk add --no-cache docker
+  - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin "$REGISTRY_URL"
+  
+build:
+  stage: build
+  image: node:alpine
+  script:
+    - apk add --no-cache python3 make g++
+    - npm install
+    - npm run build
+  tags:
+    - mis-runner
+
+docker-build:
+  stage: docker-build
+  image: docker:stable
+  script:
+    - echo "Docker build start!!"
+    # Dockerfile로 Docker 이미지 빌드
+    - docker build -t $CI_REGISTRY/$FRONTEND_IMAGE .
+  tags:
+    - mis-runner
+  dependencies:
+    - build
+
+docker-push:
+  stage: docker-push
+  image: docker:stable
+  script:
+    - echo "Docker push start!!"
+    - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin "$REGISTRY_URL"
+    # Docker 이미지 푸시
+    - docker push $REGISTRY_URL/$FRONTEND_IMAGE
+  tags:
+    - mis-runner
+  dependencies:
+    - docker-build
+
+deploy:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan $DEPLOY_SERVER >> ~/.ssh/known_hosts
+  script:
+    - echo "Docker  Deploy!!"
+    - ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $DEPLOY_USER@$DEPLOY_SERVER "
+        echo $REGISTRY_PASSWORD | docker login -u $REGISTRY_USER --password-stdin $REGISTRY_URL &&
+        cd / &&
+        export CI_REGISTRY=$REGISTRY_URL &&
+        export CI_PROJECT_NAMESPACE=$CI_PROJECT_NAMESPACE &&
+        export CI_PROJECT_NAME=$CI_PROJECT_NAME &&
+        export CI_COMMIT_REF_NAME=$CI_COMMIT_REF_NAME &&
+        docker-compose pull $DOCKER_IMAGE &&
+        docker-compose up -d $DOCKER_IMAGE
+      "
+  tags:
+    - mis-runner
+  dependencies:
+    - docker-push
