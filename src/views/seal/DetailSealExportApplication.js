@@ -136,7 +136,7 @@ function DetailSealExportApplication() {
                     draftId: draftId,
                     downloadType: convertedFileType,
                     downloadNotes: downloadNotes,
-                    downloaderNm: auth.hngNm,
+                    downloaderNm: auth.userNm,
                     downloaderId: auth.userId,
                 },
                 responseType: 'blob',
@@ -190,7 +190,7 @@ function DetailSealExportApplication() {
         }
 
         const updatedExportRequestDTO = {
-            drafter: auth.hngNm,
+            drafter: auth.userNm,
             drafterId: auth.userId,
             submission: applicationDetails.submission,
             useDept: applicationDetails.useDept,

@@ -23,11 +23,11 @@ const CorpDocStoreModal = ({ show, onClose, onSave, totalCorpseal, totalCoregist
         certCoregister: '',
         totalCoregister: totalCoregister,
         userId: auth.userId,
-        userNm: auth.hngNm,
+        userNm: auth.userNm,
         instCd: auth.instCd
       });
     }
-  }, [show, auth.userId, auth.hngNm, auth.instCd, totalCorpseal, totalCoregister, setFormData]);
+  }, [show, auth.userId, auth.userNm, auth.instCd, totalCorpseal, totalCoregister, setFormData]);
 
   useEffect(() => {
   }, [formData]);

@@ -64,7 +64,7 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
         const docStorageExcelApplyRequestDTO = {
           instCd: auth.instCd,
           deptCd: auth.deptCd,
-          drafter: auth.hngNm,
+          drafter: auth.userNm,
           drafterId: auth.userId,
         };
   

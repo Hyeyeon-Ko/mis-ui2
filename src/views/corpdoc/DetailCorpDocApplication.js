@@ -111,7 +111,7 @@ function DetailCorpDocApplication() {
                     draftId: draftId,
                     downloadType: convertedFileType,
                     downloadNotes: downloadNotes,
-                    downloaderNm: auth.hngNm,
+                    downloaderNm: auth.userNm,
                     downloaderId: auth.userId,
                 },
                 responseType: 'blob',
@@ -176,7 +176,7 @@ function DetailCorpDocApplication() {
     
             // 법인서류 정보 추가
             formDataToSend.append('corpDocUpdateRequest', new Blob([JSON.stringify({
-                drafter: auth.hngNm,
+                drafter: auth.userNm,
                 submission: formData.submission,
                 purpose: formData.purpose,
                 useDate: formData.useDate,

@@ -29,11 +29,11 @@ function DocApply() {
     setFormData((prevFormData) => ({
       ...prevFormData,
       receptionDate: dateString,
-      drafter: auth.hngNm,
+      drafter: auth.userNm,
       userId: auth.userId,
       division: activeTab === 'DocA' ? 'A' : 'B',
     }));
-  }, [auth.hngNm, auth.userId, activeTab, setFormData]);
+  }, [auth.userNm, auth.userId, activeTab, setFormData]);
 
   useEffect(() => {
     setDefaultValues();

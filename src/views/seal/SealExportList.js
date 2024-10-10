@@ -172,19 +172,16 @@ function SealExportList() {
     const convertedFileType = downloadTypeMap[downloadType] || "";
 
     try {
-      const response = await axios.get(
-        `/api/file/download/${encodeURIComponent(selectedFileName)}`,
-        {
-          params: {
-            draftId: selectedDraftId,
-            downloadType: convertedFileType,
-            downloadNotes: downloadNotes,
-            downloaderNm: auth.hngNm,
-            downloaderId: auth.userId,
-          },
-          responseType: "blob",
-        }
-      );
+      const response = await axios.get(`/api/file/download/${encodeURIComponent(selectedFileName)}`, {
+        params: {
+          draftId: selectedDraftId,
+          downloadType: convertedFileType,
+          downloadNotes: downloadNotes,
+          downloaderNm: auth.hngNm,
+          downloaderId: auth.userId,
+},
+        responseType: 'blob',
+      });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");

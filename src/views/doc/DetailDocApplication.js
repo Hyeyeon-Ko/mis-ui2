@@ -27,7 +27,7 @@ function DetailDocApplication() {
         const { draftDate, division, receiver, sender, docTitle, purpose, fileName, filePath } = response.data.data;
         const fetchedData = {
           receptionDate: parseDateTime(draftDate),
-          drafter: auth.hngNm, 
+          drafter: auth.userNm, 
           division: division || '',
           receiver: receiver || '',
           sender: sender || '',
@@ -42,7 +42,7 @@ function DetailDocApplication() {
     } catch (error) {
       console.error('Error fetching document details:', error);
     }
-  }, [auth.hngNm, setFormData, setExistingFile]);
+  }, [auth.userNm, setFormData, setExistingFile]);
 
   useEffect(() => {
     if (draftId) {
@@ -51,10 +51,10 @@ function DetailDocApplication() {
     } else {
       setFormData((prevFormData) => ({
         ...prevFormData,
-        drafter: auth.hngNm || '' 
+        drafter: auth.userNm || '' 
       }));
     }
-  }, [draftId, auth.hngNm, fetchDocDetail, setFormData]);
+  }, [draftId, auth.userNm, fetchDocDetail, setFormData]);
 
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);

@@ -37,7 +37,7 @@ function Header() {
                 />
                 {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
               </div>
-              <span>{auth.hngNm}({auth.userId})</span>
+              <span>{auth.userNm}({auth.userId})</span>
               <span> | </span>
               <span> {auth.isUserMode ? 'USER' : auth.role} </span>
               <span> | </span>

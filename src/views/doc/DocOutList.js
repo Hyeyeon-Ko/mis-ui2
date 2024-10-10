@@ -193,7 +193,7 @@ const handleDownloadConfirm = async ({ downloadNotes, downloadType }) => {
             draftId: selectedDraftId,
             downloadType: convertedFileType,
             downloadNotes: finalDownloadNotes, 
-            downloaderNm: auth.hngNm,
+            downloaderNm: auth.userNm,
             downloaderId: auth.userId,
           },
           responseType: 'blob',
@@ -218,7 +218,7 @@ const handleDownloadConfirm = async ({ downloadNotes, downloadType }) => {
           draftId: draftId,
           downloadType: convertedFileType,
           downloadNotes: finalDownloadNotes,
-          downloaderNm: auth.hngNm,
+          downloaderNm: auth.userNm,
           downloaderId: auth.userId,
         };
       });

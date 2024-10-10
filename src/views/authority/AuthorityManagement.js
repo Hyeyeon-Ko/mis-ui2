@@ -52,7 +52,7 @@ function AuthorityManagement() {
         id: item.userId,
         role: item.userRole,
         centerName: `${item.instNm} (${item.deptNm})`,
-        name: `${item.hngNm}(${item.userId})`,
+        name: `${item.userNm}(${item.userId})`,
         email: item.email,
         authId: item.authId,
         permissions: {

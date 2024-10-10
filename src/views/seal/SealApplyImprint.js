@@ -48,7 +48,7 @@ function SealApplyImprint() {
 
         // 2. Submit SealForm
         const imprintRequestDTO = {
-            drafter: auth.hngNm,
+            drafter: auth.userNm,
             drafterId: auth.userId,
             submission,
             useDate,

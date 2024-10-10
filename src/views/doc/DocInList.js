@@ -202,7 +202,7 @@ const handleDownloadFiles = () => {
               draftId: selectedDraftId,
               downloadType: convertedFileType,
               downloadNotes: finalDownloadNotes, 
-              downloaderNm: auth.hngNm,
+              downloaderNm: auth.userNm,
               downloaderId: auth.userId,
               },
             responseType: "blob",
@@ -227,7 +227,7 @@ const handleDownloadFiles = () => {
           draftId: draftId,
           downloadType: convertedFileType,
           downloadNotes: finalDownloadNotes,
-          downloaderNm: auth.hngNm,
+          downloaderNm: auth.userNm,
           downloaderId: auth.userId,
         };
       });

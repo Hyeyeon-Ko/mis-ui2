@@ -57,7 +57,7 @@ const Login = () => {
 
             login(
               userId, 
-              data.data.hngNm, 
+              data.data.userNm, 
               data.data.role, 
               data.data.sidebarPermissions, 
               authorityData.data, 

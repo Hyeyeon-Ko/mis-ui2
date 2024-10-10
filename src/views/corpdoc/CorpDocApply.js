@@ -86,7 +86,7 @@ function CorpDocApply() {
         const typeValue = getTypeName(formData.type);
     
         payload.append('corpDocRequest', new Blob([JSON.stringify({
-            drafter: auth.hngNm,
+            drafter: auth.userNm,
             drafterId: auth.userId,
             instCd: auth.instCd,
             submission: formData.submission,
