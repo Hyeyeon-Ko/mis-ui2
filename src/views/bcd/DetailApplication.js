@@ -272,7 +272,13 @@ function DetailApplication() {
         alert('명함 승인 중 오류가 발생했습니다.');
       }
     } catch (error) {
-      alert('명함 승인 중 오류가 발생했습니다.');
+      if (error.response && error.response.data && error.response.data.message) {
+        alert(error.response.data.data);
+        navigate(`/applyList?documentType=명함신청`);
+      } else {
+        alert('명함 승인 중 오류가 발생했습니다.');
+        navigate(`/pendingList?documentType=명함신청`);
+      }
     }
   };
           
