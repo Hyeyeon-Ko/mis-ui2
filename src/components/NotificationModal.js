@@ -38,19 +38,13 @@ const NotificationModal = ({ onClose, position }) => {
   const fetchNotificationsFromDB = useCallback(async () => {
     try {
       const response = await axios.get(`/api/noti/${auth.userId}`);
-      const fetchedNotifications = Array.isArray(response.data.data) ? response.data.data : [];
-
-      // 기존 알림과 중복되지 않는 새로운 알림만 추가
-      setNotifications((prevNotifications) => {
-        const updatedNotifications = prevNotifications.filter(
-          (prevNoti) => !fetchedNotifications.some((noti) => noti.id === prevNoti.id)
-        );
-        return [...fetchedNotifications, ...updatedNotifications];
-      });
+      console.log(response)
+      const notifications = Array.isArray(response.data.data) ? response.data.data : [];
+      setNotifications(notifications);
     } catch (error) {
       console.error("Error fetching notifications from DB:", error);
     }
-  }, [auth.userId, setNotifications]);
+  }, [auth.userId]);
 
   useEffect(() => {
     fetchNotificationsFromDB();
