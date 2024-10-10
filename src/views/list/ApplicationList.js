@@ -46,7 +46,7 @@ function ApplicationsList() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState(null);
   const [selectedCenter, setSelectedCenter] = useState('전체');
-  const { formattedStartDate: defaultStartDate, formattedEndDate: defaultEndDate } = useDateSet();
+  const { formattedStartDate, formattedEndDate } = useDateSet();
   const [totalPages, setTotalPages] = useState('1')
   const [currentPage, setCurrentPage] = useState('1')
 
@@ -113,7 +113,22 @@ function ApplicationsList() {
     }
   };
 
-  const applyFilters = useCallback(() => {
+  const applyFilters = (filterValues) => {
+    // filterValues에서 documentType과 기타 필터 값을 가져옴
+    const { startDate, endDate, documentType, searchType, filters, keyword } = filterValues;
+    
+    const params = {
+      startDate: startDate ? startDate.toISOString().split('T')[0] : '', // 시작일
+      endDate: endDate ? endDate.toISOString().split('T')[0] : '', // 종료일
+      documentType: documentType,
+      searchType: searchType,
+      keyword: keyword, // 검색어
+    };
+
+    fetchApplications(1, itemsPerPage, params);
+  };
+
+  const applyFilters2 = useCallback(() => {
     let filteredData = applications;
 
     if (filterInputs.startDate) {
@@ -172,77 +187,77 @@ function ApplicationsList() {
     setFilteredApplications(filtered);
   }, [filters]);
         
-  const fetchApplications = useCallback(async (filterParams = {}, searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
+  const fetchApplications = useCallback(async (pageIndex = 1, pageSize = itemsPerPage, filters= {}) => {
     setLoading(true);
     setError(null);
     try {
-      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : defaultStartDate;
-      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : defaultEndDate;
-
       const response = await axios.get('/api/applyList2', {
         params: {
-          // ApplyRequestDTO parameters
           userId: auth.userId || '',
           instCd: instCd || '',
-          documentType: convertDocumentType(filterParams.documentType) || convertDocumentType(documentTypeFromUrl) || null,
-
-          // PostSearchRequestDTO parameters
-          searchType,
-          keyword,
-          startDate: formattedStartDate,
-          endDate: formattedEndDate,
-
-          // PostPageRequest parameters
+          documentType: convertDocumentType(filters.documentType) || convertDocumentType(documentTypeFromUrl) || null,
+          searchType: filters.searchType,
+          keyword: filters.keyword,
+          startDate: filters.startDate ? filters.startDate : formattedStartDate,
+          endDate: filters.endDate ? filters.endDate : formattedEndDate,
           pageIndex,
           pageSize
         },
       });
-
+  
       const { bcdMasterResponses, docMasterResponses, corpDocMasterResponses, sealMasterResponses } = response.data.data;
-
+  
       const combinedData = [
         bcdMasterResponses,
         docMasterResponses,
         corpDocMasterResponses,
         sealMasterResponses
       ];
-
-      const selectedData = combinedData.find(response => response.totalElements > 0);
-
-      const totalPages = selectedData.totalPages;
-      const currentPage = selectedData.number + 1;
-      const content = selectedData.content;
-      const filteredData = content.filter(application => application.applyStatus !== 'X');
-
-      const transformedData = filteredData.map(application => ({
-        draftId: application.draftId,
-        instCd: application.instCd,
-        instNm: application.instNm,
-        title: application.title,
-        draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
-        respondDate: application.respondDate ? parseDateTime(application.respondDate) : '',
-        orderDate: application.orderDate ? parseDateTime(application.orderDate) : '',
-        drafter: application.drafter,
-        applyStatus: getStatusText(application.applyStatus),
-        docType: application.docType,
-      }));
-
-      transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
-
-      setApplications(transformedData);
-      setTotalPages(totalPages);
-      setCurrentPage(currentPage);
-      applyStatusFilters(transformedData);
-
+  
+      const selectedData = combinedData.find(response => response && response.totalElements > 0);
+  
+      if (!selectedData || !selectedData.content.length) {
+        setApplications([]);
+        setFilteredApplications([]);
+        setTotalPages(1);
+        setCurrentPage(1);
+        setError('조회된 데이터가 없습니다.');
+      } else {
+        const totalPages = selectedData.totalPages;
+        const currentPage = selectedData.number + 1;
+        const content = selectedData.content;
+        const filteredData = content.filter(application => application.applyStatus !== 'X');
+  
+        const transformedData = filteredData.map(application => ({
+          draftId: application.draftId,
+          instCd: application.instCd,
+          instNm: application.instNm,
+          title: application.title,
+          draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
+          respondDate: application.respondDate ? parseDateTime(application.respondDate) : '',
+          orderDate: application.orderDate ? parseDateTime(application.orderDate) : '',
+          drafter: application.drafter,
+          applyStatus: getStatusText(application.applyStatus),
+          docType: application.docType,
+        }));
+  
+        transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
+  
+        setApplications(transformedData);
+        setFilteredApplications(transformedData);
+        setTotalPages(totalPages);
+        setCurrentPage(currentPage);
+        setError(null); 
+        applyStatusFilters(transformedData);
+      }
     } catch (error) {
       console.error('Error fetching applications:', error);
       setError('데이터를 불러오는 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
-     // eslint-disable-next-line
   }, [applyStatusFilters, auth.userId, documentTypeFromUrl, instCd, selectedCenter]);
-
+  
     /**
    * 페이지 변경 핸들러
    */
@@ -325,9 +340,9 @@ function ApplicationsList() {
     }));
   };
         
-  const handleSearch = () => {
-    applyFilters();
-  };
+  // const handleSearch = () => {
+  //   applyFilters();
+  // };
       
   const handleReset = () => {
     resetFilters();
@@ -481,7 +496,8 @@ function ApplicationsList() {
           filters={filters}
           setFilters={setFilters}
           onFilterChange={handleFilterChange}
-          onSearch={handleSearch}
+          // onSearch={handleSearch}
+          onSearch={applyFilters}
           onReset={handleReset}
           showStatusFilters={showStatusFilters}
           showSearchCondition={true}
@@ -494,13 +510,10 @@ function ApplicationsList() {
         />
         {loading ? (
           <Loading />
-        ) : error ? (
-          <p>{error}</p>
         ) : (
           <>
           <Table columns={columns} data={filteredApplications} onSelect={handleSelect} selectedItems={selectedApplications} />
-
-        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+          <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
           
           </>
         )}

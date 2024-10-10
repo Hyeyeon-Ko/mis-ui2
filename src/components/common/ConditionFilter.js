@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../common/Button';
+import useDateSet from '../../hooks/apply/useDateSet';
+
 import '../../styles/common/ConditionFilter.css';
 
 const ConditionFilter = ({
@@ -13,9 +15,12 @@ const ConditionFilter = ({
   forceShowAllStatusFilters = false,
   startDateLabel = '신청일자',
 }) => {
+  // useDateSet에서 기본 시작일과 종료일을 가져옴
+  const { formattedStartDate, formattedEndDate } = useDateSet();
+
   // 내부 상태 관리
-  const [startDate, setStartDate] = useState(new Date(new Date().setMonth(new Date().getMonth() - 1)));
-  const [endDate, setEndDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(new Date(formattedStartDate));
+  const [endDate, setEndDate] = useState(new Date(formattedEndDate));
   const [filters, setFilters] = useState({
     statusApproved: false,
     statusRejected: false,
@@ -28,10 +33,8 @@ const ConditionFilter = ({
 
   // 필터 초기화 함수
   const resetFilters = () => {
-    const defaultStartDate = new Date();
-    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
-    setStartDate(defaultStartDate);
-    setEndDate(new Date());
+    setStartDate(new Date(formattedStartDate));
+    setEndDate(new Date(formattedEndDate));
     setSearchType('전체');
     setKeyword('');
     setFilters({
@@ -60,7 +63,15 @@ const ConditionFilter = ({
 
   // 검색 버튼 클릭 시 호출할 함수
   const handleSearch = () => {
-    onSearch();
+    // onSearch();
+    onSearch({
+      startDate,
+      endDate,
+      documentType,
+      searchType,
+      filters,
+      keyword,
+    });
   };
 
   const handleStartDateChange = (event) => {
@@ -226,10 +237,10 @@ const ConditionFilter = ({
               onChange={handleDocumentTypeChange}
             >
               <option value="">전체</option>
-              <option value="명함신청">명함신청</option>
-              <option value="문서수발신">문서수발신</option>
-              <option value="법인서류">법인서류</option>
-              <option value="인장신청">인장신청</option>
+              <option value="A">명함신청</option>
+              <option value="B">문서수발신</option>
+              <option value="C">법인서류</option>
+              <option value="D">인장신청</option>
             </select>
           </>
         )}

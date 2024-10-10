@@ -7,6 +7,7 @@ import '../../styles/common/Page.css';
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 import useStandardChange from '../../hooks/useStandardChange';
+import Pagination from '../../components/common/Pagination';
 
 
 
@@ -20,6 +21,8 @@ function StandardData() {
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('detail');
   const [editDetailData, setEditDetailData] = useState(null);
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
   const { auth } = useContext(AuthContext);
 
   const dragStartIndex = useRef(null);
@@ -58,10 +61,14 @@ function StandardData() {
     }
   };
 
-  const fetchDetails = async (groupCd) => {
+  const fetchDetails = async (groupCd, pageIndex = 1, pageSize = 10) => {
     try {
-      const response = await axios.get(`/api/std/detailInfo`, { params: { groupCd } });
-      const data = response.data.data || [];
+      const response = await axios.get(`/api/std/detailInfo2`, { params: { groupCd, pageIndex, pageSize } });
+      const pageData = response.data.data;
+      const totalPages = pageData.totalPages || 1;
+      const currentPage = pageData.number + 1; 
+      const data = pageData.content || [];
+
       if (Array.isArray(data)) {
         data.sort((a, b) => parseInt(a.detailCd, 10) - parseInt(b.detailCd, 10));
         setDetails(data);
@@ -70,6 +77,8 @@ function StandardData() {
         setDetails([]);
       }
       setSelectedDetails([]);
+      setTotalPages(totalPages);
+      setCurrentPage(currentPage);
     } catch (error) {
       console.error('상세 정보를 가져오는 중 에러 발생:', error);
       setDetails([]);
@@ -88,6 +97,12 @@ function StandardData() {
       console.error('선택된 상세 정보를 가져오는 중 에러 발생:', error);
       alert('상세 정보 가져오기에 실패했습니다.');
     }
+  };
+
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
+    fetchDetails(selectedSubCategory, selectedPage);
   };
 
   const fetchHeaderData = async (groupCd) => {
@@ -411,10 +426,13 @@ function StandardData() {
                 onRowMouseOver={handleMouseOver}  
                 onRowMouseUp={handleMouseUp}    
               />
+                      
             </div>
           </div>
         </div>
+        
       </div>
+      <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
       <StandardAddModal
         show={showModal}
         onClose={resetModal}

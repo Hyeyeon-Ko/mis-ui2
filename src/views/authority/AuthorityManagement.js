@@ -10,6 +10,7 @@ import deleteIcon from '../../assets/images/delete.png';
 import Pagination from '../../components/common/Pagination';
 import '../../styles/authority/AuthorityManagement.css';
 import axios from 'axios';
+import Loading from '../../components/common/Loading';
 
 /**
  * 권한 관리 페이지 컴포넌트
@@ -22,6 +23,9 @@ function AuthorityManagement() {
   const [showConfirmModal, setShowConfirmModal] = useState(false); // 확인 모달 표시 상태 관리
   const [selectedAdmin, setSelectedAdmin] = useState(null); // 선택된 관리자 상태 관리
   const [isEditMode, setIsEditMode] = useState(false); // 수정 모드 상태 관리
+
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const itemsPerPage = 10;
@@ -34,6 +38,7 @@ function AuthorityManagement() {
    * 권한 내역 가져오기
    */
   const fetchAuthorityList = async (pageIndex = 1, pageSize = itemsPerPage) => {
+    setLoading(true)
     try {
       const response = await axios.get(`/api/auth/`, {
         params: { pageIndex, pageSize }
@@ -61,6 +66,8 @@ function AuthorityManagement() {
       setCurrentPage(currentPage);
     } catch (error) {
       console.error('Error fetching authority list: ', error);
+    } finally {
+    setLoading(false)
     }
   };
 
@@ -197,8 +204,14 @@ function AuthorityManagement() {
             </CustomButton>
           </div>
         </div>
-        <Table columns={columns} data={applications} />
-        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+          <Table columns={columns} data={applications} />
+          <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+        </>
+        )}
       </div>
       <AuthorityModal
         show={showModal}

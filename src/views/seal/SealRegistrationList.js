@@ -6,7 +6,9 @@ import SealRegistrationUpdateModal from './SealRegistrationUpdateModal';
 import ConfirmModal from '../../components/common/ConfirmModal'; 
 import '../../styles/seal/SealRegistrationList.css';
 import axios from 'axios';
+import Pagination from '../../components/common/Pagination';
 import { AuthContext } from '../../components/AuthContext';
+import Loading from '../../components/common/Loading';
 
 function SealRegistrationList() {
   const { auth } = useContext(AuthContext);
@@ -16,15 +18,44 @@ function SealRegistrationList() {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedDraftId, setSelectedDraftId] = useState(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false); 
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
+  const [loading, setLoading] = useState(false);
 
-  const fetchSealRegistrationList = useCallback(async () => {
+
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    fetchSealRegistrationList(currentPage, itemsPerPage);
+    // eslint-disable-next-line
+  }, [currentPage]);
+
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
+  };
+
+  const fetchSealRegistrationList = useCallback(async (pageIndex = 1, pageSize = itemsPerPage) => {
+    setLoading(true)
     try {
-      const response = await axios.get(`/api/seal/registrationList`, {
-        params: { instCd: auth.instCd }
+      const response = await axios.get(`/api/seal/registrationList2`, {
+        params: {
+          // ApplyRequestDTO parameters
+          instCd: auth.instCd || '',
+
+          // PostPageRequest parameters
+          pageIndex,
+          pageSize
+        }
+        
       });
 
+      const data = response.data.data;
+      const totalPages = data.totalPages;
+      const currentPage = data.number + 1;
+
       if (response.data.code === 200) {
-        const data = response.data.data.map(item => ({
+        const dataList = data.content.map(item => ({
           draftId: item.draftId,
           seal: item.sealNm,
           sealImage: item.sealImage, 
@@ -35,15 +66,20 @@ function SealRegistrationList() {
           subManager: item.subManager,
           draftDate: item.draftDate,
         }));
-        setFilteredApplications(data);
+
+        setFilteredApplications(dataList);
+        setTotalPages(totalPages);
+        setCurrentPage(currentPage);
       } else {
         alert('데이터를 불러오는 중 오류가 발생했습니다.');
       }
     } catch (error) {
       console.error('Error fetching seal registration list:', error);
       alert('데이터를 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false)
     }
-  }, [auth.instCd]);
+  }, [auth.instCd, auth.userId]);
 
   useEffect(() => {
     fetchSealRegistrationList();
@@ -131,6 +167,11 @@ function SealRegistrationList() {
             <CustomButton className="seal-delete-button" onClick={handleDeleteApplication}>삭 제</CustomButton>
           </div>
         </div>
+
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
         <table className="seal-registration-table">
           <thead>
             <tr>
@@ -193,6 +234,10 @@ function SealRegistrationList() {
             )}
           </tbody>
         </table>
+        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+        </>
+
+        )}
         <SealRegistrationAddModal
           isOpen={isAddModalOpen}
           onClose={() => {

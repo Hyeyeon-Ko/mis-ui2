@@ -13,6 +13,8 @@ import { AuthContext } from "../../components/AuthContext";
 import { docFilterData } from "../../datas/docDatas";
 import useDocChange from "../../hooks/useDocChange";
 import Pagination from "../../components/common/Pagination";
+import Loading from "../../components/common/Loading";
+import useDateSet from '../../hooks/apply/useDateSet';
 
 function DocInList() {
   const { auth } = useContext(AuthContext);
@@ -27,16 +29,21 @@ function DocInList() {
 
   const [filterInputs, setFilterInputs] = useState(docFilterData);
 
-  const [downloadType, setDownloadType] = useState(null);
+  const [downloadMode, setDownloadMode] = useState(null); 
   const [totalPages, setTotalPages] = useState('1');
-  const [currentPage, setCurrentPage] = useState('1');
+  const [, setCurrentPage] = useState('1');
+
+  const [filteredApplications, setFilteredApplications] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const itemsPerPage = 10;
+  const { formattedStartDate, formattedEndDate } = useDateSet();
+
 
   const {
     handleSelectRow,
     handleSelectAll,
-    setFilteredApplications,
     selectedRows,
-    filteredApplications,
     setSelectedRows,
   } = useDocChange();
 
@@ -52,39 +59,62 @@ function DocInList() {
     return "doc";
   };
 
+  const docInFilters = (filterValues) => {
+    // filterValues에서 documentType과 기타 필터 값을 가져옴
+    const { startDate, endDate, searchType, keyword } = filterValues;
+    
+    const params = {
+      startDate: startDate ? startDate.toISOString().split('T')[0] : '', // 시작일
+      endDate: endDate ? endDate.toISOString().split('T')[0] : '', // 종료일
+      searchType: searchType,
+      keyword: keyword, // 검색어
+      status: "A"
+    };
+
+    fetchDocInList(1, itemsPerPage, params);
+  };
+
   const fetchDocInList = useCallback(
     async (
-      searchType = "전체",
-      keyword = "",
-      startDate = null,
-      endDate = null,
+      // searchType = "전체",
+      // keyword = "",
+      // startDate = null,
+      // endDate = null,
+      // pageIndex = 1, 
+      // pageSize = itemsper,
+      // status = "A"
       pageIndex = 1, 
-      pageSize = 10,
-      status ="",
+      pageSize = itemsPerPage, 
+      filters= {status: "A"}
     ) => {
+      setLoading(true)
       try {
-        const formattedStartDate = startDate
-          ? startDate.toISOString().split("T")[0]
-          : "";
-        const formattedEndDate = endDate
-          ? endDate.toISOString().split("T")[0]
-          : "";
-
-        const response = await axios.get("/api/doc/receiveList2", {
+        // const formattedStartDate = startDate?.toISOString().split('T')[0] || '';
+        // const formattedEndDate = endDate?.toISOString().split('T')[0] || '';
+  
+        const response = await axios.get('/api/doc/receiveList2', {
           params: {
             instCd: auth.instCd,
-            searchType,
-            keyword,
-            startDate: formattedStartDate,
-            endDate: formattedEndDate,
+            // searchType,
+            // keyword,
+            // startDate: formattedStartDate,
+            // endDate: formattedEndDate,
+            searchType: filters.searchType,
+            keyword: filters.keyword,
+            startDate: filters.startDate ? filters.startDate : formattedStartDate,
+            endDate: filters.endDate ? filters.endDate : formattedEndDate,
             pageIndex,
             pageSize,
-            status,
+            status: filters.status,
           },
         });
-
-        if (response.data && response.data.data) {
-          const formattedData = response.data.data.map((item) => ({
+  
+        const content = response.data?.data?.content ?? [];
+        const totalPages = response.data?.data?.totalPages ?? 1;
+        const currentPage = response.data?.data?.number + 1 || 1;
+  
+        if (content.length) {
+          const formattedData = content.map(item => ({
             draftId: item.draftId,
             draftDate: item.draftDate,
             docId: item.docId,
@@ -96,16 +126,20 @@ function DocInList() {
             fileUrl: item.fileUrl,
             docType: deriveDocType(item.filePath),
           }));
+  
           setApplications(formattedData);
           setFilteredApplications(formattedData);
+          setTotalPages(totalPages);
+          setCurrentPage(currentPage);
+        } else {
+          console.warn("No content found in response.");
         }
-        setTotalPages(totalPages);
-        setCurrentPage(currentPage);
       } catch (error) {
         console.error("Error fetching document list:", error);
+      } finally {
+        setLoading(false)
       }
     },
-    // eslint-disable-next-line
     [auth.instCd, setFilteredApplications]
   );
 
@@ -125,33 +159,52 @@ function DocInList() {
   const handleFileDownloadClick = (draftId, fileName) => {
     setSelectedDraftId(draftId);
     setSelectedFileName(fileName);
-    setDownloadType("single");
+    setDownloadMode('single'); 
     setShowDownloadReasonModal(true);
-  };
+};
+
+const handleDownloadFiles = () => {
+    if (selectedRows.length === 0) {
+      alert('다운로드할 파일을 선택하세요.');
+      return;
+    }
+    setDownloadMode('multiple'); 
+    setShowDownloadReasonModal(true);
+};
 
   const handleDownloadModalClose = () => {
     setShowDownloadReasonModal(false);
     setSelectedDraftId(null);
     setSelectedFileName("");
-    setDownloadType(null);
+    setDownloadMode(null);
   };
 
-  const handleDownloadConfirm = async ({ reason, fileType }) => {
+  const handleDownloadConfirm = async ({ downloadNotes, downloadType }) => {
     setShowDownloadReasonModal(false);
+    
+    const downloadTypeMap = {
+      'draft': 'A',
+      'order': 'B',
+      'approval': 'C',
+      'check': 'D',
+      'etc': 'Z',
+    };
 
-    if (downloadType === "single") {
+    const convertedFileType = downloadTypeMap[downloadType] || '';
+    const finalDownloadNotes = downloadType === 'etc' ? downloadNotes : null;
+  
+
+    if (downloadMode === "single") {
       try {
-        const response = await axios.get(
-          `/api/file/download/${encodeURIComponent(selectedFileName)}`,
+        const response = await axios.get(`/api/file/download/${encodeURIComponent(selectedFileName)}`,
           {
             params: {
               draftId: selectedDraftId,
-              docType: "doc",
-              fileType: fileType,
-              reason: reason,
+              downloadType: convertedFileType,
+              downloadNotes: finalDownloadNotes, 
               downloaderNm: auth.hngNm,
               downloaderId: auth.userId,
-            },
+              },
             responseType: "blob",
           }
         );
@@ -167,30 +220,22 @@ function DocInList() {
         console.error("Error downloading the file:", error);
         alert("파일 다운로드에 실패했습니다.");
       }
-    } else if (downloadType === "multiple") {
+    } else if (downloadMode === "multiple") {
       const requestData = selectedRows.map((draftId) => {
-        const selectedApp = filteredApplications.find(
-          (app) => app.draftId === draftId
-        );
+        
         return {
           draftId: draftId,
-          docType: selectedApp ? selectedApp.docType : "doc",
-          fileName: selectedApp ? selectedApp.fileName : "",
-          fileType: fileType,
-          reason: reason,
+          downloadType: convertedFileType,
+          downloadNotes: finalDownloadNotes,
           downloaderNm: auth.hngNm,
           downloaderId: auth.userId,
         };
       });
 
       try {
-        const response = await axios.post(
-          "/api/file/download/multiple",
-          requestData,
-          {
-            responseType: "blob",
-          }
-        );
+        const response = await axios.post("/api/file/download/multiple", requestData, {
+          responseType: "blob",
+        });
 
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement("a");
@@ -207,7 +252,7 @@ function DocInList() {
       }
     }
 
-    setDownloadType(null);
+    setDownloadMode(null);
   };
 
   const handleDeleteClick = (draftId) => {
@@ -236,50 +281,53 @@ function DocInList() {
     }
   };
 
-  const handleSearch = async () => {
-    const { searchType, keyword, startDate, endDate, pageIndex, pageSize, status } = filterInputs;
+  // const handleSearch = async () => {
+  //   const { searchType, keyword, startDate, endDate} = filterInputs;
 
-    const formattedStartDate = startDate
-      ? startDate.toISOString().split("T")[0]
-      : null;
-    const formattedEndDate = endDate
-      ? endDate.toISOString().split("T")[0]
-      : null;
+  //   const formattedStartDate = startDate
+  //     ? startDate.toISOString().split("T")[0]
+  //     : null;
+  //   const formattedEndDate = endDate
+  //     ? endDate.toISOString().split("T")[0]
+  //     : null;
 
-    try {
-      const response = await axios.get("/api/doc/receiveList2", {
-        params: {
-          instCd: auth.instCd,
-          searchType,
-          keyword,
-          startDate: formattedStartDate,
-          endDate: formattedEndDate,
-          pageIndex,
-          pageSize,
-          status,
-        },
-      });
+  //   try {
+  //     const response = await axios.get("/api/doc/receiveList2", {
+  //       params: {
+  //         instCd: auth.instCd,
+  //         searchType,
+  //         keyword,
+  //         startDate: formattedStartDate,
+  //         endDate: formattedEndDate,
+  //         pageIndex: 1,
+  //         pageSize: 10,
+  //         status: 'A',
+  //       },
+  //     });
 
-      if (response.data && response.data.data) {
-        const formattedData = response.data.data.map((item) => ({
-          draftId: item.draftId,
-          draftDate: item.draftDate,
-          docId: item.docId,
-          resSender: item.resSender,
-          title: item.title,
-          drafter: item.drafter,
-          status: item.status,
-          fileName: item.fileName,
-          fileUrl: item.fileUrl,
-          docType: deriveDocType(item.filePath),
-        }));
-        setApplications(formattedData);
-        setFilteredApplications(formattedData);
-      }
-    } catch (error) {
-      console.error("Error fetching document list:", error);
-    }
-  };
+  //     const data = response.data?.data || {};
+  //     const content = data.content || [];
+
+  //     if (response.data && response.data.data) {
+  //       const formattedData = content.map((item) => ({
+  //         draftId: item.draftId,
+  //         draftDate: item.draftDate,
+  //         docId: item.docId,
+  //         resSender: item.resSender,
+  //         title: item.title,
+  //         drafter: item.drafter,
+  //         status: item.status,
+  //         fileName: item.fileName,
+  //         fileUrl: item.fileUrl,
+  //         docType: deriveDocType(item.filePath),
+  //       }));
+  //       setApplications(formattedData);
+  //       setFilteredApplications(formattedData);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching document list:", error);
+  //   }
+  // };
 
   const resetFilters = useCallback(() => {
     const defaultStartDate = new Date();
@@ -302,25 +350,11 @@ function DocInList() {
     fetchDocInList();
   };
 
-  const handleDownloadFiles = () => {
-    if (selectedRows.length === 0) {
-      alert("다운로드할 파일을 선택하세요.");
-      return;
-    }
-    setDownloadType("multiple");
-    setShowDownloadReasonModal(true);
-  };
-
   const columns = [
     {
-      header: (
-        <input
-          type="checkbox"
-          onChange={(e) => handleSelectAll(e.target.checked)}
-        />
-      ),
-      accessor: "select",
-      width: "4%",
+      header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
+      accessor: 'select',
+      width: '4%',
       Cell: ({ row }) => (
         <input
           type="checkbox"
@@ -329,30 +363,27 @@ function DocInList() {
         />
       ),
     },
-    { header: "접수일자", accessor: "draftDate", width: "8%" },
-    { header: "문서번호", accessor: "docId", width: "8%" },
-    { header: "발신처", accessor: "resSender", width: "10%" },
-    { header: "제목", accessor: "title", width: "20%" },
+    { header: '접수일자', accessor: 'draftDate', width: '12%', Cell: ({ row }) => row.draftDate.split('T')[0] },
+    { header: '문서번호', accessor: 'docId', width: '8%' },
+    { header: '수신처', accessor: 'resSender', width: '10%' },
+    { header: '제목', accessor: 'title', width: '20%' },
     {
-      header: "첨부파일",
-      accessor: "file",
-      width: "7%",
+      header: '첨부파일',
+      accessor: 'fileName',
+      width: '10%',
       Cell: ({ row }) =>
         row.fileName ? (
-          <button
-            className="download-button"
-            onClick={() => handleFileDownloadClick(row.draftId, row.fileName)}
-          >
+          <button className="download-button" onClick={() => handleFileDownloadClick(row.draftId, row.fileName)}>
             <img src={downloadIcon} alt="Download" className="action-icon" />
           </button>
         ) : null,
     },
-    { header: "접수인", accessor: "drafter", width: "8%" },
-    { header: "상태", accessor: "status", width: "8%" },
+    { header: '접수인', accessor: 'drafter', width: '8%' },
+    { header: '상태', accessor: 'status', width: '8%' },
     {
-      header: "신청 삭제",
-      accessor: "delete",
-      width: "7%",
+      header: '신청 삭제',
+      accessor: 'delete',
+      width: '7%',
       Cell: ({ row }) => (
         <div className="icon-cell">
           <img
@@ -392,7 +423,8 @@ function DocInList() {
           setEndDate={(date) =>
             setFilterInputs((prev) => ({ ...prev, endDate: date }))
           }
-          onSearch={handleSearch}
+          // onSearch={handleSearch}
+          onSearch={docInFilters}
           onReset={handleReset}
           showDocumentType={false}
           showSearchCondition={true}
@@ -410,10 +442,16 @@ function DocInList() {
           setDocumentType={() => {}}
         />
         <div className="doc-out-content">
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
           {/* <Table columns={columns} data={filteredApplications} /> */}
           <Table columns={columns} data={filteredApplications || []} />
         <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+        </>
 
+)}
         </div>
         {showDeleteModal && (
           <ConfirmModal

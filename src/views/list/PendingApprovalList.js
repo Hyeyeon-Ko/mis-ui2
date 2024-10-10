@@ -38,7 +38,7 @@ function PendingApprovalList() {
   const queryParams = new URLSearchParams(location.search);
   const documentType = queryParams.get('documentType') || '';
 
-  const { formattedStartDate: defaultStartDate, formattedEndDate: defaultEndDate } = useDateSet();
+  const { formattedStartDate, formattedEndDate } = useDateSet();
 
   const [totalPages, setTotalPages] = useState('1')
   const [currentPage, setCurrentPage] = useState('1')
@@ -85,12 +85,13 @@ function PendingApprovalList() {
     }
   };
 
-  const fetchPendingList = useCallback(async (startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
+  // const fetchPendingList = useCallback(async (startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
+  const fetchPendingList = useCallback(async (pageIndex = 1, pageSize = itemsPerPage, filters={}) => {
     setLoading(true);
     try {
 
-      const formattedStartDate = startDate instanceof Date ? startDate.toISOString().split('T')[0] : defaultStartDate;
-      const formattedEndDate = endDate instanceof Date ? endDate.toISOString().split('T')[0] : defaultEndDate;
+      // const formattedStartDate = startDate instanceof Date ? startDate.toISOString().split('T')[0] : defaultStartDate;
+      // const formattedEndDate = endDate instanceof Date ? endDate.toISOString().split('T')[0] : defaultEndDate;
 
       const response = await axios.get(`/api/pendingList2`, {
         params: {
@@ -100,8 +101,10 @@ function PendingApprovalList() {
           documentType: convertDocumentType(documentType),
           
           // PostSearchRequestDTO parameters
-          startDate: formattedStartDate,
-          endDate: formattedEndDate,
+          // startDate: formattedStartDate,
+          // endDate: formattedEndDate,
+          startDate: filters.startDate ? filters.startDate : formattedStartDate,
+          endDate: filters.endDate ? filters.endDate : formattedEndDate,
 
           // PostPageRequest parameters
           pageIndex,
@@ -119,27 +122,34 @@ function PendingApprovalList() {
       ];
 
       const selectedData = combinedData.find(response => response.totalElements > 0);
+      
+      if (!selectedData || !selectedData.content.length) {
+        setApplications([]);
+        setTotalPages(1);
+        setCurrentPage(1);
+        } else {
+        const totalPages = selectedData.totalPages;
+        const currentPage = selectedData.number + 1;
+        const content = selectedData.content;
+        const filteredData = content.filter(application => application.applyStatus !== 'X');
 
-      const totalPages = selectedData.totalPages;
-      const currentPage = selectedData.number + 1;
-      const content = selectedData.content;
-      const filteredData = content.filter(application => application.applyStatus !== 'X');
+        const transformedData = filteredData.map(item => ({
+          draftId: item.draftId,
+          title: item.title,
+          center: item.instNm || '재단본부',
+          draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
+          drafter: item.drafter,
+          status: '승인대기',
+          docType: item.docType
+        }));
+    
+        transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
+        setApplications(transformedData);
+        setTotalPages(totalPages);
+        setCurrentPage(currentPage);
+      }
   
-      const transformedData = filteredData.map(item => ({
-        draftId: item.draftId,
-        title: item.title,
-        center: item.instNm || '재단본부',
-        draftDate: item.draftDate ? parseDateTime(item.draftDate) : '',
-        drafter: item.drafter,
-        status: '승인대기',
-        docType: item.docType
-      }));
-  
-      transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
-  
-      setApplications(transformedData);
-      setTotalPages(totalPages);
-      setCurrentPage(currentPage);
+      
     } catch (error) {
       console.error('Error fetching pending list: 데이터를 불러오는 중 오류가 발생했습니다.', error);
     } finally {
@@ -149,8 +159,10 @@ function PendingApprovalList() {
   }, [documentType, auth.instCd, auth.userId, startDate, endDate]);
       
   useEffect(() => {
-    fetchPendingList(filters);
-  }, [filters, fetchPendingList]);
+    // fetchPendingList(filters);
+    fetchPendingList(currentPage, itemsPerPage);
+  // }, [filters, fetchPendingList]);
+  }, [currentPage, fetchPendingList]);
 
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
@@ -216,6 +228,18 @@ function PendingApprovalList() {
     }));
   };
 
+  const applyFilters = (filterValues) => {
+    const { startDate, endDate } = filterValues;
+    
+    const params = {
+      startDate: startDate ? startDate.toISOString().split('T')[0] : '',
+      endDate: endDate ? endDate.toISOString().split('T')[0] : '',
+      selectedCenter,
+    };
+
+    fetchPendingList(1, itemsPerPage, params);
+  };
+
   const handleReset = () => {
     const defaultStartDate = new Date();
     defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
@@ -234,13 +258,13 @@ function PendingApprovalList() {
   const approveDocument = async (documentId) => {
     try {
       await axios.put(`/api/doc/confirm`, null, {
-        params: { draftId: documentId , userId: auth.userId},
+        params: { draftId: documentId , userId: auth.userId, rejectReason: null},
       });
       alert('승인이 완료되었습니다.');
       closeModal();
-      
-      fetchPendingList(filters);
 
+      fetchPendingList(currentPage, itemsPerPage); 
+  
       if (typeof refreshSidebar === 'function') {
         refreshSidebar();  
       }
@@ -303,7 +327,8 @@ function PendingApprovalList() {
           setEndDate={setEndDate}
           filters={filters}
           setFilters={setFilters}
-          onSearch={handleSearch}
+          // onSearch={handleSearch}
+          onSearch={applyFilters}
           onReset={handleReset}
           showDocumentType={false}
           showSearchCondition={false}

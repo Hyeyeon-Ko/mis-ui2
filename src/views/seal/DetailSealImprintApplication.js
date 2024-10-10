@@ -17,7 +17,7 @@ import ReasonModal from '../../components/ReasonModal';
 
 function DetailSealImprintApplication() {
     const {handleSealChange, handleQuantityChange, handleChange, applicationDetails, setApplicationDetails, sealSelections, setSealSelections} = useSealForm();
-    const { refreshSidebar } = useContext(AuthContext);
+    const { auth, refreshSidebar } = useContext(AuthContext);
     const { draftId } = useParams(); 
     const navigate = useNavigate();
     const location = useLocation();
@@ -159,9 +159,12 @@ function DetailSealImprintApplication() {
 
     const handleRejectConfirm = async (reason) => {
         try {
-          const response = await axios.post(`/api/seal/return/${draftId}`, reason, {
+          const response = await axios.post(`/api/seal/return/${draftId}`, {
+            userId: auth.userId,
+            rejectReason: reason
+          }, {
             headers: {
-              'Content-Type': 'text/plain',
+              'Content-Type': 'application/json',
             },
           });
           if (response.data.code === 200) {

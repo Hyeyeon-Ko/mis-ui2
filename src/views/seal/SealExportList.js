@@ -7,12 +7,17 @@ import { AuthContext } from '../../components/AuthContext';
 import axios from 'axios';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import ReasonModal from '../../components/ReasonModal'; 
+import useDateSet from '../../hooks/apply/useDateSet';
+import Pagination from '../../components/common/Pagination';
 import '../../styles/seal/SealExportList.css';
+import Loading from '../../components/common/Loading';
 
 function SealExportList() {
   const { auth } = useContext(AuthContext);
   const [applications, setApplications] = useState([]);
   const [filterInputs, setFilterInputs] = useState({
+    startDate: null,
+    endDate: null,
     searchType: '전체',
     keyword: '',
   });
@@ -25,18 +30,50 @@ function SealExportList() {
   const [selectedFileName, setSelectedFileName] = useState('');
   const [selectedDraftId, setSelectedDraftId] = useState(null);
 
-  const fetchSealExportList = useCallback(async (searchType = null, keyword = null) => {
+  const { formattedStartDate, formattedEndDate } = useDateSet();
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
+  const [loading, setLoading] = useState(false);
+
+
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    fetchSealExportList(currentPage, itemsPerPage);
+    // eslint-disable-next-line
+  }, [currentPage]);
+
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
+  };
+
+  const fetchSealExportList = useCallback(async (pageIndex = 1, pageSize = itemsPerPage, filters= {}) => {
     try {
       const { instCd } = auth;
-      const response = await axios.get(`/api/seal/exportList`, {
+      const response = await axios.get(`/api/seal/exportList2`, {
         params: {
-          instCd,
-          searchType,
-          keyword,
+          // ApplyRequestDTO parameters
+          userId: auth.userId || '',
+          instCd: instCd || '',
+
+          // PostSearchRequestDTO parameters
+          searchType: filters.searchType,
+          keyword: filters.keyword,
+          startDate: filters.startDate ? filters.startDate : formattedStartDate,
+          endDate: filters.endDate ? filters.endDate : formattedEndDate,
+
+          // PostPageRequest parameters
+          pageIndex,
+          pageSize
         },
       });
+
+      const data = response.data.data;
+      const totalPages = data.totalPages;
+      const currentPage = data.number + 1;
       
-      const fetchedData = response.data.data.map((item, index) => ({
+      const fetchedData = data.content.map((item, index) => ({
         id: index + 1, 
         draftId: item.draftId,
         expDate: item.expDate,
@@ -56,14 +93,18 @@ function SealExportList() {
       }));
 
       setApplications(fetchedData);
+      setTotalPages(totalPages);
+      setCurrentPage(currentPage);
 
       const storedClickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
       setClickedRows(storedClickedRows);
     } catch (error) {
       console.error('Error fetching seal export list:', error);
       alert('인장 반출대장 데이터를 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false)
     }
-  }, [auth]);
+  }, [auth, formattedEndDate, formattedStartDate]);
 
   useEffect(() => {
     if (initialLoad) {
@@ -72,12 +113,27 @@ function SealExportList() {
     }
   }, [initialLoad, fetchSealExportList]);
 
-  const handleSearch = () => {
-    fetchSealExportList(filterInputs.searchType, filterInputs.keyword);  
+  const handleSearch = (filterValues) => {
+    // fetchSealExportList(filterInputs.searchType, filterInputs.keyword);  
+    // filterValues에서 documentType과 기타 필터 값을 가져옴
+    const { startDate, endDate, documentType, searchType, filters, keyword } = filterValues;
+    
+    const params = {
+      startDate: startDate ? startDate.toISOString().split('T')[0] : '', // 시작일
+      endDate: endDate ? endDate.toISOString().split('T')[0] : '', // 종료일
+      searchType: searchType,
+      keyword: keyword, // 검색어
+    };
+
+    fetchSealExportList(1, itemsPerPage, params);
   };
 
   const handleReset = () => {
+    const defaultStartDate = new Date();
+    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
     setFilterInputs({
+      startDate: defaultStartDate,
+      endDate: new Date(),
       searchType: '전체',
       keyword: '',
     });
@@ -186,6 +242,11 @@ function SealExportList() {
           setDocumentType={() => {}}
         />
 
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+
         <table className="table">
           <thead>
             <tr>
@@ -243,6 +304,10 @@ function SealExportList() {
             )}
           </tbody>
         </table>
+        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+        </>
+
+)}
       </div>
       <ReasonModal 
         show={showDownloadReasonModal} 

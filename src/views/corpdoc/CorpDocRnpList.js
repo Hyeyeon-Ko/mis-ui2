@@ -7,6 +7,8 @@ import SignitureImage from '../../assets/images/signiture.png';
 import axios from 'axios';
 import '../../styles/corpdoc/CorpDocRnpList.css';
 import { corpFilterData } from '../../datas/corpDocDatas';
+import useDateSet from '../../hooks/apply/useDateSet';
+import Pagination from '../../components/common/Pagination';
 
 function CorpDocRnpList() {
   const { auth } = useContext(AuthContext);
@@ -18,18 +20,56 @@ function CorpDocRnpList() {
   const [clickedRows, setClickedRows] = useState([]);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
 
-  const fetchRnpData = useCallback(async (searchType = '전체', keyword = '') => {
+  // const { formattedStartDate: defaultStartDate, formattedEndDate: defaultEndDate } = useDateSet();
+  const { formattedStartDate, formattedEndDate } = useDateSet();
+  const [totalPages, setTotalPages] = useState('1')
+  const [currentPage, setCurrentPage] = useState('1')
+
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    fetchRnpData(currentPage, itemsPerPage);
+    // eslint-disable-next-line
+  }, [currentPage]);
+
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
+  };
+
+  // const fetchRnpData = useCallback(async (searchType = '전체', keyword = '', startDate = null, endDate = null, pageIndex = 1, pageSize = itemsPerPage) => {
+  const fetchRnpData = useCallback(async (pageIndex = 1, pageSize = itemsPerPage, filters={}) => {
     try {
+      // const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : defaultStartDate;
+      // const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : defaultEndDate;
+
       const response = await axios.get('/api/corpDoc/rnpList', {
         params: {
+          // PostSearchRequestDTO parameters
+          // searchType,
+          // keyword,
+          // startDate: formattedStartDate,
+          // endDate: formattedEndDate,
+          searchType: filters.searchType,
+          keyword: filters.keyword,
+          startDate: filters.startDate ? filters.startDate : formattedStartDate,
+          endDate: filters.endDate ? filters.endDate : formattedEndDate,
+
+          // inst parameter
           instCd: auth.instCd,
-          searchType,
-          keyword,
+
+          // PostPageRequest parameters
+          pageIndex,
+          pageSize
         },
       });
 
       if (response.data) {
-        const rnpListData = response.data.data.map(item => ({
+        const data = response.data.data
+        const totalPages = data.totalPages;
+        const currentPage = data.number + 1;
+
+        const rnpListData = data.content.map(item => ({
           id: item.draftId,
           date: item.draftDate,
           drafter: item.drafter,
@@ -45,6 +85,8 @@ function CorpDocRnpList() {
         }));
 
         setApplications(rnpListData);
+        setTotalPages(totalPages);
+        setCurrentPage(currentPage);
 
         const clickedRows = JSON.parse(localStorage.getItem('clickedRows')) || [];
         setClickedRows(clickedRows);
@@ -54,6 +96,7 @@ function CorpDocRnpList() {
     } catch (error) {
       console.error("Error fetching RNP data:", error);
     }
+  // }, [auth.instCd, defaultEndDate, defaultStartDate]);
   }, [auth.instCd]);
 
   useEffect(() => {
@@ -62,9 +105,24 @@ function CorpDocRnpList() {
     }
   }, [fetchRnpData, initialDataLoaded]);
 
-  const applyFilters = useCallback(() => {
-    fetchRnpData(filterInputs.searchType, filterInputs.keyword); 
-  }, [fetchRnpData, filterInputs]);
+  // const applyFilters = useCallback(() => {
+  //   fetchRnpData(filterInputs.searchType, filterInputs.keyword); 
+  // }, [fetchRnpData, filterInputs]);
+
+  const applyFilters = (filterValues) => {
+    // filterValues에서 documentType과 기타 필터 값을 가져옴
+    const { startDate, endDate, documentType, searchType, filters, keyword } = filterValues;
+    
+    const params = {
+      startDate: startDate ? startDate.toISOString().split('T')[0] : '', // 시작일
+      endDate: endDate ? endDate.toISOString().split('T')[0] : '', // 종료일
+      documentType: documentType,
+      searchType: searchType,
+      keyword: keyword, // 검색어
+    };
+    
+    fetchRnpData(1, itemsPerPage, params);
+  };
 
   const handleReset = () => {
     setFilterInputs({
@@ -103,6 +161,7 @@ function CorpDocRnpList() {
         <Breadcrumb items={['법인서류 대장', '서류 수불 대장']} />
 
         <ConditionFilter
+          startDateLabel="수령일자"
           startDate={null}  
           setStartDate={() => {}} 
           endDate={null} 
@@ -118,7 +177,7 @@ function CorpDocRnpList() {
           setSearchType={(searchType) => setFilterInputs(prev => ({ ...prev, searchType }))}
           keyword={filterInputs.keyword}
           setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
-          searchOptions={['전체', '수령일자', '신청자', '제출처', '사용목적']}
+          searchOptions={['전체', '신청자', '제출처', '사용목적']}
           setDocumentType={() => {}}
         />
 
@@ -143,7 +202,7 @@ function CorpDocRnpList() {
             {applications.length > 0 ? (
               applications.map((app, index) => (
                 <tr key={index}>
-                  <td>{app.date}</td>
+                  <td>{app.date.split('T')[0]}</td>
                   <td>{app.drafter}</td>
                   <td>{app.submission}</td>
                   <td>{app.purpose}</td>
@@ -168,6 +227,7 @@ function CorpDocRnpList() {
             )}
           </tbody>
         </table>
+        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
       </div>
       {modalVisible && selectedDocumentDetails && (
         <CorpDocApprovalModal

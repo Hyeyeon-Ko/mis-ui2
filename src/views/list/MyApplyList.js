@@ -40,7 +40,7 @@ function MyApplyList() {
   const [loading, setLoading] = useState(false);
   const itemsPerPage = 10;
 
-  const fetchApplications = useCallback(async (pageIndex = 1,  pageSize = itemsPerPage) => {
+  const fetchApplications = useCallback(async (pageIndex = 1,  pageSize = itemsPerPage, filters = {}) => {
     setLoading(true);
 
     try {
@@ -48,14 +48,33 @@ function MyApplyList() {
         params: {
           userId: auth.userId,
           pageIndex,
-          pageSize
+          pageSize,
+          startDate: filters.startDate,
+          endDate: filters.endDate,
+          documentType: filters.documentType === '' || filters.documentType === undefined || filters.documentType == null ? null : filters.documentType,
+          keyword: filters.keyword,
         },
       });
   
-      const data = response.data?.data || {};
-    
-      const pagedResult = data.pagedResult || {}; 
-      const combinedData = pagedResult.content || []; 
+      const { myBcdResponses, myDocResponses, myCorpDocResponses, mySealResponses, pagedResult } = response.data.data;
+
+      let combinedData = [];
+      if(!pagedResult) {
+        if(myBcdResponses != null) { 
+          combinedData = combinedData.concat(myBcdResponses.content);
+        }
+        if(myDocResponses != null) { 
+          combinedData = combinedData.concat(myDocResponses.content);
+        }
+        if(myCorpDocResponses != null) { 
+          combinedData = combinedData.concat(myCorpDocResponses.content);
+        }
+        if(mySealResponses != null) { 
+          combinedData = combinedData.concat(mySealResponses.content);
+        }
+      } else {
+        combinedData = pagedResult.content || []; 
+      }
   
       const uniqueData = combinedData.reduce((acc, current) => {
         const x = acc.find(item => item.draftId === current.draftId && item.docType === current.docType);
@@ -91,8 +110,20 @@ function MyApplyList() {
     }
   }, [auth.userId, setTotalPages, setCurrentPage, currentPage, totalPages]);
 
-  const applyFilters = () => {
-    fetchApplications();
+  // const applyFilters = () => {
+  const applyFilters = (filterValues) => {
+    // filterValues에서 documentType과 기타 필터 값을 가져옴
+    const { startDate, endDate, documentType, filters, keyword } = filterValues;
+    
+    const params = {
+      startDate: startDate ? startDate.toISOString().split('T')[0] : '', // 시작일
+      endDate: endDate ? endDate.toISOString().split('T')[0] : '', // 종료일
+      documentType: documentType,
+      keyword: keyword, // 검색어
+    };
+
+    // fetchApplications();
+    fetchApplications(1, itemsPerPage, params);
   };
 
   useEffect(() => {

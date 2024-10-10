@@ -12,6 +12,7 @@ import { FadeLoader } from 'react-spinners';
 import { AuthContext } from '../../components/AuthContext'; 
 import useBdcChange from '../../hooks/bdc/useBdcChange';
 import Pagination from '../../components/common/Pagination';
+import Loading from '../../components/common/Loading';
 
 
 function BcdOrder() {
@@ -20,8 +21,9 @@ function BcdOrder() {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [totalPages, setTotalPages] = useState('1')
-  const [currentPage, setCurrentPage] = useState('1')
+  const [totalPages, setTotalPages] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [loading, setLoading] = useState(false);
 
   const itemsPerPage = 10;
 
@@ -52,6 +54,7 @@ function BcdOrder() {
 
   // 발주 리스트 가져오기
   const fetchBcdOrderList = useCallback(async (pageIndex = 1, pageSize = itemsPerPage) => {
+    setLoading(true);
     try {
       const response = await axios.get(`/api/bsc/order/get`, {
         params: {
@@ -61,8 +64,7 @@ function BcdOrder() {
         },
       });
       const data = response.data.data || response.data;
-      console.log(data)
-      const totalPages = data.totalPages;
+      const totalPages = Math.max(data.totalPages, 1);
       const currentPage = data.number + 1;
 
       const transformedData = data.content.map((item) => ({
@@ -79,6 +81,8 @@ function BcdOrder() {
       setCurrentPage(currentPage);
     } catch (error) {
       console.error('Error fetching bcdOrder list: ', error);
+    } finally {
+      setLoading(false)
     }
   }, [auth.instCd, setApplications]);
 
@@ -262,6 +266,10 @@ function BcdOrder() {
             </CustomButton>
           </div>
         </div>
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
         <Table 
           columns={columns} 
           data={applications} 
@@ -272,6 +280,9 @@ function BcdOrder() {
           onRowMouseUp={handleMouseUp}    
         />
         <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+        </>
+
+)}
       </div>
       {isLoading && (
         <div className="loading-overlay">

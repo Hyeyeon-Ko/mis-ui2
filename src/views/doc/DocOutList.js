@@ -13,9 +13,12 @@ import { AuthContext } from '../../components/AuthContext';
 import { docFilterData } from '../../datas/docDatas';
 import useDocChange from '../../hooks/useDocChange';
 import Pagination from '../../components/common/Pagination';
+import Loading from '../../components/common/Loading';
+import useDateSet from '../../hooks/apply/useDateSet';
 
 function DocOutList() {
   const { auth } = useContext(AuthContext);
+  const [, setApplications] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const [showDownloadReasonModal, setShowDownloadReasonModal] = useState(false);
@@ -26,18 +29,23 @@ function DocOutList() {
 
   const [filterInputs, setFilterInputs] = useState(docFilterData);
 
-  const [downloadType, setDownloadType] = useState(null); 
+  const [downloadMode, setDownloadMode] = useState(null); 
   const [totalPages, setTotalPages] = useState('1')
-  const [currentPage, setCurrentPage] = useState('1')
+  const [, setCurrentPage] = useState('1')
+  const [loading, setLoading] = useState(false);
+
+  const [filteredApplications, setFilteredApplications] = useState([]);
+
+  const itemsPerPage = 10;
+  const { formattedStartDate, formattedEndDate } = useDateSet();
 
   const {
     handleSelectRow,
     handleSelectAll,
-    setFilteredApplications,
     selectedRows,
-    filteredApplications,
     setSelectedRows,
   } = useDocChange();
+
 
   const deriveDocType = (filePath) => {
     if (!filePath) return "doc"; 
@@ -51,34 +59,57 @@ function DocOutList() {
     return "doc";
   };
 
-  const fetchDocOutList = useCallback(async (
-    searchType = "전체",
-    keyword = "",
-    startDate = null,
-    endDate = null,
-    pageIndex = 1, 
-    pageSize = 10,
-    status ="",
-    ) => {
-    try {
-      const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : '';
-      const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : '';
+  const docOutFilters = (filterValues) => {
+    // filterValues에서 documentType과 기타 필터 값을 가져옴
+    const { startDate, endDate, searchType, keyword } = filterValues;
+    
+    const params = {
+      startDate: startDate ? startDate.toISOString().split('T')[0] : '', // 시작일
+      endDate: endDate ? endDate.toISOString().split('T')[0] : '', // 종료일
+      searchType: searchType,
+      keyword: keyword, // 검색어
+      status: "B"
+    };
 
-      const response = await axios.get('/api/doc/sendList2', {
+    fetchDocOutList(1, itemsPerPage, params);
+  };
+
+  const fetchDocOutList = useCallback(async (
+    // searchType = "전체",
+    // keyword = "",
+    // startDate = null,
+    // endDate = null,
+    // pageIndex = 1, 
+    // pageSize = 10,
+    // status = "B",
+      pageIndex = 1, 
+      pageSize = itemsPerPage, 
+      filters= {status: "B"}
+  ) => {
+    setLoading(true);
+    try {
+      // const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : '';
+      // const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : '';
+      
+      const response = await axios.get('/api/doc/receiveList2', {
         params: {
           instCd: auth.instCd,
-          searchType,
-          keyword,
-          startDate: formattedStartDate,
-          endDate: formattedEndDate,
-          pageIndex,
-          pageSize,
-          status,
+          // searchType,
+          // keyword,
+          // startDate: formattedStartDate,
+          // endDate: formattedEndDate,
+            searchType: filters.searchType,
+            keyword: filters.keyword,
+            startDate: filters.startDate ? filters.startDate : formattedStartDate,
+            endDate: filters.endDate ? filters.endDate : formattedEndDate,
+            pageIndex,
+            pageSize,
+            status: filters.status,
         },
       });
-
-      if (response.data && response.data.data) {
-        const formattedData = response.data.data.map((item) => ({
+  
+      if (response.data && response.data.data && Array.isArray(response.data.data.content)) { 
+        const formattedData = response.data.data.content.map((item) => ({
           draftId: item.draftId,
           draftDate: item.draftDate,
           docId: item.docId,
@@ -90,16 +121,21 @@ function DocOutList() {
           fileUrl: item.fileUrl,
           docType: deriveDocType(item.filePath),
         }));
+    
+        setApplications(formattedData);
         setFilteredApplications(formattedData);
+        setTotalPages(response.data.data.totalPages); 
+        setCurrentPage(response.data.data.number + 1); 
+      } else {
+        console.error("Unexpected response structure: ", response.data);
       }
-      setTotalPages(totalPages);
-      setCurrentPage(currentPage);
     } catch (error) {
       console.error('Error fetching document list:', error);
+    } finally {
+      setLoading(false);
     }
-     // eslint-disable-next-line
   }, [auth.instCd, setFilteredApplications]);
-
+      
   useEffect(() => {
     fetchDocOutList();
   }, [fetchDocOutList]);
@@ -113,41 +149,50 @@ function DocOutList() {
     setCurrentPage(selectedPage);
   };
 
-
-  const handleFileDownloadClick = (draftId, fileName) => {
-    setSelectedDraftId(draftId);
-    setSelectedFileName(fileName);
-    setDownloadType('single'); 
-    setShowDownloadReasonModal(true);
-  };
-
-  const handleDownloadFiles = () => {
-    if (selectedRows.length === 0) {
-      alert('다운로드할 파일을 선택하세요.');
-      return;
-    }
-    setDownloadType('multiple');
-    setShowDownloadReasonModal(true);
-  };
-
   const handleDownloadModalClose = () => {
     setShowDownloadReasonModal(false);
     setSelectedDraftId(null);
     setSelectedFileName('');
-    setDownloadType(null);
+    setDownloadMode(null);
   };
 
-  const handleDownloadConfirm = async ({ reason, fileType }) => {
-    setShowDownloadReasonModal(false);
+  const handleFileDownloadClick = (draftId, fileName) => {
+    setSelectedDraftId(draftId);
+    setSelectedFileName(fileName);
+    setDownloadMode('single'); 
+    setShowDownloadReasonModal(true);
+};
 
-    if (downloadType === 'single') {
+const handleDownloadFiles = () => {
+    if (selectedRows.length === 0) {
+      alert('다운로드할 파일을 선택하세요.');
+      return;
+    }
+    setDownloadMode('multiple'); 
+    setShowDownloadReasonModal(true);
+};
+
+const handleDownloadConfirm = async ({ downloadNotes, downloadType }) => {
+    console.log("Download confirmed with reason:", downloadNotes, "and type:", downloadType);
+
+    const downloadTypeMap = {
+      'draft': 'A',
+      'order': 'B',
+      'approval': 'C',
+      'check': 'D',
+      'etc': 'Z',
+    };
+
+    const convertedFileType = downloadTypeMap[downloadType] || '';
+    const finalDownloadNotes = downloadType === 'etc' ? downloadNotes : null;
+    
+    if (downloadMode === 'single') { 
       try {
         const response = await axios.get(`/api/file/download/${encodeURIComponent(selectedFileName)}`, {
           params: {
             draftId: selectedDraftId,
-            docType: 'doc',
-            fileType: fileType,
-            reason: reason,
+            downloadType: convertedFileType,
+            downloadNotes: finalDownloadNotes, 
             downloaderNm: auth.hngNm,
             downloaderId: auth.userId,
           },
@@ -161,19 +206,18 @@ function DocOutList() {
         document.body.appendChild(link);
         link.click();
         link.parentNode.removeChild(link);
+
+        console.log("File downloaded successfully");
       } catch (error) {
         console.error('Error downloading the file:', error);
         alert('파일 다운로드에 실패했습니다.');
       }
-    } else if (downloadType === 'multiple') {
+    } else if (downloadMode === 'multiple') { 
       const requestData = selectedRows.map((draftId) => {
-        const selectedApp = filteredApplications.find(app => app.draftId === draftId);
         return {
           draftId: draftId,
-          docType: selectedApp ? selectedApp.docType : 'doc', 
-          fileName: selectedApp ? selectedApp.fileName : '',
-          fileType: fileType,
-          reason: reason,
+          downloadType: convertedFileType,
+          downloadNotes: finalDownloadNotes,
           downloaderNm: auth.hngNm,
           downloaderId: auth.userId,
         };
@@ -181,27 +225,27 @@ function DocOutList() {
 
       try {
         const response = await axios.post('/api/file/download/multiple', requestData, {
-          responseType: 'blob', 
+          responseType: 'blob',
         });
 
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'documents.zip'); 
+        link.setAttribute('download', 'documents.zip');
         document.body.appendChild(link);
         link.click();
         link.parentNode.removeChild(link);
 
-        setSelectedRows([]);
+        setSelectedRows([]); 
       } catch (error) {
         console.error('파일 다운로드에 실패했습니다:', error);
         alert('파일 다운로드에 실패했습니다.');
       }
     }
 
-    setDownloadType(null); 
+    setDownloadMode(null); 
   };
-
+    
   const handleDeleteClick = (draftId) => {
     if (draftId) {
       setSelectedDraftId(draftId);
@@ -235,13 +279,16 @@ function DocOutList() {
     const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : null;
 
     try {
-      const response = await axios.get('/api/doc/sendList', {
+      const response = await axios.get('/api/doc/receiveList2', {
         params: {
           instCd: auth.instCd,
-          searchType: searchType,
-          keyword: keyword.trim() !== '' ? keyword : null,
+          searchType,
+          keyword,
           startDate: formattedStartDate,
           endDate: formattedEndDate,
+          pageIndex: 1,
+          pageSize: 10,
+          status: 'B',
         },
       });
 
@@ -258,6 +305,7 @@ function DocOutList() {
           fileUrl: item.fileUrl,
           docType: deriveDocType(item.filePath), 
         }));
+        setApplications(formattedData);
         setFilteredApplications(formattedData);
       }
     } catch (error) {
@@ -299,14 +347,14 @@ function DocOutList() {
         />
       ),
     },
-    { header: '접수일자', accessor: 'draftDate', width: '8%' },
+    { header: '접수일자', accessor: 'draftDate', width: '12%', Cell: ({ row }) => row.draftDate.split('T')[0] },
     { header: '문서번호', accessor: 'docId', width: '8%' },
     { header: '수신처', accessor: 'resSender', width: '10%' },
     { header: '제목', accessor: 'title', width: '20%' },
     {
       header: '첨부파일',
-      accessor: 'file',
-      width: '7%',
+      accessor: 'fileName',
+      width: '10%',
       Cell: ({ row }) =>
         row.fileName ? (
           <button className="download-button" onClick={() => handleFileDownloadClick(row.draftId, row.fileName)}>
@@ -332,7 +380,7 @@ function DocOutList() {
       ),
     },
   ];
-
+    
   return (
     <div className="content">
       <div className="doc-out-list">
@@ -352,7 +400,8 @@ function DocOutList() {
           setStartDate={(date) => setFilterInputs((prev) => ({ ...prev, startDate: date }))}
           endDate={filterInputs.endDate}
           setEndDate={(date) => setFilterInputs((prev) => ({ ...prev, endDate: date }))}
-          onSearch={handleSearch}
+          // onSearch={handleSearch}
+          onSearch={docOutFilters}
           onReset={handleReset}
           showDocumentType={false}
           showSearchCondition={true}
@@ -366,9 +415,14 @@ function DocOutList() {
           setDocumentType={() => {}}
         />
         <div className="doc-out-content">
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
           <Table columns={columns} data={filteredApplications || []} />
         <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
-
+        </>
+        )}
         </div>
         {showDeleteModal && (
           <ConfirmModal
