@@ -144,7 +144,7 @@ function MyApplyList() {
 
   useEffect(() => {
     fetchApplications(currentPage);
-  }, [currentPage]);
+  }, [currentPage, fetchApplications]);
 
   const applyStatusFilters = useCallback(() => {
     let filteredData = applications;
