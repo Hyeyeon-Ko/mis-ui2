@@ -11,7 +11,7 @@ import '../../styles/common/Page.css';
 import axios from 'axios';
 import { filterData } from '../../datas/listDatas';
 import useListChange from '../../hooks/useListChange';
-import Pagination from '../../components/common/Pagination';
+import PaginationSub from '../../components/common/PaginationSub';
 import Loading from '../../components/common/Loading';
 
 
@@ -55,7 +55,12 @@ function MyApplyList() {
           keyword: filters.keyword,
         },
       });
-  
+
+      const data = response.data.data.pagedResult || response.data;
+
+      const totalPages = Math.max(data.totalPages, 1);
+      const currentPage = data.number + 1;
+
       const { myBcdResponses, myDocResponses, myCorpDocResponses, mySealResponses, pagedResult } = response.data.data;
 
       let combinedData = [];
@@ -108,7 +113,7 @@ function MyApplyList() {
     } finally {
       setLoading(false);
     }
-  }, [auth.userId, setTotalPages, setCurrentPage, currentPage, totalPages]);
+  }, [auth.userId, setTotalPages, setCurrentPage]);
 
   // const applyFilters = () => {
   const applyFilters = (filterValues) => {
@@ -127,8 +132,8 @@ function MyApplyList() {
   };
 
   useEffect(() => {
-    fetchApplications();
-  }, [fetchApplications]);
+    fetchApplications(currentPage);
+  }, [fetchApplications, currentPage]);
 
   const applyStatusFilters = useCallback(() => {
     let filteredData = applications;
@@ -255,6 +260,7 @@ function MyApplyList() {
   const handlePageClick = (event) => {
     const selectedPage = event.selected + 1;
     setCurrentPage(selectedPage);
+    fetchApplications(selectedPage);
   };
       
   const applicationColumns = [
@@ -346,7 +352,7 @@ function MyApplyList() {
         ) : (
           <>
           <Table columns={applicationColumns} data={filteredApplications} />
-          <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+          <PaginationSub totalPages={totalPages} onPageChange={handlePageClick} currentPage={currentPage} />
         </>
 
         )}
