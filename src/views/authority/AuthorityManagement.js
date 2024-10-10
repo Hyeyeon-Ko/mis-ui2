@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import Table from '../../components/common/Table';
-import CustomButton from '../../components/common/CustomButton';
-import AuthorityModal from '../authority/AuthorityModal';
-import ConfirmModal from '../../components/common/ConfirmModal';
-import editIcon from '../../assets/images/edit.png';
-import deleteIcon from '../../assets/images/delete.png';
-import Pagination from '../../components/common/Pagination';
-import '../../styles/authority/AuthorityManagement.css';
-import axios from 'axios';
-import Loading from '../../components/common/Loading';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Breadcrumb from "../../components/common/Breadcrumb";
+import Table from "../../components/common/Table";
+import CustomButton from "../../components/common/CustomButton";
+import AuthorityModal from "../authority/AuthorityModal";
+import ConfirmModal from "../../components/common/ConfirmModal";
+import editIcon from "../../assets/images/edit.png";
+import deleteIcon from "../../assets/images/delete.png";
+import Pagination from "../../components/common/Pagination";
+import "../../styles/authority/AuthorityManagement.css";
+import axios from "axios";
+import Loading from "../../components/common/Loading";
 
 /**
  * 권한 관리 페이지 컴포넌트
  */
 function AuthorityManagement() {
   const [applications, setApplications] = useState([]); // 신청 내역 상태 관리
-  const [totalPages, setTotalPages] = useState('1')
-  const [currentPage, setCurrentPage] = useState('1')
+  const [totalPages, setTotalPages] = useState("1");
+  const [currentPage, setCurrentPage] = useState("1");
   const [showModal, setShowModal] = useState(false); // 권한 추가/수정 모달 표시 상태 관리
   const [showConfirmModal, setShowConfirmModal] = useState(false); // 확인 모달 표시 상태 관리
   const [selectedAdmin, setSelectedAdmin] = useState(null); // 선택된 관리자 상태 관리
@@ -38,14 +38,14 @@ function AuthorityManagement() {
    * 권한 내역 가져오기
    */
   const fetchAuthorityList = async (pageIndex = 1, pageSize = itemsPerPage) => {
-    setLoading(true)
+    setLoading(true);
     try {
       const response = await axios.get(`/api/auth/`, {
-        params: { pageIndex, pageSize }
+        params: { pageIndex, pageSize },
       });
 
       const data = response.data.data;
-      const totalPages = data.totalPages;
+      const totalPages = data.totalPages || 1;
       const currentPage = data.number + 1;
 
       const transformedData = data.content.map((item) => ({
@@ -65,9 +65,9 @@ function AuthorityManagement() {
       setTotalPages(totalPages);
       setCurrentPage(currentPage);
     } catch (error) {
-      console.error('Error fetching authority list: ', error);
+      console.error("Error fetching authority list: ", error);
     } finally {
-    setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -92,7 +92,7 @@ function AuthorityManagement() {
         ...admin,
         role: adminData.userRole,
         permissions: {
-          standardDataManagement: adminData.canHandleStd === 'Y',
+          standardDataManagement: adminData.canHandleStd === "Y",
         },
       });
       setIsEditMode(true);
@@ -100,10 +100,10 @@ function AuthorityManagement() {
     } catch (error) {
       // SessionExpiredException 감지 및 처리
       if (error.response && error.response.status === 401) {
-        alert('세션이 만료되었습니다. 다시 로그인 해주세요.');
-        navigate('/login');
+        alert("세션이 만료되었습니다. 다시 로그인 해주세요.");
+        navigate("/login");
       } else {
-        console.error('Error fetching authority list: ', error);
+        console.error("Error fetching authority list: ", error);
       }
     }
   };
@@ -118,7 +118,7 @@ function AuthorityManagement() {
       setShowConfirmModal(false);
       setSelectedAdmin(null);
     } catch (error) {
-      console.error('Error deleting admin:', error);
+      console.error("Error deleting admin:", error);
     }
   };
 
@@ -141,13 +141,13 @@ function AuthorityManagement() {
   };
 
   const columns = [
-    { header: '권한', accessor: 'role', width: '15%' },
-    { header: '센터(부서)', accessor: 'centerName', width: '20%' },
-    { header: '이름(사번)', accessor: 'name', width: '20%' },
+    { header: "권한", accessor: "role", width: "15%" },
+    { header: "센터(부서)", accessor: "centerName", width: "20%" },
+    { header: "이름(사번)", accessor: "name", width: "20%" },
     {
-      header: '이메일',
-      accessor: 'email',
-      width: '25%',
+      header: "이메일",
+      accessor: "email",
+      width: "25%",
       Cell: ({ row }) => (
         <div className="email-cell">
           <span className="email-text">{row.email}</span>
@@ -155,9 +155,9 @@ function AuthorityManagement() {
       ),
     },
     {
-      header: '수정',
-      accessor: 'edit',
-      width: '4%',
+      header: "수정",
+      accessor: "edit",
+      width: "4%",
       Cell: ({ row }) => (
         <div className="icon-cell">
           <img
@@ -170,9 +170,9 @@ function AuthorityManagement() {
       ),
     },
     {
-      header: '삭제',
-      accessor: 'delete',
-      width: '8%',
+      header: "삭제",
+      accessor: "delete",
+      width: "8%",
       Cell: ({ row }) => (
         <div className="icon-cell">
           <img
@@ -191,7 +191,7 @@ function AuthorityManagement() {
       <div className="admin-list">
         <h2>권한 관리</h2>
         <div className="header-row">
-          <Breadcrumb items={['권한 관리']} />
+          <Breadcrumb items={["권한 관리"]} />
           <div className="buttons-container">
             <CustomButton
               className="authority-add-button"
@@ -208,9 +208,12 @@ function AuthorityManagement() {
           <Loading />
         ) : (
           <>
-          <Table columns={columns} data={applications} />
-          <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
-        </>
+            <Table columns={columns} data={applications} />
+            <Pagination
+              totalPages={totalPages}
+              onPageChange={handlePageClick}
+            />
+          </>
         )}
       </div>
       <AuthorityModal
