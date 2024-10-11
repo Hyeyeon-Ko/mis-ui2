@@ -11,11 +11,11 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
-  const [currentPage, setCurrentPage] = useState("1"); 
-  const [totalPages, setTotalPages] = useState("1"); 
+  const [currentPage, setCurrentPage] = useState(1); 
+  const [totalPages, setTotalPages] = useState(1); 
 
   const itemsPerPage = 10;
- 
+
   const getOneMonthAgo = () => {
     const today = new Date();
     const oneMonthAgo = new Date(today);
@@ -34,14 +34,16 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
               endDate: endDate ? endDate.toISOString().split('T')[0] : null,
               pageIndex,
               pageSize,
-              },
+            },
           }
         );
+
         const transformedData = response.data.data.content.map((item) => ({
           ...item,
           applyStatus: getStatusText(item.applyStatus),
           draftDate: parseDateTime(item.draftDate),
         }));
+
         setFilteredData(transformedData);
         setTotalPages(response.data.data.totalPages); 
       } catch (error) {
@@ -91,7 +93,7 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   };
 
   const handleSearch = () => {
-    setCurrentPage("1"); 
+    setCurrentPage(1); 
     fetchHistory(draftId, startDate, endDate, 1);
   };
 
@@ -100,7 +102,7 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
     const defaultEndDate = new Date();
     setStartDate(defaultStartDate);
     setEndDate(defaultEndDate);
-    setCurrentPage("1");
+    setCurrentPage(1);
     fetchHistory(draftId, defaultStartDate, defaultEndDate, 1);
   };
 
@@ -132,22 +134,23 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
           </button>
         </div>
         <div className="condition-filter-container">
-        <ConditionFilter
-          startDate={startDate}
-          setStartDate={(date) => {
-            console.log('Start Date set to:', date);
-            setStartDate(date);
-          }}
-          endDate={endDate}
-          setEndDate={(date) => {
-            console.log('End Date set to:', date);
-            setEndDate(date);
-          }}
-          onSearch={handleSearch}
-          onReset={handleReset}
-          showDocumentType={false}
-          showSearchCondition={false}
-        />
+          <ConditionFilter
+            startDate={startDate}
+            setStartDate={(date) => {
+              console.log('Start Date set to:', date);
+              setStartDate(date);
+            }}
+            endDate={endDate}
+            setEndDate={(date) => {
+              console.log('End Date set to:', date);
+              setEndDate(date);
+            }}
+            onSearch={handleSearch}
+            onReset={handleReset}
+            showDocumentType={false}
+            showSearchCondition={false}
+            searchOptions={[]} 
+          />
         </div>
         <div className="table-container">
           <Table columns={columns} data={filteredData} />
