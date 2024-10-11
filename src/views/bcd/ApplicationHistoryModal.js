@@ -59,6 +59,16 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   );
 
   useEffect(() => {
+    if (draftId && show) {
+      const defaultStartDate = getOneMonthAgo();
+      const defaultEndDate = new Date();
+
+      setStartDate(defaultStartDate);
+      setEndDate(defaultEndDate);
+    }
+  }, [draftId, show]);
+
+  useEffect(() => {
     if (startDate && endDate && draftId && show) {
       fetchHistory(draftId, startDate, endDate, currentPage);
     }
