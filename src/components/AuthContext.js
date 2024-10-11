@@ -45,8 +45,6 @@ export const AuthProvider = ({ children }) => {
       originalRole: sessionStorage.getItem('originalRole') || sessionStorage.getItem('role'),
     };
 
-    console.log(storedAuth);
-
     if (storedAuth.userId && storedAuth.userNm && storedAuth.role) {
       setAuth(storedAuth);
     }
