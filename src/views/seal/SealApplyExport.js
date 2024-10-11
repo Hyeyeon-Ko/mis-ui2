@@ -61,7 +61,7 @@ function SealApplyExport() {
         }
 
         const exportRequestDTO = {
-            drafter: auth.hngNm,
+            drafter: auth.userNm,
             drafterId: auth.userId,
             submission: submission,
             expNm: draftNm,

@@ -1,35 +1,35 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import Breadcrumb from '../../components/common/Breadcrumb';
-import ConditionFilter from '../../components/common/ConditionFilter';
-import Table from '../../components/common/Table';
-import CustomButton from '../../components/common/CustomButton';
-import DocConfirmModal from '../doc/DocConfirmModal';
-import CenterSelect from '../../components/CenterSelect';
-import '../../styles/list/ApplicationsList.css';
-import '../../styles/common/Page.css';
-import axios from 'axios';
-import fileDownload from 'js-file-download';
-import { AuthContext } from '../../components/AuthContext';
-import useDateSet from '../../hooks/apply/useDateSet';
-import Pagination from '../../components/common/Pagination';
-import Loading from '../../components/common/Loading';
+import React, { useState, useEffect, useCallback, useContext } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import Breadcrumb from "../../components/common/Breadcrumb";
+import ConditionFilter from "../../components/common/ConditionFilter";
+import Table from "../../components/common/Table";
+import CustomButton from "../../components/common/CustomButton";
+import DocConfirmModal from "../doc/DocConfirmModal";
+import CenterSelect from "../../components/CenterSelect";
+import "../../styles/list/ApplicationsList.css";
+import "../../styles/common/Page.css";
+import axios from "axios";
+import fileDownload from "js-file-download";
+import { AuthContext } from "../../components/AuthContext";
+import useDateSet from "../../hooks/apply/useDateSet";
+import PaginationSub from "../../components/common/PaginationSub";
+import Loading from "../../components/common/Loading";
 
 function ApplicationsList() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const documentTypeFromUrl = queryParams.get('documentType');
+  const documentTypeFromUrl = queryParams.get("documentType");
   const { auth } = useContext(AuthContext);
   const instCd = auth.instCd;
 
   const [applications, setApplications] = useState([]);
-  const [filteredApplications, setFilteredApplications] = useState([]); 
+  const [filteredApplications, setFilteredApplications] = useState([]);
   const [filterInputs, setFilterInputs] = useState({
     startDate: null,
     endDate: null,
-    documentType: documentTypeFromUrl || '',
-    searchType: '전체',
-    keyword: '',
+    documentType: documentTypeFromUrl || "",
+    searchType: "전체",
+    keyword: "",
   });
   const [filters, setFilters] = useState({
     statusApproved: false,
@@ -45,10 +45,10 @@ function ApplicationsList() {
   const [showExcelButton, setShowExcelButton] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState(null);
-  const [selectedCenter, setSelectedCenter] = useState('전체');
+  const [selectedCenter, setSelectedCenter] = useState("전체");
   const { formattedStartDate, formattedEndDate } = useDateSet();
-  const [totalPages, setTotalPages] = useState('1')
-  const [currentPage, setCurrentPage] = useState('1')
+  const [totalPages, setTotalPages] = useState("1");
+  const [currentPage, setCurrentPage] = useState("1");
 
   const itemsPerPage = 10;
 
@@ -58,37 +58,46 @@ function ApplicationsList() {
   }, [currentPage]);
 
   const [centers] = useState([
-    '전체', '재단본부', '광화문', '여의도센터', '강남센터',
-    '수원센터', '대구센터', '부산센터', '광주센터', '제주센터', '협력사'
+    "전체",
+    "재단본부",
+    "광화문",
+    "여의도센터",
+    "강남센터",
+    "수원센터",
+    "대구센터",
+    "부산센터",
+    "광주센터",
+    "제주센터",
+    "협력사",
   ]);
 
   const navigate = useNavigate();
 
   const getBreadcrumbItems = () => {
     switch (documentTypeFromUrl) {
-      case '명함신청':
-        return ['명함 관리', '전체 신청내역'];
-      case '인장신청':
-        return ['인장 관리', '전체 신청내역'];
-      case '법인서류':
-        return ['법인서류 관리', '전체 신청내역'];
-      case '문서수발신':
-        return ['문서수발신 관리', '전체 신청내역'];
+      case "명함신청":
+        return ["명함 관리", "전체 신청내역"];
+      case "인장신청":
+        return ["인장 관리", "전체 신청내역"];
+      case "법인서류":
+        return ["법인서류 관리", "전체 신청내역"];
+      case "문서수발신":
+        return ["문서수발신 관리", "전체 신청내역"];
       default:
-        return ['신청내역 관리', '전체 신청내역'];
+        return ["신청내역 관리", "전체 신청내역"];
     }
   };
 
   const convertDocumentType = (type) => {
     switch (type) {
-      case '명함신청':
-        return 'A';
-      case '문서수발신':
-        return 'B';
-      case '법인서류':
-        return 'C';
-      case '인장신청':
-        return 'D';
+      case "명함신청":
+        return "A";
+      case "문서수발신":
+        return "B";
+      case "법인서류":
+        return "C";
+      case "인장신청":
+        return "D";
       default:
         return null;
     }
@@ -96,30 +105,45 @@ function ApplicationsList() {
 
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}-${String(date.getDate()).padStart(2, "0")} ${String(
+      date.getHours()
+    ).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
   };
 
   const getStatusText = (status) => {
     switch (status) {
-      case 'A': return '승인대기';
-      case 'B': return '승인완료';
-      case 'C': return '반려';
-      case 'D': return '발주완료';
-      case 'E': return '처리완료';
-      case 'F': return '신청취소';
-      case 'G': return '발급완료';
-      case 'X': return '상태없음';
-      default: return status;
+      case "A":
+        return "승인대기";
+      case "B":
+        return "승인완료";
+      case "C":
+        return "반려";
+      case "D":
+        return "발주완료";
+      case "E":
+        return "처리완료";
+      case "F":
+        return "신청취소";
+      case "G":
+        return "발급완료";
+      case "X":
+        return "상태없음";
+      default:
+        return status;
     }
   };
 
   const applyFilters = (filterValues) => {
     // filterValues에서 documentType과 기타 필터 값을 가져옴
-    const { startDate, endDate, documentType, searchType, keyword } = filterValues;
-    
+    const { startDate, endDate, documentType, searchType, keyword } =
+      filterValues;
+
     const params = {
-      startDate: startDate ? startDate.toISOString().split('T')[0] : '', // 시작일
-      endDate: endDate ? endDate.toISOString().split('T')[0] : '', // 종료일
+      startDate: startDate ? startDate.toISOString().split("T")[0] : "", // 시작일
+      endDate: endDate ? endDate.toISOString().split("T")[0] : "", // 종료일
       documentType: documentType,
       searchType: searchType,
       keyword: keyword, // 검색어
@@ -151,11 +175,11 @@ function ApplicationsList() {
   //         application.drafter.toLowerCase().includes(keyword)
   //       );
   //     } else if (filterInputs.searchType === '제목') {
-  //       filteredData = filteredData.filter(application => 
+  //       filteredData = filteredData.filter(application =>
   //         application.title.toLowerCase().includes(keyword)
   //       );
   //     } else if (filterInputs.searchType === '신청자') {
-  //       filteredData = filteredData.filter(application => 
+  //       filteredData = filteredData.filter(application =>
   //         application.drafter.toLowerCase().includes(keyword)
   //       );
   //     }
@@ -176,100 +200,141 @@ function ApplicationsList() {
   //   setFilteredApplications(filteredData);
   // }, [applications, filterInputs, filters]);
 
-  const applyStatusFilters = useCallback((data) => {
-    const filtered = data.filter((app) => {
-      if (filters.statusApproved && app.applyStatus === '승인완료') return true;
-      if (filters.statusRejected && app.applyStatus === '반려') return true;
-      if (filters.statusOrdered && app.applyStatus === '발주완료') return true;
-      if (filters.statusClosed && app.applyStatus === '처리완료') return true;
-      return !Object.values(filters).some(Boolean); 
-    });
-    setFilteredApplications(filtered);
-  }, [filters]);
-        
-  const fetchApplications = useCallback(async (pageIndex = 1, pageSize = itemsPerPage, filters= {}) => {
-    setLoading(true);
-    // setError(null);
-    try {
-      const response = await axios.get('/api/applyList2', {
-        params: {
-          userId: auth.userId || '',
-          instCd: instCd || '',
-          documentType: convertDocumentType(filters.documentType) || convertDocumentType(documentTypeFromUrl) || null,
-          searchType: filters.searchType,
-          keyword: filters.keyword,
-          startDate: filters.startDate ? filters.startDate : formattedStartDate,
-          endDate: filters.endDate ? filters.endDate : formattedEndDate,
-          pageIndex,
-          pageSize
-        },
+  const applyStatusFilters = useCallback(
+    (data) => {
+      const filtered = data.filter((app) => {
+        if (filters.statusApproved && app.applyStatus === "승인완료")
+          return true;
+        if (filters.statusRejected && app.applyStatus === "반려") return true;
+        if (filters.statusOrdered && app.applyStatus === "발주완료")
+          return true;
+        if (filters.statusClosed && app.applyStatus === "처리완료") return true;
+        return !Object.values(filters).some(Boolean);
       });
-  
-      const { bcdMasterResponses, docMasterResponses, corpDocMasterResponses, sealMasterResponses } = response.data.data;
-  
-      const combinedData = [
-        bcdMasterResponses,
-        docMasterResponses,
-        corpDocMasterResponses,
-        sealMasterResponses
-      ];
-  
-      const selectedData = combinedData.find(response => response && response.totalElements > 0);
-  
-      if (!selectedData || !selectedData.content.length) {
-        setApplications([]);
-        setFilteredApplications([]);
-        setTotalPages(1);
-        setCurrentPage(1);
-        // setError('조회된 데이터가 없습니다.');
-      } else {
-        const totalPages = selectedData.totalPages;
-        const currentPage = selectedData.number + 1;
-        const content = selectedData.content;
-        const filteredData = content.filter(application => application.applyStatus !== 'X');
-  
-        const transformedData = filteredData.map(application => ({
-          draftId: application.draftId,
-          instCd: application.instCd,
-          instNm: application.instNm,
-          title: application.title,
-          draftDate: application.draftDate ? parseDateTime(application.draftDate) : '',
-          respondDate: application.respondDate ? parseDateTime(application.respondDate) : '',
-          orderDate: application.orderDate ? parseDateTime(application.orderDate) : '',
-          drafter: application.drafter,
-          applyStatus: getStatusText(application.applyStatus),
-          docType: application.docType,
-        }));
-  
-        transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
-  
-        setApplications(transformedData);
-        setFilteredApplications(transformedData);
-        setTotalPages(totalPages);
-        setCurrentPage(currentPage);
-        // setError(null); 
-        applyStatusFilters(transformedData);
+      setFilteredApplications(filtered);
+    },
+    [filters]
+  );
+
+  const fetchApplications = useCallback(
+    async (pageIndex = 1, pageSize = itemsPerPage, filters = {}) => {
+      setLoading(true);
+      // setError(null);
+      try {
+        const response = await axios.get("/api/applyList2", {
+          params: {
+            userId: auth.userId || "",
+            instCd: instCd || "",
+            documentType:
+              convertDocumentType(filters.documentType) ||
+              convertDocumentType(documentTypeFromUrl) ||
+              null,
+            searchType: filters.searchType,
+            keyword: filters.keyword,
+            startDate: filters.startDate
+              ? filters.startDate
+              : formattedStartDate,
+            endDate: filters.endDate ? filters.endDate : formattedEndDate,
+            pageIndex,
+            pageSize,
+          },
+        });
+
+        const {
+          bcdMasterResponses,
+          docMasterResponses,
+          corpDocMasterResponses,
+          sealMasterResponses,
+        } = response.data.data;
+
+        const combinedData = [
+          bcdMasterResponses,
+          docMasterResponses,
+          corpDocMasterResponses,
+          sealMasterResponses,
+        ];
+
+        const selectedData = combinedData.find(
+          (response) => response && response.totalElements > 0
+        );
+
+        if (!selectedData || !selectedData.content.length) {
+          setApplications([]);
+          setFilteredApplications([]);
+          setTotalPages(1);
+          setCurrentPage(1);
+          // setError('조회된 데이터가 없습니다.');
+        } else {
+          const totalPages = selectedData.totalPages;
+          const currentPage = selectedData.number + 1;
+          const content = selectedData.content;
+          const filteredData = content.filter(
+            (application) => application.applyStatus !== "X"
+          );
+
+          const transformedData = filteredData.map((application) => ({
+            draftId: application.draftId,
+            instCd: application.instCd,
+            instNm: application.instNm,
+            title: application.title,
+            draftDate: application.draftDate
+              ? parseDateTime(application.draftDate)
+              : "",
+            respondDate: application.respondDate
+              ? parseDateTime(application.respondDate)
+              : "",
+            orderDate: application.orderDate
+              ? parseDateTime(application.orderDate)
+              : "",
+            drafter: application.drafter,
+            applyStatus: getStatusText(application.applyStatus),
+            docType: application.docType,
+          }));
+
+          transformedData.sort(
+            (a, b) => new Date(b.draftDate) - new Date(a.draftDate)
+          );
+
+          setApplications(transformedData);
+          setFilteredApplications(transformedData);
+          setTotalPages(totalPages);
+          setCurrentPage(currentPage);
+          // setError(null);
+          applyStatusFilters(transformedData);
+        }
+      } catch (error) {
+        console.error(
+          "Error fetching applications: 데이터를 불러오는 중 오류가 발생했습니다.",
+          error
+        );
+        // setError('데이터를 불러오는 중 오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error fetching applications: 데이터를 불러오는 중 오류가 발생했습니다.', error);
-      // setError('데이터를 불러오는 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  }, [applyStatusFilters, auth.userId, documentTypeFromUrl, instCd, formattedStartDate, formattedEndDate]);
-  
-    /**
+    },
+    [
+      applyStatusFilters,
+      auth.userId,
+      documentTypeFromUrl,
+      instCd,
+      formattedStartDate,
+      formattedEndDate,
+    ]
+  );
+
+  /**
    * 페이지 변경 핸들러
    */
-    const handlePageClick = (event) => {
-      const selectedPage = event.selected + 1;
-      setCurrentPage(selectedPage);
-    };
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setCurrentPage(selectedPage);
+  };
 
   useEffect(() => {
-    const centerFilteredData = selectedCenter === '전체' 
-      ? applications 
-      : applications.filter(app => app.instNm === selectedCenter);
+    const centerFilteredData =
+      selectedCenter === "전체"
+        ? applications
+        : applications.filter((app) => app.instNm === selectedCenter);
 
     setFilteredApplications(centerFilteredData);
   }, [selectedCenter, applications]);
@@ -283,8 +348,8 @@ function ApplicationsList() {
       const response = await axios.get(`/api/seal/imprint/${draftId}`);
       return response.data.data;
     } catch (error) {
-      console.error('Error fetching seal imprint details:', error);
-      alert('날인신청 정보를 불러오는 중 오류가 발생했습니다.');
+      console.error("Error fetching seal imprint details:", error);
+      alert("날인신청 정보를 불러오는 중 오류가 발생했습니다.");
     }
   };
 
@@ -293,8 +358,8 @@ function ApplicationsList() {
       const response = await axios.get(`/api/seal/export/${draftId}`);
       return response.data.data;
     } catch (error) {
-      console.error('Error fetching seal export details:', error);
-      alert('반출신청 정보를 불러오는 중 오류가 발생했습니다.');
+      console.error("Error fetching seal export details:", error);
+      alert("반출신청 정보를 불러오는 중 오류가 발생했습니다.");
     }
   };
 
@@ -304,9 +369,9 @@ function ApplicationsList() {
     setFilterInputs({
       startDate: defaultStartDate,
       endDate: new Date(),
-      documentType: documentTypeFromUrl || '',
-      searchType: '전체',
-      keyword: '',
+      documentType: documentTypeFromUrl || "",
+      searchType: "전체",
+      keyword: "",
     });
     setFilters({
       statusApproved: false,
@@ -314,16 +379,17 @@ function ApplicationsList() {
       statusOrdered: false,
       statusClosed: false,
     });
-    setSelectedCenter('전체');
+    setSelectedCenter("전체");
   }, [documentTypeFromUrl]);
 
   useEffect(() => {
     resetFilters();
   }, [documentTypeFromUrl, resetFilters]);
-  
+
   useEffect(() => {
-    if (documentTypeFromUrl === '명함신청') {
-      const isShowExcelButton = filters.statusClosed && selectedApplications.length > 0;
+    if (documentTypeFromUrl === "명함신청") {
+      const isShowExcelButton =
+        filters.statusClosed && selectedApplications.length > 0;
       setShowCheckboxColumn(filters.statusClosed);
       setShowExcelButton(isShowExcelButton);
     } else {
@@ -339,30 +405,33 @@ function ApplicationsList() {
       [name]: !prevFilters[name],
     }));
   };
-        
+
   // const handleSearch = () => {
   //   applyFilters();
   // };
-      
+
   const handleReset = () => {
     resetFilters();
     fetchApplications();
   };
 
   const handleSelectAll = (isChecked) => {
-    setSelectedApplications(isChecked ? filteredApplications.map(app => app.draftId) : []);
+    setSelectedApplications(
+      isChecked ? filteredApplications.map((app) => app.draftId) : []
+    );
   };
 
   const handleSelect = (isChecked, id) => {
-    setSelectedApplications(isChecked
-      ? [...selectedApplications, id]
-      : selectedApplications.filter(appId => appId !== id)
+    setSelectedApplications(
+      isChecked
+        ? [...selectedApplications, id]
+        : selectedApplications.filter((appId) => appId !== id)
     );
   };
 
   const handleExcelDownload = async () => {
     if (selectedApplications.length === 0) {
-      alert('엑셀변환 할 명함 신청 목록을 선택하세요.');
+      alert("엑셀변환 할 명함 신청 목록을 선택하세요.");
       return;
     }
 
@@ -372,13 +441,17 @@ function ApplicationsList() {
         selectedApplications,
       };
 
-      const response = await axios.post('/api/bsc/applyList/orderExcel', requestData, {
-        responseType: 'blob',
-      });
+      const response = await axios.post(
+        "/api/bsc/applyList/orderExcel",
+        requestData,
+        {
+          responseType: "blob",
+        }
+      );
 
-      fileDownload(response.data, '명함 완료내역.xlsx');
+      fileDownload(response.data, "명함 완료내역.xlsx");
     } catch (error) {
-      console.error('Error downloading excel: ', error);
+      console.error("Error downloading excel: ", error);
     }
   };
 
@@ -396,91 +469,130 @@ function ApplicationsList() {
       await axios.put(`/api/doc/confirm`, null, {
         params: { draftId: documentId },
       });
-      alert('승인이 완료되었습니다.');
+      alert("승인이 완료되었습니다.");
       closeModal();
       fetchApplications(filterInputs);
     } catch (error) {
-      console.error('Error approving document:', error);
-      alert('Error approving document.');
+      console.error("Error approving document:", error);
+      alert("Error approving document.");
     }
   };
 
   const handleRowClick = async (draftId, docType, applyStatus) => {
-    if (docType === '문서수신' || docType === '문서발신') {
+    if (docType === "문서수신" || docType === "문서발신") {
       setSelectedDocumentId(draftId);
       setModalVisible(true);
       setSelectedApplyStatus(applyStatus);
-    } else if (docType === '명함신청') {
-      navigate(`/bcd/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`);
-    } else if (docType === '법인서류') {
-      navigate(`/corpDoc/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`);
-    } else if (docType === '인장신청(날인)') {
+    } else if (docType === "명함신청") {
+      navigate(
+        `/bcd/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`
+      );
+    } else if (docType === "법인서류") {
+      navigate(
+        `/corpDoc/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`
+      );
+    } else if (docType === "인장신청(날인)") {
       const sealImprintDetails = await fetchSealImprintDetail(draftId);
-      navigate(`/seal/imprint/${draftId}?readonly=true&applyStatus=${applyStatus}`, { state: { sealImprintDetails, readOnly: true } });
-    } else if (docType === '인장신청(반출)') {
+      navigate(
+        `/seal/imprint/${draftId}?readonly=true&applyStatus=${applyStatus}`,
+        { state: { sealImprintDetails, readOnly: true } }
+      );
+    } else if (docType === "인장신청(반출)") {
       const sealExportDetails = await fetchSealExportDetail(draftId);
-      navigate(`/seal/export/${draftId}?readonly=true&applyStatus=${applyStatus}`, { state: { sealExportDetails, readOnly: true } });
+      navigate(
+        `/seal/export/${draftId}?readonly=true&applyStatus=${applyStatus}`,
+        { state: { sealExportDetails, readOnly: true } }
+      );
     }
   };
 
   const columns = [
-    ...(showCheckboxColumn && documentTypeFromUrl === '명함신청' ? [{
-      header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
-      accessor: 'select',
-      width: '4%',
-      Cell: ({ row }) => (
-        <input
-          type="checkbox"
-          checked={selectedApplications.includes(row.draftId)}
-          onChange={(e) => handleSelect(e.target.checked, row.draftId)}
-        />
-      ),
-    }] : []),
-    { header: '문서분류', accessor: 'docType', width: '10%' },
-    ...(documentTypeFromUrl === '법인서류' ? [{
-      header: <CenterSelect centers={centers} selectedCenter={selectedCenter} onCenterChange={handleCenterChange} />,
-      accessor: 'instNm',
-      width: '10%',
-    }] : [
-      { header: '센터', accessor: 'instNm', width: '10%' },
-    ]),
+    ...(showCheckboxColumn && documentTypeFromUrl === "명함신청"
+      ? [
+          {
+            header: (
+              <input
+                type="checkbox"
+                onChange={(e) => handleSelectAll(e.target.checked)}
+              />
+            ),
+            accessor: "select",
+            width: "4%",
+            Cell: ({ row }) => (
+              <input
+                type="checkbox"
+                checked={selectedApplications.includes(row.draftId)}
+                onChange={(e) => handleSelect(e.target.checked, row.draftId)}
+              />
+            ),
+          },
+        ]
+      : []),
+    { header: "문서분류", accessor: "docType", width: "10%" },
+    ...(documentTypeFromUrl === "법인서류"
+      ? [
+          {
+            header: (
+              <CenterSelect
+                centers={centers}
+                selectedCenter={selectedCenter}
+                onCenterChange={handleCenterChange}
+              />
+            ),
+            accessor: "instNm",
+            width: "10%",
+          },
+        ]
+      : [{ header: "센터", accessor: "instNm", width: "10%" }]),
     {
-      header: '제목',
-      accessor: 'title',
-      width: '24%',
+      header: "제목",
+      accessor: "title",
+      width: "24%",
       Cell: ({ row }) => (
         <span
           className="status-pending clickable"
-          onClick={() => handleRowClick(row.draftId, row.docType, row.applyStatus)}
+          onClick={() =>
+            handleRowClick(row.draftId, row.docType, row.applyStatus)
+          }
         >
           {row.title}
         </span>
       ),
     },
-    { header: '신청일시', accessor: 'draftDate', width: '13%' },
-    { header: '신청자', accessor: 'drafter', width: '6%' },
+    { header: "신청일시", accessor: "draftDate", width: "13%" },
+    { header: "신청자", accessor: "drafter", width: "6%" },
     {
-      header: documentTypeFromUrl === '문서수발신' ? '승인일시' : '승인/반려일시',
-      accessor: 'respondDate',
-      width: '13%',
+      header:
+        documentTypeFromUrl === "문서수발신" ? "승인일시" : "승인/반려일시",
+      accessor: "respondDate",
+      width: "13%",
     },
-    ...(documentTypeFromUrl === '문서수발신' || documentTypeFromUrl === '법인서류' || documentTypeFromUrl === '인장신청' ? [] : [
-      { header: '발주일시', accessor: 'orderDate', width: '14%' },
-    ]),
-    { header: '문서상태', accessor: 'applyStatus', width: '10%' },
+    ...(documentTypeFromUrl === "문서수발신" ||
+    documentTypeFromUrl === "법인서류" ||
+    documentTypeFromUrl === "인장신청"
+      ? []
+      : [{ header: "발주일시", accessor: "orderDate", width: "14%" }]),
+    { header: "문서상태", accessor: "applyStatus", width: "10%" },
   ];
 
-  const showStatusFilters = documentTypeFromUrl === '명함신청' || documentTypeFromUrl === '법인서류' || documentTypeFromUrl === '문서수발신' || documentTypeFromUrl === '인장신청';
+  const showStatusFilters =
+    documentTypeFromUrl === "명함신청" ||
+    documentTypeFromUrl === "법인서류" ||
+    documentTypeFromUrl === "문서수발신" ||
+    documentTypeFromUrl === "인장신청";
 
   return (
     <div className="content">
-      <div className='all-applications'>
+      <div className="all-applications">
         <h2>전체 신청내역</h2>
         <div className="application-header-row">
           <Breadcrumb items={getBreadcrumbItems()} />
           <div className="application-button-container">
-            {showExcelButton && documentTypeFromUrl === '명함신청' && (
-              <CustomButton className="finish-excel-button" onClick={handleExcelDownload}>
+            {showExcelButton && documentTypeFromUrl === "명함신청" && (
+              <CustomButton
+                className="finish-excel-button"
+                onClick={handleExcelDownload}
+              >
                 엑셀변환
               </CustomButton>
             )}
@@ -488,11 +600,17 @@ function ApplicationsList() {
         </div>
         <ConditionFilter
           startDate={filterInputs.startDate}
-          setStartDate={(date) => setFilterInputs(prev => ({ ...prev, startDate: date }))}
+          setStartDate={(date) =>
+            setFilterInputs((prev) => ({ ...prev, startDate: date }))
+          }
           endDate={filterInputs.endDate}
-          setEndDate={(date) => setFilterInputs(prev => ({ ...prev, endDate: date }))}
+          setEndDate={(date) =>
+            setFilterInputs((prev) => ({ ...prev, endDate: date }))
+          }
           documentType={filterInputs.documentType}
-          setDocumentType={(docType) => setFilterInputs(prev => ({ ...prev, documentType: docType }))}
+          setDocumentType={(docType) =>
+            setFilterInputs((prev) => ({ ...prev, documentType: docType }))
+          }
           filters={filters}
           setFilters={setFilters}
           onFilterChange={handleFilterChange}
@@ -503,18 +621,30 @@ function ApplicationsList() {
           showSearchCondition={true}
           showDocumentType={false}
           searchType={filterInputs.searchType}
-          setSearchType={(searchType) => setFilterInputs(prev => ({ ...prev, searchType }))}
+          setSearchType={(searchType) =>
+            setFilterInputs((prev) => ({ ...prev, searchType }))
+          }
           keyword={filterInputs.keyword}
-          setKeyword={(keyword) => setFilterInputs(prev => ({ ...prev, keyword }))}
-          searchOptions={['전체', '제목', '신청자']} 
+          setKeyword={(keyword) =>
+            setFilterInputs((prev) => ({ ...prev, keyword }))
+          }
+          searchOptions={["전체", "제목", "신청자"]}
         />
         {loading ? (
           <Loading />
         ) : (
           <>
-          <Table columns={columns} data={filteredApplications} onSelect={handleSelect} selectedItems={selectedApplications} />
-          <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
-          
+            <Table
+              columns={columns}
+              data={filteredApplications}
+              onSelect={handleSelect}
+              selectedItems={selectedApplications}
+            />
+            <PaginationSub
+              totalPages={totalPages}
+              onPageChange={handlePageClick}
+              currentPage={currentPage}
+            />
           </>
         )}
       </div>

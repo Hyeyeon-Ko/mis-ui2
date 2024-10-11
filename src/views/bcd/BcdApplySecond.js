@@ -247,7 +247,7 @@ function BcdApplySecond() {
     const approverIds = selectedUsers.map(user => user.userId);
 
     const requestData = {
-      drafter: auth.hngNm,
+      drafter: auth.userNm,
       drafterId: auth.userId,
       userId: formData.userId,
       korNm: formData.name,
@@ -640,7 +640,7 @@ function BcdApplySecond() {
       <FinalConfirmationModal
         show={showFinalConfirmationModal}
         onClose={() => setShowFinalConfirmationModal(false)}
-        applicant={{ name: auth.hngNm, id: auth.userId }}
+        applicant={{ name: auth.userNm, id: auth.userId }}
         recipient={{ name: formData.name, id: formData.userId }}
         cardType={formData.cardType === 'personal' ? '[뒷면] 영문 명함' : '[뒷면] 회사 정보'}
         quantity={formData.quantity}

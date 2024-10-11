@@ -203,7 +203,7 @@ function DetailApplication() {
     const fullAddress = `${formData.address}${floor ? `, ${floor}` : ''}`;
 
     const requestData = {
-      drafter: auth.hngNm,
+      drafter: auth.userNm,
       drafterId: auth.userId,
       userId: formData.userId,
       korNm: formData.name,
@@ -272,7 +272,13 @@ function DetailApplication() {
         alert('명함 승인 중 오류가 발생했습니다.');
       }
     } catch (error) {
-      alert('명함 승인 중 오류가 발생했습니다.');
+      if (error.response && error.response.data && error.response.data.message) {
+        alert(error.response.data.data);
+        navigate(`/applyList?documentType=명함신청`);
+      } else {
+        alert('명함 승인 중 오류가 발생했습니다.');
+        navigate(`/pendingList?documentType=명함신청`);
+      }
     }
   };
           
@@ -596,7 +602,7 @@ function DetailApplication() {
       <FinalConfirmationModal
         show={showFinalConfirmationModal}
         onClose={() => setShowFinalConfirmationModal(false)}
-        applicant={{ name: auth.hngNm, id: auth.userId }}
+        applicant={{ name: auth.userNm, id: auth.userId }}
         recipient={{ name: formData.name, id: formData.userId }}
         cardType={formData.cardType === 'personal' ? '[뒷면] 영문 명함' : '[뒷면] 회사 정보'}
         quantity={formData.quantity}

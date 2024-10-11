@@ -136,7 +136,9 @@ function DetailSealImprintApplication() {
 
     const handleApproval = (e) => {
         e.preventDefault();  
-        axios.post(`/api/seal/${draftId}`) 
+        axios.post(`/api/seal/${draftId}`, {
+            userId: auth.userId,
+        }) 
         .then(response => {
             alert('인장 신청이 성공적으로 승인되었습니다.');
             navigate('/pendingList?documentType=인장신청');

@@ -55,7 +55,7 @@ const ReasonModal = ({ show, onClose, onConfirm, reason = '', isViewOnly = false
       case 'reject':
         return '반려 사유를 작성해주세요.\n해당 내용은 명함 신청자에게 전달됩니다.';
       case 'download':
-        return '파일 다운로드 사유를 작성해주세요.';
+        return '파일 다운로드 사유를 작성해주세요.(최대 50자)';
       default:
         return '사유를 작성해주세요.';
     }
@@ -82,7 +82,7 @@ const ReasonModal = ({ show, onClose, onConfirm, reason = '', isViewOnly = false
           </div>
         )}
 
-        {(modalType !== 'download' || selectedFileType === '기타') && !isViewOnly && (
+        {(modalType !== 'download' || selectedFileType === 'etc') && !isViewOnly && (
           <textarea
             placeholder={getPlaceholder()}
             value={inputReason}

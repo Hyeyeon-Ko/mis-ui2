@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [auth, setAuth] = useState({
     userId: '',
-    hngNm: '',
+    userNm: '',
     role: '',
     isAuthenticated: false,
     sidebarPermissions: [],
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
 
     const storedAuth = {
       userId: sessionStorage.getItem('userId'),
-      hngNm: sessionStorage.getItem('hngNm'),
+      userNm: sessionStorage.getItem('userNm'),
       role: sessionStorage.getItem('role'),
       isAuthenticated: sessionStorage.getItem('isAuthenticated') === 'true',
       sidebarPermissions: JSON.parse(sessionStorage.getItem('sidebarPermissions')) || [],
@@ -45,7 +45,9 @@ export const AuthProvider = ({ children }) => {
       originalRole: sessionStorage.getItem('originalRole') || sessionStorage.getItem('role'),
     };
 
-    if (storedAuth.userId && storedAuth.hngNm && storedAuth.role) {
+    console.log(storedAuth);
+
+    if (storedAuth.userId && storedAuth.userNm && storedAuth.role) {
       setAuth(storedAuth);
     }
   }, []);
@@ -53,7 +55,7 @@ export const AuthProvider = ({ children }) => {
   // 인증 상태가 변경될 때마다 세션 스토리지에 저장
   useEffect(() => {
     sessionStorage.setItem('userId', auth.userId);
-    sessionStorage.setItem('hngNm', auth.hngNm);
+    sessionStorage.setItem('userNm', auth.userNm);
     sessionStorage.setItem('role', auth.role);
     sessionStorage.setItem('isAuthenticated', auth.isAuthenticated.toString());
     sessionStorage.setItem('sidebarPermissions', JSON.stringify(auth.sidebarPermissions));
@@ -66,10 +68,10 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.setItem('originalRole', auth.originalRole);
   }, [auth]);
 
-  const login = (userId, hngNm, role, sidebarPermissions, hasStandardDataAuthority, instCd, deptCd, teamCd, roleNm) => {
+  const login = (userId, userNm, role, sidebarPermissions, hasStandardDataAuthority, instCd, deptCd, teamCd, roleNm) => {
     const newAuthState = {
       userId,
-      hngNm,
+      userNm,
       role,
       isAuthenticated: true,
       sidebarPermissions,
@@ -89,7 +91,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setAuth({
       userId: '',
-      hngNm: '',
+      userNm: '',
       role: '',
       isAuthenticated: false,
       sidebarPermissions: [],
@@ -103,7 +105,7 @@ export const AuthProvider = ({ children }) => {
     });
 
     sessionStorage.removeItem('userId');
-    sessionStorage.removeItem('hngNm');
+    sessionStorage.removeItem('userNm');
     sessionStorage.removeItem('role');
     sessionStorage.removeItem('sidebarPermissions');
     sessionStorage.removeItem('hasStandardDataAuthority');
