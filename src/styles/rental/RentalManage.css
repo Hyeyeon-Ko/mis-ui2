@@ -88,3 +88,9 @@
 .rental-apply-button:hover {
     background-color: #1e6fc1;
 }
+
+.last-updt-date {
+  margin-right: 14px; 
+  font-size: 14px;
+  display: inline-block; 
+}

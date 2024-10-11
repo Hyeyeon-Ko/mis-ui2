@@ -22,6 +22,7 @@ function RentalManage() {
   const [selectedRental, setSelectedRental] = useState(null); 
   const [rentalDetails, setRentalDetails] = useState([]);  
   const [loading, setLoading] = useState(false);
+  const [lastUpdtDate, setLastUpdtDate] = useState(null);
 
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
@@ -39,27 +40,34 @@ function RentalManage() {
   };
 
   const fetchRentalData = useCallback(async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const response = await axios.get(`/api/rentalList/center`, {
         params: { instCd: auth.instCd },
       });
   
+      console.log(response);
       const transformedData = response.data.data.map((item, index) => ({
         ...item,
-        no: index + 1, 
+        no: index + 1,
         status: getStatusText(item.status),
       }));
   
       setRentalDetails(transformedData);
       setSelectedRows([]);
+
+      if (response.data.data[0].lastUpdtDate) {
+        setLastUpdtDate(response.data.data[0].lastUpdtDate);
+      }
+  
     } catch (error) {
       console.error('센터 렌탈현황을 불러오는데 실패했습니다.', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }, [auth.instCd, setSelectedRows]);
-
+  
+  
   useEffect(() => {
     fetchRentalData();
   }, [fetchRentalData]);
@@ -292,35 +300,40 @@ function RentalManage() {
           <h2>렌탈현황 관리표</h2>
           <Breadcrumb items={['자산 관리', '렌탈현황 관리표']} />
           {loading ? (
-          <Loading />
-        ) : (
-          <>
-          <div className="rental-tables-section">
-            <div className="rental-details-content">
-              <div className="rental-header-buttons">
-                <label className='rental-detail-content-label'>렌탈 현황&gt;&gt;</label>
-                <div className="rental-detail-buttons">
-                  <button className="rental-add-button" onClick={handleAddButtonClick}>추 가</button>
-                  <button className="rental-modify-button" onClick={handleModifyButtonClick}>수 정</button>
-                  <button className="rental-delete-button" onClick={handleDeleteButtonClick}>삭 제</button>
-                  <button className="rental-excel-button" onClick={handleExcelDownload}>엑 셀</button>
-                  <button className="rental-apply-button" onClick={handleFinishButtonClick}>완 료</button>
+            <Loading />
+          ) : (
+            <>
+              <div className="rental-tables-section">
+                <div className="rental-details-content">
+                  <div className="rental-header-buttons">
+                    <label className='rental-detail-content-label'>렌탈 현황&gt;&gt;</label>
+                    <div className="rental-detail-buttons">
+                      {lastUpdtDate && (
+                        <div className="last-updt-date">
+                          최종 수정일자: {lastUpdtDate}
+                        </div>
+                      )}
+                      <button className="rental-add-button" onClick={handleAddButtonClick}>추 가</button>
+                      <button className="rental-modify-button" onClick={handleModifyButtonClick}>수 정</button>
+                      <button className="rental-delete-button" onClick={handleDeleteButtonClick}>삭 제</button>
+                      <button className="rental-excel-button" onClick={handleExcelDownload}>엑 셀</button>
+                      <button className="rental-apply-button" onClick={handleFinishButtonClick}>완 료</button>
+                    </div>
+                  </div>
+                  <div className="rental-details-table">
+                    <Table
+                      columns={detailColumns}
+                      data={rentalDetails}
+                      onRowClick={handleRowClick}  
+                      onRowMouseDown={handleMouseDown}  
+                      onRowMouseOver={handleMouseOver}  
+                      onRowMouseUp={handleMouseUp}    
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="rental-details-table">
-                <Table
-                  columns={detailColumns}
-                  data={rentalDetails}
-                  onRowClick={handleRowClick}  
-                  onRowMouseDown={handleMouseDown}  
-                  onRowMouseOver={handleMouseOver}  
-                  onRowMouseUp={handleMouseUp}    
-                />
-              </div>
-            </div>
-          </div>
-          </>
-        )}
+            </>
+          )}
         </div>
       </div>
       <RentalAddModal 
