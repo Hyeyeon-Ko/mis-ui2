@@ -42,31 +42,35 @@ function RentalManage() {
   const fetchRentalData = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/rentalList/center`, {
-        params: { instCd: auth.instCd },
-      });
-  
-      console.log(response);
-      const transformedData = response.data.data.map((item, index) => ({
-        ...item,
-        no: index + 1,
-        status: getStatusText(item.status),
-      }));
-  
-      setRentalDetails(transformedData);
-      setSelectedRows([]);
+        const response = await axios.get(`/api/rentalList/center`, {
+            params: { instCd: auth.instCd },
+        });
 
-      if (response.data.data[0].lastUpdtDate) {
-        setLastUpdtDate(response.data.data[0].lastUpdtDate);
-      }
-  
+        if (response.data.data && response.data.data.length > 0) {
+            const transformedData = response.data.data.map((item, index) => ({
+                ...item,
+                no: index + 1,
+                status: getStatusText(item.status),
+            }));
+
+            setRentalDetails(transformedData);
+            setSelectedRows([]);
+
+            if (response.data.data[0].lastUpdtDate) {
+                setLastUpdtDate(response.data.data[0].lastUpdtDate);
+            } else {
+                setLastUpdtDate(null); 
+            }
+        } else {
+            setRentalDetails([]); 
+            setLastUpdtDate(null);
+        }
     } catch (error) {
-      console.error('센터 렌탈현황을 불러오는데 실패했습니다.', error);
+        console.error('센터 렌탈현황을 불러오는데 실패했습니다.', error);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  }, [auth.instCd, setSelectedRows]);
-  
+}, [auth.instCd, setSelectedRows]);
   
   useEffect(() => {
     fetchRentalData();

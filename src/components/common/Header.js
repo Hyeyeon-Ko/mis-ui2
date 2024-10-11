@@ -30,7 +30,6 @@ function Header() {
   const fetchUnReadNotiNum = useCallback(async () => {
     try {
       const response = await axios.get(`/api/noti/unread/${auth.userId}`);
-      console.log(response)
       setUnreadCount(response.data.data);
     } catch (error) {
       console.error("Error fetching unread notifications:", error);
