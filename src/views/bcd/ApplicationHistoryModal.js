@@ -40,12 +40,10 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
           pageIndex,
           pageSize,
         };
-        console.log("Params:", params);
         const response = await axios.get(
           `/api/bcd/applyList/history2/${draftId}`,
           { params }
         );
-        console.log("response", response);
 
         const transformedData = response.data.data.content.map((item) => ({
           ...item,
@@ -55,9 +53,7 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
 
         setFilteredData(transformedData);
         setTotalPages(response.data.data.totalPages);
-      } catch (error) {
-        console.error("Error fetching application history:", error);
-      }
+      } catch (error) {}
     },
     []
   );
@@ -142,12 +138,10 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
           <ConditionFilter
             startDate={startDate}
             setStartDate={(date) => {
-              console.log("Start Date set to:", date);
               setStartDate(date);
             }}
             endDate={endDate}
             setEndDate={(date) => {
-              console.log("End Date set to:", date);
               setEndDate(date);
             }}
             onSearch={handleSearch}
