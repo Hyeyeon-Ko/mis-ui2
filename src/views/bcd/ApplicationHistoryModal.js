@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
-import Pagination from '../../components/common/Pagination'; // 페이징 컴포넌트 추가
+import PaginationSub from '../../components/common/PaginationSub';
 import '../../styles/bcd/ApplicationHistoryModal.css';
 
 /* 신청 이력 모달 */
@@ -11,8 +11,8 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
-  const [currentPage, setCurrentPage] = useState("1"); // 현재 페이지
-  const [totalPages, setTotalPages] = useState("1"); // 총 페이지 수
+  const [currentPage, setCurrentPage] = useState("1"); 
+  const [totalPages, setTotalPages] = useState("1"); 
 
   const itemsPerPage = 10;
  
@@ -132,20 +132,26 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
           </button>
         </div>
         <div className="condition-filter-container">
-          <ConditionFilter
-            startDate={startDate}
-            setStartDate={setStartDate}
-            endDate={endDate}
-            setEndDate={setEndDate}
-            onSearch={handleSearch}
-            onReset={handleReset}
-            showDocumentType={false}
-            showSearchCondition={false}
-          />
+        <ConditionFilter
+          startDate={startDate}
+          setStartDate={(date) => {
+            console.log('Start Date set to:', date);
+            setStartDate(date);
+          }}
+          endDate={endDate}
+          setEndDate={(date) => {
+            console.log('End Date set to:', date);
+            setEndDate(date);
+          }}
+          onSearch={handleSearch}
+          onReset={handleReset}
+          showDocumentType={false}
+          showSearchCondition={false}
+        />
         </div>
         <div className="table-container">
           <Table columns={columns} data={filteredData} />
-          <Pagination
+          <PaginationSub
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={handlePageChange}
