@@ -1,5 +1,6 @@
-import React, { useContext, useState, useRef } from 'react';
+import React, { useContext, useState, useRef, useCallback, useEffect } from 'react';
 import { AuthContext } from '../../components/AuthContext';
+import axios from 'axios';
 import '../../styles/common/Header.css';
 import userImg from '../../assets/images/user.png';
 import adminImg from '../../assets/images/admin.png';
@@ -8,17 +9,39 @@ import NotificationModal from '../../../src/components/NotificationModal';
 
 /* 헤더 component */
 function Header() {
-  const { auth, logout, toggleMode, notifications } = useContext(AuthContext);
+  const { auth, logout, toggleMode } = useContext(AuthContext);
   const [showNotiModal, setShowNotiModal] = useState(false);
   const [notiPosition, setNotiPosition] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
   const notiButtonRef = useRef(null);
-  const unreadCount = notifications.filter(noti => !noti.isRead).length;
 
   const handleNotiClick = () => {
     const buttonRect = notiButtonRef.current.getBoundingClientRect();
     setNotiPosition(buttonRect);
     setShowNotiModal(!showNotiModal);
   };
+
+  // Function to decrement unread notifications
+  const decrementUnreadCount = () => {
+    setUnreadCount(prevCount => Math.max(prevCount - 1, 0)); // Decrease by 1, minimum 0
+  };
+
+  // DB에서 unread 알림 개수를 불러오는 함수
+  const fetchUnReadNotiNum = useCallback(async () => {
+    try {
+      const response = await axios.get(`/api/noti/unread/${auth.userId}`);
+      console.log(response)
+      setUnreadCount(response.data.data);
+    } catch (error) {
+      console.error("Error fetching unread notifications:", error);
+    }
+  }, [auth.userId]);
+
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      fetchUnReadNotiNum();
+    }
+  }, [fetchUnReadNotiNum, auth.isAuthenticated]);
 
   return (
     <header className="header">
@@ -55,7 +78,13 @@ function Header() {
           )}
         </div>
       </div>
-      {showNotiModal && <NotificationModal onClose={handleNotiClick} position={notiPosition} />}
+      {showNotiModal && (
+        <NotificationModal
+          onClose={handleNotiClick}
+          position={notiPosition}
+          decrementUnreadCount={decrementUnreadCount}
+        />
+      )}
     </header>
   );
 }

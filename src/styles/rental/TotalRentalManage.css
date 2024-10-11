@@ -86,3 +86,9 @@
 .totalRentalManage-excel-button:hover {
     background-color: #068c4e;
 }
+
+.last-updated {
+    margin-right: 14px; 
+    font-size: 14px;
+    display: inline-block; 
+  }  

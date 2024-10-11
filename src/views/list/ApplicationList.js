@@ -38,7 +38,6 @@ function ApplicationsList() {
     statusClosed: false,
   });
   const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState(null);
   const [showCheckboxColumn, setShowCheckboxColumn] = useState(false);
   const [selectedApplications, setSelectedApplications] = useState([]);
   const [selectedApplyStatus, setSelectedApplyStatus] = useState(null);
@@ -152,54 +151,6 @@ function ApplicationsList() {
     fetchApplications(1, itemsPerPage, params);
   };
 
-  // const applyFilters2 = useCallback(() => {
-  //   let filteredData = applications;
-
-  //   if (filterInputs.startDate) {
-  //     const startOfDay = new Date(filterInputs.startDate);
-  //     startOfDay.setHours(0, 0, 0, 0);
-  //     filteredData = filteredData.filter(application => new Date(application.draftDate) >= startOfDay);
-  //   }
-
-  //   if (filterInputs.endDate) {
-  //     const endOfDay = new Date(filterInputs.endDate);
-  //     endOfDay.setHours(23, 59, 59, 999);
-  //     filteredData = filteredData.filter(application => new Date(application.draftDate) <= endOfDay);
-  //   }
-
-  //   const keyword = filterInputs.keyword.toLowerCase().trim();
-  //   if (keyword) {
-  //     if (filterInputs.searchType === '전체') {
-  //       filteredData = filteredData.filter(application =>
-  //         application.title.toLowerCase().includes(keyword) ||
-  //         application.drafter.toLowerCase().includes(keyword)
-  //       );
-  //     } else if (filterInputs.searchType === '제목') {
-  //       filteredData = filteredData.filter(application =>
-  //         application.title.toLowerCase().includes(keyword)
-  //       );
-  //     } else if (filterInputs.searchType === '신청자') {
-  //       filteredData = filteredData.filter(application =>
-  //         application.drafter.toLowerCase().includes(keyword)
-  //       );
-  //     }
-  //   }
-
-  //   const selectedStatuses = [];
-  //   if (filters.statusApproved) selectedStatuses.push('승인완료');
-  //   if (filters.statusRejected) selectedStatuses.push('반려');
-  //   if (filters.statusOrdered) selectedStatuses.push('발주완료');
-  //   if (filters.statusClosed) selectedStatuses.push('처리완료');
-
-  //   if (selectedStatuses.length > 0) {
-  //     filteredData = filteredData.filter(application =>
-  //       selectedStatuses.includes(application.applyStatus)
-  //     );
-  //   }
-
-  //   setFilteredApplications(filteredData);
-  // }, [applications, filterInputs, filters]);
-
   const applyStatusFilters = useCallback(
     (data) => {
       const filtered = data.filter((app) => {
@@ -219,7 +170,6 @@ function ApplicationsList() {
   const fetchApplications = useCallback(
     async (pageIndex = 1, pageSize = itemsPerPage, filters = {}) => {
       setLoading(true);
-      // setError(null);
       try {
         const response = await axios.get("/api/applyList2", {
           params: {
@@ -263,7 +213,6 @@ function ApplicationsList() {
           setFilteredApplications([]);
           setTotalPages(1);
           setCurrentPage(1);
-          // setError('조회된 데이터가 없습니다.');
         } else {
           const totalPages = selectedData.totalPages;
           const currentPage = selectedData.number + 1;
@@ -299,7 +248,6 @@ function ApplicationsList() {
           setFilteredApplications(transformedData);
           setTotalPages(totalPages);
           setCurrentPage(currentPage);
-          // setError(null);
           applyStatusFilters(transformedData);
         }
       } catch (error) {
@@ -307,7 +255,6 @@ function ApplicationsList() {
           "Error fetching applications: 데이터를 불러오는 중 오류가 발생했습니다.",
           error
         );
-        // setError('데이터를 불러오는 중 오류가 발생했습니다.');
       } finally {
         setLoading(false);
       }
@@ -405,10 +352,6 @@ function ApplicationsList() {
       [name]: !prevFilters[name],
     }));
   };
-
-  // const handleSearch = () => {
-  //   applyFilters();
-  // };
 
   const handleReset = () => {
     resetFilters();
@@ -614,7 +557,6 @@ function ApplicationsList() {
           filters={filters}
           setFilters={setFilters}
           onFilterChange={handleFilterChange}
-          // onSearch={handleSearch}
           onSearch={applyFilters}
           onReset={handleReset}
           showStatusFilters={showStatusFilters}

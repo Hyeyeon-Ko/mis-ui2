@@ -6,8 +6,6 @@ import '../../styles/common/Page.css';
 import '../../styles/rental/TotalRentalManage.css';
 import Loading from '../../components/common/Loading';
 
-
-
 function TotalRentalManage() {
     const [selectedCenter, setSelectedCenter] = useState('all'); 
     const [centerData, setCenterData] = useState([]);
@@ -16,6 +14,7 @@ function TotalRentalManage() {
     const [nationwideSummary, setNationwideSummary] = useState([]); 
     const [selectedRows, setSelectedRows] = useState([]); 
     const [loading, setLoading] = useState(false)
+    const [lastUpdated, setLastUpdated] = useState('');
 
     const dragStartIndex = useRef(null);
     const dragEndIndex = useRef(null);
@@ -33,6 +32,8 @@ function TotalRentalManage() {
                   nationwideCenter, 
                   ...centerResponses
               ];
+
+              console.log(response.data.data)
   
               const formattedSummaryResponses = summaryResponses.map(summary => ({
                   ...summary,
@@ -44,6 +45,10 @@ function TotalRentalManage() {
   
               setCenterData(sortedCenterData);
               setCenterRentalResponses(centerRentalResponses[0]);
+
+              if (centerRentalResponses[0]?.foundationResponses?.length > 0) {
+                setLastUpdated(centerRentalResponses[0].foundationResponses[0].lastUpdtDate);
+            }
   
           } catch (error) {
               console.error("렌탈 데이터를 불러오는 중 오류 발생:", error);
@@ -112,6 +117,7 @@ function TotalRentalManage() {
 
         if (detailCd === 'all') {
             setRentalDetails(nationwideSummary); 
+            setLastUpdated('');
             return;
         }
 
@@ -139,6 +145,12 @@ function TotalRentalManage() {
         }));
 
         setRentalDetails(numberedDetails);
+
+        if (selectedDetails.length > 0) {
+            setLastUpdated(selectedDetails[0].lastUpdtDate);  // 센터 첫번째 데이터의 lastUpdtDate 설정
+        } else {
+            setLastUpdated('');  // 데이터가 없을 경우 lastUpdtDate 초기화
+        }
     };
 
     const handleRowClick = (row) => {
@@ -245,6 +257,11 @@ function TotalRentalManage() {
                         <div className="totalRentalManage-header-buttons">
                             <label className='totalRentalManage-detail-content-label'>렌탈 현황&gt;&gt;</label>
                             <div className="totalRentalManage-detail-buttons">
+                                {selectedCenter !== 'all' && lastUpdated && (
+                                    <div className="last-updated">
+                                        최종 수정일시: {lastUpdated}
+                                    </div>
+                                )}
                                 <button
                                     className="totalRentalManage-excel-button"
                                     onClick={handleExcelDownload}

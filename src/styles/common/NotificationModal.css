@@ -65,8 +65,10 @@
   padding-bottom: 15px;
   border-top: 1px solid #f1eeee;
   border-bottom: 1px solid #f1eeee;
+  user-select: none;
 }
 
 .notification-item.unclicked {
   background-color: #f2f6fab0;
+  user-select: none;
 }
