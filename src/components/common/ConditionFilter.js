@@ -8,6 +8,7 @@ import '../../styles/common/ConditionFilter.css';
 const ConditionFilter = ({
   onSearch,
   onReset,
+  showStatus,
   showStatusFilters,
   showSearchCondition,
   showDocumentType = true,
@@ -26,6 +27,7 @@ const ConditionFilter = ({
     statusRejected: false,
     statusOrdered: false,
     statusClosed: false,
+    statusReceived: false,
   });
   const [documentType, setDocumentType] = useState('');
   const [searchType, setSearchType] = useState('전체');
@@ -42,6 +44,7 @@ const ConditionFilter = ({
       statusRejected: false,
       statusOrdered: false,
       statusClosed: false,
+      statusReceived: false
     });
 
     // 외부에서 넘겨받은 리셋 핸들러 호출
@@ -90,42 +93,61 @@ const ConditionFilter = ({
     if (forceShowAllStatusFilters) {
       return (
         <>
-          <label>
-            <input
-              type="checkbox"
-              name="statusApproved"
-              checked={filters.statusApproved}
-              onChange={handleFilterChange}
-            />
-            승인완료
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              name="statusRejected"
-              checked={filters.statusRejected}
-              onChange={handleFilterChange}
-            />
-            반려
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              name="statusOrdered"
-              checked={filters.statusOrdered}
-              onChange={handleFilterChange}
-            />
-            발주완료
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              name="statusClosed"
-              checked={filters.statusClosed}
-              onChange={handleFilterChange}
-            />
-            처리완료
-          </label>
+          {showStatus.statusApproved && (
+            <label>
+              <input
+                type="checkbox"
+                name="statusApproved"
+                checked={filters.statusApproved}
+                onChange={handleFilterChange}
+              />
+              승인완료
+            </label>
+          )}
+          {showStatus.statusRejected && (
+            <label>
+              <input
+                type="checkbox"
+                name="statusRejected"
+                checked={filters.statusRejected}
+                onChange={handleFilterChange}
+              />
+              반려
+            </label>
+          )}
+          {showStatus.statusOrdered && (
+            <label>
+              <input
+                type="checkbox"
+                name="statusOrdered"
+                checked={filters.statusOrdered}
+                onChange={handleFilterChange}
+              />
+              발주완료
+            </label>
+          )}
+          {showStatus.statusClosed && (
+            <label>
+              <input
+                type="checkbox"
+                name="statusClosed"
+                checked={filters.statusClosed}
+                onChange={handleFilterChange}
+              />
+              처리완료
+            </label>
+          )}
+          {showStatus.statusReceived && (
+            <label>
+              <input
+                type="checkbox"
+                name="statusReceived"
+                checked={filters.statusReceived}
+                onChange={handleFilterChange}
+              />
+              발급완료
+            </label>
+          )}
         </>
       );
     }

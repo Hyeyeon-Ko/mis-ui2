@@ -39,7 +39,6 @@ const NotificationModal = ({ onClose, position, decrementUnreadCount }) => {
   const fetchNotificationsFromDB = useCallback(async () => {
     try {
       const response = await axios.get(`/api/noti/${auth.userId}`);
-      console.log(response);
       const notifications = Array.isArray(response.data.data) ? response.data.data : [];
       setNotifications(notifications);
     } catch (error) {
