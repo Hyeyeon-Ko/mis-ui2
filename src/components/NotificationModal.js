@@ -4,7 +4,7 @@ import { AuthContext } from '../components/AuthContext.js';
 import axios from 'axios';
 import '../styles/common/NotificationModal.css';
 
-const NotificationModal = ({ onClose, position }) => {
+const NotificationModal = ({ onClose, position, decrementUnreadCount }) => {
   const { notifications, setNotifications, auth } = useContext(AuthContext);
   const [readNotifications, setReadNotifications] = useState([]);
   const navigate = useNavigate();
@@ -27,6 +27,7 @@ const NotificationModal = ({ onClose, position }) => {
             noti.id === id ? { ...noti, isRead: true } : noti
           )
         );
+        decrementUnreadCount();
       } catch (error) {
         console.error("Error marking notification as read:", error);
       }

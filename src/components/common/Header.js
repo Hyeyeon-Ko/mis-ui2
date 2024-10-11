@@ -21,6 +21,11 @@ function Header() {
     setShowNotiModal(!showNotiModal);
   };
 
+  // Function to decrement unread notifications
+  const decrementUnreadCount = () => {
+    setUnreadCount(prevCount => Math.max(prevCount - 1, 0)); // Decrease by 1, minimum 0
+  };
+
   // DB에서 unread 알림 개수를 불러오는 함수
   const fetchUnReadNotiNum = useCallback(async () => {
     try {
@@ -73,7 +78,13 @@ function Header() {
           )}
         </div>
       </div>
-      {showNotiModal && <NotificationModal onClose={handleNotiClick} position={notiPosition} />}
+      {showNotiModal && (
+        <NotificationModal
+          onClose={handleNotiClick}
+          position={notiPosition}
+          decrementUnreadCount={decrementUnreadCount}
+        />
+      )}
     </header>
   );
 }
