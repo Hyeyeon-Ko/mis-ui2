@@ -381,7 +381,7 @@ function DetailApplication() {
                   )}
                 </div>
                 <div className="form-group-horizontal quantity-group">
-                  <label className="bold-label">명함 수량 선택</label>
+                  <label className="bold-label">명함 수량 선택 :</label>
                   {isReadOnly ? (
                     <div className="quantity-display">
                       {formData.quantity} 통

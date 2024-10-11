@@ -149,7 +149,6 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
             onReset={handleReset}
             showDocumentType={false}
             showSearchCondition={false}
-            searchOptions={[]} 
           />
         </div>
         <div className="table-container">
