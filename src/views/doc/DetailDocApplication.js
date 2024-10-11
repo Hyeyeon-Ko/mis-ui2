@@ -109,7 +109,7 @@ function DetailDocApplication() {
     }
 
     if (JSON.stringify(formData) === JSON.stringify(initialData) && !file && !isFileDeleted) {
-        alert('수정된 사항이 없습니다.');
+        navigate('/myPendingList');
         return;
     }
 
@@ -142,6 +142,10 @@ function DetailDocApplication() {
         alert('문서 수정 중 오류가 발생했습니다.');
     }
   };
+
+  const handleCancelRequest = () => {
+    navigate('/myPendingList');
+  }
 
   return (
     <div className="content">
@@ -242,10 +246,9 @@ function DetailDocApplication() {
                     />
                 )}
               </div>
-              <div className="doc-apply-button-container">
-                <CustomButton className="apply-request-button" type="submit">
-                  {isEdit ? '문서 수정하기' : '문서 신청하기'}
-                </CustomButton>
+              <div className="modify-buttons-container">
+                <CustomButton className="apply-request-button" type="submit">{isEdit ? '수정완료' : '문서 신청하기'}</CustomButton>
+                <CustomButton className="apply-cancel-button" onClick={handleCancelRequest}>수정취소</CustomButton>
               </div>
             </form>
           </div>

@@ -197,6 +197,10 @@ function DetailApplication() {
     setShowFinalConfirmationModal(true);
   };
 
+  const handleCancelRequest = () => {
+    navigate('/myPendingList');
+  }
+
   const handleConfirmRequest = async () => {
     setShowFinalConfirmationModal(false);
 
@@ -225,6 +229,11 @@ function DetailApplication() {
       division: formData.cardType === 'personal' ? 'B' : 'A',
       quantity: formData.quantity,
     };
+
+    if (JSON.stringify(formData) === JSON.stringify(requestData)) {
+      navigate('/myPendingList');
+      return; 
+    }
 
     try {
       const response = await axios.post(`/api/bcd/update?draftId=${draftId}`, requestData);
@@ -594,7 +603,10 @@ function DetailApplication() {
             </div>
           ) : (
             !isReadOnly && (
-              <CustomButton className="apply-request-button" onClick={handleApplyRequest}>수정완료</CustomButton>
+              <div className="modify-buttons-container">
+                <CustomButton className="apply-request-button" onClick={handleApplyRequest}>수정완료</CustomButton>
+                <CustomButton className="apply-cancel-button" onClick={handleCancelRequest}>수정취소</CustomButton>
+              </div>
             )
           )}
         </div>
