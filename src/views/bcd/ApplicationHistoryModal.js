@@ -60,9 +60,9 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
 
   useEffect(() => {
     if (startDate && endDate && draftId && show) {
-      fetchHistory(draftId, startDate, endDate, 1);
+      fetchHistory(draftId, startDate, endDate, currentPage);
     }
-  }, [startDate, endDate, draftId, show, fetchHistory]);
+  }, [startDate, endDate, draftId, show, currentPage, fetchHistory]);
 
   const parseDateTime = (dateString) => {
     const date = new Date(dateString);
