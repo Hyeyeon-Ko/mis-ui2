@@ -177,7 +177,7 @@ function SealExportList() {
           draftId: selectedDraftId,
           downloadType: convertedFileType,
           downloadNotes: downloadNotes,
-          downloaderNm: auth.hngNm,
+          downloaderNm: auth.userNm,
           downloaderId: auth.userId,
 },
         responseType: 'blob',
