@@ -157,7 +157,6 @@ function ApplicationsList() {
       showStatus[filter] = true;
     });
 
-    console.log("showStatusFilters: ", showStatus)
     return showStatus;
   }
 
@@ -181,7 +180,6 @@ function ApplicationsList() {
   // 1-2. 신청상태로 필터링 완료된 데이터 담기
   const applyStatusFilters = useCallback(
     (data) => {
-      console.log("data: ", data)
       const filtered = data.filter((app) => {
         if (filters.statusApproved && app.applyStatus === "승인완료") return true;
         if (filters.statusRejected && app.applyStatus === "반려") return true;
@@ -205,8 +203,6 @@ function ApplicationsList() {
         .filter((key) => filters[key] === true)  // Get only true filters
         .map((key) => convertDocumentType(key))  // Use convertDocumentType for status mapping
         .filter(Boolean);
-
-        console.log("ss: ", applyStatusList)
 
         const formattedStart = formatDate(new Date(filterInputs.startDate || formattedStartDate));
         const formattedEnd = formatDate(new Date(filterInputs.endDate || formattedEndDate));
@@ -246,7 +242,6 @@ function ApplicationsList() {
         const selectedData = combinedData.find(
           (response) => response && response.totalElements > 0
         );
-        console.log(selectedData)
 
         if (!selectedData || !selectedData.content.length) {
           setApplications([]);
@@ -328,6 +323,7 @@ function ApplicationsList() {
    * 신청상태 필터 변경 핸들러
    */
   const handleFilterChange = (e) => {
+    console.log("e: ",e)
     const { name } = e.target;
     setFilters((prevFilters) => ({
       ...prevFilters,
