@@ -62,11 +62,15 @@ const NotificationModal = ({ onClose, position, decrementUnreadCount, decrementA
 
   const handleMarkAllAsRead = async () => {
     try {
-      await axios.put('/api/noti/allRead'); 
-      setNotifications((prevNotifications) =>
+      await axios.put('/api/noti/allRead', null, {
+        params: {
+          userId: auth.userId,
+        }
+      });
+        setNotifications((prevNotifications) =>
         prevNotifications.map((noti) => ({ ...noti, isRead: true })) 
       );
-      decrementAllUnreadCount(); // TODO: 전체 개수로 수정 필요
+      decrementAllUnreadCount(); 
     } catch (error) {
       console.error("Error marking all notifications as read:", error);
     }
