@@ -6,9 +6,8 @@ import { useSealForm } from '../../hooks/useSealForm';
 import { validateForm } from '../../hooks/validateForm';
 
 function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
-  const { formData, setFormData, handleUpdateChange, handleFileUpdateChange } = useSealForm();
+  const { formData, setFormData, setIsFileDeleted, handleUpdateChange, handleFileUpdateChange } = useSealForm();
   const { auth } = useContext(AuthContext);
-  const { setIsFileDeleted } = useSealForm();
 
   const fetchSealDetail = useCallback(async (id) => {
     try {
@@ -23,6 +22,7 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
           manager: data.manager,
           subManager: data.subManager,
           date: data.draftDate,
+          sealImageNm: data.sealImageNm,
         });
         setIsFileDeleted(false);
       } else {
