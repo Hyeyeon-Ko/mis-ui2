@@ -27,9 +27,6 @@ export const AuthProvider = ({ children }) => {
 
   // 앱 로드 시 세션 스토리지에서 인증 상태와 알림을 불러옴
   useEffect(() => {
-    const storedNotifications = JSON.parse(sessionStorage.getItem('notifications')) || [];
-    setNotifications(storedNotifications); 
-
     const storedAuth = {
       userId: sessionStorage.getItem('userId'),
       userNm: sessionStorage.getItem('userNm'),
@@ -44,12 +41,12 @@ export const AuthProvider = ({ children }) => {
       isUserMode: sessionStorage.getItem('isUserMode') === 'true',
       originalRole: sessionStorage.getItem('originalRole') || sessionStorage.getItem('role'),
     };
-
-    if (storedAuth.userId && storedAuth.hngNm && storedAuth.role) {
+  
+    if (storedAuth.userId && storedAuth.userNm && storedAuth.role) {
       setAuth(storedAuth);
     }
   }, []);
-
+  
   // 인증 상태가 변경될 때마다 세션 스토리지에 저장
   useEffect(() => {
     sessionStorage.setItem('userId', auth.userId);
