@@ -208,6 +208,9 @@ function ApplicationsList() {
 
         console.log("ss: ", applyStatusList)
 
+        const formattedStart = formatDate(new Date(filterInputs.startDate || formattedStartDate));
+        const formattedEnd = formatDate(new Date(filterInputs.endDate || formattedEndDate));
+
         const response = await axios.get("/api/applyList2", {
           params: {
             userId: auth.userId || "",
@@ -218,10 +221,8 @@ function ApplicationsList() {
               null,
             searchType: filterInputs.searchType,
             keyword: filterInputs.keyword,
-            startDate: filterInputs.startDate
-              ? filterInputs.startDate
-              : formattedStartDate,
-            endDate: filterInputs.endDate ? filterInputs.endDate : formattedEndDate,
+            startDate: formattedStart,
+            endDate: formattedEnd,
             applyStatus: applyStatusList,
             pageIndex,
             pageSize,
@@ -308,6 +309,12 @@ function ApplicationsList() {
       formattedEndDate,
     ]
   );
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  };
+  
 
   /**
    * 페이지 변경 핸들러
@@ -581,13 +588,6 @@ function ApplicationsList() {
       : [{ header: "발주일시", accessor: "orderDate", width: "14%" }]),
     { header: "문서상태", accessor: "applyStatus", width: "10%" },
   ];
-
-  // todo: 얘 사용 안함. 추후 삭제
-  const showStatusFilters =
-    documentTypeFromUrl === "명함신청" ||
-    documentTypeFromUrl === "법인서류" ||
-    documentTypeFromUrl === "문서수발신" ||
-    documentTypeFromUrl === "인장신청";
 
   return (
     <div className="content">
