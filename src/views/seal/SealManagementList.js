@@ -62,7 +62,7 @@ const SealManagementTable = ({
 };
 
 function SealManagementList() {
-  const [applications, setApplications] = useState([]);
+  const [, setApplications] = useState([]);
   const { auth } = useContext(AuthContext);
   const [clickedRows, setClickedRows] = useState([]);
   const [filterInputs, setFilterInputs] = useState({
