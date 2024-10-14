@@ -14,6 +14,7 @@ import { AuthContext } from "../../components/AuthContext";
 import useDateSet from "../../hooks/apply/useDateSet";
 import PaginationSub from "../../components/common/PaginationSub";
 import Loading from "../../components/common/Loading";
+import qs from 'qs';
 
 function ApplicationsList() {
   const location = useLocation();
@@ -30,6 +31,7 @@ function ApplicationsList() {
     documentType: documentTypeFromUrl || "",
     searchType: "전체",
     keyword: "",
+    applyStatus:"",
   });
   const [filters, setFilters] = useState({
     statusApproved: false,
@@ -163,8 +165,20 @@ function ApplicationsList() {
   // 1-1. 필터값 적용해서 application fetch해오기
   const applyFilters = (filterValues) => {
     // filterValues에서 documentType과 기타 필터 값을 가져옴
-    const { startDate, endDate, documentType, searchType, keyword } =
-      filterValues;
+    const { startDate, endDate, documentType, searchType, keyword, filters } = filterValues;
+
+    const statusCodeMap = {
+      statusApproved: "B",
+      statusRejected: "C",
+      statusOrdered: "D",
+      statusClosed: "E",
+      statusReceived: "F",
+    };
+
+    // filters 객체에서 true인 항목만 찾아서 코드로 변환
+    const applyStatus = Object.keys(filters)
+    .filter((key) => filters[key]) // true인 필터만 추출
+    .map((key) => statusCodeMap[key]); // 코드로 변환
 
     const params = {
       startDate: startDate ? startDate.toISOString().split("T")[0] : "", // 시작일
@@ -172,8 +186,8 @@ function ApplicationsList() {
       documentType: documentType,
       searchType: searchType,
       keyword: keyword, // 검색어
+      applyStatus: applyStatus
     };
-
     fetchApplications(1, itemsPerPage, params);
   };
 
@@ -195,18 +209,25 @@ function ApplicationsList() {
 
   // 1. 데이터 fetch해오기
   const fetchApplications = useCallback(
-    async (pageIndex = 1, pageSize = itemsPerPage) => {
+    async (pageIndex = 1, pageSize = itemsPerPage, filterParams) => {
       setLoading(true);
       try {
 
-        const applyStatusList = Object.keys(filters)
-        .filter((key) => filters[key] === true)  // Get only true filters
-        .map((key) => convertDocumentType(key))  // Use convertDocumentType for status mapping
-        .filter(Boolean);
+        console.log("filterParams: ", filterParams)
+        let applyStatusList;
+        if(filterParams) {
+          applyStatusList = filterParams.applyStatus
+        } else {
+          applyStatusList = Object.keys(filters)
+          .filter((key) => filters[key] === true)  // Get only true filters
+          .map((key) => convertDocumentType(key))  // Use convertDocumentType for status mapping
+          .filter(Boolean);
+        }
 
         const formattedStart = formatDate(new Date(filterInputs.startDate || formattedStartDate));
         const formattedEnd = formatDate(new Date(filterInputs.endDate || formattedEndDate));
 
+        console.log("applyStatus: ", applyStatusList)
         const response = await axios.get("/api/applyList2", {
           params: {
             userId: auth.userId || "",
@@ -223,6 +244,10 @@ function ApplicationsList() {
             pageIndex,
             pageSize,
           },
+          paramsSerializer: params => {
+            // applyStatus 배열을 제대로 직렬화
+            return qs.stringify(params, { arrayFormat: "repeat" });
+          }
         });
 
         const {
