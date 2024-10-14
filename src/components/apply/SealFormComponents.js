@@ -97,7 +97,7 @@ function SealFormComponents({
                                         type="text" 
                                         name="useDate" 
                                         value={useDate} 
-                                        onChange={(e) => setUseDate(e.target.value)} 
+                                        onChange={setUseDate} 
                                         placeholder="YYYY-MM-DD" 
                                     />
                                 </div>

@@ -17,6 +17,19 @@ function SealApplyImprint() {
     const [purpose, setPurpose] = useState('');
     const [notes, setNotes] = useState('');
 
+    const handleUseDateChange = (e) => {
+        const formattedDate = e.target.value.replace(/\D+/g, "");
+        const length = 8;
+        let result = "";
+
+        for (let i = 0; i < formattedDate.length && i < length; i++) {
+            if (i === 4 || i === 6) result += "-";
+            result += formattedDate[i];
+        }
+      
+        setUseDate(result);
+    };
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -84,7 +97,7 @@ function SealApplyImprint() {
             submission={submission}
             setSubmission={setSubmission}
             useDate={useDate}
-            setUseDate={setUseDate}
+            setUseDate={handleUseDateChange}
             purpose={purpose}
             setPurpose={setPurpose}
             notes={notes}
