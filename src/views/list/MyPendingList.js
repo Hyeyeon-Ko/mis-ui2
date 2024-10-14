@@ -55,7 +55,7 @@ function MyPendingList() {
       transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
   
       setPendingApplications(transformedData);
-      setTotalPages(Math.max(pagedResult.totalPages, 1));  // Set total pages once
+      setTotalPages(Math.max(pagedResult.totalPages, 1)); 
     } catch (error) {
       console.error('Error fetching pending applications:', error.response ? error.response.data : error.message);
     }
@@ -87,20 +87,20 @@ function MyPendingList() {
   
       switch (selectedApplication.docType) {
         case '명함신청':
-          endpoint = '/bcd/';
+          endpoint = '/api/bcd/';
           break;
         case '문서발신':
         case '문서수신': 
-          endpoint = '/doc/';
+          endpoint = '/api/doc/';
           break;
         case '법인서류':
-          endpoint = '/corpDoc/';
+          endpoint = '/api/corpDoc/';
           break;
         case '인장신청(날인)':
-          endpoint = '/seal/imprint/';
+          endpoint = '/api/seal/imprint/';
           break;
         case '인장신청(반출)':
-          endpoint = '/seal/export/';
+          endpoint = '/api/seal/export/';
           break;
         default:
           console.error('Unknown document type:', selectedApplication.docType);

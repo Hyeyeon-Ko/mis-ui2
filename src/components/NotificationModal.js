@@ -4,7 +4,7 @@ import { AuthContext } from '../components/AuthContext.js';
 import axios from 'axios';
 import '../styles/common/NotificationModal.css';
 
-const NotificationModal = ({ onClose, position, decrementUnreadCount }) => {
+const NotificationModal = ({ onClose, position, decrementUnreadCount, decrementAllUnreadCount }) => {
   const { notifications, setNotifications, auth } = useContext(AuthContext);
   const [readNotifications, setReadNotifications] = useState([]);
   const navigate = useNavigate();
@@ -39,7 +39,6 @@ const NotificationModal = ({ onClose, position, decrementUnreadCount }) => {
   const fetchNotificationsFromDB = useCallback(async () => {
     try {
       const response = await axios.get(`/api/noti/${auth.userId}`);
-      console.log(response)
       const notifications = Array.isArray(response.data.data) ? response.data.data : [];
       setNotifications(notifications);
     } catch (error) {
@@ -61,6 +60,21 @@ const NotificationModal = ({ onClose, position, decrementUnreadCount }) => {
   const readNotificationsSorted = sortedNotifications
     .filter(noti => noti.isRead && new Date(noti.createdDate) > thirtyDaysAgo);
 
+  const handleMarkAllAsRead = async () => {
+    try {
+      await axios.put('/api/noti/allRead', null, {
+        params: {
+          userId: auth.userId,
+        }
+      });
+        setNotifications((prevNotifications) =>
+        prevNotifications.map((noti) => ({ ...noti, isRead: true })) 
+      );
+      decrementAllUnreadCount(); 
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+    }
+  };
 
   return (
     <div
@@ -74,7 +88,10 @@ const NotificationModal = ({ onClose, position, decrementUnreadCount }) => {
       <div className="modal-content">
         <div className="modal-content-header">
           <h3>Notification</h3>
-          <button className="close-modal" onClick={onClose}>X</button>
+          <div className="modal-buttons">
+            <button type="button" className="button-all-read" onClick={handleMarkAllAsRead}>모두읽음</button>
+            <button className="close-modal" onClick={onClose}>X</button>
+          </div>
         </div>
         <div className='modal-content-detail'> 
           <ul>

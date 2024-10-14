@@ -39,6 +39,21 @@ function MyApplyList() {
   const [currentPage, setCurrentPage] = useState('1')
   const [loading, setLoading] = useState(false);
   const itemsPerPage = 10;
+  // const [filterInputs, setFilterInputs] = useState({
+  //   startDate: null,
+  //   endDate: null,
+  //   documentType: "",
+  //   searchType: "전체",
+  //   keyword: "",
+  //   applyStatus:"",
+  // });
+  // const [showStatus, setShowStatus] = useState({
+  //   statusApproved: true,
+  //   statusRejected: true,
+  //   statusOrdered: true,
+  //   statusClosed: true,
+  //   statusReceived: true,
+  // });
 
   const fetchApplications = useCallback(async (pageIndex = 1,  pageSize = itemsPerPage, filters = {}) => {
     setLoading(true);
@@ -56,9 +71,6 @@ function MyApplyList() {
       });
   
       const data = response.data.data.pagedResult || response.data.data;
-  
-      // const totalPages = Math.max(data.totalPages || 1, 1);
-      // const currentPage = data.number + 1;
   
       const { myBcdResponses, myDocResponses, myCorpDocResponses, mySealResponses, pagedResult } = response.data.data;
 
@@ -132,11 +144,25 @@ function MyApplyList() {
 
   const applyFilters = (filterValues) => {
     const { startDate, endDate, documentType, keyword } = filterValues;
+
+    // const statusCodeMap = {
+    //   statusApproved: "B",
+    //   statusRejected: "C",
+    //   statusOrdered: "D",
+    //   statusClosed: "E",
+    //   statusReceived: "G",
+    // };
+
+    // const applyStatus = Object.keys(filters)
+    // .filter((key) => filters[key])     // true인 필터만 추출
+    // .map((key) => statusCodeMap[key]); // 코드로 변환
+
     const params = {
       startDate: startDate ? startDate.toISOString().split('T')[0] : '',
       endDate: endDate ? endDate.toISOString().split('T')[0] : '',
       documentType: documentType,
       keyword: keyword,
+      // applyStatus: ""
     };
   
     fetchApplications(1, itemsPerPage, params); 
@@ -154,6 +180,7 @@ function MyApplyList() {
     if (filters.statusRejected) selectedStatuses.push('반려');
     if (filters.statusOrdered) selectedStatuses.push('발주완료');
     if (filters.statusClosed) selectedStatuses.push('처리완료');
+    if (filters.statusReceived) selectedStatuses.push('발급완료');
 
     if (selectedStatuses.length > 0) {
       filteredData = filteredData.filter(application =>
@@ -272,7 +299,6 @@ function MyApplyList() {
     const selectedPage = event.selected + 1;
     setCurrentPage(selectedPage);
     fetchApplications(selectedPage);
-    fetchApplications(selectedPage);
   };
       
   const applicationColumns = [
@@ -353,11 +379,25 @@ function MyApplyList() {
           onSearch={applyFilters}
           onReset={handleReset}
           showStatusFilters={true}
-          forceShowAllStatusFilters={true}
+          // forceShowAllStatusFilters={true}
           filters={filters}
           setFilters={setFilters}
+          // showStatus={showStatus}
+          // setShowStatus={setShowStatus}
           onFilterChange={handleFilterChange}
-          searchOptions={[]}          
+          // showSearchCondition={true}
+          searchOptions={[]}  
+                    // searchType={filterInputs.searchType}        // 선택한 검색유형
+          // setSearchType={(searchType) =>
+          //   setFilterInputs((prev) => ({ ...prev, searchType }))
+          // }
+          // keyword={filterInputs.keyword}        // 검색어
+          // setKeyword={(keyword) =>
+          //   setFilterInputs((prev) => ({ ...prev, keyword }))
+          // }
+          // showDocumentType={false}   // 문서분류 표시여부
+          // documentType={documentType}
+          // setDocumentType={setDocumentType} 
         />
         {loading ? (
           <Loading />

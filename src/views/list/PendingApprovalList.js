@@ -143,7 +143,6 @@ function PendingApprovalList() {
           docType: item.docType
         }));
     
-        transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
         setApplications(transformedData);
         setTotalPages(totalPages);
         setCurrentPage(currentPage);

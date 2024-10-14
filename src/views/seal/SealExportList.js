@@ -177,7 +177,7 @@ function SealExportList() {
           draftId: selectedDraftId,
           downloadType: convertedFileType,
           downloadNotes: downloadNotes,
-          downloaderNm: auth.hngNm,
+          downloaderNm: auth.userNm,
           downloaderId: auth.userId,
 },
         responseType: 'blob',
@@ -248,7 +248,8 @@ function SealExportList() {
           setKeyword={(keyword) =>
             setFilterInputs((prev) => ({ ...prev, keyword }))
           }
-          searchOptions={["전체", "반출일자", "반납일자", "사용목적"]}
+          searchOptions={["전체", "반납일자", "사용목적"]}
+          startDateLabel="반출일자"
           setDocumentType={() => {}}
         />
 

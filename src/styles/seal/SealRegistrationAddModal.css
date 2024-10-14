@@ -126,3 +126,13 @@ input:disabled {
 .seal-regist-button.cancel:hover {
     background-color: #999;
 }
+
+.seal-file-display {
+    display: flex;
+    align-items: center;
+    background-color: #f9f9f9;
+    border: 1px solid #e4e1e1;
+    border-radius: 6px;
+    padding: 8px 10px;
+    justify-content: space-between; 
+  }

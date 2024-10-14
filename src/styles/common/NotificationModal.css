@@ -6,10 +6,18 @@
 
 .modal-content-header {
   display: flex;
-  justify-content: space-between;
-  padding: 20px 20px 15px 40px;
+  justify-content: flex-start; 
+  padding: 20px;
   align-items: center;
   height: 50px;
+  margin-left: 20px;
+  font-size: 18px;
+}
+
+.modal-buttons {
+  margin-left: auto; 
+  display: flex; 
+  gap: 2px; 
 }
 
 .modal-content-header h3 {
@@ -71,4 +79,19 @@
 .notification-item.unclicked {
   background-color: #f2f6fab0;
   user-select: none;
+}
+
+.button-all-read {
+  background-color: white;
+  color: #2789FE; 
+  border: none; 
+  border-radius: 5px; 
+  padding: 6px 8px 10px 8px; 
+  font-size: 14px;
+  cursor: pointer; 
+  text-decoration: none; 
+}
+
+.button-all-read:hover {
+  text-decoration: underline; 
 }

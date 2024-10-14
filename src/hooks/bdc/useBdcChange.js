@@ -245,11 +245,6 @@ const useBdcChange = () => {
       ? `${updatedFloor}F, ${originalEngAddress}`
       : originalEngAddress;
 
-    console.log(bcdData.instInfo);
-    console.log(formData.center);
-    console.log(originalEngAddress);
-    console.log(updatedEngAddress);
-
     setFormData({
       ...formData,
       address: updatedAddress,

@@ -8,6 +8,7 @@ import '../../styles/common/ConditionFilter.css';
 const ConditionFilter = ({
   onSearch,
   onReset,
+//  showStatus,
   showStatusFilters,
   showSearchCondition,
   showDocumentType = true,
@@ -26,6 +27,7 @@ const ConditionFilter = ({
     statusRejected: false,
     statusOrdered: false,
     statusClosed: false,
+    statusReceived: false,
   });
   const [documentType, setDocumentType] = useState('');
   const [searchType, setSearchType] = useState('전체');
@@ -42,6 +44,7 @@ const ConditionFilter = ({
       statusRejected: false,
       statusOrdered: false,
       statusClosed: false,
+      statusReceived: false
     });
 
     // 외부에서 넘겨받은 리셋 핸들러 호출
@@ -125,6 +128,15 @@ const ConditionFilter = ({
               onChange={handleFilterChange}
             />
             처리완료
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="statusReceived"
+              checked={filters.statusReceived}
+              onChange={handleFilterChange}
+            />
+            발급완료
           </label>
         </>
       );

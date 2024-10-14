@@ -113,7 +113,8 @@ function DocOutList() {
           draftId: item.draftId,
           draftDate: item.draftDate,
           docId: item.docId,
-          resSender: item.resSender,
+          senderd: item.sender,
+          receiver: item.receiver,
           title: item.title,
           drafter: item.drafter,
           status: item.status,
@@ -349,7 +350,7 @@ const handleDownloadConfirm = async ({ downloadNotes, downloadType }) => {
     },
     { header: '접수일자', accessor: 'draftDate', width: '12%', Cell: ({ row }) => row.draftDate.split('T')[0] },
     { header: '문서번호', accessor: 'docId', width: '8%' },
-    { header: '수신처', accessor: 'resSender', width: '10%' },
+    { header: '수신처', accessor: 'receiver', width: '10%' },
     { header: '제목', accessor: 'title', width: '20%' },
     {
       header: '첨부파일',

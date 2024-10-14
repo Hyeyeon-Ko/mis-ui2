@@ -109,16 +109,13 @@ function DocInList() {
           },
         });
   
-        const content = response.data?.data?.content ?? [];
-        const totalPages = response.data?.data?.totalPages ?? 1;
-        const currentPage = response.data?.data?.number + 1 || 1;
-  
-        if (content.length) {
-          const formattedData = content.map(item => ({
+        if (response.data && response.data.data && Array.isArray(response.data.data.content)) {
+          const formattedData = response.data.data.content.map(item => ({
             draftId: item.draftId,
             draftDate: item.draftDate,
             docId: item.docId,
-            resSender: item.resSender,
+            sender: item.sender,
+            receiver: item.receiver,
             title: item.title,
             drafter: item.drafter,
             status: item.status,
@@ -129,10 +126,10 @@ function DocInList() {
   
           setApplications(formattedData);
           setFilteredApplications(formattedData);
-          setTotalPages(totalPages);
-          setCurrentPage(currentPage);
+          setTotalPages(response.data.data.totalPages || 1);
+          setCurrentPage(response.data.data.number + 1);
         } else {
-          console.warn("No content found in response.");
+          console.error("Unexpected response structure: ", response.data);
         }
       } catch (error) {
         console.error("Error fetching document list:", error);
@@ -365,7 +362,7 @@ const handleDownloadFiles = () => {
     },
     { header: '접수일자', accessor: 'draftDate', width: '12%', Cell: ({ row }) => row.draftDate.split('T')[0] },
     { header: '문서번호', accessor: 'docId', width: '8%' },
-    { header: '수신처', accessor: 'resSender', width: '10%' },
+    { header: '발신처', accessor: 'sender', width: '10%' },
     { header: '제목', accessor: 'title', width: '20%' },
     {
       header: '첨부파일',
@@ -436,7 +433,7 @@ const handleDownloadFiles = () => {
           setKeyword={(keyword) =>
             setFilterInputs((prev) => ({ ...prev, keyword }))
           }
-          searchOptions={["전체", "수신처", "제목", "접수인"]}
+          searchOptions={["전체", "발신처", "제목", "접수인"]}
           startDateLabel="접수일자"
           setFilters={() => {}}
           setDocumentType={() => {}}
@@ -446,12 +443,10 @@ const handleDownloadFiles = () => {
           <Loading />
         ) : (
           <>
-          {/* <Table columns={columns} data={filteredApplications} /> */}
           <Table columns={columns} data={filteredApplications || []} />
         <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
         </>
-
-)}
+        )}
         </div>
         {showDeleteModal && (
           <ConfirmModal

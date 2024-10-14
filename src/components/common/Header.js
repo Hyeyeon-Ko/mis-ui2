@@ -26,11 +26,14 @@ function Header() {
     setUnreadCount(prevCount => Math.max(prevCount - 1, 0)); // Decrease by 1, minimum 0
   };
 
+  const decrementAllUnreadCount = () => {
+    setUnreadCount(0);
+  }
+
   // DB에서 unread 알림 개수를 불러오는 함수
   const fetchUnReadNotiNum = useCallback(async () => {
     try {
       const response = await axios.get(`/api/noti/unread/${auth.userId}`);
-      console.log(response)
       setUnreadCount(response.data.data);
     } catch (error) {
       console.error("Error fetching unread notifications:", error);
@@ -83,6 +86,7 @@ function Header() {
           onClose={handleNotiClick}
           position={notiPosition}
           decrementUnreadCount={decrementUnreadCount}
+          decrementAllUnreadCount={decrementAllUnreadCount}
         />
       )}
     </header>

@@ -14,6 +14,7 @@ import { AuthContext } from "../../components/AuthContext";
 import useDateSet from "../../hooks/apply/useDateSet";
 import PaginationSub from "../../components/common/PaginationSub";
 import Loading from "../../components/common/Loading";
+//import qs from 'qs';
 
 function ApplicationsList() {
   const location = useLocation();
@@ -30,13 +31,28 @@ function ApplicationsList() {
     documentType: documentTypeFromUrl || "",
     searchType: "전체",
     keyword: "",
+    applyStatus:"",
   });
   const [filters, setFilters] = useState({
     statusApproved: false,
     statusRejected: false,
     statusOrdered: false,
     statusClosed: false,
+    statusReceived: false,
   });
+  // const [showStatus, setShowStatus] = useState({
+  //   statusApproved: false,
+  //   statusRejected: false,
+  //   statusOrdered: false,
+  //   statusClosed: true,
+  //   statusReceived: false,
+  // });
+  // const filterMapping = {
+  //   A: ['statusApproved', 'statusRejected', 'statusOrdered'],
+  //   B: ['statusReceived'],
+  //   C: ['statusApproved', 'statusReceived', 'statusRejected'],
+  //   D: ['statusRejected'],
+  // };
   const [loading, setLoading] = useState(false);
   const [showCheckboxColumn, setShowCheckboxColumn] = useState(false);
   const [selectedApplications, setSelectedApplications] = useState([]);
@@ -53,7 +69,6 @@ function ApplicationsList() {
 
   useEffect(() => {
     fetchApplications(currentPage, itemsPerPage);
-    // eslint-disable-next-line
   }, [currentPage]);
 
   const [centers] = useState([
@@ -135,10 +150,33 @@ function ApplicationsList() {
     }
   };
 
+  // // 0. 신청상태 필터값 세팅
+  // const getStatusFilter = (documentTypeFromUrl) => {
+  //   const specificFilters = filterMapping[convertDocumentType(documentTypeFromUrl)] || [];
+  
+  //   specificFilters.forEach((filter) => {
+  //     showStatus[filter] = true;
+  //   });
+
+  //   return showStatus;
+  // }
+
+  // 1-1. 필터값 적용해서 application fetch해오기
   const applyFilters = (filterValues) => {
-    // filterValues에서 documentType과 기타 필터 값을 가져옴
-    const { startDate, endDate, documentType, searchType, keyword } =
-      filterValues;
+    const { startDate, endDate, documentType, searchType, keyword } = filterValues;
+
+    // const statusCodeMap = {
+    //   statusApproved: "B",
+    //   statusRejected: "C",
+    //   statusOrdered: "D",
+    //   statusClosed: "E",
+    //   statusReceived: "G",
+    // };
+
+    // // filters 객체에서 true인 항목만 찾아서 코드로 변환
+    // const applyStatus = Object.keys(filters)
+    // .filter((key) => filters[key])     // true인 필터만 추출
+    // .map((key) => statusCodeMap[key]); // 코드로 변환
 
     const params = {
       startDate: startDate ? startDate.toISOString().split("T")[0] : "", // 시작일
@@ -146,20 +184,20 @@ function ApplicationsList() {
       documentType: documentType,
       searchType: searchType,
       keyword: keyword, // 검색어
+      applyStatus: ""
     };
-
     fetchApplications(1, itemsPerPage, params);
   };
 
+  // 1-2. 신청상태로 필터링 완료된 데이터 담기
   const applyStatusFilters = useCallback(
     (data) => {
       const filtered = data.filter((app) => {
-        if (filters.statusApproved && app.applyStatus === "승인완료")
-          return true;
+        if (filters.statusApproved && app.applyStatus === "승인완료") return true;
         if (filters.statusRejected && app.applyStatus === "반려") return true;
-        if (filters.statusOrdered && app.applyStatus === "발주완료")
-          return true;
+        if (filters.statusOrdered && app.applyStatus === "발주완료") return true;
         if (filters.statusClosed && app.applyStatus === "처리완료") return true;
+        if (filters.statusReceived && app.applyStatus === "발급완료") return true;
         return !Object.values(filters).some(Boolean);
       });
       setFilteredApplications(filtered);
@@ -167,10 +205,25 @@ function ApplicationsList() {
     [filters]
   );
 
+  // 1. 데이터 fetch해오기
   const fetchApplications = useCallback(
     async (pageIndex = 1, pageSize = itemsPerPage, filters = {}) => {
       setLoading(true);
       try {
+
+        // let applyStatusList;
+        // if(filterParams) {
+        //   applyStatusList = filterParams.applyStatus
+        // } else {
+        //   applyStatusList = Object.keys(filters)
+        //   .filter((key) => filters[key] === true)  // Get only true filters
+        //   .map((key) => convertDocumentType(key))  // Use convertDocumentType for status mapping
+        //   .filter(Boolean);
+        // }
+
+        // const formattedStart = formatDate(new Date(filterInputs.startDate || formattedStartDate));
+        // const formattedEnd = formatDate(new Date(filterInputs.endDate || formattedEndDate));
+
         const response = await axios.get("/api/applyList2", {
           params: {
             userId: auth.userId || "",
@@ -181,13 +234,16 @@ function ApplicationsList() {
               null,
             searchType: filters.searchType,
             keyword: filters.keyword,
-            startDate: filters.startDate
-              ? filters.startDate
-              : formattedStartDate,
+            startDate: filters.startDate ? filters.startDate : formattedStartDate,
             endDate: filters.endDate ? filters.endDate : formattedEndDate,
+            applyStatus: "",
             pageIndex,
             pageSize,
           },
+          // paramsSerializer: params => {
+          //   // applyStatus 배열을 제대로 직렬화
+          //   return qs.stringify(params, { arrayFormat: "repeat" });
+          // }
         });
 
         const {
@@ -246,6 +302,7 @@ function ApplicationsList() {
 
           setApplications(transformedData);
           setFilteredApplications(transformedData);
+          // setShowStatus(getStatusFilter(documentTypeFromUrl));
           setTotalPages(totalPages);
           setCurrentPage(currentPage);
           applyStatusFilters(transformedData);
@@ -269,6 +326,12 @@ function ApplicationsList() {
     ]
   );
 
+  // const formatDate = (dateString) => {
+  //   const date = new Date(dateString);
+  //   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  // };
+  
+
   /**
    * 페이지 변경 핸들러
    */
@@ -277,6 +340,77 @@ function ApplicationsList() {
     setCurrentPage(selectedPage);
   };
 
+  /**
+   * 신청상태 필터 변경 핸들러
+   */
+  const handleFilterChange = (e) => {
+    const { name } = e.target;
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [name]: !prevFilters[name],
+    }));
+  };
+
+  /**
+   * 필터 초기화 핸들러
+   */
+  const handleReset = () => {
+    resetFilters();
+    fetchApplications();
+  };
+
+  // 2. 필터 초기화!
+  const resetFilters = useCallback(() => {
+    const defaultStartDate = new Date();
+    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
+    setFilterInputs({
+      startDate: defaultStartDate,
+      endDate: new Date(),
+      documentType: documentTypeFromUrl || "",
+      searchType: "전체",
+      keyword: "",
+    });
+    setFilters({
+      statusApproved: false,
+      statusRejected: false,
+      statusOrdered: false,
+      statusClosed: false,
+      statusReceived: false,
+    });
+    setSelectedCenter("전체");
+    // setShowStatus({
+    //   statusApproved: false,
+    //   statusRejected: false,
+    //   statusOrdered: false,
+    //   statusClosed: true,
+    //   statusReceived: false,
+    // })
+  }, [documentTypeFromUrl]);
+
+  useEffect(() => {
+    resetFilters();
+  }, [documentTypeFromUrl, resetFilters]);
+
+  /**
+  * 데이터 선택 핸들러
+  */
+  const handleSelectAll = (isChecked) => {
+    setSelectedApplications(
+      isChecked ? filteredApplications.map((app) => app.draftId) : []
+    );
+  };
+
+  const handleSelect = (isChecked, id) => {
+    setSelectedApplications(
+      isChecked
+        ? [...selectedApplications, id]
+        : selectedApplications.filter((appId) => appId !== id)
+    );
+  };
+
+  /**
+  * 센터 선택 핸들러
+  */
   useEffect(() => {
     const centerFilteredData =
       selectedCenter === "전체"
@@ -285,6 +419,10 @@ function ApplicationsList() {
 
     setFilteredApplications(centerFilteredData);
   }, [selectedCenter, applications]);
+
+  const handleCenterChange = (e) => {
+    setSelectedCenter(e.target.value);
+  };
 
   useEffect(() => {
     fetchApplications();
@@ -310,29 +448,7 @@ function ApplicationsList() {
     }
   };
 
-  const resetFilters = useCallback(() => {
-    const defaultStartDate = new Date();
-    defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
-    setFilterInputs({
-      startDate: defaultStartDate,
-      endDate: new Date(),
-      documentType: documentTypeFromUrl || "",
-      searchType: "전체",
-      keyword: "",
-    });
-    setFilters({
-      statusApproved: false,
-      statusRejected: false,
-      statusOrdered: false,
-      statusClosed: false,
-    });
-    setSelectedCenter("전체");
-  }, [documentTypeFromUrl]);
-
-  useEffect(() => {
-    resetFilters();
-  }, [documentTypeFromUrl, resetFilters]);
-
+  // 3. 명함신청 + 처리완료일 때 엑셀버튼 보이기
   useEffect(() => {
     if (documentTypeFromUrl === "명함신청") {
       const isShowExcelButton =
@@ -344,33 +460,6 @@ function ApplicationsList() {
       setShowExcelButton(false);
     }
   }, [filters, selectedApplications, documentTypeFromUrl]);
-
-  const handleFilterChange = (e) => {
-    const { name } = e.target;
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [name]: !prevFilters[name],
-    }));
-  };
-
-  const handleReset = () => {
-    resetFilters();
-    fetchApplications();
-  };
-
-  const handleSelectAll = (isChecked) => {
-    setSelectedApplications(
-      isChecked ? filteredApplications.map((app) => app.draftId) : []
-    );
-  };
-
-  const handleSelect = (isChecked, id) => {
-    setSelectedApplications(
-      isChecked
-        ? [...selectedApplications, id]
-        : selectedApplications.filter((appId) => appId !== id)
-    );
-  };
 
   const handleExcelDownload = async () => {
     if (selectedApplications.length === 0) {
@@ -398,15 +487,12 @@ function ApplicationsList() {
     }
   };
 
-  const handleCenterChange = (e) => {
-    setSelectedCenter(e.target.value);
-  };
-
   const closeModal = () => {
     setModalVisible(false);
     setSelectedDocumentId(null);
   };
 
+  // 5. 승인
   const approveDocument = async (documentId) => {
     try {
       await axios.put(`/api/doc/confirm`, null, {
@@ -519,10 +605,10 @@ function ApplicationsList() {
   ];
 
   const showStatusFilters =
-    documentTypeFromUrl === "명함신청" ||
-    documentTypeFromUrl === "법인서류" ||
-    documentTypeFromUrl === "문서수발신" ||
-    documentTypeFromUrl === "인장신청";
+  documentTypeFromUrl === "명함신청" ||
+  documentTypeFromUrl === "법인서류" ||
+  documentTypeFromUrl === "문서수발신" ||
+  documentTypeFromUrl === "인장신청";
 
   return (
     <div className="content">
@@ -542,35 +628,38 @@ function ApplicationsList() {
           </div>
         </div>
         <ConditionFilter
-          startDate={filterInputs.startDate}
+          startDate={filterInputs.startDate}  // 신청 시작일자
           setStartDate={(date) =>
             setFilterInputs((prev) => ({ ...prev, startDate: date }))
           }
-          endDate={filterInputs.endDate}
+          endDate={filterInputs.endDate}      // 신청 종료일자
           setEndDate={(date) =>
             setFilterInputs((prev) => ({ ...prev, endDate: date }))
           }
-          documentType={filterInputs.documentType}
-          setDocumentType={(docType) =>
-            setFilterInputs((prev) => ({ ...prev, documentType: docType }))
-          }
-          filters={filters}
+          onSearch={applyFilters}    // 조회
+          onReset={handleReset}      // 초기화
+          showStatusFilters={showStatusFilters}   // 개별 상태필터 표시여부
+//          forceShowAllStatusFilters={true}  // 전체 상태필터 표시여부
+          filters={filters}          // 상태필터 체크여부
           setFilters={setFilters}
+          // showStatus={showStatus}
+          // setShowStatus={setShowStatus}
           onFilterChange={handleFilterChange}
-          onSearch={applyFilters}
-          onReset={handleReset}
-          showStatusFilters={showStatusFilters}
-          showSearchCondition={true}
-          showDocumentType={false}
-          searchType={filterInputs.searchType}
+          showSearchCondition={true} // 검색조건 표시여부
+          searchOptions={["전체", "제목", "신청자"]}   // 검색유형 종류
+          searchType={filterInputs.searchType}        // 선택한 검색유형
           setSearchType={(searchType) =>
             setFilterInputs((prev) => ({ ...prev, searchType }))
           }
-          keyword={filterInputs.keyword}
+          keyword={filterInputs.keyword}        // 검색어
           setKeyword={(keyword) =>
             setFilterInputs((prev) => ({ ...prev, keyword }))
           }
-          searchOptions={["전체", "제목", "신청자"]}
+          showDocumentType={false}   // 문서분류 표시여부
+          documentType={filterInputs.documentType}  // 문서분류
+          setDocumentType={(docType) =>
+            setFilterInputs((prev) => ({ ...prev, documentType: docType }))
+          } 
         />
         {loading ? (
           <Loading />

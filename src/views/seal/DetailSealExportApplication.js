@@ -290,6 +290,10 @@ function DetailSealExportApplication() {
         }
     };
 
+    const handleCancelRequest = () => {
+        navigate('/myPendingList');
+    }    
+
     return (
         <div className="content">
             <div className="seal-export-content">
@@ -478,10 +482,9 @@ function DetailSealExportApplication() {
                                 )}
                             </div>
                             {!readOnly && (
-                              <div className="seal-export-apply-button-container">
-                                  <CustomButton className="apply-request-button" type="submit">
-                                      수정완료
-                                  </CustomButton>
+                              <div className="modify-seal-buttons-container">
+                                  <CustomButton className="apply-request-button" onClick={handleSubmit}>수정완료</CustomButton>
+                                  <CustomButton className="apply-cancel-button" onClick={handleCancelRequest}>수정취소</CustomButton>
                               </div>
                             )}
                             {applyStatus === '승인대기' && readOnly && (

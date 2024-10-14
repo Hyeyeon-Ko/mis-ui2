@@ -166,7 +166,7 @@ function DetailCorpDocApplication() {
     
         // 폼 데이터가 수정되지 않았을 경우
         if (JSON.stringify(formData) === JSON.stringify(initialData) && !file && !isFileDeleted) {
-            alert('수정된 사항이 없습니다.');
+            navigate('/myPendingList');
             return;
         }
     
@@ -258,6 +258,10 @@ function DetailCorpDocApplication() {
         }
     };
 
+    const handleCancelRequest = () => {
+        navigate('/myPendingList');
+    }    
+    
     return (
         <div className="content">
             <div className="corpDoc-content">
@@ -445,12 +449,11 @@ function DetailCorpDocApplication() {
                                 />
                             </div>
                             { !isReadOnly && (
-                              <div className="edit-buttons">
-                                <CustomButton className="apply-request-button" onClick={handleSubmit}>
-                                    수정하기
-                                </CustomButton>
-                                </div>
-                            )}
+                              <div className="modify-seal-buttons-container">
+                                <CustomButton className="apply-request-button" onClick={handleSubmit}>수정완료</CustomButton>
+                                <CustomButton className="apply-cancel-button" onClick={handleCancelRequest}>수정취소</CustomButton>
+                            </div>
+                        )}
                             {applyStatus === '승인대기' && isReadOnly && (
                                 <div className="corpDoc-apply-button-container">
                                     <div className="approval-buttons">
