@@ -227,7 +227,7 @@ function SealManagementList() {
     }
   };
 
-  const handleReset = () => {
+  const resetFilters = useCallback(() => {
     const defaultStartDate = new Date();
     defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
     setFilterInputs({
@@ -236,7 +236,15 @@ function SealManagementList() {
       searchType: "전체",
       keyword: "",
     });
-    setFilteredApplications(applications);
+  }, []);
+
+  useEffect(() => {
+    resetFilters();
+  }, [resetFilters]);
+
+  const handleReset = () => {
+    resetFilters();
+    fetchSealManagementList();
   };
 
   const handleConfirmDelete = () => {
@@ -274,7 +282,7 @@ function SealManagementList() {
           setKeyword={(keyword) =>
             setFilterInputs((prev) => ({ ...prev, keyword }))
           }
-          searchOptions={["전체", "일자", "제출처", "사용목적"]}
+          searchOptions={["전체", "제출처", "사용목적"]}
           startDateLabel="일자"
           setDocumentType={() => {}}
         />
