@@ -249,6 +249,7 @@ function SealExportList() {
             setFilterInputs((prev) => ({ ...prev, keyword }))
           }
           searchOptions={["전체", "반출일자", "반납일자", "사용목적"]}
+          startDateLabel="반출일자"
           setDocumentType={() => {}}
         />
 

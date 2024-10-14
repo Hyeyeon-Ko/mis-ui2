@@ -275,6 +275,7 @@ function SealManagementList() {
             setFilterInputs((prev) => ({ ...prev, keyword }))
           }
           searchOptions={["전체", "일자", "제출처", "사용목적"]}
+          startDateLabel="일자"
           setDocumentType={() => {}}
         />
         {loading ? (
