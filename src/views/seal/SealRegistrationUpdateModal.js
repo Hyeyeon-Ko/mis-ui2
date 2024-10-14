@@ -4,9 +4,10 @@ import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 import { useSealForm } from '../../hooks/useSealForm';
 import { validateForm } from '../../hooks/validateForm';
+import deleteIcon from '../../assets/images/delete2.png'; 
 
 function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
-  const { formData, setFormData, setIsFileDeleted, handleUpdateChange, handleFileUpdateChange } = useSealForm();
+  const { formData, setFormData, setIsFileDeleted } = useSealForm();
   const { auth } = useContext(AuthContext);
 
   const fetchSealDetail = useCallback(async (id) => {
@@ -46,6 +47,24 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
       sealImage: null,
     }));
     setIsFileDeleted(true);
+  };
+
+  const handleUpdateChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  };  
+
+  const handleFileUpdateChange = (e) => {
+    const file = e.target.files[0];
+    setFormData((prev) => ({
+      ...prev,
+      sealImage: file,
+      sealImageNm: file.name,  
+    }));
+    setIsFileDeleted(false);  
   };
 
   const handleSave = async () => {
@@ -193,9 +212,17 @@ function SealRegistrationUpdateModal({ isOpen, onClose, onSave, draftId }) {
                   <>
                     {/* 파일 제목 표시 */}
                     {formData.sealImage ? (
-                      <div>
-                        <span>{formData.sealImageNm || 'Uploaded Image'}</span>
-                        <button onClick={handleDeleteFile}>기존 파일 삭제</button>
+                      <div className="seal-file-display">
+                        <span className="file-name">{formData.sealImageNm}</span>
+                        <div className="file-actions">
+                          <button 
+                            type="button"
+                            className="file-delete-button"
+                            onClick={handleDeleteFile}
+                            >
+                            <img src={deleteIcon} alt="삭제" />
+                          </button>
+                        </div>
                       </div>
                     ) : (
                       <input type="file" onChange={handleFileUpdateChange} />
