@@ -69,7 +69,6 @@ function ApplicationsList() {
 
   useEffect(() => {
     fetchApplications(currentPage, itemsPerPage);
-    // eslint-disable-next-line
   }, [currentPage]);
 
   const [centers] = useState([
@@ -164,7 +163,6 @@ function ApplicationsList() {
 
   // 1-1. 필터값 적용해서 application fetch해오기
   const applyFilters = (filterValues) => {
-    // filterValues에서 documentType과 기타 필터 값을 가져옴
     const { startDate, endDate, documentType, searchType, keyword, filters } = filterValues;
 
     const statusCodeMap = {
@@ -172,12 +170,12 @@ function ApplicationsList() {
       statusRejected: "C",
       statusOrdered: "D",
       statusClosed: "E",
-      statusReceived: "F",
+      statusReceived: "G",
     };
 
     // filters 객체에서 true인 항목만 찾아서 코드로 변환
     const applyStatus = Object.keys(filters)
-    .filter((key) => filters[key]) // true인 필터만 추출
+    .filter((key) => filters[key])     // true인 필터만 추출
     .map((key) => statusCodeMap[key]); // 코드로 변환
 
     const params = {
@@ -213,7 +211,6 @@ function ApplicationsList() {
       setLoading(true);
       try {
 
-        console.log("filterParams: ", filterParams)
         let applyStatusList;
         if(filterParams) {
           applyStatusList = filterParams.applyStatus
@@ -227,7 +224,6 @@ function ApplicationsList() {
         const formattedStart = formatDate(new Date(filterInputs.startDate || formattedStartDate));
         const formattedEnd = formatDate(new Date(filterInputs.endDate || formattedEndDate));
 
-        console.log("applyStatus: ", applyStatusList)
         const response = await axios.get("/api/applyList2", {
           params: {
             userId: auth.userId || "",
@@ -348,7 +344,6 @@ function ApplicationsList() {
    * 신청상태 필터 변경 핸들러
    */
   const handleFilterChange = (e) => {
-    console.log("e: ",e)
     const { name } = e.target;
     setFilters((prevFilters) => ({
       ...prevFilters,
@@ -429,7 +424,6 @@ function ApplicationsList() {
     setSelectedCenter(e.target.value);
   };
 
-  // todo: 이것도 useEffect 중복 없는지 확인!
   useEffect(() => {
     fetchApplications();
   }, [fetchApplications]);
