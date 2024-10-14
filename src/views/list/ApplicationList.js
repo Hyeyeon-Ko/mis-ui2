@@ -14,7 +14,7 @@ import { AuthContext } from "../../components/AuthContext";
 import useDateSet from "../../hooks/apply/useDateSet";
 import PaginationSub from "../../components/common/PaginationSub";
 import Loading from "../../components/common/Loading";
-import qs from 'qs';
+//import qs from 'qs';
 
 function ApplicationsList() {
   const location = useLocation();
@@ -40,19 +40,19 @@ function ApplicationsList() {
     statusClosed: false,
     statusReceived: false,
   });
-  const [showStatus, setShowStatus] = useState({
-    statusApproved: false,
-    statusRejected: false,
-    statusOrdered: false,
-    statusClosed: true,
-    statusReceived: false,
-  });
-  const filterMapping = {    // 어떤 상태필터보여야하는지
-    A: ['statusApproved', 'statusRejected', 'statusOrdered'],
-    B: ['statusReceived'],
-    C: ['statusApproved', 'statusReceived', 'statusRejected'],
-    D: ['statusRejected'],
-  };
+  // const [showStatus, setShowStatus] = useState({
+  //   statusApproved: false,
+  //   statusRejected: false,
+  //   statusOrdered: false,
+  //   statusClosed: true,
+  //   statusReceived: false,
+  // });
+  // const filterMapping = {
+  //   A: ['statusApproved', 'statusRejected', 'statusOrdered'],
+  //   B: ['statusReceived'],
+  //   C: ['statusApproved', 'statusReceived', 'statusRejected'],
+  //   D: ['statusRejected'],
+  // };
   const [loading, setLoading] = useState(false);
   const [showCheckboxColumn, setShowCheckboxColumn] = useState(false);
   const [selectedApplications, setSelectedApplications] = useState([]);
@@ -150,33 +150,33 @@ function ApplicationsList() {
     }
   };
 
-  // 0. 신청상태 필터값 세팅
-  const getStatusFilter = (documentTypeFromUrl) => {
-    const specificFilters = filterMapping[convertDocumentType(documentTypeFromUrl)] || [];
+  // // 0. 신청상태 필터값 세팅
+  // const getStatusFilter = (documentTypeFromUrl) => {
+  //   const specificFilters = filterMapping[convertDocumentType(documentTypeFromUrl)] || [];
   
-    specificFilters.forEach((filter) => {
-      showStatus[filter] = true;
-    });
+  //   specificFilters.forEach((filter) => {
+  //     showStatus[filter] = true;
+  //   });
 
-    return showStatus;
-  }
+  //   return showStatus;
+  // }
 
   // 1-1. 필터값 적용해서 application fetch해오기
   const applyFilters = (filterValues) => {
-    const { startDate, endDate, documentType, searchType, keyword, filters } = filterValues;
+    const { startDate, endDate, documentType, searchType, keyword } = filterValues;
 
-    const statusCodeMap = {
-      statusApproved: "B",
-      statusRejected: "C",
-      statusOrdered: "D",
-      statusClosed: "E",
-      statusReceived: "G",
-    };
+    // const statusCodeMap = {
+    //   statusApproved: "B",
+    //   statusRejected: "C",
+    //   statusOrdered: "D",
+    //   statusClosed: "E",
+    //   statusReceived: "G",
+    // };
 
-    // filters 객체에서 true인 항목만 찾아서 코드로 변환
-    const applyStatus = Object.keys(filters)
-    .filter((key) => filters[key])     // true인 필터만 추출
-    .map((key) => statusCodeMap[key]); // 코드로 변환
+    // // filters 객체에서 true인 항목만 찾아서 코드로 변환
+    // const applyStatus = Object.keys(filters)
+    // .filter((key) => filters[key])     // true인 필터만 추출
+    // .map((key) => statusCodeMap[key]); // 코드로 변환
 
     const params = {
       startDate: startDate ? startDate.toISOString().split("T")[0] : "", // 시작일
@@ -184,7 +184,7 @@ function ApplicationsList() {
       documentType: documentType,
       searchType: searchType,
       keyword: keyword, // 검색어
-      applyStatus: applyStatus
+      applyStatus: ""
     };
     fetchApplications(1, itemsPerPage, params);
   };
@@ -207,43 +207,43 @@ function ApplicationsList() {
 
   // 1. 데이터 fetch해오기
   const fetchApplications = useCallback(
-    async (pageIndex = 1, pageSize = itemsPerPage, filterParams) => {
+    async (pageIndex = 1, pageSize = itemsPerPage, filters = {}) => {
       setLoading(true);
       try {
 
-        let applyStatusList;
-        if(filterParams) {
-          applyStatusList = filterParams.applyStatus
-        } else {
-          applyStatusList = Object.keys(filters)
-          .filter((key) => filters[key] === true)  // Get only true filters
-          .map((key) => convertDocumentType(key))  // Use convertDocumentType for status mapping
-          .filter(Boolean);
-        }
+        // let applyStatusList;
+        // if(filterParams) {
+        //   applyStatusList = filterParams.applyStatus
+        // } else {
+        //   applyStatusList = Object.keys(filters)
+        //   .filter((key) => filters[key] === true)  // Get only true filters
+        //   .map((key) => convertDocumentType(key))  // Use convertDocumentType for status mapping
+        //   .filter(Boolean);
+        // }
 
-        const formattedStart = formatDate(new Date(filterInputs.startDate || formattedStartDate));
-        const formattedEnd = formatDate(new Date(filterInputs.endDate || formattedEndDate));
+        // const formattedStart = formatDate(new Date(filterInputs.startDate || formattedStartDate));
+        // const formattedEnd = formatDate(new Date(filterInputs.endDate || formattedEndDate));
 
         const response = await axios.get("/api/applyList2", {
           params: {
             userId: auth.userId || "",
             instCd: instCd || "",
             documentType:
-              convertDocumentType(filterInputs.documentType) ||
+              convertDocumentType(filters.documentType) ||
               convertDocumentType(documentTypeFromUrl) ||
               null,
-            searchType: filterInputs.searchType,
-            keyword: filterInputs.keyword,
-            startDate: formattedStart,
-            endDate: formattedEnd,
-            applyStatus: applyStatusList,
+            searchType: filters.searchType,
+            keyword: filters.keyword,
+            startDate: filters.startDate ? filters.startDate : formattedStartDate,
+            endDate: filters.endDate ? filters.endDate : formattedEndDate,
+            applyStatus: "",
             pageIndex,
             pageSize,
           },
-          paramsSerializer: params => {
-            // applyStatus 배열을 제대로 직렬화
-            return qs.stringify(params, { arrayFormat: "repeat" });
-          }
+          // paramsSerializer: params => {
+          //   // applyStatus 배열을 제대로 직렬화
+          //   return qs.stringify(params, { arrayFormat: "repeat" });
+          // }
         });
 
         const {
@@ -302,7 +302,7 @@ function ApplicationsList() {
 
           setApplications(transformedData);
           setFilteredApplications(transformedData);
-          setShowStatus(getStatusFilter(documentTypeFromUrl));
+          // setShowStatus(getStatusFilter(documentTypeFromUrl));
           setTotalPages(totalPages);
           setCurrentPage(currentPage);
           applyStatusFilters(transformedData);
@@ -326,10 +326,10 @@ function ApplicationsList() {
     ]
   );
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-  };
+  // const formatDate = (dateString) => {
+  //   const date = new Date(dateString);
+  //   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  // };
   
 
   /**
@@ -378,13 +378,13 @@ function ApplicationsList() {
       statusReceived: false,
     });
     setSelectedCenter("전체");
-    setShowStatus({
-      statusApproved: false,
-      statusRejected: false,
-      statusOrdered: false,
-      statusClosed: true,
-      statusReceived: false,
-    })
+    // setShowStatus({
+    //   statusApproved: false,
+    //   statusRejected: false,
+    //   statusOrdered: false,
+    //   statusClosed: true,
+    //   statusReceived: false,
+    // })
   }, [documentTypeFromUrl]);
 
   useEffect(() => {
@@ -604,6 +604,12 @@ function ApplicationsList() {
     { header: "문서상태", accessor: "applyStatus", width: "10%" },
   ];
 
+  const showStatusFilters =
+  documentTypeFromUrl === "명함신청" ||
+  documentTypeFromUrl === "법인서류" ||
+  documentTypeFromUrl === "문서수발신" ||
+  documentTypeFromUrl === "인장신청";
+
   return (
     <div className="content">
       <div className="all-applications">
@@ -632,12 +638,12 @@ function ApplicationsList() {
           }
           onSearch={applyFilters}    // 조회
           onReset={handleReset}      // 초기화
-          showStatusFilters={true}   // 개별 상태필터 표시여부
-          forceShowAllStatusFilters={true}  // 전체 상태필터 표시여부
+          showStatusFilters={showStatusFilters}   // 개별 상태필터 표시여부
+//          forceShowAllStatusFilters={true}  // 전체 상태필터 표시여부
           filters={filters}          // 상태필터 체크여부
           setFilters={setFilters}
-          showStatus={showStatus}
-          setShowStatus={setShowStatus}
+          // showStatus={showStatus}
+          // setShowStatus={setShowStatus}
           onFilterChange={handleFilterChange}
           showSearchCondition={true} // 검색조건 표시여부
           searchOptions={["전체", "제목", "신청자"]}   // 검색유형 종류
