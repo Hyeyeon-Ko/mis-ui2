@@ -67,10 +67,6 @@ function ApplicationsList() {
 
   const itemsPerPage = 10;
 
-  useEffect(() => {
-    fetchApplications(currentPage, itemsPerPage);
-  }, [currentPage, fetchApplications]);
-
   const [centers] = useState([
     "전체",
     "재단본부",
@@ -326,6 +322,11 @@ function ApplicationsList() {
     ]
   );
 
+  useEffect(() => {
+    fetchApplications(currentPage, itemsPerPage);
+  }, [currentPage]);
+
+  
   // const formatDate = (dateString) => {
   //   const date = new Date(dateString);
   //   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
