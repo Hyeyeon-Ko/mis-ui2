@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext, useCallback } from "react";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import CustomButton from "../../components/common/CustomButton";
 import SealRegistrationAddModal from "./SealRegistrationAddModal";
-import SealRegistrationUpdateModal from "./SealRegistrationUpdateModal";
 import ConfirmModal from "../../components/common/ConfirmModal";
 import "../../styles/seal/SealRegistrationList.css";
 import axios from "axios";
@@ -15,8 +14,6 @@ function SealRegistrationList() {
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [selectedApplications, setSelectedApplications] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [selectedDraftId, setSelectedDraftId] = useState(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [totalPages, setTotalPages] = useState("1");
   const [currentPage, setCurrentPage] = useState("1");
@@ -91,21 +88,6 @@ function SealRegistrationList() {
     setIsAddModalOpen(true);
   };
 
-  const handleModifyApplication = () => {
-    if (selectedApplications.length === 0) {
-      alert("수정할 항목을 선택하세요.");
-      return;
-    }
-    if (selectedApplications.length > 1) {
-      alert("수정할 항목을 하나만 선택하세요.");
-      return;
-    }
-    const selectedIndex = selectedApplications[0];
-    const selectedData = filteredApplications[selectedIndex];
-    setSelectedDraftId(selectedData.draftId);
-    setIsUpdateModalOpen(true);
-  };
-
   const handleDeleteApplication = () => {
     if (selectedApplications.length === 0) {
       alert("삭제할 항목을 선택하세요.");
@@ -155,7 +137,6 @@ function SealRegistrationList() {
   const handleSave = () => {
     fetchSealRegistrationList();
     setIsAddModalOpen(false);
-    setIsUpdateModalOpen(false);
     setSelectedApplications([]);
   };
 
@@ -171,12 +152,6 @@ function SealRegistrationList() {
               onClick={handleAddApplication}
             >
               추 가
-            </CustomButton>
-            <CustomButton
-              className="seal-modify-button"
-              onClick={handleModifyApplication}
-            >
-              수 정
             </CustomButton>
             <CustomButton
               className="seal-delete-button"
@@ -279,17 +254,6 @@ function SealRegistrationList() {
           }}
           onSave={handleSave}
         />
-        {selectedDraftId && (
-          <SealRegistrationUpdateModal
-            isOpen={isUpdateModalOpen}
-            onClose={() => {
-              setIsUpdateModalOpen(false);
-              setSelectedApplications([]);
-            }}
-            onSave={handleSave}
-            draftId={selectedDraftId}
-          />
-        )}
         {isConfirmModalOpen && (
           <ConfirmModal
             message="정말 삭제하시겠습니까?"
