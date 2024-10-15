@@ -192,7 +192,7 @@ function RentalManage() {
     });
 
     if (completedItems.length > 0) {
-        alert("이미 완료된 항목이 선택되었습니다. 완료된 항목은 업데이트할 수 없습니다.");
+        alert("이미 완료된 항목은 업데이트할 수 없습니다.");
         return;
     }
 
@@ -222,6 +222,17 @@ function RentalManage() {
   };
 
   const handleModifyButtonClick = () => {
+
+      const completedItems = selectedRows.filter(rowId => {
+        const selectedItem = rentalDetails.find(item => item.detailId === rowId);
+        return selectedItem && selectedItem.status === '완료';
+    });
+
+    if (completedItems.length > 0) {
+        alert("완료된 항목은 수정할 수 없습니다.");
+        return;
+    }
+
     if (selectedRows.length === 1) {
       const rentalData = rentalDetails.find(detail => detail.detailId === selectedRows[0]);
       setSelectedRental(rentalData);
