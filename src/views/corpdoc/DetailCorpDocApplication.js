@@ -12,6 +12,7 @@ import '../../styles/corpdoc/CorpDocApply.css';
 import downloadIcon from '../../assets/images/download.png';
 import deleteIcon from '../../assets/images/delete2.png'; 
 import useCorpChange from '../../hooks/useCorpChange';
+import { useDateChange } from '../../hooks/apply/useDateChange';
 
 function DetailCorpDocApplication() {
     const { draftId } = useParams();
@@ -21,6 +22,8 @@ function DetailCorpDocApplication() {
     const applyStatus = queryParams.get('applyStatus'); 
     const { auth, refreshSidebar } = useContext(AuthContext);
     const [initialData, setInitialData] = useState(null);
+    
+    const [formattedDate, handleUseDateChange] = useDateChange();
 
     const [showRejectModal, setShowRejectModal] = useState(false);
     const isReadOnly = new URLSearchParams(location.search).get('readonly') === 'true';
@@ -297,8 +300,11 @@ function DetailCorpDocApplication() {
                                 <input
                                     type="text"
                                     name="useDate"
-                                    value={formData.useDate}
-                                    onChange={handleChange}
+                                    value={formattedDate || formData.useDate}
+                                    onChange={(e) => {
+                                        handleUseDateChange(e);
+                                        handleChange(e);
+                                    }}
                                     placeholder="YYYY-MM-DD"
                                     disabled={isReadOnly}
                                 />

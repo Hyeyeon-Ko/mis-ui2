@@ -12,6 +12,7 @@ import facsimileSeal from '../../assets/images/facsimile_seal.png';
 import companySeal from '../../assets/images/company_seal.png';
 import { useSealForm } from '../../hooks/useSealForm';
 import ReasonModal from '../../components/ReasonModal';
+import { useDateChange } from '../../hooks/apply/useDateChange';
 
 
 
@@ -25,6 +26,8 @@ function DetailSealImprintApplication() {
     const queryParams = new URLSearchParams(location.search);
     const applyStatus = queryParams.get('applyStatus'); 
     const [showRejectModal, setShowRejectModal] = useState(false);
+    
+    const [formattedDate, handleUseDateChange] = useDateChange();
 
     useEffect(() => {
         if (sealImprintDetails) {
@@ -211,8 +214,11 @@ function DetailSealImprintApplication() {
                                 <input
                                     type="text"
                                     name="useDate"
-                                    value={applicationDetails.useDate}
-                                    onChange={handleChange}
+                                    value={formattedDate || applicationDetails.useDate}
+                                    onChange={(e) => {
+                                        handleUseDateChange(e);
+                                        handleChange(e);
+                                    }}
                                     disabled={readOnly}
                                 />
                             </div>

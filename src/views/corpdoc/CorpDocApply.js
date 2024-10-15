@@ -14,7 +14,7 @@ function CorpDocApply() {
     const navigate = useNavigate();
     const { auth } = useContext(AuthContext); 
     const {formData, handleFileChange, handleChange} = useCorpChange();
-    const [formattedDate, handleUseDateChange] = useDateChange(); // 날짜 훅 호출
+    const [formattedDate, handleUseDateChange] = useDateChange();
 
     const corpDocGroup = [
         {
@@ -159,8 +159,8 @@ function CorpDocApply() {
                                     name="useDate"
                                     value={formattedDate}
                                     onChange={(e) => {
-                                        handleUseDateChange(e); // 날짜 포맷 처리
-                                        handleChange(e); // 일반 핸들러 호출
+                                        handleUseDateChange(e);
+                                        handleChange(e);
                                     }}
                                     placeholder="YYYY-MM-DD"
                                 />
