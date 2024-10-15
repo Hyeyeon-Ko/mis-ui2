@@ -8,11 +8,13 @@ import CustomButton from '../../components/common/CustomButton';
 import '../../styles/common/Page.css';
 import '../../styles/corpdoc/CorpDocApply.css';
 import useCorpChange from '../../hooks/useCorpChange';
+import { useDateChange } from '../../hooks/apply/useDateChange'
 
 function CorpDocApply() {
     const navigate = useNavigate();
     const { auth } = useContext(AuthContext); 
     const {formData, handleFileChange, handleChange} = useCorpChange();
+    const [formattedDate, handleUseDateChange] = useDateChange(); // 날짜 훅 호출
 
     const corpDocGroup = [
         {
@@ -155,8 +157,11 @@ function CorpDocApply() {
                                 <input
                                     type="text"
                                     name="useDate"
-                                    value={formData.useDate}
-                                    onChange={handleChange}
+                                    value={formattedDate}
+                                    onChange={(e) => {
+                                        handleUseDateChange(e); // 날짜 포맷 처리
+                                        handleChange(e); // 일반 핸들러 호출
+                                    }}
                                     placeholder="YYYY-MM-DD"
                                 />
                             </div>
