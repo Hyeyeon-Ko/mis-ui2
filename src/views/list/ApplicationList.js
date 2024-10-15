@@ -324,7 +324,7 @@ function ApplicationsList() {
 
   useEffect(() => {
     fetchApplications(currentPage, itemsPerPage);
-  }, [currentPage]);
+  }, [currentPage, fetchApplications]);
 
   
   // const formatDate = (dateString) => {
