@@ -7,10 +7,13 @@ import { AuthContext } from '../../components/AuthContext';
 import { validateForm } from '../../hooks/validateForm';
 import { dockStorageFormData } from '../../datas/dockstorageDatas';
 import useDocstorageChange from '../../hooks/useDocstorageChange';
+import { useDateChange } from '../../hooks/apply/useDateChange';
 
 const DocstorageAddModal = ({ show, onClose, onSave }) => {
   const { file, activeTab, formData, handleTabChange, handleFileChange, handleChange, setFormData, setFile, setActiveTab } = useDocstorageChange();
   const { auth } = useContext(AuthContext);
+  const [formattedCreationDate, handleCreationDateChange] = useDateChange();
+  const [formattedDisposalDate, handleDisposalDateChange] = useDateChange();
 
   const resetFormData = () => {
     setFormData(dockStorageFormData);
@@ -221,8 +224,19 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
                 <input
                   type="text"
                   name={name}
-                  value={formData[name]}
-                  onChange={handleChange}
+                  value={
+                    name === 'createDate' ? formattedCreationDate :
+                    name === 'disposalDate' ? formattedDisposalDate :
+                    formData[name] // 그 외의 경우는 기존 formData에서 가져옴
+                  }
+                  onChange={(e) => {
+                    if (name === 'createDate') {
+                        handleCreationDateChange(e);
+                    } else if (name === 'disposalDate') {
+                        handleDisposalDateChange(e);
+                    }
+                    handleChange(e); // 일반 핸들러 호출
+                  }}
                   placeholder={placeholder || ''}
                   disabled={disabled || false}
                 />
