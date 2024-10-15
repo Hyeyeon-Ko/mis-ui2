@@ -2,28 +2,27 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import { addFormData, formFields } from '../../datas/rentalDatas';
 import useRentalChange from '../../hooks/useRentalChange';
-
+import { useDateChange } from '../../hooks/apply/useDateChange';
 
 
 const RentalBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds }) => {
   const {handleChange, formData, setFormData} = useRentalChange();
-  // const [formData, setFormData] = useState(addFormData);
-
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData({
-  //     ...formData,
-  //     [name]: value,
-  //   });
-  // };
+  const [formattedInstallDate, handleInstallDateChange] = useDateChange();
+  const [formattedExpiryDate, handleExpiryDateChange] = useDateChange();
 
   const validateDateFormat = (dateStr) => {
     return /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
   };
 
+  const handleResetFormattedDates = () => {
+    handleInstallDateChange({ target: { value: '' } });
+    handleExpiryDateChange({ target: { value: '' } });
+  };
+
   const handleClose = () => {
     setFormData(addFormData);
-    onClose(); // 모달을 닫는 함수 호출
+    handleResetFormattedDates();
+    onClose();
   };
 
   const handleSaveClick = async () => {
@@ -47,10 +46,9 @@ const RentalBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds }) => 
     try {
         await axios.put(`/api/rental/bulkUpdate`, payload);
         alert('렌탈 정보가 성공적으로 수정되었습니다.');
-
         setFormData(addFormData);
-
         onSave(payload);
+        handleResetFormattedDates();
     } catch (error) {
     console.error('렌탈 정보 수정 중 에러 발생:', error);
     alert('렌탈 정보 수정에 실패했습니다.');
@@ -75,11 +73,22 @@ const RentalBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds }) => 
                 <input
                   type="text"
                   name={field.name}
-                  value={formData[field.name]}
-                  onChange={handleChange}
+                  value={
+                    field.name === 'installDate' ? formattedInstallDate:
+                    field.name === 'expiryDate' ? formattedExpiryDate:
+                    ''}
+                  onChange={(e) => {
+                    if (field.name === 'installDate') {
+                        handleInstallDateChange(e);
+                    } else if (field.name === 'expiryDate') {
+                        handleExpiryDateChange(e);
+                    }
+                    handleChange(e);
+                  }}
                   placeholder={field.placeholder || ''}
                   disabled={field.disabled || false}
                 />
+                {field.name === 'location' && <span2> 반드시 다음 5가지 항목으로만 기재 &gt;&gt; 사무실, 병원, 임원실, 휴게실, 화장실</span2>}
               </div>
             ))}
           </div>
