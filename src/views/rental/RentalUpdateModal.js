@@ -113,7 +113,10 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         !contractNum ||
         !modelNm ||
         !installDate ||
-        !expiryDate
+        !expiryDate ||
+        !rentalFee ||
+        !location ||
+        !installationSite
       ) {
         alert('모든 필수 항목을 입력해 주세요.');
         return;
@@ -182,7 +185,7 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
             <div className="rental-add-section">
               {formFields.map((field) => (
                 <div className="rental-add-detail-row" key={field.name}>
-                  <label>{field.label}</label>
+                  <label>{field.label} {field.isRequired && <span>*</span>}</label>
                   <input
                     type={field.type}
                     name={field.name}
