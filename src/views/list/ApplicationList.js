@@ -69,7 +69,7 @@ function ApplicationsList() {
 
   useEffect(() => {
     fetchApplications(currentPage, itemsPerPage);
-  }, [currentPage]);
+  }, [currentPage, fetchApplications]);
 
   const [centers] = useState([
     "전체",
