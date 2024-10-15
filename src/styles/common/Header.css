@@ -10,6 +10,7 @@
 .header-content {
   display: flex;
   align-items: center;
+  user-select: none;
 }
 
 .user-info {
@@ -53,6 +54,7 @@
   width: 20px;
   height: 20px;
   vertical-align: middle;
+  user-select: none;
 }
 
 .notification-wrapper {
@@ -72,4 +74,5 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  user-select: none;
 }

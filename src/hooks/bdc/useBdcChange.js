@@ -232,11 +232,9 @@ const useBdcChange = () => {
     setFloor(updatedFloor);
 
     const baseAddress = formData.address.split(",")[0];
-    console.log(baseAddress);
     const updatedAddress = `${baseAddress}${
       updatedFloor ? `, ${updatedFloor}` : ""
     }`;
-    console.log(updatedAddress);
 
     const originalEngAddress =
       bcdData.instInfo.find((inst) => inst.detailNm === formData.center)
