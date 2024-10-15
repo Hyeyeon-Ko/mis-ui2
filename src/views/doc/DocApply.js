@@ -77,13 +77,13 @@ function DocApply() {
   
     // 2. Apply Request
     if (formData.division === 'A') {
-      if (auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) {
+      if (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2') {
         handleReceiveLeaderRequest();
       } else {
         handleReceiveRequest();
       }
     } else {
-      if (auth.roleNm !== '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) {
+      if (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2') {
         handleSendLeaderRequest();
       } else {
         if (auth.roleNm !== '팀원') {

@@ -54,23 +54,23 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         alert('파일을 첨부해주세요.');
         return;
       }
-
+  
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = async (event) => {
         const data = new Uint8Array(event.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-
+  
         const jsonOptions = {
           header: 1,
           defval: '',
           raw: false,
           dateNF: 'yyyy-mm-dd',
         };
-
+  
         const worksheetData = XLSX.utils.sheet_to_json(worksheet, jsonOptions);
-
+  
         const extractedData = worksheetData
           .slice(5)
           .filter((row) => row[1])
@@ -86,15 +86,19 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
             installationSite: row[9] !== undefined ? row[9].toString() : '',
             specialNote: row[10] !== undefined ? row[10].toString() : '',
           }));
-
+  
         try {
-          axios.post(`/api/rental/update`, extractedData);
+          await axios.post(`/api/rental/update`, extractedData);
           alert('수정이 완료되었습니다.');
-          onSave(extractedData, true);
+          onSave(extractedData, true); 
           onClose();
         } catch (error) {
           console.error('업데이트 중 오류 발생:', error);
-          alert('수정 중 오류가 발생했습니다.');
+          if (error.response && error.response.data && error.response.data.message === '완료된 항목은 수정할 수 없습니다.') {
+            alert('완료된 항목은 수정할 수 없습니다.');
+          } else {
+            alert('완료된 항목은 수정할 수 없습니다.');
+          }
         }
       };
       reader.readAsArrayBuffer(file);
@@ -111,7 +115,7 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         installationSite,
         specialNote,
       } = formData;
-
+  
       if (
         !category ||
         !companyNm ||
@@ -123,18 +127,17 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         alert('모든 필수 항목을 입력해 주세요.');
         return;
       }
-
-        
+  
       if (!validateDateFormat(installDate)) {
         alert('설치일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
         return;
       }
-    
+  
       if (!validateDateFormat(expiryDate)) {
         alert('만료일자는 YYYY-MM-DD 형식으로 입력해 주세요.');
         return;
       }
-
+  
       const payload = {
         instCd: auth.instCd,
         category,
@@ -148,24 +151,25 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         installationSite,
         specialNote,
       };
-
-      axios.put(`/api/rental/?detailId=${rentalData.detailId}`, payload)
-        .then(response => {
-          onSave([payload]);
-          alert('항목이 성공적으로 수정되었습니다.');
-          onClose();
-        })
-        .catch(error => {
-          console.error('Error sending data:', error);
-          if (error.response && error.response.status === 400) {
-            alert("계약번호는 중복이 불가합니다");
-          } else {
-            alert('데이터 수정 중 오류가 발생했습니다.');
-          }
-        });
+  
+      try {
+        await axios.put(`/api/rental/?detailId=${rentalData.detailId}`, payload);
+        onSave([payload]);
+        alert('항목이 성공적으로 수정되었습니다.');
+        onClose(); 
+      } catch (error) {
+        console.error('Error sending data:', error);
+        if (error.response && error.response.data && error.response.data.message === '완료된 항목은 수정할 수 없습니다.') {
+          alert('완료된 항목은 수정할 수 없습니다.');
+        } else if (error.response && error.response.status === 400) {
+          alert("계약번호는 중복이 불가합니다");
+        } else {
+          alert('데이터 수정 중 오류가 발생했습니다.');
+        }
+      }
     }
   };
-  
+      
   if (!show) return null;
 
   return (

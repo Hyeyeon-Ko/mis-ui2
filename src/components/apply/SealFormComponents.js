@@ -75,7 +75,7 @@ function SealFormComponents({
                                             type="text" 
                                             name="exportDate" 
                                             value={exportDate} 
-                                            onChange={(e) => setExportDate(e.target.value)} 
+                                            onChange={setExportDate} 
                                             placeholder="YYYY-MM-DD" 
                                         />
                                     </div>
@@ -85,7 +85,7 @@ function SealFormComponents({
                                             type="text" 
                                             name="returnDate" 
                                             value={returnDate} 
-                                            onChange={(e) => setReturnDate(e.target.value)} 
+                                            onChange={setReturnDate} 
                                             placeholder="YYYY-MM-DD" 
                                         />
                                     </div>
@@ -97,7 +97,7 @@ function SealFormComponents({
                                         type="text" 
                                         name="useDate" 
                                         value={useDate} 
-                                        onChange={(e) => setUseDate(e.target.value)} 
+                                        onChange={setUseDate} 
                                         placeholder="YYYY-MM-DD" 
                                     />
                                 </div>

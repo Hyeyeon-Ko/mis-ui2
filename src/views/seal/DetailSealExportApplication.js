@@ -14,6 +14,7 @@ import ReasonModal from '../../components/ReasonModal';
 import downloadIcon from '../../assets/images/download.png';
 import deleteIcon from '../../assets/images/delete2.png';
 import { useSealForm } from '../../hooks/useSealForm';
+import { useDateChange } from '../../hooks/apply/useDateChange';
 
 function DetailSealExportApplication() {
     // const [applicationDetails, setApplicationDetails] = useState(applicationData);
@@ -38,6 +39,9 @@ function DetailSealExportApplication() {
     const queryParams = new URLSearchParams(location.search);
     const applyStatus = queryParams.get('applyStatus'); 
     const [showDownloadReasonModal, setShowDownloadReasonModal] = useState(false);
+    
+    const [formattedExpDate, handleExpDateChange] = useDateChange();
+    const [formattedReturnDate, handleReturnDateChange] = useDateChange();
 
    
     useEffect(() => {
@@ -330,8 +334,11 @@ function DetailSealExportApplication() {
                                 <input
                                     type="text"
                                     name="expDate"
-                                    value={applicationDetails.expDate}
-                                    onChange={handleChange}
+                                    value={formattedExpDate ||applicationDetails.expDate}
+                                    onChange={(e) => {
+                                        handleExpDateChange(e);
+                                        handleChange(e);
+                                    }}
                                     disabled={readOnly}
                                 />
                             </div>
@@ -340,8 +347,11 @@ function DetailSealExportApplication() {
                                 <input
                                     type="text"
                                     name="returnDate"
-                                    value={applicationDetails.returnDate}
-                                    onChange={handleChange}
+                                    value={formattedReturnDate || applicationDetails.returnDate}
+                                    onChange={(e) => {
+                                        handleReturnDateChange(e);
+                                        handleChange(e);
+                                    }}
                                     disabled={readOnly}
                                 />
                             </div>

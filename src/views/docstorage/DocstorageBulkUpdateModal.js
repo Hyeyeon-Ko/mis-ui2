@@ -5,10 +5,14 @@ import { AuthContext } from '../../components/AuthContext';
 import { validateForm } from '../../hooks/validateForm';
 import { dockStorageFormData } from '../../datas/dockstorageDatas';
 import useDocstorageChange from '../../hooks/useDocstorageChange';
+import { useDateChange } from '../../hooks/apply/useDateChange';
 
 const DocstorageBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds, modalType }) => {
   const { auth } = useContext(AuthContext);
   const {handleChange, formData, setFormData} = useDocstorageChange();
+
+  const [formattedCreateDate, handleCreateDateChange] = useDateChange();
+  const [formattedDisposalDate, handleDisposalDateChange] = useDateChange();
 
   const handleSaveClick = () => {
 
@@ -29,7 +33,13 @@ const DocstorageBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds, m
     };
 
     onSave(payload);
+    handleResetFormattedDates();
     handleClose();
+  };
+
+  const handleResetFormattedDates = () => {
+    handleCreateDateChange({ target: { value: '' } });
+    handleDisposalDateChange({ target: { value: '' } });
   };
 
   const handleClose = () => {
@@ -78,9 +88,19 @@ const DocstorageBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds, m
                   <input
                     type="text"
                     name={name}
-                    value={formData[name] || ''}
+                    value={
+                      name === 'createDate' ? formattedCreateDate:
+                      name === 'disposalDate' ? formattedDisposalDate:
+                      ''}
                     placeholder={placeholder}
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      if (name === 'createDate') {
+                          handleCreateDateChange(e);
+                      } else if (name === 'disposalDate') {
+                          handleDisposalDateChange(e);
+                      }
+                      handleChange(e); // 일반 핸들러 호출
+                    }}
                     disabled={isDisabled(name)}
                   />
                 </div>

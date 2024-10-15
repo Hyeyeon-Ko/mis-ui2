@@ -4,11 +4,14 @@ import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
 import { validateForm } from '../../hooks/validateForm';
 import { useSealForm } from '../../hooks/useSealForm';
+import { useDateChange } from '../../hooks/apply/useDateChange';
 
 
 function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
   const { auth } = useContext(AuthContext);
   const {handleAddModalChange, handleAddModalFileChange, formData} = useSealForm();
+  const [formattedDate, handleDraftDateChange] = useDateChange();
+
 
   const handleSave = async () => {
     const data = new FormData();
@@ -158,8 +161,16 @@ function SealRegistrationAddModal({ isOpen, onClose, onSave }) {
                   <input
                     type={field.type}
                     name={field.name}
-                    value={formData[field.name] || ''}
-                    onChange={handleAddModalChange}
+                    value={
+                      field.name === 'date' ? formattedDate :
+                      formData[field.name] || ''
+                    }
+                    onChange={(e) => {
+                      if(field.name === 'date') {
+                        handleDraftDateChange(e);
+                      }
+                      handleAddModalChange(e);
+                    }}
                     placeholder={field.placeholder}
                   />
                 )}

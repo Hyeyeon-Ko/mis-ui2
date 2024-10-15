@@ -5,6 +5,7 @@ import { AuthContext } from '../../components/AuthContext';
 import { validateForm } from '../../hooks/validateForm';
 import SealFormComponents from '../../components/apply/SealFormComponents';
 import { useSealForm } from '../../hooks/useSealForm';
+import { useDateChange } from '../../hooks/apply/useDateChange';
 
 
 function SealApplyImprint() {
@@ -13,10 +14,11 @@ function SealApplyImprint() {
     const { sealSelections, handleSealChange, handleQuantityChange } = useSealForm();
         
     const [submission, setSubmission] = useState('');
-    const [useDate, setUseDate] = useState('');
     const [purpose, setPurpose] = useState('');
     const [notes, setNotes] = useState('');
 
+    const [useDate, handleUseDateChange] = useDateChange();
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -58,7 +60,6 @@ function SealApplyImprint() {
             purpose,
             notes,
             instCd: auth.instCd,
-            // ...selectedSeals,
         };
 
 
@@ -84,7 +85,7 @@ function SealApplyImprint() {
             submission={submission}
             setSubmission={setSubmission}
             useDate={useDate}
-            setUseDate={setUseDate}
+            setUseDate={handleUseDateChange}
             purpose={purpose}
             setPurpose={setPurpose}
             notes={notes}

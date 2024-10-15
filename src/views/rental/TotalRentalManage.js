@@ -33,8 +33,6 @@ function TotalRentalManage() {
                   ...centerResponses
               ];
 
-              console.log(response.data.data)
-  
               const formattedSummaryResponses = summaryResponses.map(summary => ({
                   ...summary,
                   monthlyRentalFee: summary.monthlyRentalFee.toLocaleString() 

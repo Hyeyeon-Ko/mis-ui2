@@ -6,12 +6,15 @@ import { AuthContext } from '../../components/AuthContext';
 import '../../styles/rental/RentalAddModal.css';
 import { addFormData, formFields } from '../../datas/rentalDatas';
 import useRentalChange from '../../hooks/useRentalChange';
+import { useDateChange } from '../../hooks/apply/useDateChange';
 
 
 
 const RentalAddModal = ({ show, onClose, onSave }) => {
   const { auth } = useContext(AuthContext); 
   const {handleChange, handleTabChange, handleFileChange, formData, file, activeTab, setFormData, setActiveTab, setFile} = useRentalChange();
+  const [formattedInstallDate, handleInstallDateChange] = useDateChange();
+  const [formattedExpiryDate, handleExpiryDateChange] = useDateChange();
 
   const resetFormData = () => {
     setFormData(addFormData);
@@ -187,14 +190,27 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
             <div className="rental-add-section">
               {formFields.map((field, index) => (
                 <div className="rental-add-detail-row" key={index}>
-                  <label>{field.label}</label>
+                  <label>
+                    {field.label} {field.isRequired && <span>*</span>}
+                  </label>
                   <input
                     type="text"
                     name={field.name}
-                    value={formData[field.name]}
-                    onChange={handleChange}
+                    value={
+                      field.name === 'installDate' ? formattedInstallDate:
+                      field.name === 'expiryDate' ? formattedExpiryDate:
+                      formData[field.name]}
+                    onChange={(e) => {
+                      if (field.name === 'installDate') {
+                          handleInstallDateChange(e);
+                      } else if (field.name === 'expiryDate') {
+                          handleExpiryDateChange(e);
+                      }
+                      handleChange(e);
+                    }}
                     placeholder={field.placeholder || ''}
                   />
+                  {field.name === 'location' && <span2> 반드시 다음 5가지 항목으로만 기재 &gt;&gt; 사무실, 병원, 임원실, 휴게실, 화장실</span2>}
                 </div>
               ))}
             </div>

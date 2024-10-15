@@ -5,6 +5,7 @@ import SealFormComponents from '../../components/apply/SealFormComponents';
 import { useSealForm } from '../../hooks/useSealForm';
 import { AuthContext } from '../../components/AuthContext';
 import { validateForm } from '../../hooks/validateForm';
+import { useDateChange } from '../../hooks/apply/useDateChange';
 
 
 function SealApplyExport() {
@@ -15,11 +16,12 @@ function SealApplyExport() {
     // 상태 관리
     const [submission, setSubmission] = useState('');
     const [draftNm, setDraftNm] = useState('');
-    const [exportDate, setExportDate] = useState('');
-    const [returnDate, setReturnDate] = useState('');
     const [purpose, setPurpose] = useState('');
     const [notes, setNotes] = useState('');
     const [file, setFile] = useState(null);
+
+    const [exportDate, handleExportDateChange] = useDateChange();
+    const [returnDate, handleReturnDateChange] = useDateChange();
 
     // 파일 선택 핸들러
     const handleFileChange = (e) => {
@@ -32,11 +34,11 @@ function SealApplyExport() {
 
         // 1. SealForm Validation
         const requiredInputs = {
-            submission: submission,
+            submission,
             expNm: draftNm,
-            exportDate: exportDate,
-            returnDate: returnDate,
-            purpose: purpose,
+            exportDate,
+            returnDate,
+            purpose,
             docFile: file,
         }
 
@@ -50,8 +52,8 @@ function SealApplyExport() {
         }, {});
 
         const inputDates = {
-            exportDate: exportDate,
-            returnDate: returnDate
+            exportDate,
+            returnDate
         }
 
         const { isValid, message } = validateForm('Seal', requiredInputs, selectedSeals, inputDates);
@@ -63,15 +65,15 @@ function SealApplyExport() {
         const exportRequestDTO = {
             drafter: auth.userNm,
             drafterId: auth.userId,
-            submission: submission,
+            submission,
             expNm: draftNm,
             expDate: exportDate,
             returnDate: returnDate,
             corporateSeal: selectedSeals.corporateSeal.quantity,
             facsimileSeal: selectedSeals.facsimileSeal.quantity,
             companySeal: selectedSeals.companySeal.quantity,
-            purpose: purpose,
-            notes: notes,
+            purpose,
+            notes,
             instCd: auth.instCd,
         };
 
@@ -111,9 +113,9 @@ function SealApplyExport() {
             draftNm={draftNm}
             setDraftNm={setDraftNm}
             exportDate={exportDate}
-            setExportDate={setExportDate}
+            setExportDate={handleExportDateChange}
             returnDate={returnDate}
-            setReturnDate={setReturnDate}
+            setReturnDate={handleReturnDateChange}
             purpose={purpose}
             setPurpose={setPurpose}
             notes={notes}

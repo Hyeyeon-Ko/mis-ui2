@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext, useCallback, useRef } from "react";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import ConditionFilter from "../../components/common/ConditionFilter";
 import Table from "../../components/common/Table";
@@ -39,10 +39,12 @@ function DocInList() {
   const itemsPerPage = 10;
   const { formattedStartDate, formattedEndDate } = useDateSet();
 
+  const dragStartIndex = useRef(null);
+  const dragEndIndex = useRef(null);
+  const dragMode = useRef('select');
 
   const {
     handleSelectRow,
-    handleSelectAll,
     selectedRows,
     setSelectedRows,
   } = useDocChange();
@@ -60,7 +62,6 @@ function DocInList() {
   };
 
   const docInFilters = (filterValues) => {
-    // filterValues에서 documentType과 기타 필터 값을 가져옴
     const { startDate, endDate, searchType, keyword } = filterValues;
     
     const params = {
@@ -76,29 +77,15 @@ function DocInList() {
 
   const fetchDocInList = useCallback(
     async (
-      // searchType = "전체",
-      // keyword = "",
-      // startDate = null,
-      // endDate = null,
-      // pageIndex = 1, 
-      // pageSize = itemsper,
-      // status = "A"
       pageIndex = 1, 
       pageSize = itemsPerPage, 
       filters= {status: "A"}
     ) => {
       setLoading(true)
       try {
-        // const formattedStartDate = startDate?.toISOString().split('T')[0] || '';
-        // const formattedEndDate = endDate?.toISOString().split('T')[0] || '';
-  
         const response = await axios.get('/api/doc/receiveList2', {
           params: {
             instCd: auth.instCd,
-            // searchType,
-            // keyword,
-            // startDate: formattedStartDate,
-            // endDate: formattedEndDate,
             searchType: filters.searchType,
             keyword: filters.keyword,
             startDate: filters.startDate ? filters.startDate : formattedStartDate,
@@ -108,7 +95,7 @@ function DocInList() {
             status: filters.status,
           },
         });
-  
+
         if (response.data && response.data.data && Array.isArray(response.data.data.content)) {
           const formattedData = response.data.data.content.map(item => ({
             draftId: item.draftId,
@@ -123,7 +110,7 @@ function DocInList() {
             fileUrl: item.fileUrl,
             docType: deriveDocType(item.filePath),
           }));
-  
+
           setApplications(formattedData);
           setFilteredApplications(formattedData);
           setTotalPages(response.data.data.totalPages || 1);
@@ -158,16 +145,16 @@ function DocInList() {
     setSelectedFileName(fileName);
     setDownloadMode('single'); 
     setShowDownloadReasonModal(true);
-};
+  };
 
-const handleDownloadFiles = () => {
+  const handleDownloadFiles = () => {
     if (selectedRows.length === 0) {
       alert('다운로드할 파일을 선택하세요.');
       return;
     }
     setDownloadMode('multiple'); 
     setShowDownloadReasonModal(true);
-};
+  };
 
   const handleDownloadModalClose = () => {
     setShowDownloadReasonModal(false);
@@ -209,7 +196,18 @@ const handleDownloadFiles = () => {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", selectedFileName);
+
+        const contentDisposition = response.headers['content-disposition'];
+        let fileName = selectedFileName; 
+
+        if (contentDisposition) {
+          const fileNameMatch = contentDisposition.match(/filename\*=UTF-8''(.+)/);
+          if (fileNameMatch && fileNameMatch.length > 1) {
+            fileName = decodeURIComponent(fileNameMatch[1]);
+          }
+        }
+
+        link.setAttribute("download", fileName);
         document.body.appendChild(link);
         link.click();
         link.parentNode.removeChild(link);
@@ -278,54 +276,6 @@ const handleDownloadFiles = () => {
     }
   };
 
-  // const handleSearch = async () => {
-  //   const { searchType, keyword, startDate, endDate} = filterInputs;
-
-  //   const formattedStartDate = startDate
-  //     ? startDate.toISOString().split("T")[0]
-  //     : null;
-  //   const formattedEndDate = endDate
-  //     ? endDate.toISOString().split("T")[0]
-  //     : null;
-
-  //   try {
-  //     const response = await axios.get("/api/doc/receiveList2", {
-  //       params: {
-  //         instCd: auth.instCd,
-  //         searchType,
-  //         keyword,
-  //         startDate: formattedStartDate,
-  //         endDate: formattedEndDate,
-  //         pageIndex: 1,
-  //         pageSize: 10,
-  //         status: 'A',
-  //       },
-  //     });
-
-  //     const data = response.data?.data || {};
-  //     const content = data.content || [];
-
-  //     if (response.data && response.data.data) {
-  //       const formattedData = content.map((item) => ({
-  //         draftId: item.draftId,
-  //         draftDate: item.draftDate,
-  //         docId: item.docId,
-  //         resSender: item.resSender,
-  //         title: item.title,
-  //         drafter: item.drafter,
-  //         status: item.status,
-  //         fileName: item.fileName,
-  //         fileUrl: item.fileUrl,
-  //         docType: deriveDocType(item.filePath),
-  //       }));
-  //       setApplications(formattedData);
-  //       setFilteredApplications(formattedData);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching document list:", error);
-  //   }
-  // };
-
   const resetFilters = useCallback(() => {
     const defaultStartDate = new Date();
     defaultStartDate.setMonth(defaultStartDate.getMonth() - 1);
@@ -347,16 +297,73 @@ const handleDownloadFiles = () => {
     fetchDocInList();
   };
 
+  const handleRowClick = (row) => {
+    const id = row.draftId;
+    if (selectedRows.includes(id)) {
+      setSelectedRows(selectedRows.filter((appId) => appId !== id));
+    } else {
+      setSelectedRows([...selectedRows, id]);
+    }
+  };
+
+  const handleMouseDown = (rowIndex) => {
+    dragStartIndex.current = rowIndex;
+
+    const id = filteredApplications[rowIndex].draftId;
+    if (selectedRows.includes(id)) {
+      dragMode.current = 'deselect';
+    } else {
+      dragMode.current = 'select';
+    }
+  };
+
+  const handleMouseOver = (rowIndex) => {
+    if (dragStartIndex.current !== null) {
+      dragEndIndex.current = rowIndex;
+
+      const start = Math.min(dragStartIndex.current, dragEndIndex.current);
+      const end = Math.max(dragStartIndex.current, dragEndIndex.current);
+
+      let newSelectedRows = [...selectedRows];
+
+      for (let i = start; i <= end; i++) {
+        const id = filteredApplications[i]?.draftId;
+        if (dragMode.current === 'select' && id && !newSelectedRows.includes(id)) {
+          newSelectedRows.push(id);
+        } else if (dragMode.current === 'deselect' && id && newSelectedRows.includes(id)) {
+          newSelectedRows = newSelectedRows.filter(selectedId => selectedId !== id);
+        }
+      }
+
+      setSelectedRows(newSelectedRows);
+    }
+  };
+
+  const handleMouseUp = () => {
+    dragStartIndex.current = null;
+    dragEndIndex.current = null;
+  };
+
+  const handleSelectAllRows = (checked) => {
+    if (checked) {
+      const allIds = filteredApplications.map(app => app.draftId);
+      setSelectedRows(allIds);
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
   const columns = [
     {
-      header: <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} />,
+      header: <input type="checkbox" onChange={(e) => handleSelectAllRows(e.target.checked)} />,
       accessor: 'select',
       width: '4%',
-      Cell: ({ row }) => (
+      Cell: ({ row, rowIndex }) => (
         <input
           type="checkbox"
           checked={selectedRows.includes(row.draftId)}
           onChange={(e) => handleSelectRow(e.target.checked, row.draftId)}
+          onClick={(e) => e.stopPropagation()}
         />
       ),
     },
@@ -420,7 +427,6 @@ const handleDownloadFiles = () => {
           setEndDate={(date) =>
             setFilterInputs((prev) => ({ ...prev, endDate: date }))
           }
-          // onSearch={handleSearch}
           onSearch={docInFilters}
           onReset={handleReset}
           showDocumentType={false}
@@ -443,7 +449,15 @@ const handleDownloadFiles = () => {
           <Loading />
         ) : (
           <>
-          <Table columns={columns} data={filteredApplications || []} />
+          <Table 
+            columns={columns} 
+            data={filteredApplications || []}
+            rowClassName="clickable-row"
+            onRowClick={(row) => handleRowClick(row)}
+            onRowMouseDown={(rowIndex) => handleMouseDown(rowIndex)}
+            onRowMouseOver={(rowIndex) => handleMouseOver(rowIndex)}
+            onRowMouseUp={handleMouseUp}
+          />
         <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
         </>
         )}

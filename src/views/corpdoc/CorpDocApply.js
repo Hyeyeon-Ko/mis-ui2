@@ -8,11 +8,13 @@ import CustomButton from '../../components/common/CustomButton';
 import '../../styles/common/Page.css';
 import '../../styles/corpdoc/CorpDocApply.css';
 import useCorpChange from '../../hooks/useCorpChange';
+import { useDateChange } from '../../hooks/apply/useDateChange'
 
 function CorpDocApply() {
     const navigate = useNavigate();
     const { auth } = useContext(AuthContext); 
     const {formData, handleFileChange, handleChange} = useCorpChange();
+    const [formattedDate, handleUseDateChange] = useDateChange();
 
     const corpDocGroup = [
         {
@@ -155,8 +157,11 @@ function CorpDocApply() {
                                 <input
                                     type="text"
                                     name="useDate"
-                                    value={formData.useDate}
-                                    onChange={handleChange}
+                                    value={formattedDate}
+                                    onChange={(e) => {
+                                        handleUseDateChange(e);
+                                        handleChange(e);
+                                    }}
                                     placeholder="YYYY-MM-DD"
                                 />
                             </div>

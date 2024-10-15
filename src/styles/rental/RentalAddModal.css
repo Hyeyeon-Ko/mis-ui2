@@ -133,6 +133,18 @@ input:disabled {
     outline: none;
 }
 
+.rental-add-detail-row label span {
+    color: red;
+}
+
+.rental-add-detail-row span2 {
+    font-size: 13px;
+    color: blue;
+    margin-top: 5px;
+    margin-left: 5px;
+    margin-bottom: 12px;
+}
+
 .rental-modal-buttons {
     margin-top: 20px;
     text-align: center;
