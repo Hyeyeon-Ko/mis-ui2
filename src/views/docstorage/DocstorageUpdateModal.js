@@ -5,6 +5,7 @@ import '../../styles/docstorage/DocstorageAddModal.css';
 import { AuthContext } from '../../components/AuthContext';
 import { validateForm } from '../../hooks/validateForm';
 import useDocstorageChange from '../../hooks/useDocstorageChange';
+import { useDateChange } from '../../hooks/apply/useDateChange';
 
 const fields = [
   { label: '팀명', name: 'teamNm', required: true },
@@ -25,6 +26,8 @@ const fields = [
 const DocstorageUpdateModal = ({ show, onClose, onSave, docData, modalType }) => {
   const { auth } = useContext(AuthContext);
   const {handleChange, handleFileChange, setFormData, formData, file} = useDocstorageChange();
+  const [formattedCreateDate, handleCreateDateChange] = useDateChange();
+  const [formattedDisposalDate, handleDisposalDateChange] = useDateChange();
 
 
   useEffect(() => {
@@ -158,9 +161,19 @@ const DocstorageUpdateModal = ({ show, onClose, onSave, docData, modalType }) =>
                     <input
                       type="text"
                       name={name}
-                      value={formData[name] || ''}
+                      value={
+                        name === 'createDate' ? formattedCreateDate  ||  formData[name]:
+                        name === 'disposalDate' ? formattedDisposalDate || formData[name]:
+                        formData[name] || ''}
                       placeholder={placeholder}
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        if (name === 'createDate') {
+                            handleCreateDateChange(e);
+                        } else if (name === 'disposalDate') {
+                            handleDisposalDateChange(e);
+                        }
+                        handleChange(e); // 일반 핸들러 호출
+                      }}
                       disabled={isDisabled(name)}
                     />
                   </div>
