@@ -19,6 +19,7 @@ function Sidebar() {
     sealPendingCount: 0,
     corpDocIssuePendingCount: 0,
     orderPendingCount: 0, 
+    docstoragePendingCount: 0,
   });
 
   const toggleSidebar = () => {
@@ -124,7 +125,7 @@ function Sidebar() {
     ],
     'E': [
       { title: '문서 관리', items: [
-        { label: '문서보관 목록표', url: '/docstorageList', subIndex: 'E-1' },
+        { label: '문서보관 목록표', url: '/docstorageList', count: pendingCounts.docstoragePendingCount, subIndex: 'E-1' },
         { label: '전국 문서보관 목록표', url: '/totalDocstorageList', subIndex: 'E-2' },
       ]}
     ],
@@ -191,6 +192,7 @@ function Sidebar() {
                 items={sectionItem.items}
                 isActive={isActive}
                 location={location}
+                pendingCounts={pendingCounts}
                 defaultOpen={sectionItem.items.some(item => item.count > 0)}
               />
             ));
@@ -215,7 +217,7 @@ function Sidebar() {
   );
 }
 
-function SidebarSection({ title, items, isActive, defaultOpen }) {
+function SidebarSection({ title, items, isActive, defaultOpen, pendingCounts }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   useEffect(() => {
@@ -240,18 +242,31 @@ function SidebarSection({ title, items, isActive, defaultOpen }) {
         <img
           src={isOpen ? dropdownActiveIcon : dropdownDefaultIcon}
           alt="Toggle Icon"
-          className="toggle-icon" 
-        /> 
+          className="toggle-icon"
+        />
         {title}
       </h3>
       {isOpen && (
         <ul>
           {items.map((item, index) => (
             <li key={index} className="sidebar-item">
-              <Link to={item.url} className={isActive(item.url)}>
-                {item.label}
-                {item.count > 0 && <span className="pending-count">{item.count}</span>}
-              </Link>
+              {item.url === '/docstorageList' ? (
+                <Link
+                  to={{
+                    pathname: item.url,
+                    state: { docstoragePendingCount: pendingCounts.docstoragePendingCount }, 
+                  }}
+                  className={isActive(item.url)}
+                >
+                  {item.label}
+                  {item.count > 0 && <span className="pending-count">{item.count}</span>}
+                </Link>
+              ) : (
+                <Link to={item.url} className={isActive(item.url)}>
+                  {item.label}
+                  {item.count > 0 && <span className="pending-count">{item.count}</span>}
+                </Link>
+              )}
             </li>
           ))}
         </ul>

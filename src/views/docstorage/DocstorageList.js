@@ -11,8 +11,6 @@ import '../../styles/common/Page.css';
 import '../../styles/docstorage/DocstorageList.css';
 import Loading from '../../components/common/Loading';
 
-
-
 function DocstorageList() {
   const { auth } = useContext(AuthContext);
   const categories = [
@@ -20,7 +18,7 @@ function DocstorageList() {
     { categoryCode: 'A', categoryName: '승인대기 내역' },
   ];
 
-  const [selectedCategory, setSelectedCategory] = useState('B'); 
+  const [selectedCategory, setSelectedCategory] = useState('B');
   const [deptResponses, setDeptResponses] = useState([]);
   const [docstorageDetails, setDocstorageDetails] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -33,7 +31,6 @@ function DocstorageList() {
   const [showBulkEditModal, setShowBulkEditModal] = useState(false); 
   const [loading, setLoading] = useState(false);
 
-
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
   const dragMode = useRef('select');
@@ -43,6 +40,27 @@ function DocstorageList() {
     { label: '승인완료', value: '승인완료' },
     { label: '처리완료', value: '처리완료' },
   ];
+
+  const fetchPendingCounts = useCallback(async () => {
+    try {
+      const response = await axios.get('/api/pendingCount', {
+        params: { instCd: auth.instCd, userId: auth.userId },
+      });
+      const counts = response.data.data;
+
+      if (counts.docstoragePendingCount > 0) {
+        setSelectedCategory('A'); 
+      } else {
+        setSelectedCategory('B'); 
+      }
+    } catch (error) {
+      console.error('Error fetching pending counts:', error);
+    }
+  }, [auth.instCd, auth.userId]);
+
+  useEffect(() => {
+    fetchPendingCounts(); 
+  }, [fetchPendingCounts]);
 
   const fetchDeptList = useCallback(async () => {
     setLoading(true)
