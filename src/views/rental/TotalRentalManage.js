@@ -30,7 +30,7 @@ function TotalRentalManage() {
               const nationwideCenter = { detailNm: '전국센터', detailCd: 'all' };
               const sortedCenterData = [
                   nationwideCenter, 
-                  ...centerResponses
+                  ...centerResponses  
               ];
 
               const formattedSummaryResponses = summaryResponses.map(summary => ({
@@ -145,9 +145,9 @@ function TotalRentalManage() {
         setRentalDetails(numberedDetails);
 
         if (selectedDetails.length > 0) {
-            setLastUpdated(selectedDetails[0].lastUpdtDate);  // 센터 첫번째 데이터의 lastUpdtDate 설정
+            setLastUpdated(selectedDetails[0].lastUpdtDate);  
         } else {
-            setLastUpdated('');  // 데이터가 없을 경우 lastUpdtDate 초기화
+            setLastUpdated('');
         }
     };
 

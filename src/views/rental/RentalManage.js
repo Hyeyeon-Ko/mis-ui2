@@ -325,9 +325,9 @@ function RentalManage() {
     { header: 'NO', accessor: 'no' },
     { header: (
       <StatusSelect
-        statusOptions={statusOptions}  // 필터링을 위한 옵션 전달
-        selectedStatus={selectedStatus}  // 선택된 상태 전달
-        onStatusChange={(e) => setSelectedStatus(e.target.value)}  // 상태 변경 처리
+        statusOptions={statusOptions}  
+        selectedStatus={selectedStatus}  
+        onStatusChange={(e) => setSelectedStatus(e.target.value)} 
       />
      ), accessor: 'status' },
     { header: '업체명', accessor: 'companyNm' },

@@ -143,6 +143,7 @@ function Sidebar() {
       { title: '토너 관리표', items: [
         { label: '토너 단가표', url: '/toner/priceList', subIndex: 'G-2' },
         { label: '프린터/토너 관리표', url: '/tonerList', subIndex: 'G-1' },
+        { label: '전국 프린터/토너 관리표', url: '/totalTonerList', subIndex: 'G-2' },
       ]}
     ]
   };
