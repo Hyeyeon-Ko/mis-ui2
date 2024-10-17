@@ -7,7 +7,7 @@ import '../../styles/rental/RentalAddModal.css';
 import { addFormData, formFields } from '../../datas/rentalDatas';
 import useRentalChange from '../../hooks/useRentalChange';
 import { useDateChange } from '../../hooks/apply/useDateChange';
-
+import { usePriceChange } from '../../hooks/apply/usePriceChange';
 
 
 const RentalAddModal = ({ show, onClose, onSave }) => {
@@ -15,6 +15,7 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
   const {handleChange, handleTabChange, handleFileChange, formData, file, activeTab, setFormData, setActiveTab, setFile} = useRentalChange();
   const [formattedInstallDate, handleInstallDateChange] = useDateChange();
   const [formattedExpiryDate, handleExpiryDateChange] = useDateChange();
+  const [formattedRentalFee, handleRentalFeeChange] = usePriceChange();
 
   const resetFormData = () => {
     setFormData(addFormData);
@@ -199,18 +200,21 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
                     value={
                       field.name === 'installDate' ? formattedInstallDate:
                       field.name === 'expiryDate' ? formattedExpiryDate:
+                      field.name === 'rentalFee' ? formattedRentalFee:
                       formData[field.name]}
                     onChange={(e) => {
                       if (field.name === 'installDate') {
                           handleInstallDateChange(e);
                       } else if (field.name === 'expiryDate') {
                           handleExpiryDateChange(e);
+                      } else if (field.name === 'rentalFee') {
+                        handleRentalFeeChange(e); 
                       }
                       handleChange(e);
                     }}
                     placeholder={field.placeholder || ''}
                   />
-                  {field.name === 'location' && <span2> 반드시 다음 5가지 항목으로만 기재 &gt;&gt; 사무실, 병원, 임원실, 휴게실, 화장실</span2>}
+                  {field.name === 'location' && <span> 반드시 다음 5가지 항목으로만 기재 &gt;&gt; 사무실, 병원, 임원실, 휴게실, 화장실</span>}
                 </div>
               ))}
             </div>

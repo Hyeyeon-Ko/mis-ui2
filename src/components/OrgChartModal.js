@@ -264,7 +264,7 @@ const OrgChartModal = ({ show, onClose, onConfirm, renderOrgTree, selectedUsers,
                 <>
                   <p className="selection-guidance-header">※ 참고사항 ※</p>
                   <p className="selection-guidance-body">
-                    명함 대상자(본인) 부서의 팀장님을 선택하세요.
+                    명함 신청자(본인) 부서의 팀장님을 선택하세요.
                   </p>
                   <p className="selection-guidance-body">
                     팀장님이 없는 부서의 경우 본부장님 또는 파트장님을 선택하세요.

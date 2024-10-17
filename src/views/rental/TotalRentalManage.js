@@ -96,7 +96,7 @@ function TotalRentalManage() {
       { header: '만료일자', accessor: 'expiryDate' },
       { header: '렌탈료', accessor: 'rentalFee' },
       { header: '위치분류', accessor: 'location' },
-      { header: '설치위치', accessor: 'installationSite' },
+      { header: '설치장소', accessor: 'installationSite' },
       { header: '특이사항', accessor: 'specialNote' },
     ];
   

@@ -7,6 +7,7 @@ import { AuthContext } from '../../components/AuthContext';
 import { formFields } from '../../datas/rentalDatas';
 import useRentalChange from '../../hooks/useRentalChange';
 import { useDateChange } from '../../hooks/apply/useDateChange';
+import { usePriceChange } from '../../hooks/apply/usePriceChange';
 
 
 const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
@@ -14,6 +15,7 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
   const {handleChange, setFormData, formData, handleFileChange, file} = useRentalChange();
   const [formattedInstallDate, handleInstallDateChange] = useDateChange();
   const [formattedExpiryDate, handleExpiryDateChange] = useDateChange();
+  const [formattedRentalFee, handleRentalFeeChange] = usePriceChange();
 
   useEffect(() => {
     if (rentalData) {
@@ -33,7 +35,8 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
       handleInstallDateChange({ target: { value: '' } });
       handleExpiryDateChange({ target: { value: '' } });
     }
-  }, [rentalData, setFormData, handleInstallDateChange, handleExpiryDateChange]);
+  // }, [rentalData, setFormData, handleInstallDateChange, handleExpiryDateChange]);
+  }, [rentalData]); // TODO: 위처럼 하면 eslint 오류는 없어지는데 무한 루프...
 
   const validateDateFormat = (dateStr) => {
     return /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
@@ -192,18 +195,21 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
                     value={
                       field.name === 'installDate' ? formattedInstallDate || formData[field.name]:
                       field.name === 'expiryDate' ? formattedExpiryDate || formData[field.name]:
+                      field.name === 'rentalFee' ? formattedRentalFee:
                       formData[field.name] || ''}
                     onChange={(e) => {
                       if (field.name === 'installDate') {
                           handleInstallDateChange(e);
                       } else if (field.name === 'expiryDate') {
                           handleExpiryDateChange(e);
+                      } else if (field.name === 'rentalFee') {
+                        handleRentalFeeChange(e); 
                       }
                       handleChange(e);
                     }}
                     placeholder={field.placeholder || ''}
                   />
-                  {field.name === 'location' && <span2> 반드시 다음 5가지 항목으로만 기재 &gt;&gt; 사무실, 병원, 임원실, 휴게실, 화장실</span2>}
+                  {field.name === 'location' && <span> 반드시 다음 5가지 항목으로만 기재 &gt;&gt; 사무실, 병원, 임원실, 휴게실, 화장실</span>}
                 </div>
               ))}
             </div>

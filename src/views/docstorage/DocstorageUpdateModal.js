@@ -48,7 +48,6 @@ const DocstorageUpdateModal = ({ show, onClose, onSave, docData, modalType }) =>
       });
     }
 
-    console.log("docData: ", docData)
   }, [docData, setFormData]);
 
   const handleSaveClick = () => {

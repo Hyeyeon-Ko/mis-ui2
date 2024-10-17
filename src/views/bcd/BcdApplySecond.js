@@ -445,7 +445,7 @@ function BcdApplySecond() {
                     </div>
                     <div className="form-group-horizontal">
                       <label className="form-label">이 름</label>
-                      <input type="text" name="name" value={formData.name} onChange={handleChange} required readOnly={!isOwn} />
+                      <input type="text" name="name" value={formData.name} onChange={handleChange} required readOnly/>
                     </div>
                     <div className="form-group-horizontal">
                       <label className="form-label">영문 이름</label>

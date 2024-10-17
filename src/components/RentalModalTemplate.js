@@ -8,7 +8,7 @@ export const RentalFormFields = ({ formData, handleChange, disabledFields = [] }
         { label: '만료일자', name: 'expiryDate', type: 'text', placeholder: 'YYYY-MM-DD' },
         { label: '렌탈료', name: 'rentalFee', type: 'text' },
         { label: '위치분류', name: 'location', type: 'text' },
-        { label: '설치위치', name: 'installationSite', type: 'text' },
+        { label: '설치장소', name: 'installationSite', type: 'text' },
         { label: '특이사항', name: 'specialNote', type: 'text' }
     ];
     

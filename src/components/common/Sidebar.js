@@ -19,7 +19,6 @@ function Sidebar() {
     sealPendingCount: 0,
     corpDocIssuePendingCount: 0,
     orderPendingCount: 0, 
-    docstoragePendingCount: 0,
   });
 
   const toggleSidebar = () => {
@@ -65,15 +64,15 @@ function Sidebar() {
 
   const applyItems = [
     { label: '명함신청', url: '/bcd' },
-    { label: '인장신청', url: '/seal' },
-    { label: '법인서류', url: '/corpDoc' },
+    // { label: '인장신청', url: '/seal' },
+    // { label: '법인서류', url: '/corpDoc' },
     { label: '문서수발신', url: '/doc' },
     { label: '', url: '/' },
     { label: '', url: '/' },
-    { label: '토너신청', url: '/toner' },
-    { label: '문서이관/파쇄', url: '/docstorage' },
-    { label: '', url: '/' },
-    { label: '', url: '/' },
+    // { label: '토너신청', url: '/toner' },
+    // { label: '문서이관/파쇄', url: '/docstorage' },
+    // { label: '', url: '/' },
+    // { label: '', url: '/' },
   ];
 
   const myApplyItems = [
@@ -125,7 +124,7 @@ function Sidebar() {
     ],
     'E': [
       { title: '문서 관리', items: [
-        { label: '문서보관 목록표', url: '/docstorageList', count: pendingCounts.docstoragePendingCount, subIndex: 'E-1' },
+        { label: '문서보관 목록표', url: '/docstorageList', subIndex: 'E-1' },
         { label: '전국 문서보관 목록표', url: '/totalDocstorageList', subIndex: 'E-2' },
       ]}
     ],
@@ -133,6 +132,17 @@ function Sidebar() {
       { title: '자산 관리', items: [
         { label: '렌탈현황 관리표', url: '/rentalList', subIndex: 'F-1' },
         { label: '전국 렌탈현황 관리표', url: '/totalRentalList', subIndex: 'F-2' },
+      ]}
+    ],
+    'G': [
+      { title: '토너 관리', items: [
+        { label: '전체 신청내역', url: '/applyList?documentType=토너신청', subIndex: 'G-1' },
+        { label: '승인대기 내역', url: '/pendingList?documentType=토너신청', subIndex: 'G-1' },
+        { label: '토너 발주', url: '/toner/orderList', subIndex: 'G-1' },
+      ]},
+      { title: '토너 관리표', items: [
+        { label: '토너 단가표', url: '/toner/priceList', subIndex: 'G-2' },
+        { label: '프린터/토너 관리표', url: '/tonerList', subIndex: 'G-1' },
       ]}
     ]
   };
@@ -171,14 +181,14 @@ function Sidebar() {
             items={applyItems}
             isActive={isActive}
             location={location}
-            defaultOpen={false}
+            defaultOpen={true}
           />
           <SidebarSection
             title="나의 신청내역"
             items={myApplyItems}
             isActive={isActive}
             location={location}
-            defaultOpen={false}
+            defaultOpen={true}
           />
         </>
       ) : (
@@ -192,7 +202,6 @@ function Sidebar() {
                 items={sectionItem.items}
                 isActive={isActive}
                 location={location}
-                pendingCounts={pendingCounts}
                 defaultOpen={sectionItem.items.some(item => item.count > 0)}
               />
             ));
@@ -217,7 +226,7 @@ function Sidebar() {
   );
 }
 
-function SidebarSection({ title, items, isActive, defaultOpen, pendingCounts }) {
+function SidebarSection({ title, items, isActive, defaultOpen }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   useEffect(() => {
@@ -242,31 +251,18 @@ function SidebarSection({ title, items, isActive, defaultOpen, pendingCounts }) 
         <img
           src={isOpen ? dropdownActiveIcon : dropdownDefaultIcon}
           alt="Toggle Icon"
-          className="toggle-icon"
-        />
+          className="toggle-icon" 
+        /> 
         {title}
       </h3>
       {isOpen && (
         <ul>
           {items.map((item, index) => (
             <li key={index} className="sidebar-item">
-              {item.url === '/docstorageList' ? (
-                <Link
-                  to={{
-                    pathname: item.url,
-                    state: { docstoragePendingCount: pendingCounts.docstoragePendingCount }, 
-                  }}
-                  className={isActive(item.url)}
-                >
-                  {item.label}
-                  {item.count > 0 && <span className="pending-count">{item.count}</span>}
-                </Link>
-              ) : (
-                <Link to={item.url} className={isActive(item.url)}>
-                  {item.label}
-                  {item.count > 0 && <span className="pending-count">{item.count}</span>}
-                </Link>
-              )}
+              <Link to={item.url} className={isActive(item.url)}>
+                {item.label}
+                {item.count > 0 && <span className="pending-count">{item.count}</span>}
+              </Link>
             </li>
           ))}
         </ul>

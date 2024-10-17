@@ -137,7 +137,7 @@ input:disabled {
     color: red;
 }
 
-.rental-add-detail-row span2 {
+.rental-add-detail-row span {
     font-size: 13px;
     color: blue;
     margin-top: 5px;
