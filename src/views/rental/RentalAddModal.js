@@ -9,7 +9,6 @@ import useRentalChange from '../../hooks/useRentalChange';
 import { useDateChange } from '../../hooks/apply/useDateChange';
 import { usePriceChange } from '../../hooks/apply/usePriceChange';
 
-
 const RentalAddModal = ({ show, onClose, onSave }) => {
   const { auth } = useContext(AuthContext); 
   const {handleChange, handleTabChange, handleFileChange, formData, file, activeTab, setFormData, setActiveTab, setFile} = useRentalChange();
@@ -194,27 +193,54 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
                   <label>
                     {field.label} {field.isRequired && <span>*</span>}
                   </label>
-                  <input
-                    type="text"
-                    name={field.name}
-                    value={
-                      field.name === 'installDate' ? formattedInstallDate:
-                      field.name === 'expiryDate' ? formattedExpiryDate:
-                      field.name === 'rentalFee' ? formattedRentalFee:
-                      formData[field.name]}
-                    onChange={(e) => {
-                      if (field.name === 'installDate') {
-                          handleInstallDateChange(e);
-                      } else if (field.name === 'expiryDate') {
-                          handleExpiryDateChange(e);
-                      } else if (field.name === 'rentalFee') {
-                        handleRentalFeeChange(e); 
-                      }
-                      handleChange(e);
-                    }}
-                    placeholder={field.placeholder || ''}
-                  />
-                  {field.name === 'location' && <span> 반드시 다음 5가지 항목으로만 기재 &gt;&gt; 사무실, 병원, 임원실, 휴게실, 화장실</span>}
+                  {field.name === 'category' ? (
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">선택하세요</option>
+                      <option value="정수기">정수기</option>
+                      <option value="공기청정기">공기청정기</option>
+                      <option value="비데">비데</option>
+                    </select>
+                  ) : field.name === 'location' ? (
+                    <select
+                      name="location"
+                      value={formData.location}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">선택하세요</option>
+                      <option value="사무실">사무실</option>
+                      <option value="병원">병원</option>
+                      <option value="임원실">임원실</option>
+                      <option value="휴게실">휴게실</option>
+                      <option value="화장실">화장실</option>
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      name={field.name}
+                      value={
+                        field.name === 'installDate' ? formattedInstallDate:
+                        field.name === 'expiryDate' ? formattedExpiryDate:
+                        field.name === 'rentalFee' ? formattedRentalFee:
+                        formData[field.name]}
+                      onChange={(e) => {
+                        if (field.name === 'installDate') {
+                            handleInstallDateChange(e);
+                        } else if (field.name === 'expiryDate') {
+                            handleExpiryDateChange(e);
+                        } else if (field.name === 'rentalFee') {
+                          handleRentalFeeChange(e); 
+                        }
+                        handleChange(e);
+                      }}
+                      placeholder={field.placeholder || ''}
+                    />
+                  )}
                 </div>
               ))}
             </div>
