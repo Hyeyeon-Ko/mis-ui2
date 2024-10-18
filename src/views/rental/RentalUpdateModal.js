@@ -32,6 +32,8 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         specialNote: rentalData.specialNote || '',
       });
 
+      console.log(rentalData);
+
       handleInstallDateChange({ target: { value: '' } });
       handleExpiryDateChange({ target: { value: '' } });
     }
@@ -222,7 +224,7 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
                       value={
                         field.name === 'installDate' ? formattedInstallDate || formData[field.name]:
                         field.name === 'expiryDate' ? formattedExpiryDate || formData[field.name]:
-                        field.name === 'rentalFee' ? formattedRentalFee:
+                        field.name === 'rentalFee' ? formattedRentalFee || formData[field.name]:
                         formData[field.name] || ''}
                       onChange={(e) => {
                         if (field.name === 'installDate') {

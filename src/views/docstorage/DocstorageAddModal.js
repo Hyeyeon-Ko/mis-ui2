@@ -64,18 +64,18 @@ const DocstorageAddModal = ({ show, onClose, onSave }) => {
             dpdNum: row[12] !== undefined ? row[12].toString() : '',
           }));
   
-        const docStorageExcelRequestDTO = {
-          details: extractedData,
-          docStorageExcelApplyRequestDTO: {
-            instCd: auth.instCd,
-            deptCd: auth.deptCd,
-            drafter: auth.userNm,
-            drafterId: auth.userId,
-          },
-        };  
+        const docStorageExcelApplyRequestDTO = {
+          instCd: auth.instCd,
+          deptCd: auth.deptCd,
+          drafter: auth.userNm,
+          drafterId: auth.userId,
+        };
   
         axios
-          .post('/api/docstorage/data', docStorageExcelRequestDTO)
+          .post('/api/docstorage/data', {
+            details: extractedData,
+            docStorageExcelApplyRequestDTO: docStorageExcelApplyRequestDTO
+          })
           .then((response) => {
             onSave(response.data);
             resetFormData();

@@ -6,6 +6,7 @@ import RentalAddModal from './RentalAddModal';
 import RentalUpdateModal from './RentalUpdateModal'; 
 import RentalBulkUpdateModal from './RentalBulkUpdateModal';
 import StatusSelect from '../../components/StatusSelect';
+import ProduceSelect from '../../components/ProductSelect';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/common/Page.css';
 import '../../styles/rental/RentalManage.css';
@@ -22,6 +23,7 @@ function RentalManage() {
   const [rentalDetails, setRentalDetails] = useState([]);  
   const [filteredRentalDetails, setFilteredRentalDetails] = useState([]); 
   const [selectedStatus, setSelectedStatus] = useState('전체');
+  const [selectedCategory, setSelectedCategory] = useState('전체');
   const [loading, setLoading] = useState(false);
   const [lastUpdtDate, setLastUpdtDate] = useState(null);
   const [totalRentalFee, setTotalRentalFee] = useState(0);
@@ -30,6 +32,13 @@ function RentalManage() {
     { label: '전체', value: '전체' },
     { label: '완료', value: '완료' },
   ];
+
+  const categoryOptions = [
+    { label: '전체', value: '전체' },
+    { label: '비데', value: '비데' },
+    { label: '정수기', value: '정수기' },
+    { label: '공기청정기', value: '공기청정기' },
+  ];  
 
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
@@ -46,8 +55,8 @@ function RentalManage() {
     }
   };
 
-  const calculateTotalRentalFee = (details) => {
-    const completedItems = details.filter(item => item.status === '완료');
+  const calculateTotalRentalFee = (filteredDetails) => {
+    const completedItems = filteredDetails.filter(item => item.status === '완료');
     
     const total = completedItems.reduce((sum, item) => {
         const fee = parseFloat(item.rentalFee.replace(/,/g, '')); 
@@ -55,8 +64,8 @@ function RentalManage() {
     }, 0);
     
     setTotalRentalFee(total);  
-};
-
+  };
+  
   const fetchRentalData = useCallback(async () => {
     setLoading(true);
     try {
@@ -97,13 +106,22 @@ function RentalManage() {
   }, [fetchRentalData]);
 
   useEffect(() => {
-    if (selectedStatus === '전체') {
-      setFilteredRentalDetails(rentalDetails); 
-    } else {
-      setFilteredRentalDetails(rentalDetails.filter(item => item.status === selectedStatus));
+    let filteredData = rentalDetails;
+  
+    if (selectedStatus !== '전체') {
+      filteredData = filteredData.filter(item => item.status === selectedStatus);
     }
-  }, [selectedStatus, rentalDetails]);
-
+  
+    if (selectedCategory !== '전체') {
+      filteredData = filteredData.filter(item => item.category === selectedCategory);
+    }
+  
+    setFilteredRentalDetails(filteredData);
+  
+    calculateTotalRentalFee(filteredData);
+  
+  }, [selectedStatus, selectedCategory, rentalDetails]);
+    
   const handleRowClick = (row, index) => {
     const isChecked = !selectedRows.includes(row.detailId);
     if (isChecked) {
@@ -331,7 +349,13 @@ function RentalManage() {
       />
      ), accessor: 'status' },
     { header: '업체명', accessor: 'companyNm' },
-    { header: '제품군', accessor: 'category' },
+    { header: (
+      <ProduceSelect
+        categoryOptions={categoryOptions}  
+        selectedCategory={selectedCategory}  
+        onCategoryChange={(e) => setSelectedCategory(e.target.value)} 
+      />
+    ), accessor: 'category' },    
     { header: '계약번호', accessor: 'contractNum' },
     { header: '모델명', accessor: 'modelNm' },
     { header: '설치일자', accessor: 'installDate' },

@@ -8,7 +8,7 @@ const OrgChartModal = ({ show, onClose, onConfirm, renderOrgTree, selectedUsers,
   const [selectedRows, setSelectedRows] = useState([]);
   const { auth } = useContext(AuthContext);
 
-  const docType = mode === 'bcd' ? '명함신청' : '문서수발신';
+  const docType = mode === 'bcd' ? '명함신청' : '문서발신';
 
   useEffect(() => {
     if (show && auth.instCd) {
@@ -62,7 +62,7 @@ const OrgChartModal = ({ show, onClose, onConfirm, renderOrgTree, selectedUsers,
               }
             } else if (mode === 'doc') {
               if (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2') {
-                approvers = [teamLeader]; 
+                approvers = [teamLeader, manager]; 
               } else {
                 approvers = [manager];
               }
@@ -210,7 +210,7 @@ const OrgChartModal = ({ show, onClose, onConfirm, renderOrgTree, selectedUsers,
               </thead>
               <tbody>
                 {selectedUsers
-                  .filter(user => !(auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2') || user.seq !== 2)
+                  .filter(user => !((auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2') && auth.roleNm !== '팀원') || user.seq !== 2)
                   .map((user, index) => (
                     <tr
                       key={user.userId}
@@ -250,8 +250,36 @@ const OrgChartModal = ({ show, onClose, onConfirm, renderOrgTree, selectedUsers,
               </div>
             )}
 
+            {((auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2') && auth.roleNm === '팀원' && mode === 'doc') && (
+              <div className="selection-container">
+                <table>
+                  <thead>
+                    <tr>
+                      {신청자팀장 && <th>신청자 팀장</th>}  
+                      <th>{총무팀_담당자}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      {신청자팀장 && renderApproverInfo(신청자팀장, 0)} 
+                      {총무팀담당자 && renderApproverInfo(총무팀담당자, 1)}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
+
             <div className="selection-guidance-container">
-              {(auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2') && (
+              {((auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2') && auth.roleNm !== '팀원') && (
+                <>
+                  <p className="selection-guidance-header">※ 참고사항 ※</p>
+                  <p className="selection-guidance-body">
+                    {auth.teamCd === 'CNT2' ? '경영지원팀 팀장님' : '총무팀 팀장님'}의 경우 승인라인을 설정하지 않으셔도 됩니다.
+                  </p>
+                </>
+              )}
+
+              {((auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2') && auth.roleNm === '팀원') && (
                 <>
                   <p className="selection-guidance-header">※ 참고사항 ※</p>
                   <p className="selection-guidance-body">

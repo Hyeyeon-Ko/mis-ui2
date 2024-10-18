@@ -71,11 +71,15 @@ const PreviewModal = ({ show, onClose, formData }) => {
       return item ? item.etcItem2 : '';
     };
 
-    const centerName = formData.center ? formData.center : findDetailName(bcdData.instInfo, formData.center);
-    const teamName = formData.team === '000' ? formData.teamNm: findDetailName(bcdData.teamInfo, formData.team);
+    const centerName = bcdData.instInfo.some(i => i.detailCd === formData.center)
+    ? findDetailName(bcdData.instInfo, formData.center)
+    : formData.center;
+      const teamName = formData.team === '000' ? formData.teamNm: findDetailName(bcdData.teamInfo, formData.team);
     const positionName = formData.position === '000' ? formData.gradeNm : findDetailName(bcdData.gradeInfo, formData.position);
     const engPositionName = formData.position === '000' ? formData.enGradeNm : findEngName(bcdData.gradeInfo, formData.position);
     const engTeamName = formData.team === '000' ? formData.engTeam: findEngName(bcdData.teamInfo, formData.team);
+
+    console.log(formData.engAddress)
 
     imageKorean.onload = () => {
       ctx.drawImage(imageKorean, 0, 0, canvas.width / 2, canvas.height);
@@ -115,7 +119,7 @@ const PreviewModal = ({ show, onClose, formData }) => {
 
       if (addressParts.length === 2) {
         const mainAddress = addressParts[0];
-        const floorAddress = addressParts[1].trim() + '층';
+        const floorAddress = addressParts[1].trim();
         const fullAddress = `${mainAddress} ${floorAddress}`;
 
         drawTextWithMaxWidth(ctx, fullAddress, 270, 302.4, -1.2, 300, 13.6);

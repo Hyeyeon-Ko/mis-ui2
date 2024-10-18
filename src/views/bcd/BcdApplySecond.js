@@ -50,6 +50,27 @@ function BcdApplySecond() {
   const [expandedNodes, setExpandedNodes] = useState({});
   const [teamMembers, setTeamMembers] = useState([]);
 
+  const gradeOrder = [
+    "(직접입력)",
+    "명예이사장",
+    "이사장",
+    "센터장",
+    "이사",
+    "이사대우",
+    "본부장",
+    "상무",
+    "전무",
+    "팀장",
+    "파트장",
+    "수석",
+    "부장",
+    "책임",
+    "과장",
+    "선임",
+    "주임",
+    "사원",
+  ];
+
   useEffect(() => {
     if (isOwn) {
       fetchUserInfo(auth.userId);
@@ -343,14 +364,25 @@ function BcdApplySecond() {
   const fetchFilteredGradeInfo = () => {
     const selectedTeamInfo = bcdData.teamInfo.find((team) => team.detailNm === formData.team);
     const selectedEtcItem1 = selectedTeamInfo ? selectedTeamInfo.etcItem1 : '';
-
+  
     const filteredGradeInfo = bcdData.gradeInfo.filter(
       (grade) => grade.etcItem1 === '000' || grade.etcItem1 === selectedEtcItem1,
     );
-
-    return filteredGradeInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
+  
+    return filteredGradeInfo.sort((a, b) => {
+      const aIndex = gradeOrder.indexOf(a.detailNm);
+      const bIndex = gradeOrder.indexOf(b.detailNm);
+  
+      if (aIndex === -1 && bIndex === -1) {
+        return a.detailNm.localeCompare(b.detailNm);
+      }
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+  
+      return aIndex - bIndex;
+    });
   };
-
+  
   const handlePreview = (e) => {
     e.preventDefault();
     if (!formData.userId) {
@@ -431,6 +463,7 @@ function BcdApplySecond() {
                           <button
                             type="button"
                             onClick={() => setFormData({ ...formData, quantity: formData.quantity + 1 })}
+                            disabled={formData.quantity >= 3}
                           >
                             +
                           </button>
@@ -450,8 +483,8 @@ function BcdApplySecond() {
                     <div className="form-group-horizontal">
                       <label className="form-label">영문 이름</label>
                       <div className="name-inputs">
-                        <input type="text" name="firstName" placeholder="First name" value={formData.firstName} onChange={handleChange} required className="english-name" />
-                        <input type="text" name="lastName" placeholder="Last name" value={formData.lastName} onChange={handleChange} required className="english-name" />
+                        <input type="text" name="firstName" placeholder="이름" value={formData.firstName} onChange={handleChange} required className="english-name" />
+                        <input type="text" name="lastName" placeholder="성" value={formData.lastName} onChange={handleChange} required className="english-name" />
                       </div>
                     </div>
                     <div className="form-group-horizontal">
