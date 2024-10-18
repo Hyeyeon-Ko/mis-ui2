@@ -80,11 +80,6 @@ function Sidebar() {
     { label: '승인대기 내역', url: '/myPendingList' },
   ];
 
-  const docManageItems = [
-    { label: '문서 수신 대장', url: '/doc/receiveList' },
-    { label: '문서 발신 대장', url: '/doc/sendList' },
-  ];
-
   const sections = {
     'A': [
       { title: '명함 관리', items: [

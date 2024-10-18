@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   bcdInfoData,
   bcdMapData,
@@ -17,23 +17,6 @@ const useBdcChange = () => {
   const [selectedApplications, setSelectedApplications] = useState([]);
   const [floor, setFloor] = useState("");
   const [mappings, setMappings] = useState(bcdMapData);
-
-  const instOrder = [
-    "재단본부",
-    "광화문",
-    "본원센터",
-    "강남센터",
-    "여의도",
-    "수원센터",
-    "대구센터",
-    "부산센터",
-    "광주센터",
-    "제주센터",
-  ];
-  
-  useEffect(() => {
-    fetchBcdStd();
-  }, []); 
 
   const handleEmailChange = (e) => {
     const { id, value } = e.target;
@@ -102,7 +85,21 @@ const useBdcChange = () => {
     setUserIdInput(e.target.value);
   };
 
-  const fetchBcdStd = async () => {
+  const fetchBcdStd = useCallback(async () => {
+    
+    const instOrder = [
+      "재단본부",
+      "광화문",
+      "본원센터",
+      "강남센터",
+      "여의도",
+      "수원센터",
+      "대구센터",
+      "부산센터",
+      "광주센터",
+      "제주센터",
+    ];
+
     try {
       const response = await axios.get("/api/std/bcd");
 
@@ -120,7 +117,7 @@ const useBdcChange = () => {
           if (b.detailCd === "000") return 1;
           return a.detailNm.localeCompare(b.detailNm);
         });
-        
+
         const instMap = {};
         const deptMap = {};
         const teamMap = {};
@@ -147,7 +144,11 @@ const useBdcChange = () => {
     } catch (error) {
       alert("기준자료를 불러오는 중 오류가 발생했습니다.");
     }
-  };
+  }, []); 
+
+  useEffect(() => {
+    fetchBcdStd();
+  }, [fetchBcdStd]);
 
   const handleCenterChange = (e) => {
     if (!formData.userId) {
@@ -157,7 +158,6 @@ const useBdcChange = () => {
 
     const selectedCenter = e.target.value;
 
-    // instInfo의 각 항목과 비교
     const selectedInstInfo = bcdData.instInfo.find((inst) => {
       return inst.detailNm.trim() === selectedCenter.trim();
     });

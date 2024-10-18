@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 // import * as XLSX from 'xlsx';
 import CircleButton from '../components/CircleButton';
 import '../styles/Apply.css';
