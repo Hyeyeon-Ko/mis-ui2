@@ -2,28 +2,28 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import { addFormData, formFields } from '../../datas/rentalDatas';
 import useRentalChange from '../../hooks/useRentalChange';
-
-
+import { useDateChange } from '../../hooks/apply/useDateChange';
+import { usePriceChange } from '../../hooks/apply/usePriceChange';
 
 const RentalBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds }) => {
-  const {handleChange, formData, setFormData} = useRentalChange();
-  // const [formData, setFormData] = useState(addFormData);
-
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData({
-  //     ...formData,
-  //     [name]: value,
-  //   });
-  // };
+  const { handleChange, formData, setFormData } = useRentalChange();
+  const [formattedInstallDate, handleInstallDateChange] = useDateChange();
+  const [formattedExpiryDate, handleExpiryDateChange] = useDateChange();
+  const [formattedRentalFee, handleRentalFeeChange] = usePriceChange();
 
   const validateDateFormat = (dateStr) => {
     return /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
   };
 
+  const handleResetFormattedDates = () => {
+    handleInstallDateChange({ target: { value: '' } });
+    handleExpiryDateChange({ target: { value: '' } });
+  };
+
   const handleClose = () => {
     setFormData(addFormData);
-    onClose(); // 모달을 닫는 함수 호출
+    handleResetFormattedDates();
+    onClose();
   };
 
   const handleSaveClick = async () => {
@@ -40,20 +40,19 @@ const RentalBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds }) => 
     }
 
     const payload = {
-        detailIds: selectedDetailIds,
-        ...formData,
+      detailIds: selectedDetailIds,
+      ...formData,
     };
 
     try {
-        await axios.put(`/api/rental/bulkUpdate`, payload);
-        alert('렌탈 정보가 성공적으로 수정되었습니다.');
-
-        setFormData(addFormData);
-
-        onSave(payload);
+      await axios.put(`/api/rental/bulkUpdate`, payload);
+      alert('렌탈 정보가 성공적으로 수정되었습니다.');
+      setFormData(addFormData);
+      onSave(payload);
+      handleResetFormattedDates();
     } catch (error) {
-    console.error('렌탈 정보 수정 중 에러 발생:', error);
-    alert('렌탈 정보 수정에 실패했습니다.');
+      console.error('렌탈 정보 수정 중 에러 발생:', error);
+      alert('렌탈 정보 수정에 실패했습니다.');
     }
   };
 
@@ -72,14 +71,56 @@ const RentalBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds }) => 
             {formFields.map((field, index) => (
               <div className="rental-add-detail-row" key={index}>
                 <label>{field.label}</label>
-                <input
-                  type="text"
-                  name={field.name}
-                  value={formData[field.name]}
-                  onChange={handleChange}
-                  placeholder={field.placeholder || ''}
-                  disabled={field.disabled || false}
-                />
+                {field.name === 'category' ? (
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">선택하세요</option>
+                      <option value="정수기">정수기</option>
+                      <option value="공기청정기">공기청정기</option>
+                      <option value="비데">비데</option>
+                    </select>
+                  ) : field.name === 'location' ? (
+                    <select
+                      name="location"
+                      value={formData.location}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">선택하세요</option>
+                      <option value="사무실">사무실</option>
+                      <option value="병원">병원</option>
+                      <option value="임원실">임원실</option>
+                      <option value="휴게실">휴게실</option>
+                      <option value="화장실">화장실</option>
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      name={field.name}
+                      value={
+                        field.name === 'installDate' ? formattedInstallDate :
+                        field.name === 'expiryDate' ? formattedExpiryDate :
+                        field.name === 'rentalFee' ? formattedRentalFee:
+                        formData[field.name] || ''  
+                      }
+                      onChange={(e) => {
+                        if (field.name === 'installDate') {
+                          handleInstallDateChange(e);
+                        } else if (field.name === 'expiryDate') {
+                          handleExpiryDateChange(e);
+                        } else if (field.name === 'rentalFee') {
+                          handleRentalFeeChange(e); 
+                        }
+                        handleChange(e); 
+                      }}
+                      placeholder={field.placeholder || ''}
+                      disabled={field.disabled || false}
+                    />
+                  )}
               </div>
             ))}
           </div>

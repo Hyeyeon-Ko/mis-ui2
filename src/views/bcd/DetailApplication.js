@@ -141,6 +141,7 @@ function DetailApplication() {
           userId: data.userId,
           engAddress: data.engAddress,
         });
+
         setFloor(floor || '');
       } else {
         alert('신청 정보를 불러오는 중 오류가 발생했습니다.');
@@ -148,6 +149,7 @@ function DetailApplication() {
     } catch (error) {
       alert('신청 정보를 불러오는 중 오류가 발생했습니다.');
     }
+    
   };
 
   const fetchBcdStd = async () => {
@@ -204,7 +206,11 @@ function DetailApplication() {
   const handleConfirmRequest = async () => {
     setShowFinalConfirmationModal(false);
 
-    const fullAddress = `${formData.address}${floor ? `, ${floor}` : ''}`;
+    const baseAddress = formData.address.replace(/,\s*\d+층$/, ''); 
+    const fullAddress = `${baseAddress}${floor ? `, ${floor}층` : ''}`;
+  
+    const baseEngAddress = formData.engAddress.replace(/^\d+F,\s*/, ''); 
+    const fullEngAddress = `${floor ? `${floor}F, ` : ''}${baseEngAddress}`;
 
     const requestData = {
       drafter: auth.userNm,
@@ -225,7 +231,7 @@ function DetailApplication() {
       phoneTel: `${formData.mobile1}-${formData.mobile2}-${formData.mobile3}`,
       email: `${formData.email}@kmi.or.kr`,
       address: fullAddress,
-      engAddress: formData.engAddress,
+      engAddress: fullEngAddress,
       division: formData.cardType === 'personal' ? 'B' : 'A',
       quantity: formData.quantity,
     };
@@ -390,7 +396,7 @@ function DetailApplication() {
                   )}
                 </div>
                 <div className="form-group-horizontal quantity-group">
-                  <label className="bold-label">명함 수량 선택 :</label>
+                  <label className="bold-label">명함 수량 선택:</label>
                   {isReadOnly ? (
                     <div className="quantity-display">
                       {formData.quantity} 통
@@ -428,8 +434,8 @@ function DetailApplication() {
               <div className="form-group-horizontal">
                 <label className="form-label">영문이름</label>
                 <div className="name-inputs">
-                  <input type="text" name="firstName" placeholder="First name" value={formData.firstName} onChange={handleDetailChange} required={!isReadOnly} readOnly={isReadOnly} className="english-name" />
-                  <input type="text" name="lastName" placeholder="Last name" value={formData.lastName} onChange={handleDetailChange} required={!isReadOnly} readOnly={isReadOnly} className="english-name" />
+                  <input type="text" name="firstName" placeholder="이름" value={formData.firstName} onChange={handleDetailChange} required={!isReadOnly} readOnly={isReadOnly} className="english-name" />
+                  <input type="text" name="lastName" placeholder="성" value={formData.lastName} onChange={handleDetailChange} required={!isReadOnly} readOnly={isReadOnly} className="english-name" />
                 </div>
               </div>
               <div className="form-group-horizontal">

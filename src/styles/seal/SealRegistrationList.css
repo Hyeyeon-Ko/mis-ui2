@@ -23,6 +23,11 @@
     font-size: 13.5px;
 }
 
+.seal-registration-table tr:hover,
+.seal-registration-table tr:focus {
+  background-color: transparent;
+}
+
   .seal-registration-table th:first-child, .seal-registration-table td:first-child {
       width: 3%;  /* 체크박스 열의 너비를 줄임 */
   }
@@ -53,7 +58,7 @@
   }
 
   .selected-row {
-      background-color: #f9f9f9;
+      background-color: transparent;
   }
 
   .seal-image {

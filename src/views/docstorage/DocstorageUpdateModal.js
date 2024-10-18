@@ -28,7 +28,7 @@ const DocstorageUpdateModal = ({ show, onClose, onSave, docData, modalType }) =>
   const {handleChange, handleFileChange, setFormData, formData, file} = useDocstorageChange();
   const [formattedCreateDate, handleCreateDateChange] = useDateChange();
   const [formattedDisposalDate, handleDisposalDateChange] = useDateChange();
-
+  const [formattedTransferDate, handleTransferDateChange] = useDateChange();
 
   useEffect(() => {
     if (docData) {
@@ -47,6 +47,7 @@ const DocstorageUpdateModal = ({ show, onClose, onSave, docData, modalType }) =>
         dpdNum: docData.dpdNum || '',
       });
     }
+
   }, [docData, setFormData]);
 
   const handleSaveClick = () => {
@@ -164,6 +165,7 @@ const DocstorageUpdateModal = ({ show, onClose, onSave, docData, modalType }) =>
                       value={
                         name === 'createDate' ? formattedCreateDate  ||  formData[name]:
                         name === 'disposalDate' ? formattedDisposalDate || formData[name]:
+                        name === 'transferDate' ? formattedTransferDate || formData[name]:
                         formData[name] || ''}
                       placeholder={placeholder}
                       onChange={(e) => {
@@ -171,6 +173,8 @@ const DocstorageUpdateModal = ({ show, onClose, onSave, docData, modalType }) =>
                             handleCreateDateChange(e);
                         } else if (name === 'disposalDate') {
                             handleDisposalDateChange(e);
+                        } else if (name === 'transferDate') {
+                            handleTransferDateChange(e);
                         }
                         handleChange(e); // 일반 핸들러 호출
                       }}

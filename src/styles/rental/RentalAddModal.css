@@ -125,9 +125,23 @@ input:disabled {
     border-radius: 4px;
     font-size: 14px;
     height: 20px;
+} 
+
+.rental-add-detail-row select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    height: 40px;
 }
 
-.rental-add-detail-row input:focus {
+.rental-add-detail-row select {
+    background-color: #ffffff;
+    cursor: pointer;
+}
+
+.rental-add-detail-row input:focus,
+.rental-add-detail-row select:focus {
     border-color: #b1cef1;
     box-shadow: 0 0 2px rgba(0, 123, 255, 0.5);
     outline: none;
@@ -137,7 +151,7 @@ input:disabled {
     color: red;
 }
 
-.rental-add-detail-row span2 {
+.rental-add-detail-row span {
     font-size: 13px;
     color: blue;
     margin-top: 5px;

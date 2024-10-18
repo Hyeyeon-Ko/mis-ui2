@@ -27,6 +27,11 @@ const ReasonModal = ({ show, onClose, onConfirm, reason = '', isViewOnly = false
       alert('다운로드 타입을 선택하세요.');
       return;
     }
+
+    if ((modalType !== 'download' || selectedFileType === 'etc') && !inputReason.trim()) {
+      alert('사유를 작성해주세요.');
+      return;
+    }
   
     const downloadNotes = selectedFileType === 'etc' ? inputReason : null;
   

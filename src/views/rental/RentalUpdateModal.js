@@ -6,13 +6,16 @@ import '../../styles/rental/RentalAddModal.css';
 import { AuthContext } from '../../components/AuthContext';
 import { formFields } from '../../datas/rentalDatas';
 import useRentalChange from '../../hooks/useRentalChange';
-
+import { useDateChange } from '../../hooks/apply/useDateChange';
+import { usePriceChange } from '../../hooks/apply/usePriceChange';
 
 
 const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
   const { auth } = useContext(AuthContext);
- 
   const {handleChange, setFormData, formData, handleFileChange, file} = useRentalChange();
+  const [formattedInstallDate, handleInstallDateChange] = useDateChange();
+  const [formattedExpiryDate, handleExpiryDateChange] = useDateChange();
+  const [formattedRentalFee, handleRentalFeeChange] = usePriceChange();
 
   useEffect(() => {
     if (rentalData) {
@@ -28,21 +31,12 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         installationSite: rentalData.installationSite || '',
         specialNote: rentalData.specialNote || '',
       });
+
+      handleInstallDateChange({ target: { value: '' } });
+      handleExpiryDateChange({ target: { value: '' } });
     }
-  }, [rentalData, setFormData]);
-
-  // const handleFileChange = (e) => {
-  //   const selectedFile = e.target.files[0];
-  //   setFile(selectedFile);
-  // };
-
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData({
-  //     ...formData,
-  //     [name]: value,
-  //   });
-  // };
+  // }, [rentalData, setFormData, handleInstallDateChange, handleExpiryDateChange]);
+  }, [rentalData]); // TODO: 위처럼 하면 eslint 오류는 없어지는데 무한 루프...
 
   const validateDateFormat = (dateStr) => {
     return /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
@@ -122,7 +116,10 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         !contractNum ||
         !modelNm ||
         !installDate ||
-        !expiryDate
+        !expiryDate ||
+        !rentalFee ||
+        !location ||
+        !installationSite
       ) {
         alert('모든 필수 항목을 입력해 주세요.');
         return;
@@ -191,14 +188,55 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
             <div className="rental-add-section">
               {formFields.map((field) => (
                 <div className="rental-add-detail-row" key={field.name}>
-                  <label>{field.label}</label>
-                  <input
-                    type={field.type}
-                    name={field.name}
-                    value={formData[field.name]}
-                    onChange={handleChange}
-                    placeholder={field.placeholder || ''}
-                  />
+                  <label>{field.label} {field.isRequired && <span>*</span>}</label>
+                  {field.name === 'category' ? (
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">선택하세요</option>
+                      <option value="정수기">정수기</option>
+                      <option value="공기청정기">공기청정기</option>
+                      <option value="비데">비데</option>
+                    </select>
+                  ) : field.name === 'location' ? (
+                    <select
+                      name="location"
+                      value={formData.location}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">선택하세요</option>
+                      <option value="사무실">사무실</option>
+                      <option value="병원">병원</option>
+                      <option value="임원실">임원실</option>
+                      <option value="휴게실">휴게실</option>
+                      <option value="화장실">화장실</option>
+                    </select>
+                  ) : (
+                    <input
+                      type={field.type}
+                      name={field.name}
+                      value={
+                        field.name === 'installDate' ? formattedInstallDate || formData[field.name]:
+                        field.name === 'expiryDate' ? formattedExpiryDate || formData[field.name]:
+                        field.name === 'rentalFee' ? formattedRentalFee || formData[field.name]:
+                        formData[field.name] || ''}
+                      onChange={(e) => {
+                        if (field.name === 'installDate') {
+                            handleInstallDateChange(e);
+                        } else if (field.name === 'expiryDate') {
+                            handleExpiryDateChange(e);
+                        } else if (field.name === 'rentalFee') {
+                          handleRentalFeeChange(e); 
+                        }
+                        handleChange(e);
+                      }}
+                      placeholder={field.placeholder || ''}
+                    />
+                  )}
                 </div>
               ))}
             </div>

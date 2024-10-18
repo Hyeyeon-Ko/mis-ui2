@@ -20,6 +20,6 @@ export const formFields = [
     { label: '만료일자', name: 'expiryDate', type: 'text', placeholder: 'YYYY-MM-DD', isRequired: true },
     { label: '렌탈료', name: 'rentalFee', type: 'text', isRequired: true },
     { label: '위치분류', name: 'location', type: 'text', placeholder: '사무실 / 병원 / 임원실 / 휴게실 / 화장실', isRequired: true },
-    { label: '설치위치', name: 'installationSite', type: 'text', isRequired: true },
+    { label: '설치장소', name: 'installationSite', type: 'text', isRequired: true },
     { label: '특이사항', name: 'specialNote', type: 'text', isRequired: false }
 ];

@@ -2,11 +2,6 @@
   padding: 8px 16px;
 }
 
-.order h2 {
-  font-size: 25px;
-  margin-bottom: 16px;
-}
-
 .order-table tbody tr.selected {
   background-color: #e6f7ff;
 }

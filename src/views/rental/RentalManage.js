@@ -5,13 +5,13 @@ import Table from '../../components/common/Table';
 import RentalAddModal from './RentalAddModal'; 
 import RentalUpdateModal from './RentalUpdateModal'; 
 import RentalBulkUpdateModal from './RentalBulkUpdateModal';
+import StatusSelect from '../../components/StatusSelect';
+import ProduceSelect from '../../components/ProductSelect';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/common/Page.css';
 import '../../styles/rental/RentalManage.css';
 import useRentalChange from '../../hooks/useRentalChange';
 import Loading from '../../components/common/Loading';
-
-
 
 function RentalManage() {
   const { selectedRows, setSelectedRows, handleRowSelect } = useRentalChange();
@@ -21,8 +21,24 @@ function RentalManage() {
   const [isBulkUpdateModalVisible, setIsBulkUpdateModalVisible] = useState(false);
   const [selectedRental, setSelectedRental] = useState(null); 
   const [rentalDetails, setRentalDetails] = useState([]);  
+  const [filteredRentalDetails, setFilteredRentalDetails] = useState([]); 
+  const [selectedStatus, setSelectedStatus] = useState('전체');
+  const [selectedCategory, setSelectedCategory] = useState('전체');
   const [loading, setLoading] = useState(false);
   const [lastUpdtDate, setLastUpdtDate] = useState(null);
+  const [totalRentalFee, setTotalRentalFee] = useState(0);
+
+  const statusOptions = [
+    { label: '전체', value: '전체' },
+    { label: '완료', value: '완료' },
+  ];
+
+  const categoryOptions = [
+    { label: '전체', value: '전체' },
+    { label: '비데', value: '비데' },
+    { label: '정수기', value: '정수기' },
+    { label: '공기청정기', value: '공기청정기' },
+  ];  
 
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
@@ -39,6 +55,17 @@ function RentalManage() {
     }
   };
 
+  const calculateTotalRentalFee = (filteredDetails) => {
+    const completedItems = filteredDetails.filter(item => item.status === '완료');
+    
+    const total = completedItems.reduce((sum, item) => {
+        const fee = parseFloat(item.rentalFee.replace(/,/g, '')); 
+        return sum + (isNaN(fee) ? 0 : fee); 
+    }, 0);
+    
+    setTotalRentalFee(total);  
+  };
+  
   const fetchRentalData = useCallback(async () => {
     setLoading(true);
     try {
@@ -61,9 +88,11 @@ function RentalManage() {
             } else {
                 setLastUpdtDate(null); 
             }
+            calculateTotalRentalFee(transformedData);
         } else {
             setRentalDetails([]); 
             setLastUpdtDate(null);
+            setTotalRentalFee(0);
         }
     } catch (error) {
         console.error('센터 렌탈현황을 불러오는데 실패했습니다.', error);
@@ -76,6 +105,23 @@ function RentalManage() {
     fetchRentalData();
   }, [fetchRentalData]);
 
+  useEffect(() => {
+    let filteredData = rentalDetails;
+  
+    if (selectedStatus !== '전체') {
+      filteredData = filteredData.filter(item => item.status === selectedStatus);
+    }
+  
+    if (selectedCategory !== '전체') {
+      filteredData = filteredData.filter(item => item.category === selectedCategory);
+    }
+  
+    setFilteredRentalDetails(filteredData);
+  
+    calculateTotalRentalFee(filteredData);
+  
+  }, [selectedStatus, selectedCategory, rentalDetails]);
+    
   const handleRowClick = (row, index) => {
     const isChecked = !selectedRows.includes(row.detailId);
     if (isChecked) {
@@ -295,16 +341,28 @@ function RentalManage() {
         },
     },
     { header: 'NO', accessor: 'no' },
-    { header: '상태', accessor: 'status' },
+    { header: (
+      <StatusSelect
+        statusOptions={statusOptions}  
+        selectedStatus={selectedStatus}  
+        onStatusChange={(e) => setSelectedStatus(e.target.value)} 
+      />
+     ), accessor: 'status' },
     { header: '업체명', accessor: 'companyNm' },
-    { header: '제품군', accessor: 'category' },
+    { header: (
+      <ProduceSelect
+        categoryOptions={categoryOptions}  
+        selectedCategory={selectedCategory}  
+        onCategoryChange={(e) => setSelectedCategory(e.target.value)} 
+      />
+    ), accessor: 'category' },    
     { header: '계약번호', accessor: 'contractNum' },
     { header: '모델명', accessor: 'modelNm' },
     { header: '설치일자', accessor: 'installDate' },
     { header: '만료일자', accessor: 'expiryDate' },
     { header: '렌탈료', accessor: 'rentalFee' },
     { header: '위치분류', accessor: 'location' },
-    { header: '설치위치', accessor: 'installationSite' },
+    { header: '설치장소', accessor: 'installationSite' },
     { header: '특이사항', accessor: 'specialNote' },
 ];
   
@@ -325,9 +383,12 @@ function RentalManage() {
                     <div className="rental-detail-buttons">
                       {lastUpdtDate && (
                         <div className="last-updt-date">
-                          최종 수정일자: {lastUpdtDate}
-                        </div>
-                      )}
+                        최종 수정일자: {lastUpdtDate} &nbsp; 
+                        <span className="total-rental-fee">
+                          총 렌탈료(완료 항목): {totalRentalFee.toLocaleString()} 원
+                        </span>
+                      </div>
+                    )}
                       <button className="rental-add-button" onClick={handleAddButtonClick}>추 가</button>
                       <button className="rental-modify-button" onClick={handleModifyButtonClick}>수 정</button>
                       <button className="rental-delete-button" onClick={handleDeleteButtonClick}>삭 제</button>
@@ -338,7 +399,7 @@ function RentalManage() {
                   <div className="rental-details-table">
                     <Table
                       columns={detailColumns}
-                      data={rentalDetails}
+                      data={filteredRentalDetails}
                       onRowClick={handleRowClick}  
                       onRowMouseDown={handleMouseDown}  
                       onRowMouseOver={handleMouseOver}  

@@ -64,15 +64,15 @@ function Sidebar() {
 
   const applyItems = [
     { label: '명함신청', url: '/bcd' },
-    { label: '인장신청', url: '/seal' },
-    { label: '법인서류', url: '/corpDoc' },
+    // { label: '인장신청', url: '/seal' },
+    // { label: '법인서류', url: '/corpDoc' },
     { label: '문서수발신', url: '/doc' },
     { label: '', url: '/' },
     { label: '', url: '/' },
-    { label: '토너신청', url: '/toner' },
-    { label: '문서이관/파쇄', url: '/docstorage' },
-    { label: '', url: '/' },
-    { label: '', url: '/' },
+    // { label: '토너신청', url: '/toner' },
+    // { label: '문서이관/파쇄', url: '/docstorage' },
+    // { label: '', url: '/' },
+    // { label: '', url: '/' },
   ];
 
   const myApplyItems = [
@@ -97,8 +97,6 @@ function Sidebar() {
       { title: '인장 관리', items: [
         { label: '전체 신청내역', url: '/applyList?documentType=인장신청', subIndex: 'B-1' },
         { label: '승인대기 내역', url: '/pendingList?documentType=인장신청', count: pendingCounts.sealPendingCount , subIndex: 'B-1' },
-      ]},
-      { title: '인장 대장', items: [
         { label: '인장 관리대장', url: '/seal/managementList', subIndex: 'B-1'  },
         { label: '인장 반출대장', url: '/seal/exportList', subIndex: 'B-1'  },
         { label: '인장 등록대장', url: '/seal/registrationList', subIndex: 'B-1'  },
@@ -109,18 +107,17 @@ function Sidebar() {
       { title: '법인서류 관리', items: [
         { label: '전체 신청내역', url: '/applyList?documentType=법인서류', subIndex: 'C-1' },
         { label: '승인대기 내역', url: '/pendingList?documentType=법인서류', count: pendingCounts.corpDocPendingCount, subIndex: 'C-1' },
-      ]},
-      { title: '법인서류 대장', items: [
         { label: '서류 발급 대장', url: '/corpDoc/issueList', count: pendingCounts.corpDocIssuePendingCount, subIndex: 'C-2' },
         { label: '서류 수불 대장', url: '/corpDoc/rnpList', subIndex: 'C-1' },
       ]}
     ],
     'D': [
-      { title: '문서수발신 관리', items: [
+      { title: '문서 관리', items: [
+        { label: '문서 수신 대장', url: '/doc/receiveList', subIndex: 'D-2' },
+        { label: '문서 발신 대장', url: '/doc/sendList', subIndex: 'D-2' },
         { label: '전체 신청내역', url: '/applyList?documentType=문서수발신', subIndex: 'D-1' },
         { label: '승인대기 내역', url: '/pendingList?documentType=문서수발신', count: pendingCounts.docPendingCount, subIndex: 'D-2' },
-      ] },
-      { title: '문서수발신 대장', items: docManageItems },
+      ]}
     ],
     'E': [
       { title: '문서 관리', items: [
@@ -132,6 +129,16 @@ function Sidebar() {
       { title: '자산 관리', items: [
         { label: '렌탈현황 관리표', url: '/rentalList', subIndex: 'F-1' },
         { label: '전국 렌탈현황 관리표', url: '/totalRentalList', subIndex: 'F-2' },
+      ]}
+    ],
+    'G': [
+      { title: '토너 관리', items: [
+        { label: '토너 단가표', url: '/toner/priceList', subIndex: 'G-2' },
+        { label: '프린터/토너 관리표', url: '/tonerList', subIndex: 'G-1' },
+        { label: '전국 프린터/토너 관리표', url: '/totalTonerList', subIndex: 'G-2' },
+        { label: '전체 신청내역', url: '/applyList?documentType=토너신청', subIndex: 'G-1' },
+        { label: '승인대기 내역', url: '/pendingList?documentType=토너신청', subIndex: 'G-1' },
+        { label: '토너 발주', url: '/toner/orderList', subIndex: 'G-1' },
       ]}
     ]
   };
@@ -170,14 +177,14 @@ function Sidebar() {
             items={applyItems}
             isActive={isActive}
             location={location}
-            defaultOpen={false}
+            defaultOpen={true}
           />
           <SidebarSection
             title="나의 신청내역"
             items={myApplyItems}
             isActive={isActive}
             location={location}
-            defaultOpen={false}
+            defaultOpen={true}
           />
         </>
       ) : (
@@ -209,6 +216,11 @@ function Sidebar() {
               </h2>
             </div>
           )}
+          <div className="sidebar-section">
+             <h2>
+              <Link style={{ color: '#EDF1F5' }}>페이크</Link>
+             </h2>
+          </div>
         </>
       )}
     </div>

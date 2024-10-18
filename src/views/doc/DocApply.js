@@ -83,7 +83,7 @@ function DocApply() {
         handleReceiveRequest();
       }
     } else {
-      if (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2') {
+      if ((auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2') && auth.roleNm !== '팀원') {
         handleSendLeaderRequest();
       } else {
         if (auth.roleNm !== '팀원') {

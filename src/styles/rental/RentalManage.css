@@ -93,4 +93,13 @@
   margin-right: 14px; 
   font-size: 14px;
   display: inline-block; 
+  letter-spacing: 0.5px;
+}
+
+.total-rental-fee {
+    margin-left: 14px;
+    margin-right: 10px; 
+    font-size: 14px;
+    display: inline-block;  
+    letter-spacing: 0.5px; 
 }

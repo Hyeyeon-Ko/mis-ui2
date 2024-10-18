@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   bcdInfoData,
   bcdMapData,
@@ -18,6 +18,23 @@ const useBdcChange = () => {
   const [floor, setFloor] = useState("");
   const [mappings, setMappings] = useState(bcdMapData);
 
+  const instOrder = [
+    "재단본부",
+    "광화문",
+    "본원센터",
+    "강남센터",
+    "여의도",
+    "수원센터",
+    "대구센터",
+    "부산센터",
+    "광주센터",
+    "제주센터",
+  ];
+  
+  useEffect(() => {
+    fetchBcdStd();
+  }, []); 
+
   const handleEmailChange = (e) => {
     const { id, value } = e.target;
     setEmailData((prevData) => ({
@@ -28,37 +45,48 @@ const useBdcChange = () => {
 
   const handleDetailChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  
+    let formattedValue = value;
+  
+    if (name === "firstName" || name === "lastName") {
+      const regex = /^[A-Za-z]*$/;
+      if (!regex.test(value)) return; 
+      formattedValue = value.toUpperCase();
+    }
+  
+    setFormData({ ...formData, [name]: formattedValue });
   };
-
+    
   const handleDetailCardTypeChange = (e) => {
     setFormData({ ...formData, cardType: e.target.value });
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (
-      [
-        "phone1",
-        "phone2",
-        "phone3",
-        "fax1",
-        "fax2",
-        "fax3",
-        "mobile1",
-        "mobile2",
-        "mobile3",
-      ].includes(name)
-    ) {
+  
+    if (["phone1", "phone2", "phone3", "fax1", "fax2", "fax3", "mobile1", "mobile2", "mobile3"].includes(name)) {
       if (isNaN(value) || value.length > 4) return;
     }
+  
+    let formattedValue = value;
+  
+    if (name === "firstName" || name === "lastName") {
+      const regex = /^[A-Za-z]*$/; 
+      if (!regex.test(value)) return; 
+      formattedValue = value.toUpperCase();
+    }
+  
     if (!formData.userId) {
       alert("사번 조회를 통해 명함 대상자를 선택하세요.");
       return;
     }
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+  
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: formattedValue,
+    }));
   };
-
+    
   const handleCardTypeChange = (e) => {
     if (!formData.userId) {
       alert("사번 조회를 통해 명함 대상자를 선택하세요.");
@@ -77,22 +105,26 @@ const useBdcChange = () => {
   const fetchBcdStd = async () => {
     try {
       const response = await axios.get("/api/std/bcd");
+
       if (response.data && response.data.data) {
         const data = response.data.data;
 
-        data.instInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
+        data.instInfo.sort((a, b) => {
+          const aIndex = instOrder.indexOf(a.detailNm);
+          const bIndex = instOrder.indexOf(b.detailNm);
+          return aIndex - bIndex;
+        });
         data.deptInfo.sort((a, b) => a.detailNm.localeCompare(b.detailNm));
         data.teamInfo.sort((a, b) => {
           if (a.detailCd === "000") return -1;
           if (b.detailCd === "000") return 1;
           return a.detailNm.localeCompare(b.detailNm);
         });
-
+        
         const instMap = {};
         const deptMap = {};
         const teamMap = {};
         const gradeMap = {};
-
         data.instInfo.forEach((inst) => {
           instMap[inst.detailNm] = inst.detailCd;
         });
@@ -233,13 +265,14 @@ const useBdcChange = () => {
 
     const baseAddress = formData.address.split(",")[0];
     const updatedAddress = `${baseAddress}${
-      updatedFloor ? `, ${updatedFloor}` : ""
+      updatedFloor ? `, ${updatedFloor}층` : ""
     }`;
 
     const originalEngAddress =
-      bcdData.instInfo.find((inst) => inst.detailNm === formData.center)
-        ?.etcItem2 || "";
-    const updatedEngAddress = updatedFloor
+      bcdData.instInfo.find((inst) => inst.detailNm === formData.center) 
+      || bcdData.instInfo.find((inst) => inst.detailCd === formData.center)
+      ?.etcItem2 || "";
+      const updatedEngAddress = updatedFloor
       ? `${updatedFloor}F, ${originalEngAddress}`
       : originalEngAddress;
 
@@ -248,6 +281,7 @@ const useBdcChange = () => {
       address: updatedAddress,
       engAddress: updatedEngAddress,
     });
+
   };
 
   return {

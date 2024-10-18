@@ -13,6 +13,7 @@ const DocstorageBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds, m
 
   const [formattedCreateDate, handleCreateDateChange] = useDateChange();
   const [formattedDisposalDate, handleDisposalDateChange] = useDateChange();
+  const [formattedTransferDate, handleTransferDateChange] = useDateChange();
 
   const handleSaveClick = () => {
 
@@ -40,6 +41,7 @@ const DocstorageBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds, m
   const handleResetFormattedDates = () => {
     handleCreateDateChange({ target: { value: '' } });
     handleDisposalDateChange({ target: { value: '' } });
+    handleTransferDateChange({ target: { value: '' } });
   };
 
   const handleClose = () => {
@@ -91,6 +93,7 @@ const DocstorageBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds, m
                     value={
                       name === 'createDate' ? formattedCreateDate:
                       name === 'disposalDate' ? formattedDisposalDate:
+                      name === 'transferDate' ? formattedTransferDate:
                       ''}
                     placeholder={placeholder}
                     onChange={(e) => {
@@ -98,6 +101,8 @@ const DocstorageBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds, m
                           handleCreateDateChange(e);
                       } else if (name === 'disposalDate') {
                           handleDisposalDateChange(e);
+                      } else if (name === 'transferDate') {
+                        handleTransferDateChange(e);
                       }
                       handleChange(e); // 일반 핸들러 호출
                     }}
