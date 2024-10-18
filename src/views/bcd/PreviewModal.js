@@ -79,8 +79,6 @@ const PreviewModal = ({ show, onClose, formData }) => {
     const engPositionName = formData.position === '000' ? formData.enGradeNm : findEngName(bcdData.gradeInfo, formData.position);
     const engTeamName = formData.team === '000' ? formData.engTeam: findEngName(bcdData.teamInfo, formData.team);
 
-    console.log(formData.engAddress)
-
     imageKorean.onload = () => {
       ctx.drawImage(imageKorean, 0, 0, canvas.width / 2, canvas.height);
 

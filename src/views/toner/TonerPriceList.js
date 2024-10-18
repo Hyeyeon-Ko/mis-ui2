@@ -24,8 +24,6 @@ function TonerPriceList() {
         params: { instCd: auth.instCd },
       });
 
-      console.log(response);
-
       if (response.data.data && response.data.data.length > 0) {
         const transformedData = response.data.data.map((item) => ({
           ...item,

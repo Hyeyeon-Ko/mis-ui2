@@ -101,7 +101,6 @@ function DetailApplication() {
   const fetchApplicationDetail = async (draftId) => {
     try {
       const response = await axios.get(`/api/bcd/applyList/${draftId}`);
-      console.log(response);
       if (response.data && response.data.data) {
         const data = response.data.data;
         const [phone1, phone2, phone3] = data.extTel.split('-');

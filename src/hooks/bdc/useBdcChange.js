@@ -106,8 +106,6 @@ const useBdcChange = () => {
     try {
       const response = await axios.get("/api/std/bcd");
 
-      console.log(response);
-    
       if (response.data && response.data.data) {
         const data = response.data.data;
 
@@ -284,7 +282,6 @@ const useBdcChange = () => {
       engAddress: updatedEngAddress,
     });
 
-    console.log(updatedEngAddress);
   };
 
   return {

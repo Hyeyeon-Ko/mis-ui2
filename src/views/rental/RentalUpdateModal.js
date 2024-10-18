@@ -32,8 +32,6 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         specialNote: rentalData.specialNote || '',
       });
 
-      console.log(rentalData);
-
       handleInstallDateChange({ target: { value: '' } });
       handleExpiryDateChange({ target: { value: '' } });
     }
