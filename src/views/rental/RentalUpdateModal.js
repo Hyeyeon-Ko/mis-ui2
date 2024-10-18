@@ -31,13 +31,12 @@ const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {
         installationSite: rentalData.installationSite || '',
         specialNote: rentalData.specialNote || '',
       });
-
-      handleInstallDateChange({ target: { value: '' } });
-      handleExpiryDateChange({ target: { value: '' } });
+  
+      handleInstallDateChange({ target: { value: rentalData.installDate || '' } });
+      handleExpiryDateChange({ target: { value: rentalData.expiryDate || '' } });
     }
-  // }, [rentalData, setFormData, handleInstallDateChange, handleExpiryDateChange]);
-  }, [rentalData]); // TODO: 위처럼 하면 eslint 오류는 없어지는데 무한 루프...
-
+  }, [rentalData, setFormData, handleInstallDateChange, handleExpiryDateChange]);
+  
   const validateDateFormat = (dateStr) => {
     return /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
   };
