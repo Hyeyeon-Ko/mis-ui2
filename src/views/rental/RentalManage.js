@@ -31,6 +31,7 @@ function RentalManage() {
   const statusOptions = [
     { label: '전체', value: '전체' },
     { label: '완료', value: '완료' },
+    { label: '대기', value: '' },
   ];
 
   const categoryOptions = [
@@ -115,6 +116,11 @@ function RentalManage() {
     if (selectedCategory !== '전체') {
       filteredData = filteredData.filter(item => item.category === selectedCategory);
     }
+  
+    filteredData = filteredData.map((item, index) => ({
+      ...item,
+      no: index + 1,  
+    }));
   
     setFilteredRentalDetails(filteredData);
   
