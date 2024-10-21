@@ -3,6 +3,7 @@ import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import Loading from '../../components/common/Loading';
+import TonerPriceModal from './TonerPriceModal';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/common/Page.css';
 import '../../styles/rental/RentalManage.css';
@@ -13,14 +14,18 @@ function TonerPriceList() {
   const { auth } = useContext(AuthContext);
   const [tonerDetails, setTonerDetails] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [selectedToner, setSelectedToner] = useState(null);
+
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
-  const dragMode = useRef('select');
+  const dragMode = useRef('select'); 
 
   const fetchTonerData = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/toner/price`, {
+      const response = await axios.get(`/api/toner/price/list`, {
         params: { instCd: auth.instCd },
       });
 
@@ -45,19 +50,48 @@ function TonerPriceList() {
     fetchTonerData();
   }, [fetchTonerData]);
 
-  const handleRowClick = (row) => {
-    const isChecked = !selectedRows.includes(row.mngNum);
+  const handleAddButtonClick = () => {
+    setIsAddModalVisible(true);
+  };
+
+  const handleEditButtonClick = () => {
+    if (selectedRows.length === 0) {
+      alert('수정할 항목을 선택하세요.');
+      return;
+    }
+    else if (selectedRows.length > 1) {
+      alert('수정할 항목을 하나만 선택하세요.');
+      return;
+    }
+    const selected = tonerDetails.find(item => item.tonerNm === selectedRows[0]);
+    setSelectedToner(selected);
+    setIsEditModalVisible(true);
+  };
+
+  const handleModalClose = () => {
+    setIsAddModalVisible(false);
+    setIsEditModalVisible(false);
+  };
+
+  const handleSave = (newTonerData) => {
+    setTonerDetails((prevDetails) => [...prevDetails, ...newTonerData]);  
+    handleModalClose();
+    fetchTonerData();
+  };
+
+  const handleRowClick = (row, index) => {
+    const isChecked = !selectedRows.includes(row.tonerNm);
     if (isChecked) {
-      setSelectedRows(prevSelectedRows => [...prevSelectedRows, row.mngNum]);
+      setSelectedRows(prevSelectedRows => [...prevSelectedRows, row.tonerNm]);
     } else {
-      setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== row.mngNum));
+      setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== row.tonerNm));
     }
   };
 
   const handleMouseDown = (index) => {
     dragStartIndex.current = index;
-    const mngNum = tonerDetails[index].mngNum;
-    if (selectedRows.includes(mngNum)) {
+    const tonerNm = tonerDetails[index].tonerNm;
+    if (selectedRows.includes(tonerNm)) {
       dragMode.current = 'deselect';
     } else {
       dragMode.current = 'select';
@@ -73,11 +107,11 @@ function TonerPriceList() {
       let newSelectedRows = [...selectedRows];
 
       for (let i = start; i <= end; i++) {
-        const mngNum = tonerDetails[i].mngNum;
-        if (dragMode.current === 'select' && !newSelectedRows.includes(mngNum)) {
-          newSelectedRows.push(mngNum);
-        } else if (dragMode.current === 'deselect' && newSelectedRows.includes(mngNum)) {
-          newSelectedRows = newSelectedRows.filter(id => id !== mngNum);
+        const tonerNm = tonerDetails[i].tonerNm;
+        if (dragMode.current === 'select' && !newSelectedRows.includes(tonerNm)) {
+          newSelectedRows.push(tonerNm);
+        } else if (dragMode.current === 'deselect' && newSelectedRows.includes(tonerNm)) {
+          newSelectedRows = newSelectedRows.filter(id => id !== tonerNm);
         }
       }
 
@@ -120,21 +154,21 @@ function TonerPriceList() {
           type="checkbox"
           onChange={(e) => {
             const isChecked = e.target.checked;
-            setSelectedRows(isChecked ? tonerDetails.map(d => d.mngNum) : []);
+            setSelectedRows(isChecked ? tonerDetails.map(d => d.tonerNm) : []);
           }}
         />
       ),
       accessor: 'select',
       width: '5%',
       Cell: ({ row }) => {
-        const mngNum = row?.mngNum || row?.original?.mngNum;
+        const tonerNm = row?.tonerNm || row?.original?.tonerNm;
         return (
           <input
             type="checkbox"
             name="detailSelect"
             onClick={(e) => e.stopPropagation()}
             onChange={(e) => handleRowSelect(e, row)}
-            checked={mngNum && selectedRows.includes(mngNum)}
+            checked={tonerNm && selectedRows.includes(tonerNm)}
           />
         );
       },
@@ -142,9 +176,9 @@ function TonerPriceList() {
     { header: '모델명', accessor: 'modelNm' },
     { header: '제조사', accessor: 'company' },
     { header: '토너명', accessor: 'tonerNm' },
-    { header: '구분', accessor: '' },
+    { header: '구분', accessor: 'division' },
     { header: '가격', accessor: 'price' },
-    { header: '비고', accessor: '' },
+    { header: '비고', accessor: 'specialNote' },
   ];
 
   return (
@@ -162,8 +196,8 @@ function TonerPriceList() {
                   <div className="rental-header-buttons">
                     <label className='rental-detail-content-label'>토너 단가 정보&gt;&gt;</label>
                     <div className="rental-detail-buttons">
-                      <button className="rental-add-button" onClick={() => { /* 추가 모달 열기 */ }}>추 가</button>
-                      <button className="rental-modify-button" onClick={() => { /* 수정 모달 열기 */ }}>수 정</button>
+                      <button className="rental-add-button" onClick={handleAddButtonClick}>추 가</button>
+                      <button className="rental-modify-button" onClick={handleEditButtonClick}>수 정</button>
                       <button className="rental-delete-button" onClick={() => { /* 삭제 처리 */ }}>삭 제</button>
                       <button className="rental-excel-button" onClick={handleExcelDownload}>엑 셀</button>
                     </div>
@@ -184,6 +218,19 @@ function TonerPriceList() {
           )}
         </div>
       </div>
+      <TonerPriceModal
+        show={isAddModalVisible}
+        onClose={handleModalClose}
+        onSave={handleSave}
+        editMode={false}
+      />
+      <TonerPriceModal
+        show={isEditModalVisible}
+        onClose={handleModalClose}
+        onSave={handleSave}
+        editMode={true}
+        selectedData={selectedToner}
+      />
     </div>
   );
 }

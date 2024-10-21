@@ -42,6 +42,8 @@ import TotalRentalManage from './views/rental/TotalRentalManage';
 import TonerList from './views/toner/TonerList';
 import TonerPriceList from './views/toner/TonerPriceList';
 import TotalTonerList from './views/toner/TotalTonerList';
+import TonerPendingList from './views/toner/TonerPendingList';
+import TonerOrderList from './views/toner/TonerOrderList';
 import { AuthProvider, AuthContext } from './components/AuthContext';
 
 function MainLayout({ children }) {
@@ -141,6 +143,8 @@ function App() {
                 <Route path="/tonerList" element={<RequireAuth><TonerList /></RequireAuth>} />
                 <Route path="/totalTonerList" element={<RequireAuth><TotalTonerList /></RequireAuth>} />
                 <Route path="/toner/priceList" element={<RequireAuth><TonerPriceList /></RequireAuth>} />
+                <Route path="/toner/pendingList" element={<RequireAuth><TonerPendingList /></RequireAuth>} />
+                <Route path="/toner/orderList" element={<RequireAuth><TonerOrderList /></RequireAuth>} />
                 <Route path="/std" element={<RequireAuth><StandardData /></RequireAuth>} />
                 <Route path="/bcd/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
                 <Route path="/doc/:draftId" element={<RequireAuth><DetailDocApplication /></RequireAuth>} />

@@ -20,7 +20,7 @@ function TonerList() {
   const fetchTonerData = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/toner`, {
+      const response = await axios.get(`/api/toner/list`, {
         params: { instCd: auth.instCd },
       });
 
@@ -159,8 +159,8 @@ function TonerList() {
     <div className='content'>
       <div className='rental-content'>
         <div className="rental-content-inner">
-          <h2>프린트/토너 관리표</h2>
-          <Breadcrumb items={['토너 관리', '프린트/토너 관리표']} />
+          <h2>토너 관리표</h2>
+          <Breadcrumb items={['토너 관리', '토너 관리표']} />
           {loading ? (
             <Loading />
           ) : (

@@ -21,7 +21,7 @@ function TotalTonerList() {
   const fetchTonerData = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/toner/total`, {
+      const response = await axios.get(`/api/toner/totalList`, {
         params: { instCd: auth.instCd },
       });
 
@@ -144,8 +144,8 @@ function TotalTonerList() {
     <div className='content'>
       <div className='totalRentalManage-content'>
         <div className="totalRentalManage-content-inner">
-          <h2>전국 프린트/토너 관리표</h2>
-          <Breadcrumb items={['토너 관리', '전국 프린트/토너 관리표']} />
+          <h2>전국 토너 관리표</h2>
+          <Breadcrumb items={['토너 관리', '전국 토너 관리표']} />
           <div className="totalRentalManage-category-section">
             <div className="totalRentalManage-category">
               <label htmlFor="center" className="totalRentalManage-category-label">센 터&gt;&gt;</label>

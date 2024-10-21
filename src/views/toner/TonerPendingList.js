@@ -15,7 +15,7 @@ import Pagination from '../../components/common/Pagination';
 import Loading from '../../components/common/Loading';
 
 
-function TonerOrderList() {
+function TonerPendingList() {
   const { handleSelectAll, handleSelect, applications, selectedApplications, setApplications, setSelectedApplications} = useBdcChange();
   const { auth, refreshSidebar } = useContext(AuthContext);
   const [showEmailModal, setShowEmailModal] = useState(false);
@@ -119,6 +119,45 @@ function TonerOrderList() {
       console.error('Error downloading excel: ', error);
     }
   };
+
+  // 발주 요청 버튼 클릭 핸들러
+  const handleOrderRequest = () => {
+    if (selectedApplications.length === 0) {
+      alert('발주요청 할 명함 신청 목록을 선택하세요.');
+      return;
+    }
+    setShowEmailModal(true);
+  };
+
+  const handleSendEmail = async (emailData) => {
+    setIsLoading(true);
+    try {
+      await axios.post(`/api/toner/order`, {
+        draftIds: selectedApplications,
+        emailSubject: emailData.subject,
+        emailBody: emailData.body,
+        fileName: emailData.fileName,
+        fromEmail: emailData.fromEmail,
+        toEmail: emailData.toEmail,
+        password: emailData.password,
+      });
+  
+      const updatedApplications = applications.filter(app => !selectedApplications.includes(app.id));
+      setApplications(updatedApplications);
+      setSelectedApplications([]); 
+  
+      setShowEmailModal(false);
+      alert('발주 요청이 성공적으로 완료되었습니다.');
+      refreshSidebar();
+      navigate('/std', { replace: true });
+      
+    } catch (error) {
+      console.error('Error sending order request: ', error);
+      alert('발주 요청 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   // 테이블 컬럼 정의
   const columns = [
@@ -171,14 +210,14 @@ function TonerOrderList() {
   return (
     <div className="content">
       <div className="order">
-        <h2>명함 발주</h2>
+        <h2>토너 대기</h2>
         <div className="bcdorder-header-row">
-          <Breadcrumb items={['발주 관리', '명함 발주']} />
+          <Breadcrumb items={['토너 관리', '토너 대기']} />
           <div className="buttons-container">
             <CustomButton className="excel-button" onClick={handleExcelDownload}>
               엑셀변환
             </CustomButton>
-            <CustomButton className="order-request-button">
+            <CustomButton className="order-request-button" onClick={handleOrderRequest}>
               발주요청
             </CustomButton>
           </div>
@@ -214,8 +253,9 @@ function TonerOrderList() {
           />
         </div>
       )}
+      <EmailModal show={showEmailModal} onClose={() => setShowEmailModal(false)} onSend={handleSendEmail} />
     </div>
   );
 }
 
-export default TonerOrderList;
+export default TonerPendingList;
