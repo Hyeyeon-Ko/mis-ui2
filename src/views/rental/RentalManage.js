@@ -198,16 +198,6 @@ function RentalManage() {
         return;
     }
 
-    const completedItems = selectedRows.filter(rowId => {
-        const selectedItem = rentalDetails.find(item => item.detailId === rowId);
-        return selectedItem && selectedItem.status === '완료';
-    });
-
-    if (completedItems.length > 0) {
-        alert("완료된 내역은 삭제할 수 없습니다.");
-        return;
-    }
-
     try {
         for (const detailId of selectedRows) {
             await axios.delete(`/api/rental/`, { params: { detailId } });
@@ -230,7 +220,7 @@ function RentalManage() {
         console.error('렌탈현황 정보를 삭제하는 중 에러 발생:', error);
         alert('삭제에 실패했습니다.');
     }
-};
+  };
 
   const handleFinishButtonClick = async () => {
     if (selectedRows.length === 0) {

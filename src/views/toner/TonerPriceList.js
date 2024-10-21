@@ -8,6 +8,7 @@ import { AuthContext } from '../../components/AuthContext';
 import '../../styles/common/Page.css';
 import '../../styles/rental/RentalManage.css';
 import useTonerChange from '../../hooks/useTonerChange';
+import { reverseDivisionMap } from '../../datas/tonerData';
 
 function TonerPriceList() {
   const { selectedRows, setSelectedRows, handleRowSelect } = useTonerChange();
@@ -54,7 +55,7 @@ function TonerPriceList() {
     setIsAddModalVisible(true);
   };
 
-  const handleEditButtonClick = () => {
+  const handleEditButtonClick = async () => {
     if (selectedRows.length === 0) {
       alert('수정할 항목을 선택하세요.');
       return;
@@ -68,6 +69,33 @@ function TonerPriceList() {
     setIsEditModalVisible(true);
   };
 
+  const handleDeleteButtonClick = async () => { 
+    if (selectedRows.length === 0) {
+      alert("삭제할 항목을 선택하세요.");
+      return;
+    }
+
+    try {
+      for (const tonerNm of selectedRows) {
+        await axios.delete(`/api/toner/price/${tonerNm}`);  
+      }
+      alert('선택된 항목이 삭제되었습니다.');
+
+      setTonerDetails(prevDetails => {
+        const updatedDetails = prevDetails
+          .filter(item => !selectedRows.includes(item.tonerNm))
+          .map((item, index) => ({
+            ...item
+          }));
+        return updatedDetails;
+      });
+      setSelectedRows([]);
+    } catch (error) {
+      console.error('토너 정보를 삭제하는 중 에러 발생: ', error);
+      alert('삭제에 실패했습니다');
+    }
+  };
+  
   const handleModalClose = () => {
     setIsAddModalVisible(false);
     setIsEditModalVisible(false);
@@ -176,7 +204,14 @@ function TonerPriceList() {
     { header: '모델명', accessor: 'modelNm' },
     { header: '제조사', accessor: 'company' },
     { header: '토너명', accessor: 'tonerNm' },
-    { header: '구분', accessor: 'division' },
+    { 
+      header: '구분', 
+      accessor: 'division',
+      Cell: ({ row }) => {
+        const divisionValue = row?.division; 
+        return divisionValue ? (reverseDivisionMap[divisionValue] || divisionValue) : 'N/A';
+      }
+    },
     { header: '가격', accessor: 'price' },
     { header: '비고', accessor: 'specialNote' },
   ];
@@ -198,7 +233,7 @@ function TonerPriceList() {
                     <div className="rental-detail-buttons">
                       <button className="rental-add-button" onClick={handleAddButtonClick}>추 가</button>
                       <button className="rental-modify-button" onClick={handleEditButtonClick}>수 정</button>
-                      <button className="rental-delete-button" onClick={() => { /* 삭제 처리 */ }}>삭 제</button>
+                      <button className="rental-delete-button" onClick={handleDeleteButtonClick}>삭 제</button>
                       <button className="rental-excel-button" onClick={handleExcelDownload}>엑 셀</button>
                     </div>
                   </div>

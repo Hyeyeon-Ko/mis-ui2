@@ -1,3 +1,15 @@
+export const divisionMap = {
+    드럼: 'A',
+    번들: 'B',
+    유지보수키트: 'C',
+    잉크: 'D',
+    토너: 'E',
+};
+
+export const reverseDivisionMap = Object.fromEntries(
+    Object.entries(divisionMap).map(([key, value]) => [value, key])
+);
+
 export const addFormData = {
     modelNm: '',
     company: '',
