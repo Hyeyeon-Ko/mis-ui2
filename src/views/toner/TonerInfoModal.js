@@ -138,20 +138,16 @@ const TonerInfoModal = ({ show, onClose, onSave, editMode, selectedData }) => {
         price,
       };
 
-      if (editMode) {
-        axios.put(`/api/toner/manage/${selectedData.mngNum}`, requestData)
-          .then(response => {
-            onSave([response.data]);
-            alert('항목이 성공적으로 수정되었습니다.');
-            resetFormData();
-            onClose();
-          })
-          .catch(error => {
-            console.error('Error updating data:', error);
-            alert('데이터 수정 중 오류가 발생했습니다.');
-          });
-      } else {
-        axios.post(`/api/toner/manage`, requestData)
+      if (!editMode) {
+        axios.post(`/api/toner/manage`, requestData, {
+          params: {
+            userId: auth.userId,  
+            instCd: auth.instCd   
+          },
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
           .then(response => {
             onSave([response.data]);
             alert('항목이 성공적으로 추가되었습니다.');
@@ -161,7 +157,26 @@ const TonerInfoModal = ({ show, onClose, onSave, editMode, selectedData }) => {
           .catch(error => {
             console.error('Error adding data:', error);
             alert('데이터 저장 중 오류가 발생했습니다.');
-          });
+          });        
+      } else {
+        axios.put(`/api/toner/manage/${selectedData.mngNum}`, requestData, {
+          params: {
+            userId: auth.userId  
+          },
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(response => {
+            onSave([response.data]);
+            alert('항목이 성공적으로 수정되었습니다.');
+            resetFormData();
+            onClose();
+          })
+          .catch(error => {
+            console.error('Error updating data:', error);
+            alert('데이터 수정 중 오류가 발생했습니다.');
+          });        
       }
     }
   };

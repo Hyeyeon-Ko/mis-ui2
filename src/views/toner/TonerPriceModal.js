@@ -112,7 +112,14 @@ const TonerPriceModal = ({ show, onClose, onSave, editMode, selectedData }) => {
       };
 
       if (editMode) {
-        axios.put(`/api/toner/price/${selectedData.tonerNm}`, requestData)
+        axios.put(`/api/toner/price/${selectedData.tonerNm}`, requestData, {
+          params: {
+            userId: auth.userId 
+          },
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
           .then(response => {
             onSave([response.data]);
             alert('항목이 성공적으로 수정되었습니다.');
@@ -122,9 +129,16 @@ const TonerPriceModal = ({ show, onClose, onSave, editMode, selectedData }) => {
           .catch(error => {
             console.error('Error updating data:', error);
             alert('데이터 수정 중 오류가 발생했습니다.');
-          });
+          });        
       } else {
-        axios.post(`/api/toner/price`, requestData)
+        axios.post(`/api/toner/price`, requestData, {
+          params: {
+            userId: auth.userId,
+          },
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
           .then(response => {
             onSave([response.data]);
             alert('항목이 성공적으로 추가되었습니다.');
