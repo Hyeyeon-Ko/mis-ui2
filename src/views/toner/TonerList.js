@@ -3,6 +3,7 @@ import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import Loading from '../../components/common/Loading';
+import TonerInfoModal from './TonerInfoModal';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/common/Page.css';
 import '../../styles/rental/RentalManage.css';
@@ -13,6 +14,10 @@ function TonerList() {
   const { auth } = useContext(AuthContext);
   const [tonerDetails, setTonerDetails] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [selectedToner, setSelectedToner] = useState(null);
+
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
   const dragMode = useRef('select');
@@ -20,7 +25,7 @@ function TonerList() {
   const fetchTonerData = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/toner/list`, {
+      const response = await axios.get(`/api/toner/manage/list`, {
         params: { instCd: auth.instCd },
       });
 
@@ -44,6 +49,62 @@ function TonerList() {
   useEffect(() => {
     fetchTonerData();
   }, [fetchTonerData]);
+
+  const handleAddButtonClick = () => {
+    setIsAddModalVisible(true);
+  }
+
+  const handleEditButtonClick = async () => {
+    if (selectedRows.length === 0) {
+      alert('수정할 항목을 선택하세요.');
+      return;
+    }
+    else if (selectedRows.length > 1) {
+      alert('수정할 항목을 하나만 선택하세요.');
+      return;
+    }
+    const selected = tonerDetails.find(item => item.mngNum === selectedRows[0]);
+    setSelectedToner(selected);
+    setIsEditModalVisible(true);
+  };
+
+  const handleDeleteButtonClick = async () => { 
+    if (selectedRows.length === 0) {
+      alert("삭제할 항목을 선택하세요.");
+      return;
+    }
+
+    try {
+      for (const mngNum of selectedRows) {
+        await axios.delete(`/api/toner/manage/${mngNum}`);  
+      }
+      alert('선택된 항목이 삭제되었습니다.');
+
+      setTonerDetails(prevDetails => {
+        const updatedDetails = prevDetails
+          .filter(item => !selectedRows.includes(item.mngNum))
+          .map((item, index) => ({
+            ...item
+          }));
+        return updatedDetails;
+      });
+      setSelectedRows([]);
+    } catch (error) {
+      console.error('토너 정보를 삭제하는 중 에러 발생: ', error);
+      alert('삭제에 실패했습니다');
+    }
+  };
+
+  const handleModalClose = () => {
+    setIsAddModalVisible(false);
+    setIsEditModalVisible(false);
+  };
+
+  const handleSave = (newTonerData) => {
+    setTonerDetails((prevDetails) => [...prevDetails, ...newTonerData]);  
+    handleModalClose();
+    fetchTonerData();
+  };
 
   const handleRowClick = (row) => {
     const isChecked = !selectedRows.includes(row.mngNum);
@@ -90,28 +151,28 @@ function TonerList() {
     dragEndIndex.current = null;
   };
 
-  const handleExcelDownload = async () => {
-    if (selectedRows.length === 0) {
-      alert("엑셀 파일로 내보낼 항목을 선택하세요.");
-      return;
-    }
+  // const handleExcelDownload = async () => {
+  //   if (selectedRows.length === 0) {
+  //     alert("엑셀 파일로 내보낼 항목을 선택하세요.");
+  //     return;
+  //   }
 
-    try {
-      const response = await axios.post(`/api/toner/excel`, selectedRows, {
-        responseType: 'blob',
-      });
+  //   try {
+  //     const response = await axios.post(`/api/toner/excel`, selectedRows, {
+  //       responseType: 'blob',
+  //     });
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', '토너 관리표.xlsx');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (error) {
-      console.error("엑셀 다운로드 실패:", error);
-    }
-  };
+  //     const url = window.URL.createObjectURL(new Blob([response.data]));
+  //     const link = document.createElement('a');
+  //     link.href = url;
+  //     link.setAttribute('download', '토너 관리표.xlsx');
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     link.remove();
+  //   } catch (error) {
+  //     console.error("엑셀 다운로드 실패:", error);
+  //   }
+  // };
 
   const detailColumns = [
     {
@@ -151,7 +212,6 @@ function TonerList() {
     { header: '제조사', accessor: 'company' },
     { header: '제조일', accessor: 'manuDate' },
     { header: '토너명', accessor: 'tonerNm' },
-    { header: '색상', accessor: 'color' },
     { header: '가격', accessor: 'price' },
   ];
 
@@ -170,10 +230,10 @@ function TonerList() {
                   <div className="rental-header-buttons">
                     <label className='rental-detail-content-label'>토너 정보&gt;&gt;</label>
                     <div className="rental-detail-buttons">
-                      <button className="rental-add-button" onClick={() => { /* 추가 모달 열기 */ }}>추 가</button>
-                      <button className="rental-modify-button" onClick={() => { /* 수정 모달 열기 */ }}>수 정</button>
-                      <button className="rental-delete-button" onClick={() => { /* 삭제 처리 */ }}>삭 제</button>
-                      <button className="rental-excel-button" onClick={handleExcelDownload}>엑 셀</button>
+                      <button className="rental-add-button" onClick={handleAddButtonClick}>추 가</button>
+                      <button className="rental-modify-button" onClick={handleEditButtonClick}>수 정</button>
+                      <button className="rental-delete-button" onClick={handleDeleteButtonClick}>삭 제</button>
+                      {/* <button className="rental-excel-button" onClick={handleExcelDownload}>엑 셀</button> */}
                     </div>
                   </div>
                   <div className="rental-details-table">
@@ -192,6 +252,19 @@ function TonerList() {
           )}
         </div>
       </div>
+      <TonerInfoModal
+        show={isAddModalVisible}
+        onClose={handleModalClose}
+        onSave={handleSave}
+        editMode={false}
+      />
+      <TonerInfoModal
+        show={isEditModalVisible}
+        onClose={handleModalClose}
+        onSave={handleSave}
+        editMode={true}
+        selectedData={selectedToner}
+      />
     </div>
   );
 }

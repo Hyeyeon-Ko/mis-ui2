@@ -5,21 +5,28 @@ import * as XLSX from 'xlsx';
 import { AuthContext } from '../../components/AuthContext';
 import useTonerChange from '../../hooks/useTonerChange';
 import '../../styles/toner/TonerAddModal.css';
-import { addFormData, formFields, divisionMap } from '../../datas/tonerData';
+import { addTonerFormData, tonerFormFields } from '../../datas/tonerData';
 
-const TonerPriceModal = ({ show, onClose, onSave, editMode, selectedData }) => {
+const TonerInfoModal = ({ show, onClose, onSave, editMode, selectedData }) => {
   const { auth } = useContext(AuthContext);
   const { handleChange, handleTabChange, handleFileChange, formData, file, activeTab, setFormData, setActiveTab, setFile } = useTonerChange();
 
   useEffect(() => {
     if (editMode && selectedData) {
       setFormData({
+        mngNum: selectedData.mngNum || '',
+        floor: selectedData.floor || '',
+        teamNm: selectedData.teamNm || '',
+        manager: selectedData.manager || '',
+        subManager: selectedData.subManager || '',
+        location: selectedData.location || '',
+        productNm: selectedData.productNm || '',
         modelNm: selectedData.modelNm || '',
+        sn: selectedData.sn || '',
         company: selectedData.company || '',
+        manuDate: selectedData.manuDate || '',
         tonerNm: selectedData.tonerNm || '',
-        division: selectedData.division || '',
         price: selectedData.price || '',
-        specialNote: selectedData.specialNote || '',
       });
     } else {
       resetFormData();
@@ -27,7 +34,7 @@ const TonerPriceModal = ({ show, onClose, onSave, editMode, selectedData }) => {
   }, [editMode, selectedData]);
 
   const resetFormData = () => {
-    setFormData({ ...addFormData });
+    setFormData({ ...addTonerFormData });
     setFile(null);
     setActiveTab('text');
   };
@@ -72,47 +79,67 @@ const TonerPriceModal = ({ show, onClose, onSave, editMode, selectedData }) => {
         });
 
         const extractedData = worksheetData
-          .slice(17) 
+          .slice(2) 
+          .filter((row) => row[0] === '구입' || row[0] === '구매') 
           .map((row) => ({
-            company: row[2],  
-            modelNm: row[3],   
-            tonerNm: row[4],   
-            division: row[5],  
-            price: row[6],
-            specialNote: row[7],  
+            mngNum: row[1],  
+            floor: row[2],   
+            teamNm: row[3],   
+            manager: row[4],   
+            subManager: row[5],  
+            location: row[6],
+            productNm: row[7],  
+            modelNm: row[8],  
+            sn: row[9],  
+            company: row[10],  
+            manuDate: row[11],  
+            tonerNm: row[14],  
+            price: row[16],  
           }));
 
           sendTonerExcel(extractedData); 
       };
       reader.readAsArrayBuffer(file);
     } else {
-      const { modelNm, company, tonerNm, division, price, specialNote } = formData;
+      const { mngNum, floor, teamNm, manager, subManager, location, productNm, modelNm, sn, company, manuDate, tonerNm, price} = formData;
       const missingFields = [];
 
+      if (!mngNum) missingFields.push('관리번호');
+      if (!floor) missingFields.push('층');
+      if (!teamNm) missingFields.push('사용부서');
+      if (!manager) missingFields.push('관리자(정)');
+      if (!subManager) missingFields.push('관리자(부)');
+      if (!location) missingFields.push('위치');
+      if (!productNm) missingFields.push('품명');
       if (!modelNm) missingFields.push('모델명');
+      if (!sn) missingFields.push('S/N');
       if (!company) missingFields.push('제조사');
-      if (!tonerNm) missingFields.push('토너명');
-      if (!division) missingFields.push('구분');
-      if (!price) missingFields.push('가격');
+      if (!manuDate) missingFields.push('제조년월');
+      if (!tonerNm) missingFields.push('토너(잉크)명');
 
       if (missingFields.length > 0) {
         alert(`다음 항목을 입력해주세요:\n${missingFields.join('\n')}`);
         return;
       }
 
-      const mappedDivision = divisionMap[division] || division;
-
       const requestData = {
+        mngNum,
+        floor,
+        teamNm,
+        manager,
+        subManager,
+        location,
+        productNm,
         modelNm,
+        sn,
         company,
+        manuDate,
         tonerNm,
-        division: mappedDivision, 
         price,
-        specialNote,
       };
 
       if (editMode) {
-        axios.put(`/api/toner/price/${selectedData.tonerNm}`, requestData)
+        axios.put(`/api/toner/manage/${selectedData.mngNum}`, requestData)
           .then(response => {
             onSave([response.data]);
             alert('항목이 성공적으로 수정되었습니다.');
@@ -124,7 +151,7 @@ const TonerPriceModal = ({ show, onClose, onSave, editMode, selectedData }) => {
             alert('데이터 수정 중 오류가 발생했습니다.');
           });
       } else {
-        axios.post(`/api/toner/price`, requestData)
+        axios.post(`/api/toner/manage`, requestData)
           .then(response => {
             onSave([response.data]);
             alert('항목이 성공적으로 추가되었습니다.');
@@ -145,7 +172,7 @@ const TonerPriceModal = ({ show, onClose, onSave, editMode, selectedData }) => {
     <div className="toner-modal-overlay">
       <div className="toner-modal-container">
         <div className="modal-header">
-          <h3>{editMode ? '토너 단가 항목 수정' : '토너 단가 항목 추가'}</h3>
+          <h3>{editMode ? '토너 항목 수정' : '토너 항목 추가'}</h3>
           <button className="toner-close-button" onClick={onClose}>X</button>
         </div>
         <div className="toner-instructions">
@@ -173,34 +200,18 @@ const TonerPriceModal = ({ show, onClose, onSave, editMode, selectedData }) => {
           )}
           {(editMode || activeTab === 'text') && (
             <div className="toner-add-section">
-              {formFields.map((field, index) => (
+              {tonerFormFields.map((field, index) => (
                 <div className="toner-add-detail-row" key={index}>
                   <label>
                     {field.label} {field.isRequired && <span>*</span>}
                   </label>
-                  {field.name === 'division' ? (
-                    <select
-                      name="division"
-                      value={formData.division || ''}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">선택하세요</option>
-                      <option value="드럼">드럼</option>
-                      <option value="번들">번들</option>
-                      <option value="유지보수키트">유지보수키트</option>
-                      <option value="잉크">잉크</option>
-                      <option value="토너">토너</option>
-                    </select>
-                  ) : (
-                    <input
-                      type="text"
-                      name={field.name}
-                      value={formData[field.name] || ''}
-                      onChange={handleChange}
-                      placeholder={field.placeholder || ''}
-                    />
-                  )}
+                <input
+                    type="text"
+                    name={field.name}
+                    value={formData[field.name] || ''}
+                    onChange={handleChange}
+                    placeholder={field.placeholder || ''}
+                />
                 </div>
               ))}
             </div>
@@ -216,7 +227,7 @@ const TonerPriceModal = ({ show, onClose, onSave, editMode, selectedData }) => {
   );
 };
 
-TonerPriceModal.propTypes = {
+TonerInfoModal.propTypes = {
   show: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
@@ -224,4 +235,4 @@ TonerPriceModal.propTypes = {
   selectedData: PropTypes.object,
 };
 
-export default TonerPriceModal;
+export default TonerInfoModal;

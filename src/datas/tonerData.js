@@ -27,3 +27,35 @@ export const formFields = [
     { label: '가격', name: 'price', type: 'text', isRequired: true },
     { label: '비고', name: 'specialNote', type: 'text', isRequired: false },
 ];
+
+export const addTonerFormData = {
+    mngNum: '',
+    floor: '',
+    teamNm: '',
+    manager: '',
+    subManager: '',
+    location: '',
+    productNm: '',
+    modelNm: '',
+    sn: '',
+    company: '',
+    manuDate: '',
+    tonerNm: '',
+    price: '',
+}
+
+export const tonerFormFields = [
+    { label: '관리번호', name: 'mngNum', type: 'text', isRequired: true },
+    { label: '층', name: 'floor', type: 'text', isRequired: true },
+    { label: '부서', name: 'teamNm', type: 'text', isRequired: true },
+    { label: '관리자(정)', name: 'manager', type: 'text', isRequired: true },
+    { label: '관리자(부)', name: 'subManager', type: 'text', isRequired: true },
+    { label: '위치', name: 'location', type: 'text', isRequired: true },
+    { label: '제품명', name: 'productNm', type: 'text', isRequired: true },
+    { label: '모델명', name: 'modelNm', type: 'text', isRequired: true },
+    { label: 'S/N', name: 'sn', type: 'text', isRequired: true },
+    { label: '제조사', name: 'company', type: 'text', isRequired: true },
+    { label: '제조일', name: 'manuDate', type: 'text', isRequired: true },
+    { label: '토너명', name: 'tonerNm', type: 'text', isRequired: true },
+    { label: '가격', name: 'price', type: 'text', isRequired: false },
+]

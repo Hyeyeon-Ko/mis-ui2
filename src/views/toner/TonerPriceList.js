@@ -152,28 +152,28 @@ function TonerPriceList() {
     dragEndIndex.current = null;
   };
 
-  const handleExcelDownload = async () => {
-    if (selectedRows.length === 0) {
-      alert("엑셀 파일로 내보낼 항목을 선택하세요.");
-      return;
-    }
+  // const handleExcelDownload = async () => {
+  //   if (selectedRows.length === 0) {
+  //     alert("엑셀 파일로 내보낼 항목을 선택하세요.");
+  //     return;
+  //   }
 
-    try {
-      const response = await axios.post(`/api/toner/excel`, selectedRows, {
-        responseType: 'blob',
-      });
+  //   try {
+  //     const response = await axios.post(`/api/toner/excel`, selectedRows, {
+  //       responseType: 'blob',
+  //     });
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', '토너 관리표.xlsx');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (error) {
-      console.error("엑셀 다운로드 실패:", error);
-    }
-  };
+  //     const url = window.URL.createObjectURL(new Blob([response.data]));
+  //     const link = document.createElement('a');
+  //     link.href = url;
+  //     link.setAttribute('download', '토너 관리표.xlsx');
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     link.remove();
+  //   } catch (error) {
+  //     console.error("엑셀 다운로드 실패:", error);
+  //   }
+  // };
 
   const detailColumns = [
     {
@@ -234,7 +234,7 @@ function TonerPriceList() {
                       <button className="rental-add-button" onClick={handleAddButtonClick}>추 가</button>
                       <button className="rental-modify-button" onClick={handleEditButtonClick}>수 정</button>
                       <button className="rental-delete-button" onClick={handleDeleteButtonClick}>삭 제</button>
-                      <button className="rental-excel-button" onClick={handleExcelDownload}>엑 셀</button>
+                      {/* <button className="rental-excel-button" onClick={handleExcelDownload}>엑 셀</button> */}
                     </div>
                   </div>
                   <div className="rental-details-table">

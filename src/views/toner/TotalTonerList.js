@@ -21,7 +21,7 @@ function TotalTonerList() {
   const fetchTonerData = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/toner/totalList`, {
+      const response = await axios.get(`/api/toner/manage/total`, {
         params: { instCd: auth.instCd },
       });
 
@@ -136,7 +136,6 @@ function TotalTonerList() {
     { header: '제조사', accessor: 'company' },
     { header: '제조일', accessor: 'manuDate' },
     { header: '토너명', accessor: 'tonerNm' },
-    { header: '색상', accessor: 'color' },
     { header: '가격', accessor: 'price' },
   ];
 
