@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useCallback } from 'react';
+import React, { useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
@@ -10,12 +10,6 @@ import { addTonerFormData, tonerFormFields } from '../../datas/tonerData';
 const TonerInfoModal = ({ show, onClose, onSave, editMode, selectedData }) => {
   const { auth } = useContext(AuthContext);
   const { handleChange, handleTabChange, handleFileChange, formData, file, activeTab, setFormData, setActiveTab, setFile } = useTonerChange();
-
-  const resetFormData = useCallback(() => {
-    setFormData({ ...addTonerFormData });
-    setFile(null);
-    setActiveTab('text');
-  }, [setFormData, setFile, setActiveTab]);
 
   useEffect(() => {
     if (editMode && selectedData) {
@@ -37,7 +31,13 @@ const TonerInfoModal = ({ show, onClose, onSave, editMode, selectedData }) => {
     } else {
       resetFormData();
     }
-  }, [editMode, selectedData, resetFormData, setFormData]);
+  }, [editMode, selectedData]);
+
+  const resetFormData = () => {
+    setFormData({ ...addTonerFormData });
+    setFile(null);
+    setActiveTab('text');
+  };
 
   const sendTonerExcel = async (data) => {
     try {
@@ -138,35 +138,8 @@ const TonerInfoModal = ({ show, onClose, onSave, editMode, selectedData }) => {
         price,
       };
 
-      if (!editMode) {
-        axios.post(`/api/toner/manage`, requestData, {
-          params: {
-            userId: auth.userId,  
-            instCd: auth.instCd   
-          },
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
-          .then(response => {
-            onSave([response.data]);
-            alert('항목이 성공적으로 추가되었습니다.');
-            resetFormData();
-            onClose();
-          })
-          .catch(error => {
-            console.error('Error adding data:', error);
-            alert('데이터 저장 중 오류가 발생했습니다.');
-          });        
-      } else {
-        axios.put(`/api/toner/manage/${selectedData.mngNum}`, requestData, {
-          params: {
-            userId: auth.userId  
-          },
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+      if (editMode) {
+        axios.put(`/api/toner/manage/${selectedData.mngNum}`, requestData)
           .then(response => {
             onSave([response.data]);
             alert('항목이 성공적으로 수정되었습니다.');
@@ -176,7 +149,19 @@ const TonerInfoModal = ({ show, onClose, onSave, editMode, selectedData }) => {
           .catch(error => {
             console.error('Error updating data:', error);
             alert('데이터 수정 중 오류가 발생했습니다.');
-          });        
+          });
+      } else {
+        axios.post(`/api/toner/manage`, requestData)
+          .then(response => {
+            onSave([response.data]);
+            alert('항목이 성공적으로 추가되었습니다.');
+            resetFormData();
+            onClose();
+          })
+          .catch(error => {
+            console.error('Error adding data:', error);
+            alert('데이터 저장 중 오류가 발생했습니다.');
+          });
       }
     }
   };
