@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import ConditionFilter from '../../components/common/ConditionFilter';
 import Table from '../../components/common/Table';
-import CenterSelect from '../../components/CenterSelect';
+import CustomSelect from '../../components/CustomSelect';
 import DocConfirmModal from '../doc/DocConfirmModal';
 import '../../styles/list/ApplicationsList.css';
 import '../../styles/common/Page.css';
@@ -293,7 +293,13 @@ function PendingApprovalList() {
   const columns = [
     { header: '문서분류', accessor: 'docType', width: '10%' },
     ...(documentType === '법인서류' ? [{
-      header: <CenterSelect centers={centers} selectedCenter={selectedCenter} onCenterChange={handleCenterChange} />,
+      header:               
+      <CustomSelect
+        label="센터"
+        options={centers}
+        selectedValue={selectedCenter}
+        onChangeHandler={handleCenterChange}
+      />,
       accessor: 'center',
       width: '10%',
     }] : [

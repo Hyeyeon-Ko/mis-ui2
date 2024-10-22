@@ -5,8 +5,7 @@ import Table from '../../components/common/Table';
 import RentalAddModal from './RentalAddModal'; 
 import RentalUpdateModal from './RentalUpdateModal'; 
 import RentalBulkUpdateModal from './RentalBulkUpdateModal';
-import StatusSelect from '../../components/StatusSelect';
-import ProduceSelect from '../../components/ProductSelect';
+import CustomSelect from '../../components/CustomSelect';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/common/Page.css';
 import '../../styles/rental/RentalManage.css';
@@ -338,18 +337,20 @@ function RentalManage() {
     },
     { header: 'NO', accessor: 'no' },
     { header: (
-      <StatusSelect
-        statusOptions={statusOptions}  
-        selectedStatus={selectedStatus}  
-        onStatusChange={(e) => setSelectedStatus(e.target.value)} 
+      <CustomSelect
+        label="상태"
+        options={statusOptions}  
+        selectedValue={selectedStatus}  
+        onChangeHandler={(e) => setSelectedStatus(e.target.value)} 
       />
      ), accessor: 'status' },
     { header: '업체명', accessor: 'companyNm' },
     { header: (
-      <ProduceSelect
-        categoryOptions={categoryOptions}  
-        selectedCategory={selectedCategory}  
-        onCategoryChange={(e) => setSelectedCategory(e.target.value)} 
+      <CustomSelect
+        label="제품군"
+        options={categoryOptions}  
+        selectedValue={selectedCategory}  
+        onChangeHandler={(e) => setSelectedCategory(e.target.value)} 
       />
     ), accessor: 'category' },    
     { header: '계약번호', accessor: 'contractNum' },

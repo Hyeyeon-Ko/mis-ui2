@@ -5,7 +5,7 @@ import ConditionFilter from "../../components/common/ConditionFilter";
 import Table from "../../components/common/Table";
 import CustomButton from "../../components/common/CustomButton";
 import DocConfirmModal from "../doc/DocConfirmModal";
-import CenterSelect from "../../components/CenterSelect";
+import CustomSelect from "../../components/CustomSelect";
 import "../../styles/list/ApplicationsList.css";
 import "../../styles/common/Page.css";
 import axios from "axios";
@@ -563,10 +563,11 @@ function ApplicationsList() {
       ? [
           {
             header: (
-              <CenterSelect
-                centers={centers}
-                selectedCenter={selectedCenter}
-                onCenterChange={handleCenterChange}
+              <CustomSelect
+                label="센터"
+                options={centers}
+                selectedValue={selectedCenter}
+                onChangeHandler={handleCenterChange}
               />
             ),
             accessor: "instNm",
