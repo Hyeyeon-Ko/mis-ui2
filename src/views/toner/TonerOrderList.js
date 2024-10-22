@@ -1,58 +1,21 @@
-import React, { useState, useEffect, useCallback, useRef, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useRef } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import CustomButton from '../../components/common/CustomButton';
-import EmailModal from '../bcd/EmailModal';
 import '../../styles/bcd/BcdOrder.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 import fileDownload from 'js-file-download';
-import { FadeLoader } from 'react-spinners';
-import { AuthContext } from '../../components/AuthContext'; 
-import useBdcChange from '../../hooks/bdc/useBdcChange';
-import Pagination from '../../components/common/Pagination';
-import Loading from '../../components/common/Loading';
+import useTonerChange from '../../hooks/useTonerChange';
 
 
 function TonerOrderList() {
-  const { handleSelectAll, handleSelect, applications, selectedApplications, setApplications, setSelectedApplications} = useBdcChange();
-  const { auth, refreshSidebar } = useContext(AuthContext);
-  const [showEmailModal, setShowEmailModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const [totalPages, setTotalPages] = useState(1)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [loading, setLoading] = useState(false);
-
-  const itemsPerPage = 10;
-
-  const handlePageClick = (event) => {
-    const selectedPage = event.selected + 1;
-    setCurrentPage(selectedPage);
-  };
-
-  const navigate = useNavigate();
+  const { handleSelectAll, handleSelect, applications, selectedApplications, setSelectedApplications} = useTonerChange();
 
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
   const dragMode = useRef('select');
 
-  // Timestamp Parsing: "YYYY-MM-DD"
-  const parseDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
-  };
-
-  // Timestamp Parsing: "YYYY-MM-DD HH:MM"
-  const parseDateTime = (dateString) => {
-    const date = new Date(dateString);
-    const datePart = date.toISOString().split('T')[0];
-    const timePart = date.toTimeString().split(' ')[0].substring(0, 5);
-    return `${datePart} ${timePart}`;
-  };
-
-  // 행 클릭 시 체크박스 선택/해제 핸들러
   const handleRowClick = (row) => {
     const id = row.id;
     if (selectedApplications.includes(id)) {
@@ -62,7 +25,6 @@ function TonerOrderList() {
     }
   };
 
-  // 마우스 다운 시 드래그 시작 위치 설정
   const handleMouseDown = (rowIndex) => {
     dragStartIndex.current = rowIndex;
 
@@ -74,7 +36,6 @@ function TonerOrderList() {
     }
   };
 
-  // 마우스 오버 시 드래그 상태에 따라 선택/해제 처리
   const handleMouseOver = (rowIndex) => {
     if (dragStartIndex.current !== null) {
       dragEndIndex.current = rowIndex;
@@ -97,13 +58,11 @@ function TonerOrderList() {
     }
   };
   
-  // 마우스 업 시 드래그 상태 초기화
   const handleMouseUp = () => {
     dragStartIndex.current = null;
     dragEndIndex.current = null;
   };
 
-  // 엑셀 변환 버튼 클릭 핸들러
   const handleExcelDownload = async () => {
     if (selectedApplications.length === 0) {
       alert('엑셀변환 할 명함 신청 목록을 선택하세요.');
@@ -111,7 +70,7 @@ function TonerOrderList() {
     }
 
     try {
-      const response = await axios.post(`/api/bsc/order/excel`, selectedApplications, {
+      const response = await axios.post(`/api/toner/order/excel`, selectedApplications, {
         responseType: 'blob',
       });
       fileDownload(response.data, '명함 발주내역.xlsx');
@@ -120,7 +79,6 @@ function TonerOrderList() {
     }
   };
   
-  // 테이블 컬럼 정의
   const columns = [
     {
       header: <input type="checkbox" onChange={handleSelectAll} />,
@@ -171,9 +129,9 @@ function TonerOrderList() {
   return (
     <div className="content">
       <div className="order">
-        <h2>명함 발주</h2>
+        <h2>토너 발주</h2>
         <div className="bcdorder-header-row">
-          <Breadcrumb items={['발주 관리', '명함 발주']} />
+          <Breadcrumb items={['토너 관리', '토너 발주']} />
           <div className="buttons-container">
             <CustomButton className="excel-button" onClick={handleExcelDownload}>
               엑셀변환
@@ -183,37 +141,21 @@ function TonerOrderList() {
             </CustomButton>
           </div>
         </div>
-        {loading ? (
-          <Loading />
-        ) : (
+        {(
           <>
-        <Table 
-          columns={columns} 
-          data={applications} 
-          rowClassName="clickable-row"
-          onRowClick={(row, rowIndex) => handleRowClick(row)}
-          onRowMouseDown={(rowIndex) => handleMouseDown(rowIndex)}  
-          onRowMouseOver={(rowIndex) => handleMouseOver(rowIndex)}  
-          onRowMouseUp={handleMouseUp}    
-        />
-        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
+          <Table 
+            columns={columns} 
+            data={applications || []} 
+            rowClassName="clickable-row"
+            onRowClick={(row, rowIndex) => handleRowClick(row)}
+            onRowMouseDown={(rowIndex) => handleMouseDown(rowIndex)}  
+            onRowMouseOver={(rowIndex) => handleMouseOver(rowIndex)}  
+            onRowMouseUp={handleMouseUp}    
+          />
         </>
 
 )}
       </div>
-      {isLoading && (
-        <div className="loading-overlay">
-          <FadeLoader
-            color="#ffffff"
-            height={15}
-            loading={isLoading}
-            margin={2}
-            radius={2}
-            speedMultiplier={1}
-            width={5}
-          />
-        </div>
-      )}
     </div>
   );
 }

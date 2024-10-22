@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
@@ -10,6 +10,12 @@ import { addFormData, formFields, divisionMap } from '../../datas/tonerData';
 const TonerPriceModal = ({ show, onClose, onSave, editMode, selectedData }) => {
   const { auth } = useContext(AuthContext);
   const { handleChange, handleTabChange, handleFileChange, formData, file, activeTab, setFormData, setActiveTab, setFile } = useTonerChange();
+  
+  const resetFormData = useCallback(() => {
+    setFormData({ ...addFormData });
+    setFile(null);
+    setActiveTab('text');
+  }, [setFormData, setFile, setActiveTab]);
 
   useEffect(() => {
     if (editMode && selectedData) {
@@ -24,13 +30,7 @@ const TonerPriceModal = ({ show, onClose, onSave, editMode, selectedData }) => {
     } else {
       resetFormData();
     }
-  }, [editMode, selectedData]);
-
-  const resetFormData = () => {
-    setFormData({ ...addFormData });
-    setFile(null);
-    setActiveTab('text');
-  };
+  }, [editMode, selectedData, resetFormData, setFormData]);
 
   const sendTonerExcel = async (data) => {
     try {
