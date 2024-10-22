@@ -4,6 +4,7 @@ import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import Loading from '../../components/common/Loading';
 import TonerInfoModal from './TonerInfoModal';
+import CustomSelect from '../../components/CustomSelect';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/common/Page.css';
 import '../../styles/rental/RentalManage.css';
@@ -16,7 +17,15 @@ function TonerList() {
   const [loading, setLoading] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [filteredTonerDetails, setFilteredTonerDetails] = useState([]);
   const [selectedToner, setSelectedToner] = useState(null);
+  const [selectedFloor, setSelectedFloor] = useState('전체');
+  const [selectedTeamNm, setSelectedTeamNm] = useState('전체');
+  const [selectedLocation, setSelectedLocation] = useState('전체');
+  const [selectedProductNm, setSelectedProductNm] = useState('전체');
+  const [selectedModelNm, setSelectedModelNm] = useState('전체');
+  const [selectedCompany, setSelectedCompany] = useState('전체');
+  const [selectedTonerNm, setSelectedTonerNm] = useState('전체');
 
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
@@ -49,6 +58,46 @@ function TonerList() {
   useEffect(() => {
     fetchTonerData();
   }, [fetchTonerData]);
+
+  useEffect(() => {
+    let filteredData = tonerDetails;
+
+    if (selectedFloor !== '전체') {
+      filteredData = filteredData.filter(item => item.floor === selectedFloor);
+    }
+    if (selectedTeamNm !== '전체') {
+      filteredData = filteredData.filter(item => item.teamNm === selectedTeamNm);
+    }
+    if (selectedLocation !== '전체') {
+      filteredData = filteredData.filter(item => item.location === selectedLocation);
+    }
+    if (selectedProductNm !== '전체') {
+      filteredData = filteredData.filter(item => item.productNm === selectedProductNm);
+    }
+    if (selectedModelNm !== '전체') {
+      filteredData = filteredData.filter(item => item.modelNm === selectedModelNm);
+    }
+    if (selectedCompany !== '전체') {
+      filteredData = filteredData.filter(item => item.company === selectedCompany);
+    }
+    if (selectedTonerNm !== '전체') {
+      filteredData = filteredData.filter(item => item.tonerNm === selectedTonerNm);
+    }
+
+    filteredData = filteredData.map((item) => ({
+      ...item,
+    }));
+
+    setFilteredTonerDetails(filteredData);
+  }, [selectedFloor, tonerDetails]);
+
+  const floorOptions = getUniqueOptions(tonerDetails, 'floor');
+  const teamOptions = getUniqueOptions(tonerDetails, 'teamNm');
+  const locationOptions = getUniqueOptions(tonerDetails, 'location');
+  const productOptions = getUniqueOptions(tonerDetails, 'productNm');
+  const modelOptions = getUniqueOptions(tonerDetails, 'modelNm');
+  const companyOptions = getUniqueOptions(tonerDetails, 'company');
+  const tonerOptions = getUniqueOptions(tonerDetails, 'tonerNm');
 
   const handleAddButtonClick = () => {
     setIsAddModalVisible(true);
@@ -201,17 +250,87 @@ function TonerList() {
       },
     },
     { header: '관리번호', accessor: 'mngNum' },
-    { header: '층', accessor: 'floor' },
-    { header: '부서', accessor: 'teamNm' },
+    { 
+      header: (
+        <CustomSelect
+          label="층"
+          options={floorOptions}
+          selectedValue={selectedFloor}
+          onChangeHandler={(e) => setSelectedFloor(e.target.value)} 
+        />
+      ), 
+      accessor: 'floor' 
+    },    
+    { 
+      header: (
+        <CustomSelect
+          label="부서"
+          options={teamOptions}
+          selectedValue={selectedTeamNm}
+          onChangeHandler={(e) => setSelectedTeamNm(e.target.value)} 
+        />
+      ), 
+      accessor: 'teamNm' 
+    },    
     { header: '관리자(정)', accessor: 'manager' },
     { header: '관리자(부)', accessor: 'subManager' },
-    { header: '위치', accessor: 'location' },
-    { header: '제품명', accessor: 'productNm' },
-    { header: '모델명', accessor: 'modelNm' },
+    { 
+      header: (
+        <CustomSelect
+          label="위치"
+          options={locationOptions}
+          selectedValue={selectedLocation}
+          onChangeHandler={(e) => setSelectedLocation(e.target.value)} 
+        />
+      ), 
+      accessor: 'location' 
+    },    
+    { 
+      header: (
+        <CustomSelect
+          label="제품명"
+          options={productOptions}
+          selectedValue={selectedProductNm}
+          onChangeHandler={(e) => setSelectedProductNm(e.target.value)} 
+        />
+      ), 
+      accessor: 'productNm' 
+    },    
+    { 
+      header: (
+        <CustomSelect
+          label="모델명"
+          options={modelOptions}
+          selectedValue={selectedModelNm}
+          onChangeHandler={(e) => setSelectedModelNm(e.target.value)} 
+        />
+      ), 
+      accessor: 'modelNm' 
+    },    
     { header: 'S/N', accessor: 'sn' },
-    { header: '제조사', accessor: 'company' },
+    { 
+      header: (
+        <CustomSelect
+          label="제조사"
+          options={companyOptions}
+          selectedValue={selectedCompany}
+          onChangeHandler={(e) => setSelectedCompany(e.target.value)} 
+        />
+      ), 
+      accessor: 'company' 
+    },    
     { header: '제조일', accessor: 'manuDate' },
-    { header: '토너명', accessor: 'tonerNm' },
+    { 
+      header: (
+        <CustomSelect
+          label="토너명"
+          options={tonerOptions}
+          selectedValue={selectedTonerNm}
+          onChangeHandler={(e) => setSelectedTonerNm(e.target.value)} 
+        />
+      ), 
+      accessor: 'tonerNm' 
+    },    
     { header: '가격', accessor: 'price' },
   ];
 
@@ -239,7 +358,7 @@ function TonerList() {
                   <div className="rental-details-table">
                     <Table
                       columns={detailColumns}
-                      data={tonerDetails}
+                      data={filteredTonerDetails}
                       onRowClick={handleRowClick}
                       onRowMouseDown={handleMouseDown}
                       onRowMouseOver={handleMouseOver}
@@ -270,3 +389,8 @@ function TonerList() {
 }
 
 export default TonerList;
+
+const getUniqueOptions = (data, key) => {
+  const uniqueValues = [...new Set(data.map(item => item[key]))];
+  return uniqueValues.map(value => ({ label: value, value }));
+};
