@@ -192,7 +192,7 @@ function TonerPendingList() {
     { header: '관리번호', accessor: 'mngNum', width: '8%' },
     { header: '부서', accessor: 'teamNm', width: '10%' },
     { header: '위치', accessor: 'location', width: '15%' },
-    { header: '프린터명', accessor: 'modelNm', width: '12%' },
+    { header: '프린터명', accessor: 'printNm', width: '12%' },
     { header: '토너명', accessor: 'tonerNm', width: '12%' },
     { header: '수량', accessor: 'quantity', width: '3%' },
     { header: '금액', accessor: 'totalPrice', width: '8%' },

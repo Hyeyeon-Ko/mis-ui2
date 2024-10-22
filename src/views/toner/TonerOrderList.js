@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useContext, useState } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import CustomButton from '../../components/common/CustomButton';
@@ -6,15 +6,40 @@ import '../../styles/bcd/BcdOrder.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 import fileDownload from 'js-file-download';
+import { AuthContext } from '../../components/AuthContext'; 
 import useTonerChange from '../../hooks/useTonerChange';
 
 
 function TonerOrderList() {
-  const { handleSelectAll, handleSelect, applications, selectedApplications, setSelectedApplications} = useTonerChange();
+  const { handleSelectAll, handleSelect, applications, selectedApplications, setApplications, setSelectedApplications} = useTonerChange();
+  const { auth } = useContext(AuthContext);
+  const [loading, setLoading] = useState(true);
 
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
   const dragMode = useRef('select');
+
+  const fetchTonerOrderList = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`/api/toner/order`, {
+        params: {
+          instCd:auth.instCd,
+        },
+      });
+      console.log(response);
+      setApplications(response.data.data || []);
+    } catch (error) {
+      console.error('Error fetching toner order list: ', error);
+      alert('토너 발주 목록을 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  }, [auth.instCd, setApplications]);
+
+  useEffect(() => {
+    fetchTonerOrderList();
+  }, [fetchTonerOrderList]);
 
   const handleRowClick = (row) => {
     const id = row.id;
@@ -95,34 +120,29 @@ function TonerOrderList() {
       ),
     },
     {
-      header: '센터명', 
-      accessor: 'center',
-      width: '18%',
-    },
-    { 
-      header: '제목', 
-      accessor: 'title', 
-      width: '28%', 
-    },
-    { 
-      header: '신청일자', 
-      accessor: 'draftDate', 
-      width: '15%', 
-    },
-    { 
-      header: '신청자', 
-      accessor: 'drafter', 
-      width: '10%', 
-    },
-    { 
-      header: '승인일시', 
-      accessor: 'respondDate', 
-      width: '17%', 
+      header: '품명', 
+      accessor: 'tonerNm',
+      width: '20%',
     },
     { 
       header: '수량', 
       accessor: 'quantity', 
-      width: '9.5%', 
+      width: '10%', 
+    },
+    { 
+      header: '단가', 
+      accessor: 'price', 
+      width: '10%', 
+    },
+    { 
+      header: '가격', 
+      accessor: 'totalPrice', 
+      width: '10%', 
+    },
+    { 
+      header: '비고', 
+      accessor: 'mngNum', 
+      width: '10%', 
     },
   ];
 

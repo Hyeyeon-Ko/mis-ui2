@@ -398,6 +398,6 @@ function TonerList() {
 export default TonerList;
 
 const getUniqueOptions = (data, key) => {
-  const uniqueValues = [...new Set(data.map(item => item[key]))];
+  const uniqueValues = [...new Set(data.map(item => item[key]))].sort((a, b) => a.localeCompare(b));
   return [{ label: '전체', value: '전체' }, ...uniqueValues.map(value => ({ label: value, value }))];
 };
