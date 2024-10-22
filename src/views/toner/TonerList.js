@@ -59,6 +59,14 @@ function TonerList() {
     fetchTonerData();
   }, [fetchTonerData]);
 
+  const floorOptions = getUniqueOptions(tonerDetails, 'floor');
+  const teamOptions = getUniqueOptions(tonerDetails, 'teamNm');
+  const locationOptions = getUniqueOptions(tonerDetails, 'location');
+  const productOptions = getUniqueOptions(tonerDetails, 'productNm');
+  const modelOptions = getUniqueOptions(tonerDetails, 'modelNm');
+  const companyOptions = getUniqueOptions(tonerDetails, 'company');
+  const tonerOptions = getUniqueOptions(tonerDetails, 'tonerNm');
+
   useEffect(() => {
     let filteredData = tonerDetails;
 
@@ -89,15 +97,7 @@ function TonerList() {
     }));
 
     setFilteredTonerDetails(filteredData);
-  }, [selectedFloor, tonerDetails]);
-
-  const floorOptions = getUniqueOptions(tonerDetails, 'floor');
-  const teamOptions = getUniqueOptions(tonerDetails, 'teamNm');
-  const locationOptions = getUniqueOptions(tonerDetails, 'location');
-  const productOptions = getUniqueOptions(tonerDetails, 'productNm');
-  const modelOptions = getUniqueOptions(tonerDetails, 'modelNm');
-  const companyOptions = getUniqueOptions(tonerDetails, 'company');
-  const tonerOptions = getUniqueOptions(tonerDetails, 'tonerNm');
+  }, [ selectedFloor, selectedTeamNm, selectedLocation, selectedProductNm, selectedModelNm, selectedCompany, selectedTonerNm, tonerDetails ]);  
 
   const handleAddButtonClick = () => {
     setIsAddModalVisible(true);
@@ -392,5 +392,5 @@ export default TonerList;
 
 const getUniqueOptions = (data, key) => {
   const uniqueValues = [...new Set(data.map(item => item[key]))];
-  return uniqueValues.map(value => ({ label: value, value }));
+  return [{ label: '전체', value: '전체' }, ...uniqueValues.map(value => ({ label: value, value }))];
 };
