@@ -11,7 +11,6 @@ import fileDownload from 'js-file-download';
 import { FadeLoader } from 'react-spinners';
 import { AuthContext } from '../../components/AuthContext'; 
 import useBdcChange from '../../hooks/bdc/useBdcChange';
-import Pagination from '../../components/common/Pagination';
 import Loading from '../../components/common/Loading';
 
 
@@ -21,16 +20,7 @@ function BcdOrder() {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [totalPages, setTotalPages] = useState(1)
-  const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(false);
-
-  const itemsPerPage = 10;
-
-  const handlePageClick = (event) => {
-    const selectedPage = event.selected + 1;
-    setCurrentPage(selectedPage);
-  };
 
   const navigate = useNavigate();
 
@@ -53,21 +43,18 @@ function BcdOrder() {
   };
 
   // 발주 리스트 가져오기
-  const fetchBcdOrderList = useCallback(async (pageIndex = 1, pageSize = itemsPerPage) => {
+  const fetchBcdOrderList = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/bsc/order/get`, {
+      const response = await axios.get(`/api/bsc/order`, {
         params: {
           instCd: auth.instCd,
-          pageIndex,
-          pageSize
         },
       });
+      console.log(response.data.data);
       const data = response.data.data || response.data;
-      const totalPages = Math.max(data.totalPages, 1);
-      const currentPage = data.number + 1;
 
-      const transformedData = data.content.map((item) => ({
+      const transformedData = data.map((item) => ({
         id: item.draftId,
         center: item.instNm,
         title: item.title,
@@ -77,19 +64,12 @@ function BcdOrder() {
         quantity: item.quantity,
       }));
       setApplications(transformedData);
-      setTotalPages(totalPages);
-      setCurrentPage(currentPage);
     } catch (error) {
       console.error('Error fetching bcdOrder list: ', error);
     } finally {
       setLoading(false)
     }
   }, [auth.instCd, setApplications]);
-
-  
-  useEffect(() => {
-    fetchBcdOrderList(currentPage, itemsPerPage);
-  }, [currentPage, fetchBcdOrderList]);
 
   // 컴포넌트 마운트 시 발주 리스트 가져오기
   useEffect(() => {
@@ -279,7 +259,6 @@ function BcdOrder() {
           onRowMouseOver={(rowIndex) => handleMouseOver(rowIndex)}  
           onRowMouseUp={handleMouseUp}    
         />
-        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
         </>
 
 )}
