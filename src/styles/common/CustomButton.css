@@ -17,6 +17,15 @@
   background-color: #068c4e;
 }
 
+.toner-button {
+  color: rgb(70, 70, 70);
+  background-color: #bdc6cf;
+}
+
+.toner-button:hover {
+  background-color: #a1a9b2;
+}
+
 .finish-excel-button {
   background-color: #d7dde4;
   color: rgb(85, 84, 84)

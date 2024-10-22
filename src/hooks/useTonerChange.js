@@ -6,7 +6,9 @@ const useTonerChange = () => {
     const [activeTab, setActiveTab] = useState('text');
     const [file, setFile] = useState(null);
     const [formData, setFormData] = useState(addFormData);
-
+    const [applications, setApplications] = useState([]);
+    const [selectedApplications, setSelectedApplications] = useState([]);
+  
     const handleRowSelect = (e, row, index) => {
         e.stopPropagation(); 
         const isChecked = e.target.checked;
@@ -43,8 +45,48 @@ const useTonerChange = () => {
             division: reverseDivisionMap[data.division] || data.division,
         });
     };
-    
-    return { formData, file, selectedRows, activeTab, setFormData: setFormDataWithDivision, setFile, setActiveTab, setSelectedRows, handleRowSelect, handleTabChange, handleFileChange, handleChange}
+
+    // 전체 선택/해제 핸들러
+    const handleSelectAll = (event) => {
+        if (event.target.checked) {
+        setSelectedApplications(applications.map((app) => app.id));
+        } else {
+        setSelectedApplications([]);
+        }
+    };
+
+    // 개별 선택/해제 핸들러
+    const handleSelect = (event, id) => {
+        if (event.target.checked) {
+        setSelectedApplications([...selectedApplications, id]);
+        } else {
+        setSelectedApplications(
+            selectedApplications.filter((appId) => appId !== id)
+        );
+        }
+    };
+
+    return { 
+        formData, 
+        file, 
+        selectedRows, 
+        activeTab, 
+        setFormData: setFormDataWithDivision, 
+        setFile, 
+        setActiveTab, 
+        setSelectedRows, 
+        handleRowSelect, 
+        handleTabChange, 
+        handleFileChange, 
+        handleChange,
+        handleSelectAll,
+        handleSelect,
+        applications,
+        selectedApplications,    
+        setApplications,
+        setSelectedApplications,
+
+    }
 }
 
 export default useTonerChange

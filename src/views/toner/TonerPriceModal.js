@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
@@ -11,26 +11,43 @@ const TonerPriceModal = ({ show, onClose, onSave, editMode, selectedData }) => {
   const { auth } = useContext(AuthContext);
   const { handleChange, handleTabChange, handleFileChange, formData, file, activeTab, setFormData, setActiveTab, setFile } = useTonerChange();
 
+  const resetFormData = useCallback(() => {
+    setFormData({ ...addFormData });
+    setFile(null);
+    setActiveTab("text");
+  }, [setFormData, setFile, setActiveTab]);
+
+  const resetFormDataRef = useRef(resetFormData);
+  useEffect(() => {
+    resetFormDataRef.current = resetFormData;
+  }, [resetFormData]);
+
+  const setFormDataRef = useRef(setFormData);
+  useEffect(() => {
+    setFormDataRef.current = setFormData;
+  }, [setFormData]);
+
   useEffect(() => {
     if (editMode && selectedData) {
-      setFormData({
-        modelNm: selectedData.modelNm || '',
-        company: selectedData.company || '',
-        tonerNm: selectedData.tonerNm || '',
-        division: selectedData.division || '',
-        price: selectedData.price || '',
-        specialNote: selectedData.specialNote || '',
+      setFormDataRef.current((prevData) => {
+        const newData = {
+          modelNm: selectedData.modelNm || '',
+          company: selectedData.company || '',
+          tonerNm: selectedData.tonerNm || '',
+          division: selectedData.division || '',
+          price: selectedData.price || '',
+          specialNote: selectedData.specialNote || '',
+        };
+    
+        if (JSON.stringify(prevData) !== JSON.stringify(newData)) {
+          return newData;
+        }
       });
     } else {
-      resetFormData();
+      resetFormDataRef.current();
     }
   }, [editMode, selectedData]);
 
-  const resetFormData = () => {
-    setFormData({ ...addFormData });
-    setFile(null);
-    setActiveTab('text');
-  };
 
   const sendTonerExcel = async (data) => {
     try {

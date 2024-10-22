@@ -112,9 +112,16 @@ function TonerList() {
       alert('수정할 항목을 하나만 선택하세요.');
       return;
     }
-    const selected = tonerDetails.find(item => item.mngNum === selectedRows[0]);
-    setSelectedToner(selected);
-    setIsEditModalVisible(true);
+    
+    try {
+      const selectedTonerName = selectedRows[0];
+      const response = await axios.get(`/api/toner/manage/${selectedTonerName}`);
+      setSelectedToner(response.data.data); 
+      setIsEditModalVisible(true); 
+    } catch (error) {
+      console.error('토너 정보를 불러오는 중 오류가 발생했습니다.', error);
+      alert('토너 정보를 불러오는 중 오류가 발생했습니다.');
+    }
   };
 
   const handleDeleteButtonClick = async () => { 
