@@ -207,28 +207,28 @@ function TonerList() {
     dragEndIndex.current = null;
   };
 
-  // const handleExcelDownload = async () => {
-  //   if (selectedRows.length === 0) {
-  //     alert("엑셀 파일로 내보낼 항목을 선택하세요.");
-  //     return;
-  //   }
+  const handleExcelDownload = async () => {
+    if (selectedRows.length === 0) {
+      alert("엑셀 파일로 내보낼 항목을 선택하세요.");
+      return;
+    }
 
-  //   try {
-  //     const response = await axios.post(`/api/toner/excel`, selectedRows, {
-  //       responseType: 'blob',
-  //     });
+    try {
+      const response = await axios.post(`/api/toner/manage/excel`, selectedRows, {
+        responseType: 'blob',
+      });
 
-  //     const url = window.URL.createObjectURL(new Blob([response.data]));
-  //     const link = document.createElement('a');
-  //     link.href = url;
-  //     link.setAttribute('download', '토너 관리표.xlsx');
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     link.remove();
-  //   } catch (error) {
-  //     console.error("엑셀 다운로드 실패:", error);
-  //   }
-  // };
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', '토너 관리표.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("엑셀 다운로드 실패:", error);
+    }
+  };
 
   const detailColumns = [
     {
@@ -271,7 +271,7 @@ function TonerList() {
     { 
       header: (
         <CustomSelect
-          label="부서"
+          label="사용부서"
           options={teamOptions}
           selectedValue={selectedTeamNm}
           onChangeHandler={(e) => setSelectedTeamNm(e.target.value)} 
@@ -295,7 +295,7 @@ function TonerList() {
     { 
       header: (
         <CustomSelect
-          label="제품명"
+          label="품명"
           options={productOptions}
           selectedValue={selectedProductNm}
           onChangeHandler={(e) => setSelectedProductNm(e.target.value)} 
@@ -326,11 +326,11 @@ function TonerList() {
       ), 
       accessor: 'company' 
     },    
-    { header: '제조일', accessor: 'manuDate' },
+    { header: '제조년월', accessor: 'manuDate' },
     { 
       header: (
         <CustomSelect
-          label="토너명"
+          label="토너(잉크)명"
           options={tonerOptions}
           selectedValue={selectedTonerNm}
           onChangeHandler={(e) => setSelectedTonerNm(e.target.value)} 
@@ -338,7 +338,7 @@ function TonerList() {
       ), 
       accessor: 'tonerNm' 
     },    
-    { header: '가격', accessor: 'price' },
+    { header: '단가', accessor: 'price' },
   ];
 
   return (
@@ -359,7 +359,7 @@ function TonerList() {
                       <button className="rental-add-button" onClick={handleAddButtonClick}>추 가</button>
                       <button className="rental-modify-button" onClick={handleEditButtonClick}>수 정</button>
                       <button className="rental-delete-button" onClick={handleDeleteButtonClick}>삭 제</button>
-                      {/* <button className="rental-excel-button" onClick={handleExcelDownload}>엑 셀</button> */}
+                      <button className="rental-excel-button" onClick={handleExcelDownload}>엑 셀</button>
                     </div>
                   </div>
                   <div className="rental-details-table">

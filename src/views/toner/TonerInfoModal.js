@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import * as XLSX from "xlsx";
@@ -21,51 +21,33 @@ const TonerInfoModal = ({ show, onClose, onSave, editMode, selectedData }) => {
     setFile,
   } = useTonerChange();
 
-  const resetFormData = useCallback(() => {
-    setFormData({ ...addTonerFormData });
-    setFile(null);
-    setActiveTab("text");
-  }, [setFormData, setFile, setActiveTab]);
-
-  const resetFormDataRef = useRef(resetFormData);
-  useEffect(() => {
-    resetFormDataRef.current = resetFormData;
-  }, [resetFormData]);
-
-  const setFormDataRef = useRef(setFormData);
-  useEffect(() => {
-    setFormDataRef.current = setFormData;
-  }, [setFormData]);
-
   useEffect(() => {
     if (editMode && selectedData) {
-
-      setFormDataRef.current((prevData) => {
-        const newData = {
-          mngNum: selectedData.mngNum || "",
-          floor: selectedData.floor || "",
-          teamNm: selectedData.teamNm || "",
-          manager: selectedData.manager || "",
-          subManager: selectedData.subManager || "",
-          location: selectedData.location || "",
-          productNm: selectedData.productNm || "",
-          modelNm: selectedData.modelNm || "",
-          sn: selectedData.sn || "",
-          company: selectedData.company || "",
-          manuDate: selectedData.manuDate || "",
-          tonerNm: selectedData.tonerNm || "",
-          price: selectedData.price || "",
-        };
-
-        if (JSON.stringify(prevData) !== JSON.stringify(newData)) {
-          return newData;
-        }
-        return prevData;
+      setFormData({
+        mngNum: selectedData.mngNum || '',
+        floor: selectedData.floor || '',
+        teamNm: selectedData.teamNm || '',
+        manager: selectedData.manager || '',
+        subManager: selectedData.subManager || '',
+        location: selectedData.location || '',
+        productNm: selectedData.productNm || '',
+        modelNm: selectedData.modelNm || '',
+        sn: selectedData.sn || '',
+        company: selectedData.company || '',
+        manuDate: selectedData.manuDate || '',
+        tonerNm: selectedData.tonerNm || '',
+        price: selectedData.price || '',
       });
     } else {
-      resetFormDataRef.current();
+      resetFormData();
     }
   }, [editMode, selectedData]);
+
+  const resetFormData = () => {
+    setFormData({ ...addTonerFormData });
+    setFile(null);
+    setActiveTab('text');
+  };
 
   const sendTonerExcel = async (data) => {
     try {

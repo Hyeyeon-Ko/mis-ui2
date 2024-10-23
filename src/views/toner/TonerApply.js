@@ -59,11 +59,9 @@ function TonerApply() {
   const handleConfirmCancel = async () => {
     try {
     // 선택된 index에 해당하는 application 삭제
-    console.log("selected: ", selectedApplication)
     const updatedApplications = applications.filter(
       (_, appIndex) => appIndex !== (selectedApplication.index-1)
     );
-    console.log("updated: ", updatedApplications)
 
     // 남은 applications의 index 재설정
     const reIndexedApplications = updatedApplications.map((app, newIndex) => ({
@@ -74,7 +72,6 @@ function TonerApply() {
     setApplications(reIndexedApplications);
     setShowConfirmModal(false);
     setSelectedApplication(null);
-    console.log("canceledApplications: ", applications)
 
     alert('취소가 완료되었습니다.');
     } catch (error) {

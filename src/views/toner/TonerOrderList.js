@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useContext, useState } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
+import Loading from '../../components/common/Loading';
 import CustomButton from '../../components/common/CustomButton';
 import '../../styles/bcd/BcdOrder.css';
 import '../../styles/common/Page.css';
@@ -27,7 +28,6 @@ function TonerOrderList() {
           instCd:auth.instCd,
         },
       });
-      console.log(response);
       setApplications(response.data.data || []);
     } catch (error) {
       console.error('Error fetching toner order list: ', error);
@@ -161,8 +161,9 @@ function TonerOrderList() {
             </CustomButton>
           </div>
         </div>
-        {(
-          <>
+        {loading ? ( // Display the Loading component while loading is true
+          <Loading />
+        ) : (
           <Table 
             columns={columns} 
             data={applications || []} 
@@ -172,9 +173,7 @@ function TonerOrderList() {
             onRowMouseOver={(rowIndex) => handleMouseOver(rowIndex)}  
             onRowMouseUp={handleMouseUp}    
           />
-        </>
-
-)}
+        )}
       </div>
     </div>
   );

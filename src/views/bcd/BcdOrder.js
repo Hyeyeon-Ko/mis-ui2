@@ -51,7 +51,6 @@ function BcdOrder() {
           instCd: auth.instCd,
         },
       });
-      console.log(response.data.data);
       const data = response.data.data || response.data;
 
       const transformedData = data.map((item) => ({
