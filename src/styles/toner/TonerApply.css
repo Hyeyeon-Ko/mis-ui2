@@ -6,10 +6,11 @@
   margin: 30px 0px 3px 0px;
 }
 
-.toner-apply-header-label {
-  font-size: 13px;
+.toner-apply-header-label,
+.toner-apply-info {
+  font-size: 15px;
   font-weight: bold;
-  margin-right: 10px;
+  margin-right: 14px;
 }
 
 .toner-apply-content select,
@@ -53,4 +54,10 @@
 
 .toner-cancel-button:hover {
   color: #2789FE;; /* Color on hover */
+}
+
+.toner-buttons-container {
+  display: flex;
+  gap: 6px;
+  align-items: center;
 }
