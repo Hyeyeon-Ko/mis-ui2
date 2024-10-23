@@ -40,7 +40,6 @@ function TonerApply() {
         params: { instCd: auth.instCd }
       });
       setMngNumOptions(response.data.data.mngNums);
-      console.log("mngNumOptions: ", mngNumOptions)
     } catch (error) {
       console.error('Error fetching management numbers:', error);
     }
@@ -63,6 +62,7 @@ function TonerApply() {
     const updatedApplications = applications.filter(
       (_, appIndex) => appIndex !== (selectedApplication.index-1)
     );
+    console.log("updated: ", updatedApplications)
 
     // 남은 applications의 index 재설정
     const reIndexedApplications = updatedApplications.map((app, newIndex) => ({
@@ -73,6 +73,7 @@ function TonerApply() {
     setApplications(reIndexedApplications);
     setShowConfirmModal(false);
     setSelectedApplication(null);
+    console.log("canceledApplications: ", applications)
 
     alert('취소가 완료되었습니다.');
     } catch (error) {
@@ -98,7 +99,6 @@ function TonerApply() {
 
       const defaultToner = tonerPriceList[0]
       const quantity = 1;
-      console.log("resPonseFetchdata: ", data)
       
       const updatedApplication = {
         ...applications[index],
@@ -113,7 +113,6 @@ function TonerApply() {
         totalPrice: formatPrice(parseInt(defaultToner.price.replace(/,/g, ''), 10) * quantity),
         tonerPriceDTOList: tonerPriceList,
       };
-      console.log("updated: ",updatedApplication)
 
       const updatedApplications = [...applications];
       updatedApplications[index - 1] = updatedApplication;
@@ -167,8 +166,6 @@ function TonerApply() {
     setApplications([...applications, { ...defaultTonerDetails, index: lastIndex + 1 }]);
   };
 
-  // 칼럼
-  // todo: 추후, 컴포넌트로 분리
   const applyColumns = [
     { 
       header: 'No.', 
@@ -179,8 +176,12 @@ function TonerApply() {
       header: '관리번호',
       accessor: 'mngNum',
       width: '14%',
-      Cell: ({ row }) => (
-        <select onChange={(e) => fetchTonerInfo(e.target.value, row.index)}>
+      Cell: ({ row }) => {
+        const application = applications[row.index - 1];
+        return (
+          <select 
+            value={application.mngNm? application.mngNm : ""}
+            onChange={(e) => fetchTonerInfo(e.target.value, row.index)}>
           <option value="">관리번호 선택</option>
           {mngNumOptions.map(option => (
             <option key={option} value={option}>
@@ -188,7 +189,8 @@ function TonerApply() {
             </option>
           ))}
         </select>
-      ),
+        ) 
+      },
     },
     {
       header: '토너명',
