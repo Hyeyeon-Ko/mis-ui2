@@ -284,7 +284,7 @@ function TonerList() {
     { 
       header: (
         <CustomSelect
-          label="위치"
+          label="직무"
           options={locationOptions}
           selectedValue={selectedLocation}
           onChangeHandler={(e) => setSelectedLocation(e.target.value)} 

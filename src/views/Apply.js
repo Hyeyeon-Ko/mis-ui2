@@ -75,7 +75,7 @@ function Apply() {
   return (
     <div className="main-content">
       <div className="kmi-intro">
-        <h1 class="kmi-title">
+        <h1 className="kmi-title">
           <span>K</span>orea <span>M</span>edical <span>I</span>nstitute
         </h1>
         <p className="kmi-subtitle">
