@@ -255,7 +255,7 @@ function TonerApply() {
       },
     },
     { header: '부서', accessor: 'teamNm', width: '11%'},
-    { header: '위치', accessor: 'location', width: '11%'},
+    { header: '직무', accessor: 'location', width: '11%'},
     { header: '프린터명', accessor: 'printer', width: '11%'},
     { header: '단가', accessor: 'price', width: '9%'},
     {
