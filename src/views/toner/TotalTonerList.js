@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useContext, useCallback, useRef } from 'react';
 import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
@@ -26,6 +26,10 @@ function TotalTonerList() {
   const [selectedModelNm, setSelectedModelNm] = useState('전체');
   const [selectedCompany, setSelectedCompany] = useState('전체');
   const [selectedTonerNm, setSelectedTonerNm] = useState('전체');
+
+  const dragStartIndex = useRef(null);
+  const dragEndIndex = useRef(null);
+  const dragMode = useRef('select');
 
   const fetchTonerData = useCallback(async () => {
     setLoading(true);
@@ -120,6 +124,51 @@ function TotalTonerList() {
     setTotalCount(selectedDetails.length); 
   };
 
+  const handleRowClick = (row) => {
+    const isChecked = !selectedRows.includes(row.mngNum);
+    if (isChecked) {
+      setSelectedRows(prevSelectedRows => [...prevSelectedRows, row.mngNum]);
+    } else {
+      setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== row.mngNum));
+    }
+  };
+
+  const handleMouseDown = (index) => {
+    dragStartIndex.current = index;
+    const mngNum = tonerDetails[index].mngNum;
+    if (selectedRows.includes(mngNum)) {
+      dragMode.current = 'deselect';
+    } else {
+      dragMode.current = 'select';
+    }
+  };
+
+  const handleMouseOver = (index) => {
+    if (dragStartIndex.current !== null) {
+      dragEndIndex.current = index;
+      const start = Math.min(dragStartIndex.current, dragEndIndex.current);
+      const end = Math.max(dragStartIndex.current, dragEndIndex.current);
+
+      let newSelectedRows = [...selectedRows];
+
+      for (let i = start; i <= end; i++) {
+        const mngNum = tonerDetails[i].mngNum;
+        if (dragMode.current === 'select' && !newSelectedRows.includes(mngNum)) {
+          newSelectedRows.push(mngNum);
+        } else if (dragMode.current === 'deselect' && newSelectedRows.includes(mngNum)) {
+          newSelectedRows = newSelectedRows.filter(id => id !== mngNum);
+        }
+      }
+
+      setSelectedRows(newSelectedRows);
+    }
+  };
+
+  const handleMouseUp = () => {
+    dragStartIndex.current = null;
+    dragEndIndex.current = null;
+  };
+
   const handleExcelDownload = async () => {
     if (selectedRows.length === 0) {
       alert("엑셀 파일로 내보낼 항목을 선택하세요.");
@@ -127,7 +176,7 @@ function TotalTonerList() {
     }
 
     try {
-      const response = await axios.post(`/api/toner/excel`, selectedRows, {
+      const response = await axios.post(`/api/toner/manage/excel`, selectedRows, {
         responseType: 'blob',
       });
 
@@ -303,6 +352,10 @@ function TotalTonerList() {
                     <Table
                       columns={detailColumns}
                       data={filteredTonerDetails}
+                      onRowClick={handleRowClick}
+                      onRowMouseDown={handleMouseDown}
+                      onRowMouseOver={handleMouseOver}
+                      onRowMouseUp={handleMouseUp}
                     />
                   </div>
                 </div>

@@ -129,6 +129,8 @@ function TonerList() {
       alert("삭제할 항목을 선택하세요.");
       return;
     }
+    console.log("삭제할 항목의 관리번호들:", selectedRows);
+
 
     try {
       for (const mngNum of selectedRows) {

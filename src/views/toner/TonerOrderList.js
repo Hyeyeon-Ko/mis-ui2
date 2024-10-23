@@ -28,6 +28,7 @@ function TonerOrderList() {
           instCd:auth.instCd,
         },
       });
+      console.log(response);
       setApplications(response.data.data || []);
     } catch (error) {
       console.error('Error fetching toner order list: ', error);
@@ -42,19 +43,18 @@ function TonerOrderList() {
   }, [fetchTonerOrderList]);
 
   const handleRowClick = (row) => {
-    const id = row.id;
-    if (selectedApplications.includes(id)) {
-      setSelectedApplications(selectedApplications.filter((appId) => appId !== id));
+    const draftId = row.draftId; 
+    if (selectedApplications.includes(draftId)) {
+      setSelectedApplications(selectedApplications.filter((appDraftId) => appDraftId !== draftId));
     } else {
-      setSelectedApplications([...selectedApplications, id]);
+      setSelectedApplications([...selectedApplications, draftId]);
     }
   };
 
   const handleMouseDown = (rowIndex) => {
     dragStartIndex.current = rowIndex;
-
-    const appId = applications[rowIndex].id;
-    if (selectedApplications.includes(appId)) {
+    const draftId = applications[rowIndex].draftId; 
+    if (selectedApplications.includes(draftId)) {
       dragMode.current = 'deselect'; 
     } else {
       dragMode.current = 'select'; 
@@ -71,11 +71,11 @@ function TonerOrderList() {
       let newSelectedApplications = [...selectedApplications];
   
       for (let i = start; i <= end; i++) {
-        const appId = applications[i]?.id;
-        if (dragMode.current === 'select' && appId && !newSelectedApplications.includes(appId)) {
-          newSelectedApplications.push(appId); 
-        } else if (dragMode.current === 'deselect' && appId && newSelectedApplications.includes(appId)) {
-          newSelectedApplications = newSelectedApplications.filter(id => id !== appId); 
+        const draftId = applications[i]?.draftId; 
+        if (dragMode.current === 'select' && draftId && !newSelectedApplications.includes(draftId)) {
+          newSelectedApplications.push(draftId); 
+        } else if (dragMode.current === 'deselect' && draftId && newSelectedApplications.includes(draftId)) {
+          newSelectedApplications = newSelectedApplications.filter(id => id !== draftId); 
         }
       }
   
@@ -98,7 +98,7 @@ function TonerOrderList() {
       const response = await axios.post(`/api/toner/order/excel`, selectedApplications, {
         responseType: 'blob',
       });
-      fileDownload(response.data, '명함 발주내역.xlsx');
+      fileDownload(response.data, '토너 발주내역.xlsx');
     } catch (error) {
       console.error('Error downloading excel: ', error);
     }
@@ -113,7 +113,7 @@ function TonerOrderList() {
         <input
           type="checkbox"
           className="order-checkbox"
-          checked={selectedApplications.includes(row.id)}
+          checked={selectedApplications.includes(row.draftId)}
           onChange={(event) => handleSelect(event, row.id)}
           onClick={(e) => e.stopPropagation()} 
         />
@@ -161,7 +161,7 @@ function TonerOrderList() {
             </CustomButton>
           </div>
         </div>
-        {loading ? ( // Display the Loading component while loading is true
+        {loading ? ( 
           <Loading />
         ) : (
           <Table 
