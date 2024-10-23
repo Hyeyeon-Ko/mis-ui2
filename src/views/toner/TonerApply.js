@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { AuthContext } from '../../components/AuthContext';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import CustomButton from '../../components/common/CustomButton';
@@ -21,7 +22,9 @@ function TonerApply() {
     totalPrice: '',
   };
 
+  const { auth } = useContext(AuthContext);
   const [applications, setApplications] = useState([]);
+  const [mngNumOptions, setMngNumOptions] = useState([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
 
@@ -30,7 +33,24 @@ function TonerApply() {
     return new Intl.NumberFormat().format(price);
   }; 
 
-  // // 1. 신청 취소 핸들러
+  // 0. 관리번호 호출
+  const fetchMngNums = async () => {
+    try {
+      const response = await axios.get(`/api/toner/mngNum`, {
+        params: { instCd: auth.instCd }
+      });
+      setMngNumOptions(response.data.data.mngNums);
+      console.log("mngNumOptions: ", mngNumOptions)
+    } catch (error) {
+      console.error('Error fetching management numbers:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchMngNums();
+  }, [auth.instCd]);
+
+  // 1. 신청항목 취소 핸들러
   const handleCancelClick = (application) => {
     setSelectedApplication(application);
     setShowConfirmModal(true);
@@ -38,11 +58,23 @@ function TonerApply() {
 
   const handleConfirmCancel = async () => {
     try {
-      await axios.put(`${selectedApplication.draftId}`);
-      setShowConfirmModal(false);
-      setSelectedApplication(null);
-      // fetchApplications();
-      alert('취소가 완료되었습니다.');
+    // 선택된 index에 해당하는 application 삭제
+    console.log("selected: ", selectedApplication)
+    const updatedApplications = applications.filter(
+      (_, appIndex) => appIndex !== (selectedApplication.index-1)
+    );
+
+    // 남은 applications의 index 재설정
+    const reIndexedApplications = updatedApplications.map((app, newIndex) => ({
+      ...app,
+      index: newIndex + 1, // 1부터 다시 세팅
+    }));
+
+    setApplications(reIndexedApplications);
+    setShowConfirmModal(false);
+    setSelectedApplication(null);
+
+    alert('취소가 완료되었습니다.');
     } catch (error) {
       console.error('Error cancelling application:', error);
       setShowConfirmModal(false);
@@ -95,7 +127,7 @@ function TonerApply() {
 
   // 3. 수량 변경 핸들러
   const handleQuantityChange = (e, index) => {
-    const newQuantity = parseInt(e.target.value, 10) || 1;
+    const newQuantity = parseInt(e.target.value, 10) || '';
     const price = applications[index].price ? applications[index].price.replace(/,/g, '') : '0';
     const newTotalPrice = formatPrice(parseInt(price, 10) * newQuantity);
   
@@ -134,10 +166,6 @@ function TonerApply() {
     const lastIndex = applications.length > 0 ? applications[applications.length - 1].index : 0;
     setApplications([...applications, { ...defaultTonerDetails, index: lastIndex + 1 }]);
   };
-
-  // 더미 데이터
-  // todo: 관리번호 > 토너관리표에서 데이터 불러와서 Options에 저장하기
-  const mngNumOptions = ['BS22', 'BS23', 'BW1', 'BW18'];
 
   // 칼럼
   // todo: 추후, 컴포넌트로 분리
@@ -194,7 +222,7 @@ function TonerApply() {
         <input
           type="number"
           min="1"
-          value={row.quantity}
+          value={row.quantity || ''}
           onChange={(e) => handleQuantityChange(e, row.index-1)}
         />
       ),
