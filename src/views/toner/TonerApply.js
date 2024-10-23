@@ -26,9 +26,7 @@ function TonerApply() {
   const [totalAmount, setTotalAmount] = useState(0);
   const [applications, setApplications] = useState([]);
   const [mngNumOptions, setMngNumOptions] = useState([]);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showApplyModal, setShowApplyModal] = useState(false);
-  const [selectedApplication, setSelectedApplication] = useState(null);
 
   // 금액 포맷팅
   const formatPrice = (price) => {
@@ -66,36 +64,22 @@ function TonerApply() {
 
   // 1-1. 신청항목 취소 핸들러
   const handleCancelClick = (application) => {
-    setSelectedApplication(application);
-    setShowConfirmModal(true);
-  };
-
-  const handleConfirmCancel = async () => {
     try {
-    // 선택된 index에 해당하는 application 삭제
-    const updatedApplications = applications.filter(
-      (_, appIndex) => appIndex !== (selectedApplication.index-1)
-    );
-
-    // 남은 applications의 index 재설정
-    const reIndexedApplications = updatedApplications.map((app, newIndex) => ({
-      ...app,
-      index: newIndex + 1, // 1부터 다시 세팅
-    }));
-
-    setApplications(reIndexedApplications);
-    setShowConfirmModal(false);
-    setSelectedApplication(null);
-    } catch (error) {
-      console.error('Error cancelling application:', error);
-      setShowConfirmModal(false);
-      setSelectedApplication(null);
-    }
-  };
-
-  const handleCloseConfirmModal = () => {
-    setShowConfirmModal(false);
-    setSelectedApplication(null);
+      // 선택된 index에 해당하는 application 삭제
+      const updatedApplications = applications.filter(
+        (_, appIndex) => appIndex !== (application.index-1)
+      );
+  
+      // 남은 applications의 index 재설정
+      const reIndexedApplications = updatedApplications.map((app, newIndex) => ({
+        ...app,
+        index: newIndex + 1, // 1부터 다시 세팅
+      }));
+  
+      setApplications(reIndexedApplications);
+      } catch (error) {
+        console.error('Error cancelling application:', error);
+      }
   };
 
   // 1-2. 신청 핸들러
@@ -315,13 +299,6 @@ function TonerApply() {
         </div>
         <Table columns={applyColumns} data={applications} isToner={true} />
       </div>
-      {showConfirmModal && (
-        <ConfirmModal
-          message="정말 취소하시겠습니까?"
-          onConfirm={handleConfirmCancel}
-          onCancel={handleCloseConfirmModal}
-        />
-      )}
       {showApplyModal && (
         <ConfirmModal
           message="신청하시겠습니까?"
