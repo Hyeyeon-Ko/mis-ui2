@@ -26,6 +26,7 @@ function TonerApply() {
   const [applications, setApplications] = useState([]);
   const [mngNumOptions, setMngNumOptions] = useState([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showApplyModal, setShowApplyModal] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
 
   // 금액 포맷팅
@@ -49,7 +50,7 @@ function TonerApply() {
     fetchMngNums();
   }, [auth.instCd]);
 
-  // 1. 신청항목 취소 핸들러
+  // 1-1. 신청항목 취소 핸들러
   const handleCancelClick = (application) => {
     setSelectedApplication(application);
     setShowConfirmModal(true);
@@ -86,6 +87,46 @@ function TonerApply() {
   const handleCloseConfirmModal = () => {
     setShowConfirmModal(false);
     setSelectedApplication(null);
+  };
+
+  // 1-2. 신청 핸들러
+  const handleApplyClick = () => {
+    setShowApplyModal(true);
+  };
+
+  const handleConfirmApply = async () => {
+    try {
+      const tonerDetailDTOs = applications.map(app => ({
+        mngNum: app.mngNm,
+        teamNm: app.teamNm,
+        location: app.location,
+        printNm: app.printer,
+        tonerNm: app.tonerNm,
+        price: app.price,
+        quantity: app.quantity,
+        totalPrice: app.totalPrice,
+      }));
+
+      const tonerRequestDTO = {
+        drafter: auth.userNm,
+        drafterId: auth.userId,
+        instCd: auth.instCd,
+        tonerDetailDTOs,
+      };
+
+      await axios.post('/api/toner', tonerRequestDTO);
+      setShowApplyModal(false);
+      alert('신청이 완료되었습니다.');
+      setApplications([])
+    } catch (error) {
+      console.error('Error applying toner:', error);
+    alert('신청 중 오류가 발생했습니다.');
+    setShowApplyModal(false);
+    }
+  };
+
+  const handleCloseApplyModal = () => {
+    setShowApplyModal(false);
   };
 
   // 2. 관리번호로 toner 상세정보 fetch
@@ -256,7 +297,7 @@ function TonerApply() {
             <CustomButton className="add-toner-button" onClick={() => handleAddItem()}>
                 추 가
             </CustomButton>
-            <CustomButton className="apply-request-button"> {/**onclick 추가 */}
+            <CustomButton className="apply-request-button" onClick={() => handleApplyClick()}>
                 신 청
             </CustomButton>
           </div>  
@@ -268,8 +309,15 @@ function TonerApply() {
           message="정말 취소하시겠습니까?"
           onConfirm={handleConfirmCancel}
           onCancel={handleCloseConfirmModal}
-          />
-        )}
+        />
+      )}
+      {showApplyModal && (
+        <ConfirmModal
+          message="신청하시겠습니까?"
+          onConfirm={handleConfirmApply}
+          onCancel={handleCloseApplyModal}
+        />
+      )}
       </div>
   );
 }
