@@ -66,21 +66,21 @@ function TonerApply() {
   // 1-1. 신청항목 취소 핸들러
   const handleCancelClick = (application) => {
     try {
-      // 선택된 index에 해당하는 application 삭제
-      const updatedApplications = applications.filter(
-        (_, appIndex) => appIndex !== (application.index-1)
-      );
-  
-      // 남은 applications의 index 재설정
-      const reIndexedApplications = updatedApplications.map((app, newIndex) => ({
-        ...app,
-        index: newIndex + 1, // 1부터 다시 세팅
-      }));
-  
-      setApplications(reIndexedApplications);
-      } catch (error) {
-        console.error('Error cancelling application:', error);
-      }
+    // 선택된 index에 해당하는 application 삭제
+    const updatedApplications = applications.filter(
+      (_, appIndex) => appIndex !== (application.index-1)
+    );
+
+    // 남은 applications의 index 재설정
+    const reIndexedApplications = updatedApplications.map((app, newIndex) => ({
+      ...app,
+      index: newIndex + 1, // 1부터 다시 세팅
+    }));
+
+    setApplications(reIndexedApplications);
+    } catch (error) {
+      console.error('Error cancelling application:', error);
+    }
   };
 
   // 1-2. 신청 핸들러
