@@ -19,6 +19,8 @@ function Sidebar() {
     sealPendingCount: 0,
     corpDocIssuePendingCount: 0,
     orderPendingCount: 0, 
+    tonerPendingCount: 0,
+    tonerOrderPendingCount: 0,
   });
 
   const toggleSidebar = () => {
@@ -133,8 +135,8 @@ function Sidebar() {
         { label: '토너 관리표', url: '/tonerList', subIndex: 'G-1' },
         { label: '전국 토너 관리표', url: '/totalTonerList', subIndex: 'G-2' },
         { label: '전체 신청내역', url: '/applyList?documentType=토너신청', subIndex: 'G-1' },
-        { label: '토너 대기', url: '/toner/pendingList', subIndex: 'G-1' },
-        { label: '토너 발주', url: '/toner/orderList', subIndex: 'G-1' },
+        { label: '토너 대기', url: '/toner/pendingList', count: pendingCounts.tonerPendingCount, subIndex: 'G-1' },
+        { label: '토너 발주', url: '/toner/orderList', count: pendingCounts.tonerOrderPendingCount, subIndex: 'G-1' },
       ]}
     ]
   };

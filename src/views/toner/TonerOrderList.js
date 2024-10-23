@@ -28,7 +28,6 @@ function TonerOrderList() {
           instCd:auth.instCd,
         },
       });
-      console.log(response);
       setApplications(response.data.data || []);
     } catch (error) {
       console.error('Error fetching toner order list: ', error);
