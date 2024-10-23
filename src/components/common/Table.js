@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../../styles/common/Table.css';
 
-const Table = ({ columns, data, onRowClick = () => {}, onRowMouseDown = () => {}, onRowMouseOver = () => {}, onRowMouseUp = () => {} }) => (
+const Table = ({ columns, data, isToner = false, onRowClick = () => {}, onRowMouseDown = () => {}, onRowMouseOver = () => {}, onRowMouseUp = () => {} }) => (
   <table className="custom-table">
     <thead>
       <tr>
@@ -14,7 +14,9 @@ const Table = ({ columns, data, onRowClick = () => {}, onRowMouseDown = () => {}
     <tbody>
       {data.length === 0 ? (
         <tr>
-          <td colSpan={columns.length} style={{ textAlign: 'center' }}>조회된 데이터가 없습니다.</td>
+          <td colSpan={columns.length} style={{ textAlign: 'center' }}>
+          {isToner ? '신청할 항목을 추가해주세요.' : '조회된 데이터가 없습니다.'}
+          </td>
         </tr>
       ) : (
         data.map((row, rowIndex) => {
@@ -50,6 +52,7 @@ const Table = ({ columns, data, onRowClick = () => {}, onRowMouseDown = () => {}
 Table.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.object).isRequired,
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  isToner: PropTypes.bool,
   onRowClick: PropTypes.func,
   onRowMouseDown: PropTypes.func,
   onRowMouseOver: PropTypes.func,

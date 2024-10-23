@@ -87,6 +87,7 @@ function Apply() {
       <div className="button-container">
         <CircleButton to="/bcd" label="명함신청" />
         <CircleButton to="/doc" label="문서수발신" />
+        <CircleButton to="/tonerApply" label="토너신청" />
       </div>
       {/* <div className="file-upload-section">
         <label htmlFor="file-upload">엑셀 파일 첨부하기</label>
