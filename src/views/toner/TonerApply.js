@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { AuthContext } from '../../components/AuthContext';
+import { validateTonerApply } from '../../hooks/validateTonerApply';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import CustomButton from '../../components/common/CustomButton';
@@ -99,6 +100,13 @@ function TonerApply() {
         quantity: app.quantity,
         totalPrice: app.totalPrice,
       }));
+
+      const { isValid, message } = validateTonerApply(tonerDetailDTOs);
+      if (!isValid) {
+          alert(message);
+          handleCloseApplyModal(false);
+          return;
+      }
 
       const tonerRequestDTO = {
         drafter: auth.userNm,
