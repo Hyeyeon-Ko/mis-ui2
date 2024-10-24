@@ -244,7 +244,6 @@ function ApplicationsList() {
           //   return qs.stringify(params, { arrayFormat: "repeat" });
           // }
         });
-        console.log(response);
 
         const {
           bcdMasterResponses,

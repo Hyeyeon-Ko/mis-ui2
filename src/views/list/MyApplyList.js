@@ -71,7 +71,6 @@ function MyApplyList() {
       });
   
       const data = response.data.data.pagedResult || response.data.data;
-      console.log(data);
   
       const { myBcdResponses, myDocResponses, myCorpDocResponses, mySealResponses, myTonerResponses, pagedResult } = response.data.data;
 
