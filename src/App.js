@@ -19,6 +19,7 @@ import DetailDocApplication from './views/doc/DetailDocApplication';
 import DetailCorpDocApplication from './views/corpdoc/DetailCorpDocApplication';
 import DetailSealImprintApplication from './views/seal/DetailSealImprintApplication';
 import DetailSealExportApplication from './views/seal/DetailSealExportApplication';
+import DetailTonerApplication from './views/toner/DetailTonerApplication';
 import DocInList from './views/doc/DocInList';
 import DocOutList from './views/doc/DocOutList';
 import SealManagementList from './views/seal/SealManagementList';
@@ -154,6 +155,7 @@ function App() {
                 <Route path="/seal/export/:draftId" element={<RequireAuth><DetailSealExportApplication /></RequireAuth>} />
                 <Route path="/bcd/applyList/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
                 <Route path="/corpDoc/applyList/:draftId" element={<RequireAuth><DetailCorpDocApplication /></RequireAuth>} />
+                <Route path="/toner/applyList/:draftId" element={<RequireAuth><DetailTonerApplication /></RequireAuth>} />
               </Routes>
             </MainLayout>
           } />

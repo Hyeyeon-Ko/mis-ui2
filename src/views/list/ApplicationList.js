@@ -14,7 +14,6 @@ import { AuthContext } from "../../components/AuthContext";
 import useDateSet from "../../hooks/apply/useDateSet";
 import PaginationSub from "../../components/common/PaginationSub";
 import Loading from "../../components/common/Loading";
-//import qs from 'qs';
 
 function ApplicationsList() {
   const location = useLocation();
@@ -93,6 +92,8 @@ function ApplicationsList() {
         return ["법인서류 관리", "전체 신청내역"];
       case "문서수발신":
         return ["문서수발신 관리", "전체 신청내역"];
+      case "토너신청":
+        return ["토너 관리", "전체 신청내역"]
       default:
         return ["신청내역 관리", "전체 신청내역"];
     }
@@ -108,6 +109,8 @@ function ApplicationsList() {
         return "C";
       case "인장신청":
         return "D";
+      case "토너신청":
+        return "E";
       default:
         return null;
     }
@@ -241,12 +244,14 @@ function ApplicationsList() {
           //   return qs.stringify(params, { arrayFormat: "repeat" });
           // }
         });
+        console.log(response);
 
         const {
           bcdMasterResponses,
           docMasterResponses,
           corpDocMasterResponses,
           sealMasterResponses,
+          tonerMasterResponses,
         } = response.data.data;
 
         const combinedData = [
@@ -254,6 +259,7 @@ function ApplicationsList() {
           docMasterResponses,
           corpDocMasterResponses,
           sealMasterResponses,
+          tonerMasterResponses,
         ];
 
         const selectedData = combinedData.find(
@@ -324,7 +330,7 @@ function ApplicationsList() {
 
   useEffect(() => {
     fetchApplications(currentPage, itemsPerPage);
-  }, [currentPage, fetchApplications]);
+  }, [currentPage, documentTypeFromUrl, fetchApplications]);
 
   
   // const formatDate = (dateString) => {
@@ -449,6 +455,16 @@ function ApplicationsList() {
     }
   };
 
+  const fetchTonerDetail = async (draftId) => {
+    try {
+      const response = await axios.get(`/api/toner/${draftId}`);
+      return response.data.data;
+    } catch (error) {
+      console.error("Error fetching toner details:", error);
+      alert("토너 신청 정보를 불러오는 중 오류가 발생했습니다.");
+    }
+  }
+
   // 3. 명함신청 + 처리완료일 때 엑셀버튼 보이기
   useEffect(() => {
     if (documentTypeFromUrl === "명함신청") {
@@ -533,6 +549,12 @@ function ApplicationsList() {
         `/seal/export/${draftId}?readonly=true&applyStatus=${applyStatus}`,
         { state: { sealExportDetails, readOnly: true } }
       );
+    } else if (docType === "토너신청") {
+      const tonerDetails = await fetchTonerDetail(draftId);
+      navigate(
+        `/toner/applyList/${draftId}?readonly=true&applyStatus=${applyStatus}`,
+        { state: { tonerDetails, readOnly: true } }
+      );
     }
   };
 
@@ -610,7 +632,8 @@ function ApplicationsList() {
   documentTypeFromUrl === "명함신청" ||
   documentTypeFromUrl === "법인서류" ||
   documentTypeFromUrl === "문서수발신" ||
-  documentTypeFromUrl === "인장신청";
+  documentTypeFromUrl === "인장신청" ||
+  documentTypeFromUrl === "토너신청";
 
   return (
     <div className="content">

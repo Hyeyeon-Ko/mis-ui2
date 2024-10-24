@@ -71,8 +71,9 @@ function MyApplyList() {
       });
   
       const data = response.data.data.pagedResult || response.data.data;
+      console.log(data);
   
-      const { myBcdResponses, myDocResponses, myCorpDocResponses, mySealResponses, pagedResult } = response.data.data;
+      const { myBcdResponses, myDocResponses, myCorpDocResponses, mySealResponses, myTonerResponses, pagedResult } = response.data.data;
 
       
   
@@ -99,6 +100,11 @@ function MyApplyList() {
           combinedData = combinedData.concat(mySealResponses.content);
           totalPages = Math.max(data.mySealResponses.totalPages || 1, 1);
           currentPage = data.mySealResponses.number + 1;
+        }
+        if(myTonerResponses != null) { 
+          combinedData = combinedData.concat(myTonerResponses.content);
+          totalPages = Math.max(data.myTonerResponses.totalPages || 1, 1);
+          currentPage = data.myTonerResponses.number + 1;
         }
         
       } else {
@@ -133,7 +139,7 @@ function MyApplyList() {
   
       setApplications(transformedData);
       setFilteredApplications(transformedData); 
-      setTotalPages(totalPages);  // 여기에 페이지 설정
+      setTotalPages(totalPages);  
       setCurrentPage(currentPage);
     } catch (error) {
       console.error('Error fetching applications:', error.response?.data || error.message);

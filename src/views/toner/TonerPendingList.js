@@ -19,6 +19,7 @@ function TonerPendingList() {
   const [isLoading, setIsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [expandedRows, setExpandedRows] = useState([]);
 
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
@@ -45,13 +46,28 @@ function TonerPendingList() {
     fetchTonerPendingList();
   }, [fetchTonerPendingList]);
 
+  const filteredApplications = applications.filter(row => row.holding === null);
+
   const handleRowClick = (row) => {
     const draftId = row.draftId;
-    if (selectedApplications.includes(draftId)) {
-      setSelectedApplications(selectedApplications.filter((appId) => appId !== draftId));
+    if (expandedRows.includes(draftId)) {
+      setExpandedRows(expandedRows.filter(id => id !== draftId));  // 이미 열려있으면 닫기
     } else {
-      setSelectedApplications([...selectedApplications, draftId]);
+      setExpandedRows([...expandedRows, draftId]);  // 닫혀 있으면 열기
     }
+  };
+
+  const getExpandedRows = () => {
+    const expandedData = [];
+    filteredApplications.forEach(row => {
+      expandedData.push(row);
+      if (expandedRows.includes(row.draftId)) {
+        // draftId가 동일한 holding이 T인 데이터를 추가
+        const holdingRows = applications.filter(holdingRow => holdingRow.draftId === row.draftId && holdingRow.holding === 'T');
+        expandedData.push(...holdingRows);
+      }
+    });
+    return expandedData;
   };
 
   const handleMouseDown = (rowIndex) => {
@@ -94,6 +110,7 @@ function TonerPendingList() {
   // TODO: 엑셀 파일 형식 받은 후 연동
   const handleExcelDownload = async () => {
     if (selectedApplications.length === 0) {
+      
       alert('엑셀변환 할 명함 신청 목록을 선택하세요.');
       return;
     }
@@ -177,7 +194,7 @@ function TonerPendingList() {
       header: <input type="checkbox" onChange={handleSelectAll} />,
       accessor: 'select',
       width: '3.5%',
-      Cell: ({ row, index }) => (
+      Cell: ({ row }) => (
         <input
           type="checkbox"
           className="order-checkbox"
@@ -223,9 +240,9 @@ function TonerPendingList() {
         ) : (
           <Table 
             columns={columns} 
-            data={applications || []} 
+            data={getExpandedRows()}  // 확장된 행들 포함
             rowClassName="clickable-row"
-            onRowClick={(row, rowIndex) => handleRowClick(row)}
+            onRowClick={(row) => handleRowClick(row)}  // 클릭 시 확장/축소
             onRowMouseDown={(rowIndex) => handleMouseDown(rowIndex)}  
             onRowMouseOver={(rowIndex) => handleMouseOver(rowIndex)}  
             onRowMouseUp={handleMouseUp}    
