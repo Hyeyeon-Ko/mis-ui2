@@ -69,9 +69,9 @@ function TonerApply() {
 
   // 1. 신청 내역을 수정 모드에서 불러오기
   useEffect(() => {
-    if (type === 'modify' && draftId) {
-      const fetchTonerDetails = async () => {
-        try {
+    const fetchTonerDetails = async () => {
+      try {
+        if (type === 'modify' && draftId) {
           const response = await axios.get(`/api/toner/${draftId}`);
           const fetchedApplications = response.data.data.map((application, index) => ({
             ...application,
@@ -87,14 +87,17 @@ function TonerApply() {
           }
   
           setApplications(fetchedApplications);
-        } catch (error) {
-          console.error('Error fetching toner details:', error);
+        } else {
+          setApplications([{ ...defaultTonerDetails, index: 1 }]);
         }
-      };
-      fetchTonerDetails();
-    }
-  }, [type, draftId]);
+      } catch (error) {
+        console.error('Error fetching toner details:', error);
+      }
+    };
   
+    fetchTonerDetails();
+  }, [type, draftId]);
+    
   // 2. 신청항목 취소 핸들러
   const handleCancelClick = (application) => {
     try {
@@ -132,7 +135,7 @@ function TonerApply() {
         totalPrice: app.totalPrice,
       }));
 
-      const { isValid, message } = validateTonerApply(tonerDetailDTOs);
+      const { isValid, message } = validateTonerApply(type, tonerDetailDTOs);
       if (!isValid) {
         alert(message);
         handleCloseApplyModal(false);
