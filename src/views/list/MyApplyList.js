@@ -416,7 +416,7 @@ function MyApplyList() {
       </div>
       {showModal && (
         <ConfirmModal
-          message={selectedApplication.applyStatus === '발급완료' ? "법인서류를 수령하셨습니까?" : "명함을 수령하셨습니까?"}
+          message={selectedApplication.docType === '토너신청' ? "토너를 수령하셨습니까?" : "명함을 수령하셨습니까?"}
           onConfirm={handleConfirmModal}
           onCancel={handleCloseModal}
         />
