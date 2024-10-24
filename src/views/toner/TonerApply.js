@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext, useCallback } from 'react';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../components/AuthContext';
 import { validateTonerApply } from '../../hooks/validateTonerApply';
 import Breadcrumb from '../../components/common/Breadcrumb';
@@ -10,34 +11,37 @@ import '../../styles/common/Page.css';
 import '../../styles/toner/TonerApply.css';
 
 function TonerApply() {
-
-  // 기본값
-  const defaultTonerDetails = {
-    mngNm: '',
-    tonerNm: '',
-    teamNm: '',
-    location: '',
-    printer: '',
-    price: '',
-    quantity: '',
-    totalPrice: '',
-  };
-
   const { auth } = useContext(AuthContext);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { draftId } = useParams(); 
+
+  const type = new URLSearchParams(location.search).get('type'); 
   const [totalAmount, setTotalAmount] = useState(0);
   const [applications, setApplications] = useState([]);
   const [mngNumOptions, setMngNumOptions] = useState([]);
   const [showApplyModal, setShowApplyModal] = useState(false);
 
+  const defaultTonerDetails = {
+    mngNum: '',
+    tonerNm: '',
+    teamNm: '',
+    location: '',
+    printNm: '',
+    price: '',
+    quantity: 1,
+    totalPrice: '',
+  };
+
   // 금액 포맷팅
   const formatPrice = (price) => {
     return new Intl.NumberFormat().format(price);
-  }; 
+  };
 
   // 신청항목 총 금액 계산
   const calculateTotalPrice = useCallback(() => {
     const total = applications.reduce((sum, app) => {
-      const price = parseInt(app.totalPrice.replace(/,/g, ''), 10); // Remove commas and convert to number
+      const price = parseInt(app.totalPrice.replace(/,/g, ''), 10); 
       return sum + (isNaN(price) ? 0 : price);
     }, 0);
     setTotalAmount(total);
@@ -63,27 +67,53 @@ function TonerApply() {
     fetchMngNums();
   }, [fetchMngNums]);
 
-  // 1-1. 신청항목 취소 핸들러
+  // 1. 신청 내역을 수정 모드에서 불러오기
+  useEffect(() => {
+    if (type === 'modify' && draftId) {
+      const fetchTonerDetails = async () => {
+        try {
+          const response = await axios.get(`/api/toner/${draftId}`);
+          const fetchedApplications = response.data.data.map((application, index) => ({
+            ...application,
+            index: index + 1,
+          }));
+  
+          for (const application of fetchedApplications) {
+            const tonerInfoResponse = await axios.get(`/api/toner/info`, {
+              params: { mngNum: application.mngNum },
+            });
+            const tonerPriceList = tonerInfoResponse.data.data.tonerPriceDTOList;
+            application.tonerPriceDTOList = tonerPriceList; 
+          }
+  
+          setApplications(fetchedApplications);
+        } catch (error) {
+          console.error('Error fetching toner details:', error);
+        }
+      };
+      fetchTonerDetails();
+    }
+  }, [type, draftId]);
+  
+  // 2. 신청항목 취소 핸들러
   const handleCancelClick = (application) => {
     try {
-    // 선택된 index에 해당하는 application 삭제
-    const updatedApplications = applications.filter(
-      (_, appIndex) => appIndex !== (application.index-1)
-    );
+      const updatedApplications = applications.filter(
+        (_, appIndex) => appIndex !== (application.index - 1)
+      );
 
-    // 남은 applications의 index 재설정
-    const reIndexedApplications = updatedApplications.map((app, newIndex) => ({
-      ...app,
-      index: newIndex + 1, // 1부터 다시 세팅
-    }));
+      const reIndexedApplications = updatedApplications.map((app, newIndex) => ({
+        ...app,
+        index: newIndex + 1,
+      }));
 
-    setApplications(reIndexedApplications);
+      setApplications(reIndexedApplications);
     } catch (error) {
       console.error('Error cancelling application:', error);
     }
   };
 
-  // 1-2. 신청 핸들러
+  // 3. 신청 핸들러
   const handleApplyClick = () => {
     setShowApplyModal(true);
   };
@@ -91,10 +121,11 @@ function TonerApply() {
   const handleConfirmApply = async () => {
     try {
       const tonerDetailDTOs = applications.map(app => ({
-        mngNum: app.mngNm,
+        itemId: app.itemId || null, 
+        mngNum: app.mngNum,
         teamNm: app.teamNm,
         location: app.location,
-        printNm: app.printer,
+        printNm: app.printNm,
         tonerNm: app.tonerNm,
         price: app.price,
         quantity: app.quantity,
@@ -103,9 +134,9 @@ function TonerApply() {
 
       const { isValid, message } = validateTonerApply(tonerDetailDTOs);
       if (!isValid) {
-          alert(message);
-          handleCloseApplyModal(false);
-          return;
+        alert(message);
+        handleCloseApplyModal(false);
+        return;
       }
 
       const tonerRequestDTO = {
@@ -115,14 +146,20 @@ function TonerApply() {
         tonerDetailDTOs,
       };
 
-      await axios.post('/api/toner', tonerRequestDTO);
-      setShowApplyModal(false);
-      alert('신청이 완료되었습니다.');
-      setApplications([])
+      if (type === 'modify' && draftId) {
+        await axios.put(`/api/toner/update/${draftId}`, tonerRequestDTO);
+        alert('수정이 완료되었습니다.');
+        navigate('/myPendingList');
+      } else {
+        await axios.post(`/api/toner`, tonerRequestDTO);
+        alert('신청이 완료되었습니다.');
+        navigate('/myPendingList');
+      }
+
     } catch (error) {
       console.error('Error applying toner:', error);
-    alert('신청 중 오류가 발생했습니다.');
-    setShowApplyModal(false);
+      alert('신청 중 오류가 발생했습니다.');
+      setShowApplyModal(false);
     }
   };
 
@@ -130,7 +167,7 @@ function TonerApply() {
     setShowApplyModal(false);
   };
 
-  // 2. 관리번호로 toner 상세정보 fetch
+  // 4. 관리번호로 toner 상세정보 fetch
   const fetchTonerInfo = async (mngNum, index) => {
     try {
       const response = await axios.get(`/api/toner/info`, {
@@ -139,16 +176,16 @@ function TonerApply() {
       const data = response.data.data;
       const tonerPriceList = data.tonerPriceDTOList;
 
-      const defaultToner = tonerPriceList[0]
+      const defaultToner = tonerPriceList[0];
       const quantity = 1;
-      
+
       const updatedApplication = {
         ...applications[index],
         index: index,
-        mngNm: data.mngNum,
+        mngNum: data.mngNum,
         teamNm: data.teamNm,
         location: data.location,
-        printer: data.modelNm,
+        printNm: data.modelNm,
         tonerNm: defaultToner.tonerNm,
         price: defaultToner.price,
         quantity: quantity,
@@ -160,30 +197,30 @@ function TonerApply() {
       updatedApplications[index - 1] = updatedApplication;
 
       setApplications(updatedApplications);
-      
+
     } catch (error) {
       console.error('Error fetching toner info:', error);
     }
   };
 
-  // 3. 수량 변경 핸들러
+  // 5. 수량 변경 핸들러
   const handleQuantityChange = (e, index) => {
     const newQuantity = parseInt(e.target.value, 10) || '';
     const price = applications[index].price ? applications[index].price.replace(/,/g, '') : '0';
     const newTotalPrice = formatPrice(parseInt(price, 10) * newQuantity);
-  
+
     const updatedApplication = {
       ...applications[index],
       quantity: newQuantity,
       totalPrice: newTotalPrice,
     };
-  
+
     const updatedApplications = [...applications];
     updatedApplications[index] = updatedApplication;
     setApplications(updatedApplications);
   };
 
-  // 4. 토너명 변경 핸들러
+  // 6. 토너명 변경 핸들러
   const handleTonerChange = (e, index) => {
     const selectedTonerNm = e.target.value;
     const application = applications[index - 1];
@@ -202,16 +239,16 @@ function TonerApply() {
     setApplications(updatedApplications);
   };
 
-  // 5. 신청항목 추가 핸들러
+  // 7. 신청항목 추가 핸들러
   const handleAddItem = () => {
     const lastIndex = applications.length > 0 ? applications[applications.length - 1].index : 0;
     setApplications([...applications, { ...defaultTonerDetails, index: lastIndex + 1 }]);
   };
 
   const applyColumns = [
-    { 
-      header: 'No.', 
-      accessor: 'index', 
+    {
+      header: 'No.',
+      accessor: 'index',
       width: '5%',
     },
     {
@@ -221,17 +258,18 @@ function TonerApply() {
       Cell: ({ row }) => {
         const application = applications[row.index - 1];
         return (
-          <select 
-            value={application.mngNm? application.mngNm : ""}
-            onChange={(e) => fetchTonerInfo(e.target.value, row.index)}>
-          <option value="">관리번호 선택</option>
-          {mngNumOptions.map(option => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-        ) 
+          <select
+            value={application.mngNum || ''} 
+            onChange={(e) => fetchTonerInfo(e.target.value, row.index)}
+          >
+            <option value="">관리번호 선택</option>
+            {mngNumOptions.map(option => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        )
       },
     },
     {
@@ -242,7 +280,7 @@ function TonerApply() {
         const application = applications[row.index - 1];
         return (
           <select
-            value={application.tonerNm}
+            value={application.tonerNm || ''}
             onChange={(e) => handleTonerChange(e, row.index)}
           >
             {application.tonerPriceDTOList && application.tonerPriceDTOList.map((toner, idx) => (
@@ -254,10 +292,10 @@ function TonerApply() {
         );
       },
     },
-    { header: '부서', accessor: 'teamNm', width: '11%'},
-    { header: '직무', accessor: 'location', width: '11%'},
-    { header: '프린터명', accessor: 'printer', width: '11%'},
-    { header: '단가', accessor: 'price', width: '9%'},
+    { header: '부서', accessor: 'teamNm', width: '11%' },
+    { header: '직무', accessor: 'location', width: '11%' },
+    { header: '프린터명', accessor: 'printNm', width: '11%' },
+    { header: '단가', accessor: 'price', width: '9%' },
     {
       header: '수량',
       accessor: 'quantity',
@@ -267,16 +305,16 @@ function TonerApply() {
           type="number"
           min="1"
           value={row.quantity || ''}
-          onChange={(e) => handleQuantityChange(e, row.index-1)}
+          onChange={(e) => handleQuantityChange(e, row.index - 1)}
         />
       ),
     },
-    { header: '금액', accessor: 'totalPrice', width: '11%'},
+    { header: '금액', accessor: 'totalPrice', width: '11%' },
     {
       header: '',
       accessor: 'cancel',
       width: '3%',
-      Cell: ({row }) => (
+      Cell: ({ row }) => (
         <span
           className="toner-cancel-button"
           onClick={() => handleCancelClick(row)}
@@ -290,31 +328,31 @@ function TonerApply() {
   return (
     <div className="content">
       <div className="toner-apply-content">
-        <h2>토너 신청</h2>
-        <Breadcrumb items={['신청하기', '토너신청']} />
+        <h2>{type === 'modify' ? '토너 수정' : '토너 신청'}</h2>
+        <Breadcrumb items={['신청하기', type === 'modify' ? '토너수정' : '토너신청']} />
         <div className='toner-apply-header'>
-          <label className='toner-apply-header-label'>신청 항목&gt;&gt;</label>
+          <label className='toner-apply-header-label'>{type === 'modify' ? '수정 항목' : '신청 항목'}&gt;&gt;</label>
           <div className="toner-buttons-container">
             <label className='toner-apply-info'>총 건수: {applications.length}</label>
             <label className='toner-apply-info'>총 금액: {formatPrice(totalAmount)}</label>
             <CustomButton className="add-toner-button" onClick={() => handleAddItem()}>
-                추 가
+              추 가
             </CustomButton>
             <CustomButton className="apply-request-button" onClick={() => handleApplyClick()}>
-                신 청
+              {type === 'modify' ? '수 정' : '신 청'}
             </CustomButton>
-          </div>  
+          </div>
         </div>
         <Table columns={applyColumns} data={applications} isToner={true} />
       </div>
       {showApplyModal && (
         <ConfirmModal
-          message="신청하시겠습니까?"
+          message={type === 'modify' ? "수정하시겠습니까?" : "신청하시겠습니까?"}
           onConfirm={handleConfirmApply}
           onCancel={handleCloseApplyModal}
         />
       )}
-      </div>
+    </div>
   );
 }
 

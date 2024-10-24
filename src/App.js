@@ -150,7 +150,7 @@ function App() {
                 <Route path="/std" element={<RequireAuth><StandardData /></RequireAuth>} />
                 <Route path="/bcd/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
                 <Route path="/doc/:draftId" element={<RequireAuth><DetailDocApplication /></RequireAuth>} />
-                <Route path="/toner/:draftId" element={<RequireAuth><DetailTonerApplication /></RequireAuth>} />
+                <Route path="/toner/:draftId" element={<RequireAuth><TonerApply /></RequireAuth>} />
                 <Route path="/corpDoc/:draftId" element={<RequireAuth><DetailCorpDocApplication/></RequireAuth>}/>
                 <Route path="/seal/imprint/:draftId" element={<RequireAuth><DetailSealImprintApplication /></RequireAuth>} />
                 <Route path="/seal/export/:draftId" element={<RequireAuth><DetailSealExportApplication /></RequireAuth>} />

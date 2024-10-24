@@ -164,7 +164,7 @@ function MyPendingList() {
                 path = `/seal/export/${row.draftId}`;
                 break;
               case '토너신청':
-                path = `/toner/${row.draftId}`;
+                path = `/toner/${row.draftId}?type=modify`; 
                 break;
               default:
                 path = `/doc/${row.draftId}`; 
