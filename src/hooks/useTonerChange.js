@@ -70,25 +70,17 @@ const useTonerChange = () => {
     //     }
     // };
 
+    // 개별 선택/해제 핸들러
     const handleSelect = (event, id) => {
-        if (event.target.checked) {
-          const updatedSelected = [...selectedApplications, id];
+      if (event.target.checked) {
+        const updatedSelected = [...selectedApplications, id];
+        setSelectedApplications(updatedSelected);
+      } else {
+        const updatedSelected = selectedApplications.filter((appId) => appId !== id);
+        setSelectedApplications(updatedSelected);
+      }
+    };
     
-          if (updatedSelected.length === applications.length) {
-            document.getElementById('select-all-checkbox').checked = true; 
-          }
-    
-          setSelectedApplications(updatedSelected);
-        } else {
-          const updatedSelected = selectedApplications.filter((appId) => appId !== id);
-    
-          document.getElementById('select-all-checkbox').checked = false;
-    
-          setSelectedApplications(updatedSelected);
-        }
-      };
-    
-
     return { 
         formData, 
         file, 

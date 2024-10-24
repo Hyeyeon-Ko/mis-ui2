@@ -174,16 +174,18 @@ function TonerPendingList() {
       ),
       accessor: 'select',
       width: '3.5%',
-      Cell: ({ row }) => (
-        <input
-          type="checkbox"
-          className="order-checkbox"
-          checked={selectedApplications.includes(row.draftId)}
-          onChange={(event) => handleSelect(event, row.draftId)}
-          onClick={(e) => e.stopPropagation()}
-        />
-      ),
-    },
+      Cell: ({ row }) => {
+        return (
+          <input
+            type="checkbox"
+            className="order-checkbox"
+            checked={row.draftId ? selectedApplications.includes(row.draftId) : false}
+            onChange={(event) => row.draftId && handleSelect(event, row.draftId)}
+            onClick={(e) => e.stopPropagation()}
+          />
+        );
+      }
+     },
     { 
       header: '총 건수', 
       accessor: 'draftIdCount', 
