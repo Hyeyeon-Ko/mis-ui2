@@ -11,7 +11,7 @@ import useTonerChange from '../../hooks/useTonerChange';
 import { reverseDivisionMap } from '../../datas/tonerData';
 
 function TonerPriceList() {
-  const { selectedRows, setSelectedRows, handleRowSelect } = useTonerChange();
+  const { selectedRows, setSelectedRows } = useTonerChange();
   const { auth } = useContext(AuthContext);
   const [tonerDetails, setTonerDetails] = useState([]);
   const [loading, setLoading] = useState(false);

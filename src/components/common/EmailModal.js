@@ -64,7 +64,7 @@ const EmailModal = ({ show, onClose, onSend, orderType }) => {
         isLoading: false,
       });
     }
-  }, [show, setEmailData]);
+  }, [show, orderType, setEmailData]);
 
   const handleSend = () => {
     setEmailData((prevData) => ({ ...prevData, isLoading: true }));

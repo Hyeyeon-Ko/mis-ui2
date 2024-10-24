@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
@@ -7,13 +7,12 @@ import RejectReasonModal from '../../components/ReasonModal';
 import '../../styles/bcd/BcdOrder.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
-import fileDownload from 'js-file-download';
 import { FadeLoader } from 'react-spinners';
 import { AuthContext } from '../../components/AuthContext'; 
 import useTonerChange from '../../hooks/useTonerChange';
 
 function TonerPendingList() {
-  const { handleSelectAll, handleSelect, applications, selectedApplications, setApplications, setSelectedApplications} = useTonerChange();
+  const { handleSelectAll, handleSelect, applications, selectedApplications, setApplications} = useTonerChange();
   const { auth, refreshSidebar } = useContext(AuthContext);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -88,14 +87,16 @@ function TonerPendingList() {
       return;
     }
 
-    try {
-      const response = await axios.post(`/api/toner/pending/excel`, selectedApplications, {
-        responseType: 'blob',
-      });
-      fileDownload(response.data, '토너 승인대기 내역(기안상신용).xlsx');
-    } catch (error) {
-      console.error('Error downloading excel: ', error);
-    }
+    alert('아직 개발 전!!!')
+
+    // try {
+    //   const response = await axios.post(`/api/toner/pending/excel`, selectedApplications, {
+    //     responseType: 'blob',
+    //   });
+    //   fileDownload(response.data, '토너 승인대기 내역(기안상신용).xlsx');
+    // } catch (error) {
+    //   console.error('Error downloading excel: ', error);
+    // }
   };
 
   const handleApprove = async () => {

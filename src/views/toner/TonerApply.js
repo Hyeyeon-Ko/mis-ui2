@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react';
+import React, { useEffect, useState, useContext, useCallback, useMemo } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../components/AuthContext';
 import { validateTonerApply } from '../../hooks/validateTonerApply';
@@ -22,7 +22,7 @@ function TonerApply() {
   const [mngNumOptions, setMngNumOptions] = useState([]);
   const [showApplyModal, setShowApplyModal] = useState(false);
 
-  const defaultTonerDetails = {
+  const defaultTonerDetails = useMemo(() => ({
     mngNum: '',
     tonerNm: '',
     teamNm: '',
@@ -31,7 +31,7 @@ function TonerApply() {
     price: '',
     quantity: 1,
     totalPrice: '',
-  };
+  }), []);
 
   // 금액 포맷팅
   const formatPrice = (price) => {
@@ -96,7 +96,7 @@ function TonerApply() {
     };
   
     fetchTonerDetails();
-  }, [type, draftId]);
+  }, [type, draftId, defaultTonerDetails]);
     
   // 2. 신청항목 취소 핸들러
   const handleCancelClick = (application) => {
