@@ -1,22 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom'; 
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
+import axios from 'axios'; 
 import '../../styles/common/Page.css';
 import '../../styles/toner/TonerApply.css';
 
 function DetailTonerApplication() {
-  const location = useLocation();
+  const { draftId } = useParams(); 
   const [applications, setApplications] = useState([]);
-
-  const isReadOnly = location.state?.readOnly || false;  
-  const tonerDetails = location.state?.tonerDetails || [];  
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
-    if (tonerDetails.length > 0) {
-      setApplications(tonerDetails);  
-    }
-  }, [tonerDetails]);
+    const fetchTonerDetails = async () => {
+      try {
+        const response = await axios.get(`/api/toner/${draftId}`);
+        setApplications(response.data.data);
+      } catch (error) {
+        console.error('Error fetching toner details:', error);
+        alert('토너 신청 정보를 불러오는 중 오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTonerDetails();
+  }, [draftId]);
 
   const numberedApplications = applications.map((application, index) => ({
     ...application,
@@ -42,12 +51,16 @@ function DetailTonerApplication() {
   return (
     <div className="content">
       <div className="all-applications">
-        <h2>{isReadOnly ? '토너 상세보기' : '토너수정'}</h2>
-        <Breadcrumb items={isReadOnly ? ['토너 관리', '토너 상세보기'] : ['나의 신청내역', '승인대기 내역', '토너수정']} />
+        <h2>토너 상세보기</h2>
+        <Breadcrumb items={['토너 관리', '토너 상세보기']} />
         <div className='toner-apply-header'>
           <label className='toner-apply-header-label'>상세 신청 내역&gt;&gt;</label>
         </div>
-        <Table columns={applyColumns} data={numberedApplications} isToner={true} />
+        {loading ? (
+          <p>로딩 중...</p>
+        ) : (
+          <Table columns={applyColumns} data={numberedApplications} isToner={true} />
+        )}
       </div>
     </div>
   );
