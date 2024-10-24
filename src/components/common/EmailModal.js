@@ -30,14 +30,16 @@ const inputFields = [
     type: 'text',
   },
 ];
+
 /* 이메일 작성 모달 */
-const EmailModal = ({ show, onClose, onSend }) => {
+const EmailModal = ({ show, onClose, onSend, orderType }) => {
   const { handleEmailChange, emailData, setEmailData } = useBdcChange();
-  // const [emailData, setEmailData] = useState(emailModalData);
 
   useEffect(() => {
     if (show) {
-      fetch(`/api/bsc/order/email-settings`)
+      const emailSettingsUrl = orderType === '명함' ? '/api/bsc/order/email-settings' : '/api/toner/order/email-settings';
+
+      fetch(emailSettingsUrl)
         .then((response) => {
           if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -66,7 +68,9 @@ const EmailModal = ({ show, onClose, onSend }) => {
 
   const handleSend = () => {
     setEmailData((prevData) => ({ ...prevData, isLoading: true }));
-    const fileToSend = emailData.fileName.trim() === '' ? '명함발주' : emailData.fileName.trim();
+
+    const defaultFileName = orderType === '명함' ? '명함발주' : '토너발주';
+    const fileToSend = emailData.fileName.trim() === '' ? defaultFileName : emailData.fileName.trim();
     
     const sendData = {
       ...emailData,
@@ -76,7 +80,7 @@ const EmailModal = ({ show, onClose, onSend }) => {
     onSend(sendData)
       .finally(() => {
         setEmailData((prevData) => ({ ...prevData, isLoading: false }));
-        window.location.href = '/bcd/orderList';
+        window.location.href = orderType === '명함' ? '/bcd/orderList' : '/toner/orderList';
         onClose();
       });
   };
@@ -86,7 +90,7 @@ const EmailModal = ({ show, onClose, onSend }) => {
   return (
     <div className="email-modal-overlay">
       <div className="email-modal-container">
-        <h3>이메일 작성</h3>
+        <h3>{orderType === '명함' ? '명함 발주 이메일 작성' : '토너 발주 이메일 작성'}</h3>
         {inputFields.map(({ id, label, placeholder, type }) => (
           <div className="email-input-group" key={id}>
             <label htmlFor={id}>{label}</label>
@@ -150,6 +154,7 @@ EmailModal.propTypes = {
   show: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSend: PropTypes.func.isRequired,
+  orderType: PropTypes.string.isRequired, 
 };
 
 export default EmailModal;

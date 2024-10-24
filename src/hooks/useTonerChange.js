@@ -47,24 +47,47 @@ const useTonerChange = () => {
     };
 
     // 전체 선택/해제 핸들러
-    const handleSelectAll = (event) => {
-        if (event.target.checked) {
-        setSelectedApplications(applications.map((app) => app.id));
+    const handleSelectAll = (e) => {
+        const isChecked = e.target.checked;
+        
+        if (isChecked) {
+          const allDraftIds = applications.map(row => row.draftId);
+          setSelectedApplications(allDraftIds);
         } else {
-        setSelectedApplications([]);
+          setSelectedApplications([]);
         }
-    };
+      };
+      
 
     // 개별 선택/해제 핸들러
+    // const handleSelect = (event, id) => {
+    //     if (event.target.checked) {
+    //     setSelectedApplications([...selectedApplications, id]);
+    //     } else {
+    //     setSelectedApplications(
+    //         selectedApplications.filter((appId) => appId !== id)
+    //     );
+    //     }
+    // };
+
     const handleSelect = (event, id) => {
         if (event.target.checked) {
-        setSelectedApplications([...selectedApplications, id]);
+          const updatedSelected = [...selectedApplications, id];
+    
+          if (updatedSelected.length === applications.length) {
+            document.getElementById('select-all-checkbox').checked = true; 
+          }
+    
+          setSelectedApplications(updatedSelected);
         } else {
-        setSelectedApplications(
-            selectedApplications.filter((appId) => appId !== id)
-        );
+          const updatedSelected = selectedApplications.filter((appId) => appId !== id);
+    
+          document.getElementById('select-all-checkbox').checked = false;
+    
+          setSelectedApplications(updatedSelected);
         }
-    };
+      };
+    
 
     return { 
         formData, 

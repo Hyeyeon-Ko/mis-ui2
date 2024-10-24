@@ -1,20 +1,27 @@
 import React, { useCallback, useEffect, useRef, useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import Loading from '../../components/common/Loading';
 import CustomButton from '../../components/common/CustomButton';
+import EmailModal from '../../components/common/EmailModal';
 import '../../styles/bcd/BcdOrder.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
 import fileDownload from 'js-file-download';
+import { FadeLoader } from 'react-spinners';
 import { AuthContext } from '../../components/AuthContext'; 
 import useTonerChange from '../../hooks/useTonerChange';
 
 
 function TonerOrderList() {
   const { handleSelectAll, handleSelect, applications, selectedApplications, setApplications, setSelectedApplications} = useTonerChange();
-  const { auth } = useContext(AuthContext);
+  const { auth, refreshSidebar } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+
+  const navigate = useNavigate();
 
   const dragStartIndex = useRef(null);
   const dragEndIndex = useRef(null);
@@ -102,6 +109,44 @@ function TonerOrderList() {
       console.error('Error downloading excel: ', error);
     }
   };
+
+  const handleOrderRequest = () => {
+    if (selectedApplications.length === 0) {
+      alert('발주 요청 할 토너 신청 목록을 선택하세요');
+      return;
+    }
+    setShowEmailModal(true);
+  }
+
+  const handleSendEmail = async (emailData) => {
+    setIsLoading(true);
+    try {
+      await axios.post(`/api/toner/order`, {
+        draftIds: selectedApplications,
+        emailSubject: emailData.subject,
+        emailBody: emailData.body,
+        fileName: emailData.fileName,
+        fromEmail: emailData.fromEmail,
+        toEmail: emailData.toEmail,
+        password: emailData.password,
+      });
+
+      const updatedApplications = applications.filter(app => !selectedApplications.includes(app.id));
+      setApplications(updatedApplications);
+      setSelectedApplications([]); 
+
+      setShowEmailModal(false);
+      alert('발주 요청이 성공적으로 완료되었습니다.');
+      refreshSidebar();
+      navigate('/std', { replace: true });
+      
+    } catch (error) {
+      console.error('Error sending order request: ', error);
+      alert('발주 요청 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   const columns = [
     {
@@ -113,35 +158,40 @@ function TonerOrderList() {
           type="checkbox"
           className="order-checkbox"
           checked={selectedApplications.includes(row.draftId)}
-          onChange={(event) => handleSelect(event, row.id)}
           onClick={(e) => e.stopPropagation()} 
+          onChange={(event) => handleSelect(event, row.draftId)}
         />
       ),
     },
     {
+      header: '신청부서', 
+      accessor: 'teamNm',
+      width: '15%',
+    },
+    {
       header: '품명', 
       accessor: 'tonerNm',
-      width: '20%',
+      width: '18%',
     },
     { 
       header: '수량', 
       accessor: 'quantity', 
-      width: '10%', 
+      width: '8%', 
     },
     { 
       header: '단가', 
       accessor: 'price', 
-      width: '10%', 
+      width: '8%', 
     },
     { 
       header: '가격', 
       accessor: 'totalPrice', 
-      width: '10%', 
+      width: '8%', 
     },
     { 
       header: '비고', 
       accessor: 'mngNum', 
-      width: '10%', 
+      width: '8%', 
     },
   ];
 
@@ -155,25 +205,43 @@ function TonerOrderList() {
             <CustomButton className="excel-button" onClick={handleExcelDownload}>
               엑셀변환
             </CustomButton>
-            <CustomButton className="order-request-button">
+            <CustomButton className="order-request-button" onClick={handleOrderRequest}>
               발주요청
             </CustomButton>
           </div>
         </div>
-        {loading ? ( 
+        {loading ? (
           <Loading />
         ) : (
-          <Table 
-            columns={columns} 
-            data={applications || []} 
-            rowClassName="clickable-row"
-            onRowClick={(row, rowIndex) => handleRowClick(row)}
-            onRowMouseDown={(rowIndex) => handleMouseDown(rowIndex)}  
-            onRowMouseOver={(rowIndex) => handleMouseOver(rowIndex)}  
-            onRowMouseUp={handleMouseUp}    
-          />
+          <>
+            <Table
+              columns={columns}
+              data={applications || []}
+              rowClassName="clickable-row"
+              onRowClick={(row, rowIndex) => handleRowClick(row)}
+              onRowMouseDown={(rowIndex) => handleMouseDown(rowIndex)}
+              onRowMouseOver={(rowIndex) => handleMouseOver(rowIndex)}
+              onRowMouseUp={handleMouseUp}
+            />
+          </>
         )}
       </div>
+
+      {isLoading && (
+        <div className="loading-overlay">
+          <FadeLoader
+            color="#ffffff"
+            height={15}
+            loading={isLoading}
+            margin={2}
+            radius={2}
+            speedMultiplier={1}
+            width={5}
+          />
+        </div>
+      )}
+
+      <EmailModal show={showEmailModal} onClose={() => setShowEmailModal(false)} onSend={handleSendEmail} orderType="토너" />
     </div>
   );
 }

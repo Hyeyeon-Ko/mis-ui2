@@ -200,8 +200,15 @@ function TonerPriceList() {
           <input
             type="checkbox"
             name="detailSelect"
-            onClick={(e) => e.stopPropagation()}
-            onChange={(e) => handleRowSelect(e, row)}
+            onClick={(e) => e.stopPropagation()} 
+            onChange={(e) => {
+              const isChecked = e.target.checked;
+              if (isChecked) {
+                setSelectedRows(prevSelectedRows => [...prevSelectedRows, tonerNm]);
+              } else {
+                setSelectedRows(prevSelectedRows => prevSelectedRows.filter(id => id !== tonerNm));
+              }
+            }}
             checked={tonerNm && selectedRows.includes(tonerNm)}
           />
         );
@@ -221,7 +228,7 @@ function TonerPriceList() {
     { header: '가격', accessor: 'price' },
     { header: '비고', accessor: 'specialNote' },
   ];
-
+  
   return (
     <div className='content'>
       <div className='rental-content'>

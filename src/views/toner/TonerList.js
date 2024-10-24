@@ -235,6 +235,7 @@ function TonerList() {
       header: (
         <input
           type="checkbox"
+          onClick={(e) => e.stopPropagation()} 
           onChange={(e) => {
             const isChecked = e.target.checked;
             setSelectedRows(isChecked ? tonerDetails.map(d => d.mngNum) : []);
@@ -249,7 +250,6 @@ function TonerList() {
           <input
             type="checkbox"
             name="detailSelect"
-            onClick={(e) => e.stopPropagation()}
             onChange={(e) => handleRowSelect(e, row)}
             checked={mngNum && selectedRows.includes(mngNum)}
           />

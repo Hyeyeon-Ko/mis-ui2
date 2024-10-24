@@ -21,10 +21,6 @@ function TonerPendingList() {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [expandedRows, setExpandedRows] = useState([]);
 
-  const dragStartIndex = useRef(null);
-  const dragEndIndex = useRef(null);
-  const dragMode = useRef('select');
-
   const fetchTonerPendingList = useCallback(async () => {
     setLoading(true);
     try {
@@ -33,7 +29,22 @@ function TonerPendingList() {
           instCd: auth.instCd,
         },
       });
-      setApplications(response.data.data || []);
+      const data = response.data.data || [];
+
+      const draftIdCounts = data.reduce((acc, row) => {
+        if (!acc[row.draftId]) {
+          acc[row.draftId] = 0;
+        }
+        acc[row.draftId]++;
+        return acc;
+      }, {});
+
+      const updatedApplications = data.map(row => ({
+        ...row,
+        draftIdCount: draftIdCounts[row.draftId], 
+      }));
+
+      setApplications(updatedApplications);
     } catch (error) {
       console.error('Error fetching toner pending list: ', error);
       alert('토너 대기 목록을 불러오는 중 오류가 발생했습니다.');
@@ -51,9 +62,9 @@ function TonerPendingList() {
   const handleRowClick = (row) => {
     const draftId = row.draftId;
     if (expandedRows.includes(draftId)) {
-      setExpandedRows(expandedRows.filter(id => id !== draftId));  // 이미 열려있으면 닫기
+      setExpandedRows(expandedRows.filter(id => id !== draftId)); 
     } else {
-      setExpandedRows([...expandedRows, draftId]);  // 닫혀 있으면 열기
+      setExpandedRows([...expandedRows, draftId]); 
     }
   };
 
@@ -62,49 +73,11 @@ function TonerPendingList() {
     filteredApplications.forEach(row => {
       expandedData.push(row);
       if (expandedRows.includes(row.draftId)) {
-        // draftId가 동일한 holding이 T인 데이터를 추가
         const holdingRows = applications.filter(holdingRow => holdingRow.draftId === row.draftId && holdingRow.holding === 'T');
         expandedData.push(...holdingRows);
       }
     });
     return expandedData;
-  };
-
-  const handleMouseDown = (rowIndex) => {
-    dragStartIndex.current = rowIndex;
-    const appId = applications[rowIndex].id;
-    if (selectedApplications.includes(appId)) {
-      dragMode.current = 'deselect'; 
-    } else {
-      dragMode.current = 'select'; 
-    }
-  };
-
-  const handleMouseOver = (rowIndex) => {
-    if (dragStartIndex.current !== null) {
-      dragEndIndex.current = rowIndex;
-  
-      const start = Math.min(dragStartIndex.current, dragEndIndex.current);
-      const end = Math.max(dragStartIndex.current, dragEndIndex.current);
-  
-      let newSelectedApplications = [...selectedApplications];
-  
-      for (let i = start; i <= end; i++) {
-        const appId = applications[i]?.id;
-        if (dragMode.current === 'select' && appId && !newSelectedApplications.includes(appId)) {
-          newSelectedApplications.push(appId); 
-        } else if (dragMode.current === 'deselect' && appId && newSelectedApplications.includes(appId)) {
-          newSelectedApplications = newSelectedApplications.filter(id => id !== appId); 
-        }
-      }
-  
-      setSelectedApplications(newSelectedApplications);
-    }
-  };
-  
-  const handleMouseUp = () => {
-    dragStartIndex.current = null;
-    dragEndIndex.current = null;
   };
 
   // TODO: 엑셀 파일 형식 받은 후 연동
@@ -142,6 +115,7 @@ function TonerPendingList() {
       };
       await axios.post(`/api/toner/confirm`, tonerConfirmRequestDTO);  
       alert('선택한 신청이 승인되었습니다.');
+      refreshSidebar();
       fetchTonerPendingList(); 
     } catch (error) {
       console.error('Error approving applications: ', error);
@@ -164,8 +138,8 @@ function TonerPendingList() {
       await axios.post(`/api/toner/confirm/return`, tonerConfirmRequestDTO);
       alert('선택한 신청이 반려되었습니다.');
       setShowRejectModal(false);
-      await fetchTonerPendingList();
-      await refreshSidebar();
+      fetchTonerPendingList();
+      refreshSidebar();
       navigate(`/toner/pendingList`);
     } catch (error) {
       console.error('Error disapproving applications: ', error);
@@ -191,7 +165,13 @@ function TonerPendingList() {
 
   const columns = [
     {
-      header: <input type="checkbox" onChange={handleSelectAll} />,
+      header: (
+        <input
+          type="checkbox"
+          onChange={handleSelectAll}
+          checked={selectedApplications.length === applications.length && applications.length > 0}
+        />
+      ),
       accessor: 'select',
       width: '3.5%',
       Cell: ({ row }) => (
@@ -200,17 +180,22 @@ function TonerPendingList() {
           className="order-checkbox"
           checked={selectedApplications.includes(row.draftId)}
           onChange={(event) => handleSelect(event, row.draftId)}
-          onClick={(e) => e.stopPropagation()} 
+          onClick={(e) => e.stopPropagation()}
         />
       ),
     },
+    { 
+      header: '총 건수', 
+      accessor: 'draftIdCount', 
+      width: '5%', 
+      Cell: ({ row }) => row.holding === null ? row.draftIdCount : null 
+    },
     { header: '신청자', accessor: 'drafter', width: '5%' },
-    { header: '신청일자', accessor: 'draftDate', width: '10%' },
+    { header: '신청일자', accessor: 'draftDate', width: '8%' },
     { header: '관리번호', accessor: 'mngNum', width: '8%' },
-    { header: '부서', accessor: 'teamNm', width: '10%' },
-    { header: '위치', accessor: 'location', width: '15%' },
-    { header: '프린터명', accessor: 'printNm', width: '12%' },
-    { header: '토너명', accessor: 'tonerNm', width: '12%' },
+    { header: '신청부서', accessor: 'teamNm', width: '8%' },
+    { header: '프린터명', accessor: 'printNm', width: '10%' },
+    { header: '토너명', accessor: 'tonerNm', width: '10%' },
     { header: '수량', accessor: 'quantity', width: '3%' },
     { header: '금액', accessor: 'totalPrice', width: '8%' },
   ];
@@ -240,12 +225,9 @@ function TonerPendingList() {
         ) : (
           <Table 
             columns={columns} 
-            data={getExpandedRows()}  // 확장된 행들 포함
+            data={getExpandedRows()}  
             rowClassName="clickable-row"
-            onRowClick={(row) => handleRowClick(row)}  // 클릭 시 확장/축소
-            onRowMouseDown={(rowIndex) => handleMouseDown(rowIndex)}  
-            onRowMouseOver={(rowIndex) => handleMouseOver(rowIndex)}  
-            onRowMouseUp={handleMouseUp}    
+            onRowClick={(row) => handleRowClick(row)}    
           />
         )}
       </div>
