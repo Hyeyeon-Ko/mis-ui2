@@ -206,6 +206,15 @@ const TonerPriceModal = ({ show, onClose, onSave, editMode, selectedData }) => {
                       <option value="잉크">잉크</option>
                       <option value="토너">토너</option>
                     </select>
+                  ) : field.name === 'tonerNm' && editMode ? (
+                    <input
+                      type="text"
+                      name={field.name}
+                      value={formData[field.name] || ''}
+                      onChange={handleChange}
+                      placeholder={field.placeholder || ''}
+                      disabled 
+                    />
                   ) : (
                     <input
                       type="text"

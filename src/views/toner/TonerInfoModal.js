@@ -259,13 +259,26 @@ const TonerInfoModal = ({ show, onClose, onSave, editMode, selectedData }) => {
                   <label>
                     {field.label} {field.isRequired && <span>*</span>}
                   </label>
-                  <input
-                    type="text"
-                    name={field.name}
-                    value={formData[field.name] || ""}
-                    onChange={handleChange}
-                    placeholder={field.placeholder || ""}
-                  />
+                  {field.name === "mngNum" && editMode ? (
+                    <>
+                      <input
+                        type="text"
+                        name={field.name}
+                        value={formData[field.name] || ""}
+                        onChange={handleChange}
+                        placeholder={field.placeholder}
+                        disabled 
+                      />
+                    </>
+                  ) : (
+                    <input
+                      type="text"
+                      name={field.name}
+                      value={formData[field.name] || ""}
+                      onChange={handleChange}
+                      placeholder={field.placeholder || ""}
+                    />
+                  )}
                 </div>
               ))}
             </div>
