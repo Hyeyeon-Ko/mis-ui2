@@ -57,5 +57,5 @@ export const tonerFormFields = [
     { label: '제조사', name: 'company', type: 'text', isRequired: true },
     { label: '제조일', name: 'manuDate', type: 'text', isRequired: true },
     { label: '토너명', name: 'tonerNm', type: 'text', isRequired: true },
-    { label: '가격', name: 'price', type: 'text', isRequired: false },
+    // { label: '가격', name: 'price', type: 'text', isRequired: false },
 ]
