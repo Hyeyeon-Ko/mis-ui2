@@ -46,7 +46,7 @@ export const addTonerFormData = {
 
 export const tonerFormFields = [
     { label: '관리번호', name: 'mngNum', type: 'text', isRequired: true },
-    { label: '층', name: 'floor', type: 'text', isRequired: true },
+    { label: '층', name: 'floor', type: 'number', isRequired: true },
     { label: '부서', name: 'teamNm', type: 'text', isRequired: true },
     { label: '관리자(정)', name: 'manager', type: 'text', isRequired: true },
     { label: '관리자(부)', name: 'subManager', type: 'text', isRequired: true },
