@@ -99,11 +99,17 @@ function TonerOrderList() {
       alert('엑셀변환 할 명함 신청 목록을 선택하세요.');
       return;
     }
-
+  
     try {
-      const response = await axios.post(`/api/toner/order/excel`, selectedApplications, {
+      const requestData = {
+        draftIds: selectedApplications,
+        instCd: auth.instCd, 
+      };
+  
+      const response = await axios.post(`/api/toner/order/excel`, requestData, {
         responseType: 'blob',
       });
+      
       fileDownload(response.data, '토너 발주내역.xlsx');
     } catch (error) {
       console.error('Error downloading excel: ', error);
@@ -129,6 +135,7 @@ function TonerOrderList() {
         fromEmail: emailData.fromEmail,
         toEmail: emailData.toEmail,
         password: emailData.password,
+        instCd: auth.instCd,
       });
 
       const updatedApplications = applications.filter(app => !selectedApplications.includes(app.id));
