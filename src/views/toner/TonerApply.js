@@ -135,7 +135,7 @@ function TonerApply() {
         totalPrice: app.totalPrice,
       }));
 
-      const { isValid, message } = validateTonerApply(type, tonerDetailDTOs);
+      const { isValid, message } = validateTonerApply(tonerDetailDTOs);
       if (!isValid) {
         alert(message);
         handleCloseApplyModal(false);
@@ -180,7 +180,9 @@ function TonerApply() {
       const tonerPriceList = data.tonerPriceDTOList;
 
       const defaultToner = tonerPriceList[0];
+      const price = defaultToner.price || '-';
       const quantity = 1;
+      console.log(response)
 
       const updatedApplication = {
         ...applications[index],
@@ -190,9 +192,9 @@ function TonerApply() {
         location: data.location,
         printNm: data.modelNm,
         tonerNm: defaultToner.tonerNm,
-        price: defaultToner.price,
+        price: price,
         quantity: quantity,
-        totalPrice: formatPrice(parseInt(defaultToner.price.replace(/,/g, ''), 10) * quantity),
+        totalPrice: price !== '-' ? formatPrice(parseInt(defaultToner.price.replace(/,/g, ''), 10) * quantity) : '-',
         tonerPriceDTOList: tonerPriceList,
       };
 
