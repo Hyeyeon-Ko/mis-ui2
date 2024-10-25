@@ -154,21 +154,29 @@ function BcdOrder() {
 
   const handleSendEmail = async (emailData) => {
     setIsLoading(true);
+    
+    const formData = new FormData();
+    formData.append('orderRequest', new Blob([JSON.stringify({
+      draftIds: selectedApplications,
+      emailSubject: emailData.subject,
+      emailBody: emailData.body,
+      fileName: emailData.fileName,
+      fromEmail: emailData.fromEmail,
+      toEmail: emailData.toEmail,
+      password: emailData.password,
+      instCd: auth.instCd,
+    })], { type: 'application/json' }));
+    formData.append('file', emailData.file); 
+    
     try {
-      await axios.post(`/api/bsc/order`, {
-        draftIds: selectedApplications,
-        emailSubject: emailData.subject,
-        emailBody: emailData.body,
-        fileName: emailData.fileName,
-        fromEmail: emailData.fromEmail,
-        toEmail: emailData.toEmail,
-        password: emailData.password,
+      await axios.post(`/api/bsc/order`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
   
       const updatedApplications = applications.filter(app => !selectedApplications.includes(app.id));
       setApplications(updatedApplications);
-      setSelectedApplications([]); 
-  
+      setSelectedApplications([]);
+    
       setShowEmailModal(false);
       alert('발주 요청이 성공적으로 완료되었습니다.');
       refreshSidebar();
@@ -181,7 +189,7 @@ function BcdOrder() {
       setIsLoading(false);
     }
   };
-  
+    
   // 테이블 컬럼 정의
   const columns = [
     {
@@ -275,7 +283,7 @@ function BcdOrder() {
           />
         </div>
       )}
-      <EmailModal show={showEmailModal} onClose={() => setShowEmailModal(false)} onSend={handleSendEmail} orderType='명함'/>
+      <EmailModal show={showEmailModal} onClose={() => setShowEmailModal(false)} onSend={handleSendEmail} orderType='명함' selectedApplications={selectedApplications}/>
     </div>
   );
 }

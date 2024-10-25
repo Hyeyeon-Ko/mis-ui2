@@ -58,9 +58,10 @@ const TonerInfoModal = ({ show, onClose, onSave, editMode, selectedData }) => {
       };
 
       //TODO: api 개발 후 변경
-      const response = await axios.post("/api/toner/excel", requestData);
-      alert("항목이 성공적으로 추가되었습니다");
-      onSave(response.data);
+      // const response = await axios.post("/api/toner/excel", requestData);
+      alert("아직 개발 전!!!")
+      // alert("항목이 성공적으로 추가되었습니다");
+      // onSave(response.data);
       onClose();
     } catch (error) {
       console.error("Error sending data to the backend:", error);

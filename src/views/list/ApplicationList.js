@@ -223,8 +223,8 @@ function ApplicationsList() {
       try {
         const isDocTypeAB = convertDocumentType(documentTypeFromUrl) === "A";
         const isFiltersChanged = 
-          filters.searchType !== "전체" ||
-          filters.keyword !== "" ||
+          (filters.searchType !== "전체" &&
+          filters.keyword !== "") ||
           filters.startDate !== formattedStartDate ||
           filters.endDate !== formattedEndDate;
 
