@@ -60,6 +60,7 @@ function ApplicationsList() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState(null);
   const [selectedCenter, setSelectedCenter] = useState("전체");
+  const [selectedStatus, setSelectedStatus] = useState("전체");
   const { formattedStartDate, formattedEndDate } = useDateSet();
   const [totalPages, setTotalPages] = useState("1");
   const [currentPage, setCurrentPage] = useState("1");
@@ -79,6 +80,15 @@ function ApplicationsList() {
     "제주센터",
     "협력사",
   ]);
+
+  const statusOptions = [
+    { label: '전체', value: '전체' },
+    { label: '승인대기', value: '승인대기' },
+    { label: '반려', value: '반려' },
+    { label: '승인완료', value: '승인완료' },
+    { label: '발주완료', value: '발주완료' },
+    { label: '처리완료', value: '처리완료' },
+  ];
 
   const navigate = useNavigate();
 
@@ -209,75 +219,46 @@ function ApplicationsList() {
     async (pageIndex = 1, pageSize = itemsPerPage, filters = {}) => {
       setLoading(true);
       try {
+        const isDocTypeAB = convertDocumentType(documentTypeFromUrl) === "A";
+        const isFiltersChanged = 
+          filters.searchType !== "전체" ||
+          filters.keyword !== "" ||
+          filters.startDate !== formattedStartDate ||
+          filters.endDate !== formattedEndDate;
 
-        // let applyStatusList;
-        // if(filterParams) {
-        //   applyStatusList = filterParams.applyStatus
-        // } else {
-        //   applyStatusList = Object.keys(filters)
-        //   .filter((key) => filters[key] === true)  // Get only true filters
-        //   .map((key) => convertDocumentType(key))  // Use convertDocumentType for status mapping
-        //   .filter(Boolean);
-        // }
+        const isNotNull = 
+          filters.searchType !== undefined &&
+          filters.keyword !== undefined &&
+          filters.startDate !== undefined &&
+          filters.endDate !== undefined;
 
-        // const formattedStart = formatDate(new Date(filterInputs.startDate || formattedStartDate));
-        // const formattedEnd = formatDate(new Date(filterInputs.endDate || formattedEndDate));
+        if (isDocTypeAB && isFiltersChanged && isNotNull) {
+          const response = await axios.get("/api/applyList", {
+            params: {
+              userId: auth.userId || "",
+              instCd: instCd || "",
+              documentType: convertDocumentType(documentTypeFromUrl),
+              searchType: filters.searchType,
+              keyword: filters.keyword,
+              startDate: filters.startDate ? filters.startDate : formattedStartDate,
+              endDate: filters.endDate ? filters.endDate : formattedEndDate,
+            }
+          });
 
-        const response = await axios.get("/api/applyList2", {
-          params: {
-            userId: auth.userId || "",
-            instCd: instCd || "",
-            documentType:
-              convertDocumentType(filters.documentType) ||
-              convertDocumentType(documentTypeFromUrl) ||
-              null,
-            searchType: filters.searchType,
-            keyword: filters.keyword,
-            startDate: filters.startDate ? filters.startDate : formattedStartDate,
-            endDate: filters.endDate ? filters.endDate : formattedEndDate,
-            applyStatus: "",
-            pageIndex,
-            pageSize,
-          },
-          // paramsSerializer: params => {
-          //   // applyStatus 배열을 제대로 직렬화
-          //   return qs.stringify(params, { arrayFormat: "repeat" });
-          // }
-        });
-
-        const {
-          bcdMasterResponses,
-          docMasterResponses,
-          corpDocMasterResponses,
-          sealMasterResponses,
-          tonerMasterResponses,
-        } = response.data.data;
-
-        const combinedData = [
-          bcdMasterResponses,
-          docMasterResponses,
-          corpDocMasterResponses,
-          sealMasterResponses,
-          tonerMasterResponses,
-        ];
-
-        const selectedData = combinedData.find(
-          (response) => response && response.totalElements > 0
-        );
-
-        if (!selectedData || !selectedData.content.length) {
-          setApplications([]);
-          setFilteredApplications([]);
-          setTotalPages(1);
-          setCurrentPage(1);
-        } else {
-          const totalPages = selectedData.totalPages;
-          const currentPage = selectedData.number + 1;
-          const content = selectedData.content;
-          const filteredData = content.filter(
+          const {
+            bcdMasterResponses,
+            docMasterResponses,
+          } = response.data.data;
+  
+          const combinedData = [
+            ...(bcdMasterResponses || []),
+            ...(docMasterResponses || []),
+          ];
+  
+          const filteredData = combinedData.filter(
             (application) => application.applyStatus !== "X"
           );
-
+  
           const transformedData = filteredData.map((application) => ({
             draftId: application.draftId,
             instCd: application.instCd,
@@ -296,17 +277,90 @@ function ApplicationsList() {
             applyStatus: getStatusText(application.applyStatus),
             docType: application.docType,
           }));
-
-          transformedData.sort(
-            (a, b) => new Date(b.draftDate) - new Date(a.draftDate)
-          );
-
+  
+          transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
+  
           setApplications(transformedData);
           setFilteredApplications(transformedData);
-          // setShowStatus(getStatusFilter(documentTypeFromUrl));
-          setTotalPages(totalPages);
-          setCurrentPage(currentPage);
-          applyStatusFilters(transformedData);
+          setTotalPages(1);  
+          setCurrentPage(1);
+        } else {
+          const response = await axios.get("/api/applyList2", {
+            params: {
+              userId: auth.userId || "",
+              instCd: instCd || "",
+              documentType:
+                convertDocumentType(filters.documentType) ||
+                convertDocumentType(documentTypeFromUrl) ||
+                null,
+              searchType: filters.searchType,
+              keyword: filters.keyword,
+              startDate: filters.startDate ? filters.startDate : formattedStartDate,
+              endDate: filters.endDate ? filters.endDate : formattedEndDate,
+              applyStatus: "",
+              pageIndex,
+              pageSize,
+            },
+          });
+          const {
+            bcdMasterResponses,
+            docMasterResponses,
+            corpDocMasterResponses,
+            sealMasterResponses,
+            tonerMasterResponses,
+          } = response.data.data;
+  
+          const combinedData = [
+            bcdMasterResponses,
+            docMasterResponses,
+            corpDocMasterResponses,
+            sealMasterResponses,
+            tonerMasterResponses,
+          ];
+  
+          const selectedData = combinedData.find(
+            (response) => response && response.totalElements > 0
+          );
+  
+          if (!selectedData || !selectedData.content.length) {
+            setApplications([]);
+            setFilteredApplications([]);
+            setTotalPages(1);
+            setCurrentPage(1);
+          } else {
+            const totalPages = selectedData.totalPages;
+            const currentPage = selectedData.number + 1;
+            const content = selectedData.content;
+            const filteredData = content.filter(
+              (application) => application.applyStatus !== "X"
+            );
+  
+            const transformedData = filteredData.map((application) => ({
+              draftId: application.draftId,
+              instCd: application.instCd,
+              instNm: application.instNm,
+              title: application.title,
+              draftDate: application.draftDate
+                ? parseDateTime(application.draftDate)
+                : "",
+              respondDate: application.respondDate
+                ? parseDateTime(application.respondDate)
+                : "",
+              orderDate: application.orderDate
+                ? parseDateTime(application.orderDate)
+                : "",
+              drafter: application.drafter,
+              applyStatus: getStatusText(application.applyStatus),
+              docType: application.docType,
+            }));
+  
+            transformedData.sort((a, b) => new Date(b.draftDate) - new Date(a.draftDate));
+  
+            setApplications(transformedData);
+            setFilteredApplications(transformedData);
+            setTotalPages(totalPages);
+            setCurrentPage(currentPage);
+          }
         }
       } catch (error) {
         console.error(
@@ -326,7 +380,7 @@ function ApplicationsList() {
       formattedEndDate,
     ]
   );
-
+  
   useEffect(() => {
     fetchApplications(currentPage, itemsPerPage);
   }, [currentPage, documentTypeFromUrl, fetchApplications]);
@@ -430,6 +484,21 @@ function ApplicationsList() {
     setSelectedCenter(e.target.value);
   };
 
+  const handleStatusChange = (e) => {
+    const selectedValue = e.target.value; 
+    setSelectedStatus(selectedValue); 
+  
+    if (selectedValue === "전체") {
+      setFilteredApplications(applications);
+    } else {
+      const filtered = applications.filter((application) => {
+        return getStatusText(application.applyStatus) === selectedValue;
+      });
+      setFilteredApplications(filtered);
+    }
+  };
+  
+
   useEffect(() => {
     fetchApplications();
   }, [fetchApplications]);
@@ -465,18 +534,6 @@ function ApplicationsList() {
   }
 
   // 3. 명함신청 + 처리완료일 때 엑셀버튼 보이기
-  useEffect(() => {
-    if (documentTypeFromUrl === "명함신청") {
-      const isShowExcelButton =
-        filters.statusClosed && selectedApplications.length > 0;
-      setShowCheckboxColumn(filters.statusClosed);
-      setShowExcelButton(isShowExcelButton);
-    } else {
-      setShowCheckboxColumn(false);
-      setShowExcelButton(false);
-    }
-  }, [filters, selectedApplications, documentTypeFromUrl]);
-
   const handleExcelDownload = async () => {
     if (selectedApplications.length === 0) {
       alert("엑셀변환 할 명함 신청 목록을 선택하세요.");
@@ -558,6 +615,27 @@ function ApplicationsList() {
   };
 
   const columns = [
+    ...(documentTypeFromUrl === "명함신청"
+      ? [
+          {
+            header: (
+              <input
+                type="checkbox"
+                onChange={(e) => handleSelectAll(e.target.checked)}
+              />
+            ),
+            accessor: "select",
+            width: "4%",
+            Cell: ({ row }) => (
+              <input
+                type="checkbox"
+                checked={selectedApplications.includes(row.draftId)}
+                onChange={(e) => handleSelect(e.target.checked, row.draftId)}
+              />
+            ),
+          },
+        ]
+      : []),
     ...(showCheckboxColumn && documentTypeFromUrl === "명함신청"
       ? [
           {
@@ -595,7 +673,7 @@ function ApplicationsList() {
             width: "10%",
           },
         ]
-      : [{ header: "센터", accessor: "instNm", width: "10%" }]),
+      : [{ header: "센터", accessor: "instNm", width: "7%" }]),
     {
       header: "제목",
       accessor: "title",
@@ -624,7 +702,18 @@ function ApplicationsList() {
     documentTypeFromUrl === "인장신청"
       ? []
       : [{ header: "발주일시", accessor: "orderDate", width: "14%" }]),
-    { header: "문서상태", accessor: "applyStatus", width: "10%" },
+    {
+      header: (
+        <CustomSelect
+          label="문서상태"
+          options={statusOptions}
+          selectedValue={selectedStatus}
+          onChangeHandler={handleStatusChange}
+        />
+      ),
+      accessor: "applyStatus",
+      width: "10%",
+    },
   ];
 
   const showStatusFilters =
@@ -641,7 +730,7 @@ function ApplicationsList() {
         <div className="application-header-row">
           <Breadcrumb items={getBreadcrumbItems()} />
           <div className="application-button-container">
-            {showExcelButton && documentTypeFromUrl === "명함신청" && (
+            { documentTypeFromUrl === "명함신청" && (
               <CustomButton
                 className="finish-excel-button"
                 onClick={handleExcelDownload}
@@ -695,11 +784,13 @@ function ApplicationsList() {
               onSelect={handleSelect}
               selectedItems={selectedApplications}
             />
-            <PaginationSub
-              totalPages={totalPages}
-              onPageChange={handlePageClick}
-              currentPage={currentPage}
-            />
+            {totalPages > 1 && ( 
+              <PaginationSub
+                totalPages={totalPages}
+                onPageChange={handlePageClick}
+                currentPage={currentPage}
+              />
+            )}
           </>
         )}
       </div>
