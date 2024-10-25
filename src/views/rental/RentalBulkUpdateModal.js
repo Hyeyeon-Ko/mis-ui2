@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { addFormData, formFields } from '../../datas/rentalDatas';
 import useRentalChange from '../../hooks/useRentalChange';
 import { useDateChange } from '../../hooks/apply/useDateChange';
-import { usePriceChange } from '../../hooks/apply/usePriceChange';
+import { usePriceChange } from '../../hooks/usePriceChange';
 
 const RentalBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds }) => {
   const { handleChange, formData, setFormData } = useRentalChange();

@@ -6,10 +6,13 @@ import { AuthContext } from '../../components/AuthContext';
 import useTonerChange from '../../hooks/useTonerChange';
 import '../../styles/toner/TonerAddModal.css';
 import { addFormData, formFields, divisionMap } from '../../datas/tonerData';
+import { usePriceChange } from '../../hooks/usePriceChange';
 
 const TonerPriceModal = ({ show, onClose, onSave, editMode, selectedData }) => {
   const { auth } = useContext(AuthContext);
   const { handleChange, handleTabChange, handleFileChange, formData, file, activeTab, setFormData, setActiveTab, setFile } = useTonerChange();
+
+  const [formattedPrice, setFormattedPrice, handleUsePriceChange] = usePriceChange();
 
   useEffect(() => {
     if (editMode && selectedData) {
@@ -21,10 +24,11 @@ const TonerPriceModal = ({ show, onClose, onSave, editMode, selectedData }) => {
         price: selectedData.price || '',
         specialNote: selectedData.specialNote || '',
       });
+      setFormattedPrice(selectedData.price || '');
     } else {
       resetFormData();
     }
-  }, [editMode, selectedData]);
+  }, [editMode, selectedData, setFormattedPrice]);
 
   const resetFormData = () => {
     setFormData({ ...addFormData });
@@ -107,7 +111,7 @@ const TonerPriceModal = ({ show, onClose, onSave, editMode, selectedData }) => {
         company,
         tonerNm,
         division: mappedDivision, 
-        price,
+        price: formattedPrice,
         specialNote,
       };
 
@@ -214,6 +218,17 @@ const TonerPriceModal = ({ show, onClose, onSave, editMode, selectedData }) => {
                       onChange={handleChange}
                       placeholder={field.placeholder || ''}
                       disabled 
+                    />
+                  ) : field.name === 'price' ? (
+                    <input
+                      type="text"
+                      name="price"
+                      value={formattedPrice}
+                      onChange={(e) => {
+                        handleUsePriceChange(e);
+                        handleChange(e);
+                      }}
+                      placeholder={field.placeholder || ''}
                     />
                   ) : (
                     <input
