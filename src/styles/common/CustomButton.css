@@ -36,6 +36,16 @@
   color: white
 }
 
+.finish-noti-button {
+  background-color: #d7dde4;
+  color: rgb(85, 84, 84)
+}
+
+.finish-noti-button:hover {
+  background-color: #2789FE;
+  color: white
+}
+
 .order-request-button {
   background-color: #2789FE;
 }

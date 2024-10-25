@@ -6,6 +6,7 @@ import Table from "../../components/common/Table";
 import CustomButton from "../../components/common/CustomButton";
 import DocConfirmModal from "../doc/DocConfirmModal";
 import CustomSelect from "../../components/CustomSelect";
+import ConfirmModal from "../../components/common/ConfirmModal";
 import "../../styles/list/ApplicationsList.css";
 import "../../styles/common/Page.css";
 import axios from "axios";
@@ -53,11 +54,11 @@ function ApplicationsList() {
   //   D: ['statusRejected'],
   // };
   const [loading, setLoading] = useState(false);
-  const [showCheckboxColumn, setShowCheckboxColumn] = useState(false);
+  const [showCheckboxColumn, ] = useState(false);
   const [selectedApplications, setSelectedApplications] = useState([]);
   const [selectedApplyStatus, setSelectedApplyStatus] = useState(null);
-  const [showExcelButton, setShowExcelButton] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState(null);
   const [selectedCenter, setSelectedCenter] = useState("전체");
   const [selectedStatus, setSelectedStatus] = useState("전체");
@@ -195,24 +196,25 @@ function ApplicationsList() {
       keyword: keyword, // 검색어
       applyStatus: ""
     };
+    setSelectedApplications([]);
     fetchApplications(1, itemsPerPage, params);
   };
 
   // 1-2. 신청상태로 필터링 완료된 데이터 담기
-  const applyStatusFilters = useCallback(
-    (data) => {
-      const filtered = data.filter((app) => {
-        if (filters.statusApproved && app.applyStatus === "승인완료") return true;
-        if (filters.statusRejected && app.applyStatus === "반려") return true;
-        if (filters.statusOrdered && app.applyStatus === "발주완료") return true;
-        if (filters.statusClosed && app.applyStatus === "처리완료") return true;
-        if (filters.statusReceived && app.applyStatus === "발급완료") return true;
-        return !Object.values(filters).some(Boolean);
-      });
-      setFilteredApplications(filtered);
-    },
-    [filters]
-  );
+  // const applyStatusFilters = useCallback(
+  //   (data) => {
+  //     const filtered = data.filter((app) => {
+  //       if (filters.statusApproved && app.applyStatus === "승인완료") return true;
+  //       if (filters.statusRejected && app.applyStatus === "반려") return true;
+  //       if (filters.statusOrdered && app.applyStatus === "발주완료") return true;
+  //       if (filters.statusClosed && app.applyStatus === "처리완료") return true;
+  //       if (filters.statusReceived && app.applyStatus === "발급완료") return true;
+  //       return !Object.values(filters).some(Boolean);
+  //     });
+  //     setFilteredApplications(filtered);
+  //   },
+  //   [filters]
+  // );
 
   // 1. 데이터 fetch해오기
   const fetchApplications = useCallback(
@@ -372,7 +374,7 @@ function ApplicationsList() {
       }
     },
     [
-      applyStatusFilters,
+      // applyStatusFilters,
       auth.userId,
       documentTypeFromUrl,
       instCd,
@@ -382,6 +384,7 @@ function ApplicationsList() {
   );
   
   useEffect(() => {
+    setSelectedApplications([]);
     fetchApplications(currentPage, itemsPerPage);
   }, [currentPage, documentTypeFromUrl, fetchApplications]);
 
@@ -397,6 +400,7 @@ function ApplicationsList() {
    */
   const handlePageClick = (event) => {
     const selectedPage = event.selected + 1;
+    setSelectedApplications([]); 
     setCurrentPage(selectedPage);
   };
 
@@ -409,6 +413,7 @@ function ApplicationsList() {
       ...prevFilters,
       [name]: !prevFilters[name],
     }));
+    setSelectedApplications([]);
   };
 
   /**
@@ -416,6 +421,7 @@ function ApplicationsList() {
    */
   const handleReset = () => {
     resetFilters();
+    setSelectedApplications([]);
     fetchApplications();
   };
 
@@ -484,16 +490,21 @@ function ApplicationsList() {
     setSelectedCenter(e.target.value);
   };
 
+  /*
+  * 문서상태 선택 핸들러
+  */
   const handleStatusChange = (e) => {
     const selectedValue = e.target.value; 
     setSelectedStatus(selectedValue); 
   
     if (selectedValue === "전체") {
+      setSelectedApplications([]);
       setFilteredApplications(applications);
     } else {
       const filtered = applications.filter((application) => {
         return getStatusText(application.applyStatus) === selectedValue;
       });
+      setSelectedApplications([]);
       setFilteredApplications(filtered);
     }
   };
@@ -533,6 +544,53 @@ function ApplicationsList() {
     }
   }
 
+  /*
+  * 수령 알림 전송
+  */
+  const handleSendNotification = async () => {
+    if (selectedApplications.length === 0) {
+      alert("알림 전송할 명함 신청 목록을 선택하세요.");
+      return;
+    }
+  
+    try {
+      const requestData = {
+        userId: auth.userId,
+        draftIds: selectedApplications, 
+      };
+  
+      const response = await axios.post(
+        "/api/bcd/noti", 
+        requestData
+      );
+  
+      if (response.status === 200) {
+        alert("알림이 성공적으로 전송되었습니다.");
+        setSelectedApplications([]);
+      }
+    } catch (error) {
+      console.error("Error sending notification: ", error);
+      alert("알림 전송 중 오류가 발생했습니다.");
+    }
+  };
+
+  const openConfirmModal = () => {
+    if (selectedApplications.length === 0) {
+      alert("알림 전송할 명함 신청 목록을 선택하세요.");
+      return;
+    }
+    setConfirmModalVisible(true);
+  };
+
+  const handleConfirm = () => {
+    setConfirmModalVisible(false);
+    handleSendNotification();
+  };
+
+  const handleCancel = () => {
+    setConfirmModalVisible(false);
+  };
+  
   // 3. 명함신청 + 처리완료일 때 엑셀버튼 보이기
   const handleExcelDownload = async () => {
     if (selectedApplications.length === 0) {
@@ -730,14 +788,22 @@ function ApplicationsList() {
         <div className="application-header-row">
           <Breadcrumb items={getBreadcrumbItems()} />
           <div className="application-button-container">
-            { documentTypeFromUrl === "명함신청" && (
+          {documentTypeFromUrl === "명함신청" && (
+            <div className="buttons-container">
               <CustomButton
                 className="finish-excel-button"
                 onClick={handleExcelDownload}
               >
                 엑셀변환
               </CustomButton>
-            )}
+              <CustomButton
+                className="finish-noti-button"
+                onClick={openConfirmModal}
+              >
+                수령알림
+              </CustomButton>
+            </div>
+          )}
           </div>
         </div>
         <ConditionFilter
@@ -801,6 +867,13 @@ function ApplicationsList() {
           onClose={closeModal}
           onApprove={approveDocument}
           applyStatus={selectedApplyStatus}
+        />
+      )}
+      {confirmModalVisible && (
+        <ConfirmModal
+          message="알림을 전송하시겠습니까?"
+          onConfirm={handleConfirm}  
+          onCancel={handleCancel}    
         />
       )}
     </div>
