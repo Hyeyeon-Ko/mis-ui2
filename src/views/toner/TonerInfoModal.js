@@ -272,7 +272,7 @@ const TonerInfoModal = ({ show, onClose, onSave, editMode, selectedData }) => {
                     </>
                   ) : (
                     <input
-                      type="text"
+                      type={field.type}
                       name={field.name}
                       value={formData[field.name] || ""}
                       onChange={handleChange}
