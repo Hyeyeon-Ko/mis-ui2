@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useRef } from 'react';
+import React, { useEffect, useState, useContext, useRef, useCallback } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import StandardAddModal from '../standard/StandardAddModal';
@@ -45,12 +45,7 @@ function StandardData() {
     fetchCategories();
   }, []);
 
-  useEffect(() => {
-    fetchSubCategories(selectedCategory);
-    setSelectedDetails([]);
-  }, [selectedCategory]);
-
-  const fetchSubCategories = async (classCd) => {
+  const fetchSubCategories = useCallback(async (classCd) => {
     try {
       const response = await axios.get(`/api/std/groupInfo`, { params: { classCd } });
       const data = response.data.data || [];
@@ -68,7 +63,12 @@ function StandardData() {
       setDetails([]);
       setSelectedDetails([]);
     }
-  };
+  }, [setDetails, setSelectedDetails]);
+
+  useEffect(() => {
+    fetchSubCategories(selectedCategory);
+    setSelectedDetails([]);
+  }, [selectedCategory, fetchSubCategories, setSelectedDetails]);
 
   const fetchDetails = async (groupCd, pageIndex = 1, pageSize = 10) => {
     try {
