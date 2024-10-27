@@ -57,7 +57,7 @@ const EmailModal = ({ show, onClose, onSend, orderType, selectedApplications }) 
         isLoading: false,
       });
     }
-  }, [show, orderType, setEmailData]);
+  }, [show, orderType, setEmailData, selectedApplications]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];

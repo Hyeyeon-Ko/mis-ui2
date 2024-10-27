@@ -104,18 +104,21 @@ function BcdApplySecond() {
     }
   };
 
-  const fetchOrgChart = () => {
-    const { instCd } = auth;
+  const openOrgChartModal = () => {
+    const { deptCode, instCd } = auth;
+  
     axios.get(`/api/std/orgChart`, {
-      params: { instCd }
+      params: { instCd, deptCode },
     })
-    .then(response => {
-      setOrgData(response.data.data);
-      setExpandedNodes({});
-      setShowOrgChart(true); 
-    })
-    .catch(error => console.error('Error fetching organization data:', error));
-  };
+      .then(response => {
+        setOrgData(response.data.data);
+        const expanded = {};
+        response.data.data.forEach(dept => expanded[dept.detailCd] = true); 
+        setExpandedNodes(expanded); 
+        setShowOrgChart(true); 
+      })
+      .catch(error => console.error('Error fetching organization data:', error));
+  };  
   
   const handleToggle = (detailCd) => {
     setExpandedNodes((prevState) => ({
@@ -123,7 +126,7 @@ function BcdApplySecond() {
       [detailCd]: !prevState[detailCd],
     }));
   };
-  
+    
   const hasChildren = (detailCd) => {
     return orgData.some(dept => dept.parentCd === detailCd);
   };
@@ -156,13 +159,13 @@ function BcdApplySecond() {
               <span className={`icon ${hasChildren(dept.detailCd) ? 'folder-icon' : 'file-icon'}`}></span>
               <span onClick={() => fetchTeamMembers(dept.detailCd)}>{dept.detailNm}</span>
             </div>
-            {expandedNodes[dept.detailCd] && renderOrgTree(dept.detailCd, level + 1)} 
+            {expandedNodes[dept.detailCd] && renderOrgTree(dept.detailCd, level + 1)}
           </li>
         ))}
       </ul>
     );
   };
-  
+      
   // const handleInputClick = (e) => {
   //   if (!formData.userId) {
   //     alert('사번 조회를 통해 명함 대상자를 선택하세요.');
@@ -237,7 +240,7 @@ function BcdApplySecond() {
       if (auth.roleNm !== '팀원') {
         autoSelectApproversAndSubmit(); 
       } else {
-        fetchOrgChart();
+        openOrgChartModal();
       }
     }
   };

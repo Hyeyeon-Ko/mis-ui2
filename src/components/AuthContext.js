@@ -17,6 +17,7 @@ export const AuthProvider = ({ children }) => {
     hasStandardDataAuthority: false,
     instCd: '',
     deptCd: '',
+    deptCode: '',
     teamCd: '',
     roleNm: '',
     isUserMode: false,
@@ -36,6 +37,7 @@ export const AuthProvider = ({ children }) => {
       hasStandardDataAuthority: sessionStorage.getItem('hasStandardDataAuthority') === 'true',
       instCd: sessionStorage.getItem('instCd') || '',
       deptCd: sessionStorage.getItem('deptCd') || '',
+      deptCode: sessionStorage.getItem('deptCode') || '',
       teamCd: sessionStorage.getItem('teamCd') || '',
       roleNm: sessionStorage.getItem('roleNm') || '',
       isUserMode: sessionStorage.getItem('isUserMode') === 'true',
@@ -56,13 +58,14 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.setItem('hasStandardDataAuthority', auth.hasStandardDataAuthority.toString());
     sessionStorage.setItem('instCd', auth.instCd);
     sessionStorage.setItem('deptCd', auth.deptCd);
+    sessionStorage.setItem('deptCode', auth.deptCode);
     sessionStorage.setItem('teamCd', auth.teamCd);
     sessionStorage.setItem('roleNm', auth.roleNm);
     sessionStorage.setItem('isUserMode', auth.isUserMode.toString());
     sessionStorage.setItem('originalRole', auth.originalRole);
   }, [auth]);
 
-  const login = (userId, userNm, role, sidebarPermissions, hasStandardDataAuthority, instCd, deptCd, teamCd, roleNm) => {
+  const login = (userId, userNm, role, sidebarPermissions, hasStandardDataAuthority, instCd, deptCd, deptCode, teamCd, roleNm) => {
     const newAuthState = {
       userId,
       userNm,
@@ -72,6 +75,7 @@ export const AuthProvider = ({ children }) => {
       hasStandardDataAuthority,
       instCd,
       deptCd,
+      deptCode,
       teamCd,
       roleNm,
       isUserMode: false,
@@ -79,6 +83,7 @@ export const AuthProvider = ({ children }) => {
     };
     setAuth(newAuthState);
 
+    console.log(newAuthState);
     navigate('/');
   };
 
@@ -92,6 +97,7 @@ export const AuthProvider = ({ children }) => {
       hasStandardDataAuthority: false,
       instCd: '',
       deptCd: '',
+      deptCode: '',
       teamCd: '',
       roleNm: '',
       isUserMode: false,
@@ -105,6 +111,7 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.removeItem('hasStandardDataAuthority');
     sessionStorage.removeItem('instCd');
     sessionStorage.removeItem('deptCd');
+    sessionStorage.removeItem('deptCode');
     sessionStorage.removeItem('teamCd');
     sessionStorage.removeItem('roleNm');
     sessionStorage.removeItem('isUserMode');

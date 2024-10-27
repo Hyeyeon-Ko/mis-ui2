@@ -79,6 +79,7 @@ const Login = () => {
                 authorityData.data,  // authorityData 기존 로직 유지
                 sessionInfoData.data.instCd,
                 sessionInfoData.data.deptCd,
+                sessionInfoData.data.deptCode,
                 sessionInfoData.data.teamCd,
                 sessionInfoData.data.roleNm,
               );
