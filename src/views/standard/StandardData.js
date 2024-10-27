@@ -232,7 +232,11 @@ function StandardData() {
         setShowModal(false);
       } catch (error) {
         console.error('대분류 정보를 저장하는 중 에러 발생:', error);
-         alert('대분류 코드 추가에 실패했습니다.');
+        if(error.response.data.code === 404) {
+          alert('이미 존재하는 대분류코드입니다.')
+        } else {
+          alert('대분류 코드 추가에 실패했습니다.');
+        }
       }
     }
   };

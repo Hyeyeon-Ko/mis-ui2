@@ -6,7 +6,7 @@ import useStandardChange from '../../hooks/useStandardChange';
 const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory, detailData }) => {
   const [detailCode, setDetailCode] = useState('');
   const [detailName, setDetailName] = useState('');
-  const [classCd, setClassCode] = useState(selectedCategory);
+  const [classCd, setClassCode] = useState('');
   const [classNm, setClassName] = useState('');
   const [groupCd, setGroupCode] = useState('');
   const [groupNm, setGroupName] = useState('');
