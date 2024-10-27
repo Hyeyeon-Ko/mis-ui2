@@ -10,6 +10,7 @@ import axios from 'axios';
 import { FadeLoader } from 'react-spinners';
 import { AuthContext } from '../../components/AuthContext'; 
 import useTonerChange from '../../hooks/useTonerChange';
+import fileDownload from 'js-file-download';
 
 function TonerPendingList() {
   const { handleSelectAll, handleSelect, applications, selectedApplications, setApplications} = useTonerChange();
@@ -79,7 +80,6 @@ function TonerPendingList() {
     return expandedData;
   };
 
-  // TODO: 엑셀 파일 형식 받은 후 연동
   const handleExcelDownload = async () => {
     if (selectedApplications.length === 0) {
       
@@ -87,16 +87,19 @@ function TonerPendingList() {
       return;
     }
 
-    alert('아직 개발 전!!!')
+    try {
+      const requestData = {
+        draftIds: selectedApplications,
+        instCd: auth.instCd, 
+      };
 
-    // try {
-    //   const response = await axios.post(`/api/toner/pending/excel`, selectedApplications, {
-    //     responseType: 'blob',
-    //   });
-    //   fileDownload(response.data, '토너 승인대기 내역(기안상신용).xlsx');
-    // } catch (error) {
-    //   console.error('Error downloading excel: ', error);
-    // }
+      const response = await axios.post(`/api/toner/pending/excel`, requestData, {
+        responseType: 'blob',
+      });
+      fileDownload(response.data, '토너 승인대기 내역.xlsx');
+    } catch (error) {
+      console.error('Error downloading excel: ', error);
+    }
   };
 
   const handleApprove = async () => {
