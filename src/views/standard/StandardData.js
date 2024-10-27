@@ -13,6 +13,7 @@ import PaginationSub from '../../components/common/PaginationSub';
 
 function StandardData() {
   const {selectedDetails, details, setSelectedDetails,setDetails, handleDetailSelect, handleSelectAll} = useStandardChange();
+  const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [headerData, setHeaderData] = useState({});
   const [selectedCategory, setSelectedCategory] = useState('A');
@@ -29,11 +30,20 @@ function StandardData() {
   const dragEndIndex = useRef(null);
   const dragMode = useRef('select');
 
-  const categories = [
-    { categoryCode: 'A', categoryName: 'A 공통' },
-    { categoryCode: 'B', categoryName: 'B 권한' },
-    { categoryCode: 'C', categoryName: 'C 인사정보' },
-  ];
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(`/api/std/classInfo`);
+      const data = response.data.data || [];
+      setCategories(data);
+    } catch (error) {
+      console.error('대분류를 가져오는 중 에러 발생:', error.response ? error.response.data : error.message);
+      setCategories([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     fetchSubCategories(selectedCategory);
@@ -388,8 +398,8 @@ function StandardData() {
               className="category-dropdown"
             >
               {categories.map(category => (
-                <option key={category.categoryCode} value={category.categoryCode}>
-                  {category.categoryName}
+                <option key={category.classCd} value={category.classCd}>
+                  {category.classCd} {category.classNm}
                 </option>
               ))}
             </select>
