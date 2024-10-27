@@ -48,7 +48,6 @@ function StandardData() {
   useEffect(() => {
     fetchSubCategories(selectedCategory);
     setSelectedDetails([]);
-     // eslint-disable-next-line
   }, [selectedCategory]);
 
   const fetchSubCategories = async (classCd) => {
@@ -221,7 +220,26 @@ function StandardData() {
         console.error('중분류 정보를 저장하는 중 에러 발생:', error);
         alert('중분류 코드 추가에 실패했습니다.');
       }
+    } else if (modalMode === 'class') {
+      try {
+        await axios.post(`/api/std/classInfo`, {
+          classCd: newRow.classCd,
+          classNm: newRow.classNm,
+          userId: auth.userId,
+        });
+        alert('대분류 코드가 추가되었습니다.');
+        fetchCategories();
+        setShowModal(false);
+      } catch (error) {
+        console.error('대분류 정보를 저장하는 중 에러 발생:', error);
+         alert('대분류 코드 추가에 실패했습니다.');
+      }
     }
+  };
+
+  const handleAddCategoryRow = () => {
+    setModalMode('class');
+    setShowModal(true);
   };
 
   const handleAddSubCategoryRow = () => {
@@ -376,6 +394,8 @@ function StandardData() {
   const getModalTitle = () => {
     if (modalMode === 'detail') {
       return `${subCategoryName} 추가`;
+    } else if (modalMode === 'class') {
+      return `대분류 추가`;
     } else if (modalMode === 'group') {
       return `중분류 추가`;
     } else {
@@ -403,6 +423,7 @@ function StandardData() {
                 </option>
               ))}
             </select>
+            <button className="data-add-button" onClick={handleAddCategoryRow} disabled={!auth.hasStandardDataAuthority}>추 가</button>
           </div>
         </div>
         <div className="tables-section">
