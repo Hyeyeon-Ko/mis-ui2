@@ -51,11 +51,11 @@ const TonerInfoModal = ({ show, onClose, onSave, editMode, selectedData }) => {
 
   const sendTonerExcel = async (data) => {
     try {
-      const requestData = {
-        details: data,
-        instCd: auth.instCd,
-        userId: auth.userId,
-      };
+      // const requestData = {
+      //   details: data,
+      //   instCd: auth.instCd,
+      //   userId: auth.userId,
+      // };
 
       //TODO: api 개발 후 변경
       // const response = await axios.post("/api/toner/excel", requestData);
