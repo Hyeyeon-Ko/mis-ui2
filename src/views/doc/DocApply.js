@@ -447,7 +447,7 @@ function DocApply() {
               </div>
               <div className='doc-form-group'>
                 <label>첨부파일 <span>*</span></label>
-                <text> 접수문서 첫 페이지를 스캔해 첨부해주세요.</text>
+                <p> 접수문서 첫 페이지를 스캔해 첨부해주세요.</p>
                 <input
                   type="file"
                   name="attachment"
