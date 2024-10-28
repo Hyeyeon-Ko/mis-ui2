@@ -243,7 +243,7 @@ const ConditionFilter = ({
         />
         {showDocumentType && (
           <>
-            <label>문서분류</label>
+            <label>신청분류</label>
             <select
               value={documentType}
               onChange={handleDocumentTypeChange}

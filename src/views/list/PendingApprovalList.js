@@ -291,7 +291,7 @@ function PendingApprovalList() {
   });
     
   const columns = [
-    { header: '문서분류', accessor: 'docType', width: '10%' },
+    { header: '신청분류', accessor: 'docType', width: '10%' },
     ...(documentType === '법인서류' ? [{
       header:               
       <CustomSelect
@@ -317,7 +317,7 @@ function PendingApprovalList() {
     },
     { header: '신청일시', accessor: 'draftDate', width: '12%' },
     { header: '신청자', accessor: 'drafter', width: '8%' }, 
-    { header: '문서상태', accessor: 'status', width: '10%' },
+    { header: '신청상태', accessor: 'status', width: '10%' },
   ];
 
   return (

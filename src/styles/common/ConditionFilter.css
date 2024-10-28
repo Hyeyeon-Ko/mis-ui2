@@ -41,7 +41,7 @@
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
-/* 문서분류 박스 스타일 수정 */
+/* 신청분류 박스 스타일 수정 */
 .all-application-filter select {
   width: 120px;
   padding: 4px;

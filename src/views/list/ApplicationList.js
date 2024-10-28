@@ -491,7 +491,7 @@ function ApplicationsList() {
   };
 
   /*
-  * 문서상태 선택 핸들러
+  * 신청상태 선택 핸들러
   */
   const handleStatusChange = (e) => {
     const selectedValue = e.target.value; 
@@ -715,7 +715,7 @@ function ApplicationsList() {
           },
         ]
       : []),
-    { header: "문서분류", accessor: "docType", width: "10%" },
+    { header: "신청분류", accessor: "docType", width: "10%" },
     ...(documentTypeFromUrl === "법인서류"
       ? [
           {
@@ -763,7 +763,7 @@ function ApplicationsList() {
     {
       header: (
         <CustomSelect
-          label="문서상태"
+          label="신청상태"
           options={statusOptions}
           selectedValue={selectedStatus}
           onChangeHandler={handleStatusChange}
@@ -834,8 +834,8 @@ function ApplicationsList() {
           setKeyword={(keyword) =>
             setFilterInputs((prev) => ({ ...prev, keyword }))
           }
-          showDocumentType={false}   // 문서분류 표시여부
-          documentType={filterInputs.documentType}  // 문서분류
+          showDocumentType={false}   // 신청분류 표시여부
+          documentType={filterInputs.documentType}  // 신청분류
           setDocumentType={(docType) =>
             setFilterInputs((prev) => ({ ...prev, documentType: docType }))
           } 

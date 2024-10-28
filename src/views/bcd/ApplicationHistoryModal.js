@@ -128,7 +128,7 @@ const ApplicationHistoryModal = ({ show, onClose, draftId }) => {
     { header: "제목", accessor: "title", width: "40%" },
     { header: "신청일시", accessor: "draftDate", width: "20%" },
     { header: "수량", accessor: "quantity", width: "10%" },
-    { header: "문서상태", accessor: "applyStatus", width: "18%" },
+    { header: "신청상태", accessor: "applyStatus", width: "18%" },
   ];
 
   return (

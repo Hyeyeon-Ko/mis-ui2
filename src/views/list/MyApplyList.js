@@ -307,7 +307,7 @@ function MyApplyList() {
   };
       
   const applicationColumns = [
-    { header: '문서분류', accessor: 'docType', width: '11%' },
+    { header: '신청분류', accessor: 'docType', width: '11%' },
     { header: '제목', accessor: 'title', width: '30%' },
     { header: '신청일시', accessor: 'draftDate', width: '14%' },
     { header: '신청자', accessor: 'drafter', width: '9%' },
@@ -400,7 +400,7 @@ function MyApplyList() {
           // setKeyword={(keyword) =>
           //   setFilterInputs((prev) => ({ ...prev, keyword }))
           // }
-          // showDocumentType={false}   // 문서분류 표시여부
+          // showDocumentType={false}   // 신청분류 표시여부
           // documentType={documentType}
           // setDocumentType={setDocumentType} 
         />
