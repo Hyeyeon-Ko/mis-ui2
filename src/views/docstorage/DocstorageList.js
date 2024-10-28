@@ -307,6 +307,7 @@ function DocstorageList() {
     
         if (draftIds.length === 0) {
           alert('승인할 문서가 없습니다.');
+          setShowConfirmModal(false);
           return;
         }
     
