@@ -262,27 +262,23 @@ const useBdcChange = () => {
   const handleFloorChange = (e) => {
     const updatedFloor = e.target.value;
     setFloor(updatedFloor);
-
+  
     const baseAddress = formData.address.split(",")[0];
-    const updatedAddress = `${baseAddress}${
-      updatedFloor ? `, ${updatedFloor}층` : ""
-    }`;
-
-    const originalEngAddress =
-      bcdData.instInfo.find((inst) => inst.detailNm === formData.center) 
-      || bcdData.instInfo.find((inst) => inst.detailCd === formData.center)
-      ?.etcItem2 || "";
-      const updatedEngAddress = updatedFloor
+    const updatedAddress = `${baseAddress}${updatedFloor ? `, ${updatedFloor}층` : ""}`;
+  
+    const selectedInstInfo = bcdData.instInfo.find((inst) => inst.detailNm === formData.center);
+    const originalEngAddress = selectedInstInfo ? selectedInstInfo.etcItem2 : "";
+  
+    const updatedEngAddress = updatedFloor
       ? `${updatedFloor}F, ${originalEngAddress}`
       : originalEngAddress;
-
+  
     setFormData({
       ...formData,
       address: updatedAddress,
       engAddress: updatedEngAddress,
     });
-
-  };
+  };  
 
   return {
     mappings,
