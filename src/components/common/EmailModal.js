@@ -139,7 +139,7 @@ const EmailModal = ({ show, onClose, onSend, orderType, selectedApplications }) 
             onChange={handleEmailChange}
           />
         </div>
-        {emailData.fileUrl || emailData.file ? (
+        { orderType === '명함' && (emailData.fileUrl || emailData.file) ? (
           <div className="email-input-group">
             <label>미리보기 파일</label>
             <div className="email-file-display">
@@ -151,7 +151,7 @@ const EmailModal = ({ show, onClose, onSend, orderType, selectedApplications }) 
               </div>
             </div>
           </div>
-        ) : (
+        ) : orderType === '명함' && (
           <div className="email-input-group">
             <label htmlFor="file">파일 첨부</label>
             <input id="file" type="file" onChange={handleFileChange} />
@@ -159,18 +159,18 @@ const EmailModal = ({ show, onClose, onSend, orderType, selectedApplications }) 
         )}
         <div className="email-modal-buttons">
           <button
-            className="email-modal-button cancel"
-            onClick={onClose}
-            disabled={emailData.isLoading}
-          >
-            취소
-          </button>
-          <button
             className="email-modal-button confirm"
             onClick={handleSend}
             disabled={emailData.isLoading}
           >
-            전송
+            전 송
+          </button>
+          <button
+            className="email-modal-button cancel"
+            onClick={onClose}
+            disabled={emailData.isLoading}
+          >
+            취 소
           </button>
         </div>
         {emailData.isLoading && (

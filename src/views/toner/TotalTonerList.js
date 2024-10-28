@@ -233,7 +233,7 @@ function TotalTonerList() {
     { 
       header: (
         <CustomSelect
-          label="부서"
+          label="사용부서"
           options={teamOptions}
           selectedValue={selectedTeamNm}
           onChangeHandler={(e) => setSelectedTeamNm(e.target.value)} 
