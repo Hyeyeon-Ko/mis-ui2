@@ -69,7 +69,7 @@ function Sidebar() {
     // { label: '인장신청', url: '/seal' },
     // { label: '법인서류', url: '/corpDoc' },
     { label: '문서수발신', url: '/doc' },
-    { label: '토너신청', url: '/tonerApply' },
+    // { label: '토너신청', url: '/tonerApply' },
     { label: '', url: '/' },
     { label: '', url: '/' },
     // { label: '토너신청', url: '/toner' },
