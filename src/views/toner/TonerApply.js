@@ -182,7 +182,6 @@ function TonerApply() {
       const defaultToner = tonerPriceList[0];
       const price = defaultToner.price || '-';
       const quantity = 1;
-      console.log(response)
 
       const updatedApplication = {
         ...applications[index],
