@@ -40,7 +40,7 @@ const EmailModal = ({ show, onClose, onSend, orderType, selectedApplications }) 
                   ...prevData,
                   previewFile: {
                     url: fileUrl,
-                    name: '명함 발주내역', // Editable name for preview file
+                    name: '명함 발주내역', 
                   },
                   files: [],
                 }));
@@ -97,8 +97,8 @@ const EmailModal = ({ show, onClose, onSend, orderType, selectedApplications }) 
     setEmailData((prevData) => ({ ...prevData, isLoading: true }));
     const sendData = {
       ...emailData,
-      previewFileName: emailData.previewFile?.name || '', // Only preview file has editable name
-      files: emailData.files.map(({ file, name }) => ({ file, name })), // Include all files without editable names
+      previewFileName: emailData.previewFile?.name || '', 
+      files: emailData.files.map(({ file, name }) => ({ file, name })), 
     };
 
     onSend(sendData)
@@ -115,7 +115,6 @@ const EmailModal = ({ show, onClose, onSend, orderType, selectedApplications }) 
       <div className="email-modal-container">
         <h3>{orderType === '명함' ? '명함 발주 이메일 작성' : '토너 발주 이메일 작성'}</h3>
 
-        {/* 스크롤이 적용될 영역 시작 */}
         <div className="scrollable-content">
           {inputFields.map(({ id, label, placeholder, type }) => (
             <div className="email-input-group" key={id}>
@@ -143,7 +142,8 @@ const EmailModal = ({ show, onClose, onSend, orderType, selectedApplications }) 
 
           {emailData.previewFile && (
             <div className="email-input-group">
-              <label htmlFor="fileName">엑셀 파일명</label>
+              
+              <label htmlFor="fileName">엑셀 파일명<p className="auto-attach-note">*명함 발주내역 엑셀 파일은 자동 첨부됩니다. 필요 시 파일명을 수정하세요.</p></label>
               <input
                 id="fileName"
                 type="text"
@@ -155,7 +155,6 @@ const EmailModal = ({ show, onClose, onSend, orderType, selectedApplications }) 
                 <span className="file-name">{emailData.previewFile.name}.xlsx</span>
                 <div className="file-actions">
                   <button type="button" className="file-delete-button" onClick={() => handleDeleteFile(emailData.previewFile.name)}>
-                    <img src={deleteIcon} alt="삭제" />
                   </button>
                 </div>
               </div>
@@ -183,7 +182,6 @@ const EmailModal = ({ show, onClose, onSend, orderType, selectedApplications }) 
             )}
           </div>
         </div>
-        {/* 스크롤이 적용될 영역 끝 */}
 
         <div className="email-modal-buttons">
           <button
