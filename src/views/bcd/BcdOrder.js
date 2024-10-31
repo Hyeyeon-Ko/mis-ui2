@@ -156,23 +156,35 @@ function BcdOrder() {
     setIsLoading(true);
     
     const formData = new FormData();
+    
     formData.append('orderRequest', new Blob([JSON.stringify({
       draftIds: selectedApplications,
       emailSubject: emailData.subject,
       emailBody: emailData.body,
-      fileName: emailData.fileName,
+      fileName: emailData.previewFileName, 
       fromEmail: emailData.fromEmail,
       toEmail: emailData.toEmail,
       password: emailData.password,
       instCd: auth.instCd,
     })], { type: 'application/json' }));
-    formData.append('file', emailData.file); 
-    
+  
+    if (emailData.previewFile && emailData.previewFile.file && emailData.previewFile.file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+      formData.append('previewFile', emailData.previewFile.file, `${emailData.previewFile.name}.xlsx`);
+    } else if (emailData.previewFile && emailData.previewFile.file) {
+      alert("미리보기 파일은 엑셀(.xlsx) 형식만 가능합니다.");
+      setIsLoading(false);
+      return;
+    }
+  
+    emailData.files.forEach(({ file, name }) => {
+      formData.append('files', file, name);
+    });
+  
     try {
       await axios.post(`/api/bsc/order`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-  
+    
       const updatedApplications = applications.filter(app => !selectedApplications.includes(app.id));
       setApplications(updatedApplications);
       setSelectedApplications([]);
@@ -181,15 +193,15 @@ function BcdOrder() {
       alert('발주 요청이 성공적으로 완료되었습니다.');
       refreshSidebar();
       navigate('/std', { replace: true });
-      
+    
     } catch (error) {
       console.error('Error sending order request: ', error);
       alert('발주 요청 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
     }
-  };
-    
+  };  
+          
   // 테이블 컬럼 정의
   const columns = [
     {

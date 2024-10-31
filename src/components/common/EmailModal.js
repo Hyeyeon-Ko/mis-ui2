@@ -38,8 +38,11 @@ const EmailModal = ({ show, onClose, onSend, orderType, selectedApplications }) 
                 const fileUrl = URL.createObjectURL(blob);
                 setEmailData((prevData) => ({
                   ...prevData,
-                  fileUrl: fileUrl, 
-                  fileName: '명함 발주내역', 
+                  previewFile: {
+                    url: fileUrl,
+                    name: '명함 발주내역', // Editable name for preview file
+                  },
+                  files: [],
                 }));
               })
               .catch((error) => console.error('Error fetching preview file:', error));
@@ -53,44 +56,49 @@ const EmailModal = ({ show, onClose, onSend, orderType, selectedApplications }) 
         toEmail: '',
         subject: '',
         body: '',
-        fileName: '',
+        previewFile: null,
+        files: [],
         isLoading: false,
       });
     }
   }, [show, orderType, setEmailData, selectedApplications]);
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const fileNameWithoutExtension = file.name.endsWith('.xlsx') 
-        ? file.name.slice(0, -5) 
-        : file.name;
-  
-      setEmailData((prevData) => ({
-        ...prevData,
-        file: file,
-        fileName: fileNameWithoutExtension,
-      }));
-    }
-  };
-  
-  const handleDeleteFile = () => {
+    const files = Array.from(e.target.files);
+    const newFiles = files.map((file) => ({
+      file,
+      name: file.name,
+    }));
+
     setEmailData((prevData) => ({
       ...prevData,
-      fileUrl: '',
-      fileName: '',
-      file: null,
+      files: [...prevData.files, ...newFiles],
+    }));
+  };
+
+  const handleDeleteFile = (fileName) => {
+    setEmailData((prevData) => ({
+      ...prevData,
+      files: prevData.files.filter((file) => file.name !== fileName),
+    }));
+  };
+
+  const handlePreviewFileNameChange = (e) => {
+    setEmailData((prevData) => ({
+      ...prevData,
+      previewFile: {
+        ...prevData.previewFile,
+        name: e.target.value,
+      },
     }));
   };
 
   const handleSend = () => {
     setEmailData((prevData) => ({ ...prevData, isLoading: true }));
-    const defaultFileName = orderType === '명함' ? '명함발주' : '토너발주';
-    const fileToSend = emailData.fileName.trim() === '' ? defaultFileName : emailData.fileName.trim();
-    
     const sendData = {
       ...emailData,
-      fileName: fileToSend,
+      previewFileName: emailData.previewFile?.name || '', // Only preview file has editable name
+      files: emailData.files.map(({ file, name }) => ({ file, name })), // Include all files without editable names
     };
 
     onSend(sendData)
@@ -106,57 +114,77 @@ const EmailModal = ({ show, onClose, onSend, orderType, selectedApplications }) 
     <div className="email-modal-overlay">
       <div className="email-modal-container">
         <h3>{orderType === '명함' ? '명함 발주 이메일 작성' : '토너 발주 이메일 작성'}</h3>
-        {inputFields.map(({ id, label, placeholder, type }) => (
-          <div className="email-input-group" key={id}>
-            <label htmlFor={id}>{label}</label>
-            <input
-              id={id}
-              type={type}
-              placeholder={placeholder}
-              value={emailData[id]}
+
+        {/* 스크롤이 적용될 영역 시작 */}
+        <div className="scrollable-content">
+          {inputFields.map(({ id, label, placeholder, type }) => (
+            <div className="email-input-group" key={id}>
+              <label htmlFor={id}>{label}</label>
+              <input
+                id={id}
+                type={type}
+                placeholder={placeholder}
+                value={emailData[id]}
+                onChange={handleEmailChange}
+              />
+            </div>
+          ))}
+
+          <div className="email-input-group">
+            <label htmlFor="body">이메일 내용</label>
+            <textarea
+              id="body"
+              placeholder="내용을 입력하세요"
+              value={emailData.body}
               onChange={handleEmailChange}
+              style={{ resize: 'vertical' }}
             />
           </div>
-        ))}
 
-        <div className="email-input-group">
-          <label htmlFor="body">이메일 내용</label>
-          <textarea
-            id="body"
-            placeholder="내용을 입력하세요"
-            value={emailData.body}
-            onChange={handleEmailChange}
-            style={{ resize: 'vertical' }}
-          />
-        </div>
-        <div className="email-input-group">
-          <label htmlFor="fileName">엑셀 파일명</label>
-          <input
-            id="fileName"
-            type="text"
-            placeholder="수정할 엑셀 파일명을 입력하세요"
-            value={emailData.fileName}
-            onChange={handleEmailChange}
-          />
-        </div>
-        { orderType === '명함' && (emailData.fileUrl || emailData.file) ? (
-          <div className="email-input-group">
-            <label>미리보기 파일</label>
-            <div className="email-file-display">
-              <span className="file-name">{emailData.fileName + ".xlsx"}</span>
-              <div className="file-actions">
-                <button type="button" className="file-delete-button" onClick={handleDeleteFile}>
-                  <img src={deleteIcon} alt="삭제" />
-                </button>
+          {emailData.previewFile && (
+            <div className="email-input-group">
+              <label htmlFor="fileName">엑셀 파일명</label>
+              <input
+                id="fileName"
+                type="text"
+                placeholder="수정할 엑셀 파일명을 입력하세요"
+                value={emailData.previewFile.name}
+                onChange={handlePreviewFileNameChange}
+              />
+              <div className="email-file-display">
+                <span className="file-name">{emailData.previewFile.name}.xlsx</span>
+                <div className="file-actions">
+                  <button type="button" className="file-delete-button" onClick={() => handleDeleteFile(emailData.previewFile.name)}>
+                    <img src={deleteIcon} alt="삭제" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ) : orderType === '명함' && (
+          )}
+
           <div className="email-input-group">
-            <label htmlFor="file">파일 첨부</label>
-            <input id="file" type="file" onChange={handleFileChange} />
+            <label htmlFor="file">추가 파일 첨부</label>
+            <input id="file" type="file" multiple onChange={handleFileChange} />
+            {emailData.files.length > 0 && (
+              <div className="email-file-container">
+                {emailData.files.map((file, index) => (
+                  <div key={index} className="file-chip">
+                    <span>{file.name}</span>
+                    <button
+                      type="button"
+                      className="file-delete-button"
+                      onClick={() => handleDeleteFile(file.name)}
+                    >
+                      <img src={deleteIcon} alt="삭제" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+        </div>
+        {/* 스크롤이 적용될 영역 끝 */}
+
         <div className="email-modal-buttons">
           <button
             className="email-modal-button confirm"
