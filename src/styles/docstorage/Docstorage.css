@@ -145,11 +145,11 @@
 
 .docstorage-apply-button {
     color: white;
-    background-color: #2789FE;
+    background-color: #5B89F5;
 }
 
 .docstorage-apply-button:hover {
-    background-color: #1e6fc1;
+    background-color: #426dd1;
 }
 
 .type-header {
@@ -161,7 +161,7 @@
 }
   
 .type-header:hover{
-    color: #2789FE;
+    color: #5B89F5;
 }
 
 .type-header span {
@@ -192,7 +192,7 @@
 }
   
 .status-header:hover{
-    color: #2789FE;
+    color: #5B89F5;
 }
 
 .status-header span {

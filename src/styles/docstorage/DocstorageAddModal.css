@@ -83,8 +83,8 @@
   
   .docstorage-tab.active {
     font-weight: bold;
-    color: #007bff;
-    border-bottom: 2px solid #007bff;
+    color: #5B89F5;
+    border-bottom: 2px solid #5B89F5;
   }
   
   .docstorage-modal-content {
@@ -141,7 +141,7 @@
   }
   
   .docstorage-modal-button.confirm {
-    background-color: #2789FE;
+    background-color: #5B89F5;
     color: #ffffff;
     padding: 10px 20px;
     border: none;
@@ -152,5 +152,5 @@
   }
   
   .docstorage-modal-button.confirm:hover {
-    background-color: #1e6fc1;
+    background-color: #426dd1;
   }

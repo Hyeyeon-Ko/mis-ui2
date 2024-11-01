@@ -9,7 +9,7 @@
 
 .status-button {
   background: none;
-  color: #2789FE;
+  color: #5B89F5;
   border: none;
   cursor: pointer;
   font-size: 13px;
@@ -17,5 +17,5 @@
 }
 
 .status-button:hover {
-  color: #1e6fc1;
+  color: #426dd1;
 }

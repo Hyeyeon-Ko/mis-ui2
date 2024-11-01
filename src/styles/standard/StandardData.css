@@ -82,12 +82,13 @@
   }
   
   .sub-category-table th {
-    background-color: white;
+    background-color: #f1f1f3;
     border: 1px solid #ddd;
     padding: 8px 20px;
     text-align: center;
     font-size: 13px;
     height: 22px;
+
   }
   
   .sub-category-table td {
@@ -124,6 +125,10 @@
     white-space: nowrap;
     height: 22px;
   }
+
+  .details-table th {
+    background-color: #f1f1f3;
+  }
   
   .details-table .checkbox-cell {
     width: 50px;
@@ -144,16 +149,16 @@
   
   .data-add-button {
     color: white;
-    background-color: #2789fe;
+    background-color: #5b89f5;
   }
   
   .data-add-button:hover {
-    background-color: #1e6fc1;
+    background-color: #426dd1;
   }
   
   .data-modify-button, .data-delete-button {
     color: black;
-    background-color: #bdc6cf;
+    background-color: #c0c6ce;
   }
   
   .data-modify-button:hover, .data-delete-button:hover {
@@ -161,5 +166,5 @@
   }
 
   .selected-sub-category-text {
-    color: #2789fe;
+    color: #426dd1;
   }

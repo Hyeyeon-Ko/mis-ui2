@@ -201,7 +201,7 @@ const EmailModal = ({ show, onClose, onSend, orderType, selectedApplications }) 
         </div>
         {emailData.isLoading && (
           <div className="loading-overlay">
-            <FadeLoader color="#2789FE" height={15} loading={emailData.isLoading} margin={2} radius={2} speedMultiplier={1} width={5} />
+            <FadeLoader color="#5B89F5" height={15} loading={emailData.isLoading} margin={2} radius={2} speedMultiplier={1} width={5} />
           </div>
         )}
       </div>

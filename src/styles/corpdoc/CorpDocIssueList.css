@@ -36,7 +36,7 @@
 /* 추후 상태변수(영문)로 변경 */
 .status-결재진행중,
 .status-결재완료 {
-    color: #2789FE;
+    color: #5B89F5;
     text-decoration: underline;
 }
 

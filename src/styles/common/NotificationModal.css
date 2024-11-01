@@ -1,7 +1,25 @@
 .modal-backdrop {
-  position: absolute;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   z-index: 1000;
-  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: 40px 20px 0 0; 
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 10px;
+  width: 500px;
+  height: 550px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+  margin-right: 60px;
 }
 
 .modal-content-header {
@@ -22,15 +40,6 @@
 
 .modal-content-header h3 {
   letter-spacing: 1px;
-}
-
-.modal-content {
-  background-color: white;
-  border-radius: 10px;
-  width: 500px;
-  height: 550px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  position: relative;
 }
 
 .modal-content-detail {
@@ -71,19 +80,19 @@
   align-items: center;
   padding-top: 15px;
   padding-bottom: 15px;
-  border-top: 1px solid #f1eeee;
-  border-bottom: 1px solid #f1eeee;
+  border-top: 0.1px solid rgba(243, 243, 243, 0.5);
+  border-bottom: 0.1px solid rgba(243, 243, 243, 0.5);
   user-select: none;
 }
 
 .notification-item.unclicked {
-  background-color: #f2f6fab0;
+  background-color: #f6faff;
   user-select: none;
 }
 
 .button-all-read {
   background-color: white;
-  color: #2789FE; 
+  color: #5B89F5; 
   border: none; 
   border-radius: 5px; 
   padding: 6px 8px 10px 8px; 

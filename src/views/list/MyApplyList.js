@@ -330,7 +330,7 @@ function MyApplyList() {
           !isSpecialRoleAndTeam ? (
           <button
             className="status-button"
-            style={{ color: '#2789FE', textDecoration: 'underline' }}
+            style={{ color: '#5B89F5', textDecoration: 'underline' }}
             onClick={() => handleApprovalClick(row)}
           >
             {row.applyStatus}
@@ -345,7 +345,7 @@ function MyApplyList() {
             style={
               viewedRejections.has(row.draftId)
                 ? { color: 'black', textDecoration: 'underline' }
-                : { color: '#2789FE', textDecoration: 'underline' }
+                : { color: '#5B89F5', textDecoration: 'underline' }
             }
             onClick={() => handleButtonClick(row)}
           >

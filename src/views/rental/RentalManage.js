@@ -367,8 +367,8 @@ function RentalManage() {
     <div className='content'>
       <div className='rental-content'>
         <div className="rental-content-inner">
-          <h2>렌탈현황 관리표</h2>
-          <Breadcrumb items={['자산 관리', '렌탈현황 관리표']} />
+          <h2>렌탈 관리표</h2>
+          <Breadcrumb items={['자산 관리', '렌탈 관리표']} />
           {loading ? (
             <Loading />
           ) : (

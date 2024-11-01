@@ -79,7 +79,7 @@
   .seal-apply-form-group input:focus,
   .seal-apply-form-group select:focus,
   .seal-apply-form-group textarea:focus {
-    border-color: #007bff;
+    border-color: #5B89F5;
     box-shadow: 0 0 2px rgba(0, 123, 255, 0.5);
     outline: none;
   }
@@ -139,7 +139,7 @@
   }
   
   .seal-apply-options input[type="radio"]:checked + img {
-    border-color: #007bff;
+    border-color: #5B89F5;
   }
   
   .seal-apply-approval-buttons {

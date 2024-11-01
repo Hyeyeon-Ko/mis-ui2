@@ -5,6 +5,13 @@ import logo from '../../assets/images/logo.png';
 import { AuthContext } from '../AuthContext';
 import dropdownDefaultIcon from '../../assets/images/dropdownDefault.png';
 import dropdownActiveIcon from '../../assets/images/dropdownActive.png';
+import bscIcon from '../../assets/images/bsc.png';
+import docIcon from '../../assets/images/docs.png';
+import rentalIcon from '../../assets/images/rental.png';
+import authorityIcon from '../../assets/images/authority.png';
+import stdIcon from '../../assets/images/std.png';
+import applyIcon from '../../assets/images/apply.png';
+import applyListIcon from '../../assets/images/applyList.png';
 import axios from 'axios';
 
 function Sidebar() {
@@ -125,8 +132,8 @@ function Sidebar() {
     ],
     'F': [
       { title: '자산 관리', items: [
-        { label: '렌탈현황 관리표', url: '/rentalList', subIndex: 'F-1' },
-        { label: '전국 렌탈현황 관리표', url: '/totalRentalList', subIndex: 'F-2' },
+        { label: '렌탈 관리표', url: '/rentalList', subIndex: 'F-1' },
+        { label: '전국 렌탈 관리표', url: '/totalRentalList', subIndex: 'F-2' },
       ]}
     ],
     'G': [
@@ -176,7 +183,7 @@ function Sidebar() {
             isActive={isActive}
             location={location}
             defaultOpen={true}
-          />
+            />
           <SidebarSection
             title="나의 신청내역"
             items={myApplyItems}
@@ -200,23 +207,33 @@ function Sidebar() {
               />
             ));
           })}
-          {(auth.role === 'MASTER' || auth.role === 'ADMIN') && (
-            <div className="sidebar-section">
-              <h2>
-                <Link to="/std" className={isActive('/std')}>기준자료 관리</Link>
-              </h2>
-            </div>
-          )}
           {auth.role === 'MASTER' && (
             <div className="sidebar-section">
-              <h2>
-                <Link to="/auth" className={isActive('/auth')}>권한 관리</Link>
-              </h2>
+                <Link to="/auth" className={`sidebar-link ${isActive('/auth')}`}>
+                  <div className="left-content">
+                    <img src={authorityIcon} alt="권한 관리 Icon" className="toggle-icon-left" />    
+                  </div>
+                  <div className="right-content">
+                    권한 관리
+                  </div>
+                </Link>
+            </div>
+          )}
+          {(auth.role === 'MASTER' || auth.role === 'ADMIN') && (
+            <div className="sidebar-section">
+              <Link to="/std" className={`sidebar-link ${isActive('/std')}`}>
+                <div className="left-content">
+                  <img src={stdIcon} alt="기준자료 관리" className="toggle-small-icon" />
+                </div>
+                <div className="right-content">
+                  기준자료 관리
+                </div>
+              </Link>
             </div>
           )}
           <div className="sidebar-section">
              <h2>
-              <Link style={{ color: '#EDF1F5' }}>페이크</Link>
+              <Link style={{ color: '#363a3f' }}>페이크</Link>
              </h2>
           </div>
         </>
@@ -224,6 +241,7 @@ function Sidebar() {
     </div>
   );
 }
+
 
 function SidebarSection({ title, items, isActive, defaultOpen }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
@@ -240,6 +258,15 @@ function SidebarSection({ title, items, isActive, defaultOpen }) {
   };
 
   const isAnyItemActive = items.some(item => isActive(item.url) === 'active');
+  
+  const getIcon = () => {
+    if (title === '명함 관리') return bscIcon;
+    if (title === '문서 관리') return docIcon;
+    if (title === '신청하기') return applyIcon;
+    if (title === '나의 신청내역') return applyListIcon;
+
+    return rentalIcon;
+  };
 
   return (
     <div className="sidebar-section">
@@ -247,12 +274,19 @@ function SidebarSection({ title, items, isActive, defaultOpen }) {
         onClick={toggleOpen} 
         className={`toggle-header ${!isOpen && isAnyItemActive ? 'active-toggle' : ''}`}
       >
+        <div className="icon-text">
+          <img
+            src={getIcon()}
+            alt="Section Icon"
+            className={getIcon() === docIcon || applyIcon || applyListIcon ? "toggle-small-icon" : "toggle-icon-left"}
+          /> 
+          {title}
+        </div>
         <img
           src={isOpen ? dropdownActiveIcon : dropdownDefaultIcon}
           alt="Toggle Icon"
-          className="toggle-icon" 
-        /> 
-        {title}
+          className="toggle-icon-right"
+        />
       </h3>
       {isOpen && (
         <ul>

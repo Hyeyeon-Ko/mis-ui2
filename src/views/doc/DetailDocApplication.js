@@ -216,7 +216,7 @@ function DetailDocApplication() {
               </div>
               <div className="doc-form-group file-group">
                 <label>첨부 파일 <span style={{ color: 'red' }}>*</span></label>
-                <text> 접수문서 첫 페이지를 스캔해 첨부해주세요.</text>
+                <p> 접수문서 첫 페이지를 스캔해 첨부해주세요.</p>
                 {existingFile ? (
                     <div className="file-display">
                         <span className="file-name">{existingFile.name}</span>

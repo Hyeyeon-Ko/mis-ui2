@@ -13,7 +13,7 @@
 }
 
 .link:hover {
-  color: #2789FE; 
+  color: #5B89F5; 
   text-decoration: none; 
 }
 
@@ -45,8 +45,8 @@
 }
 
 .status-pending:hover {
-  color: #2789FE;
-  border-bottom: 1px solid #2789FE;
+  color: #5B89F5;
+  border-bottom: 1px solid #5B89F5;
 }
 
 .center-header {

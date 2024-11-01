@@ -16,13 +16,13 @@
   }
   
   .cancel-button {
-    background-color: #2789FE;
+    background-color: #5B89F5;
     color: white;
     border: none;
   }
   
   .cancel-button:hover {
-    background-color: #2789FE;
+    background-color: #5B89F5;
   }
   
   .delete-button {
@@ -33,7 +33,7 @@
   }
   
   .delete-button:hover {
-    background-color: #2789FE;
+    background-color: #5B89F5;
     color: white;
   }
   
