@@ -6,7 +6,7 @@ import DocstorageUpdateModal from './DocstorageUpdateModal';
 import DocstorageBulkUpdateModal from './DocstorageBulkUpdateModal'; 
 import axios from 'axios';
 import { AuthContext } from '../../components/AuthContext';
-import StatusSelect from '../../components/StatusSelect';  
+import CustomSelect from '../../components/CustomSelect';  
 import '../../styles/common/Page.css';
 import '../../styles/docstorage/DocstorageList.css';
 import Loading from '../../components/common/Loading';
@@ -307,6 +307,7 @@ function DocstorageList() {
     
         if (draftIds.length === 0) {
           alert('승인할 문서가 없습니다.');
+          setShowConfirmModal(false);
           return;
         }
     
@@ -381,10 +382,11 @@ function DocstorageList() {
     ...(selectedCategory === 'B' ? [
       {
         header: (
-          <StatusSelect
-            statusOptions={statusOptions}
-            selectedStatus={selectedStatus}
-            onStatusChange={(e) => setSelectedStatus(e.target.value)} 
+          <CustomSelect
+            label="상태"
+            options={statusOptions}
+            selectedValue={selectedStatus}
+            onChangeHandler={(e) => setSelectedStatus(e.target.value)} 
           />
         ),
         accessor: 'status',

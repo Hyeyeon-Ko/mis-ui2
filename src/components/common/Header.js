@@ -61,7 +61,11 @@ function Header() {
                   onClick={handleNotiClick}
                   style={{ cursor: 'pointer', marginRight: '10px' }}
                 />
-                {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
+                {unreadCount > 0 && (
+                  <span className="unread-badge" onClick={handleNotiClick}>
+                    {unreadCount}
+                  </span>
+                )}
               </div>
               <span>{auth.userNm}({auth.userId})</span>
               <span> | </span>

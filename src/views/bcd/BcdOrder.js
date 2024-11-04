@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import CustomButton from '../../components/common/CustomButton';
-import EmailModal from './EmailModal';
+import EmailModal from '../../components/common/EmailModal';
 import '../../styles/bcd/BcdOrder.css';
 import '../../styles/common/Page.css';
 import axios from 'axios';
@@ -11,7 +11,6 @@ import fileDownload from 'js-file-download';
 import { FadeLoader } from 'react-spinners';
 import { AuthContext } from '../../components/AuthContext'; 
 import useBdcChange from '../../hooks/bdc/useBdcChange';
-import Pagination from '../../components/common/Pagination';
 import Loading from '../../components/common/Loading';
 
 
@@ -21,16 +20,7 @@ function BcdOrder() {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [totalPages, setTotalPages] = useState(1)
-  const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(false);
-
-  const itemsPerPage = 10;
-
-  const handlePageClick = (event) => {
-    const selectedPage = event.selected + 1;
-    setCurrentPage(selectedPage);
-  };
 
   const navigate = useNavigate();
 
@@ -53,21 +43,17 @@ function BcdOrder() {
   };
 
   // 발주 리스트 가져오기
-  const fetchBcdOrderList = useCallback(async (pageIndex = 1, pageSize = itemsPerPage) => {
+  const fetchBcdOrderList = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/bsc/order/get`, {
+      const response = await axios.get(`/api/bsc/order`, {
         params: {
           instCd: auth.instCd,
-          pageIndex,
-          pageSize
         },
       });
       const data = response.data.data || response.data;
-      const totalPages = Math.max(data.totalPages, 1);
-      const currentPage = data.number + 1;
 
-      const transformedData = data.content.map((item) => ({
+      const transformedData = data.map((item) => ({
         id: item.draftId,
         center: item.instNm,
         title: item.title,
@@ -77,19 +63,12 @@ function BcdOrder() {
         quantity: item.quantity,
       }));
       setApplications(transformedData);
-      setTotalPages(totalPages);
-      setCurrentPage(currentPage);
     } catch (error) {
       console.error('Error fetching bcdOrder list: ', error);
     } finally {
       setLoading(false)
     }
   }, [auth.instCd, setApplications]);
-
-  
-  useEffect(() => {
-    fetchBcdOrderList(currentPage, itemsPerPage);
-  }, [currentPage, fetchBcdOrderList]);
 
   // 컴포넌트 마운트 시 발주 리스트 가져오기
   useEffect(() => {
@@ -175,34 +154,54 @@ function BcdOrder() {
 
   const handleSendEmail = async (emailData) => {
     setIsLoading(true);
-    try {
-      await axios.post(`/api/bsc/order`, {
-        draftIds: selectedApplications,
-        emailSubject: emailData.subject,
-        emailBody: emailData.body,
-        fileName: emailData.fileName,
-        fromEmail: emailData.fromEmail,
-        toEmail: emailData.toEmail,
-        password: emailData.password,
-      });
+    
+    const formData = new FormData();
+    
+    formData.append('orderRequest', new Blob([JSON.stringify({
+      draftIds: selectedApplications,
+      emailSubject: emailData.subject,
+      emailBody: emailData.body,
+      fileName: emailData.previewFileName, 
+      fromEmail: emailData.fromEmail,
+      toEmail: emailData.toEmail,
+      password: emailData.password,
+      instCd: auth.instCd,
+    })], { type: 'application/json' }));
   
+    if (emailData.previewFile && emailData.previewFile.file && emailData.previewFile.file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+      formData.append('previewFile', emailData.previewFile.file, `${emailData.previewFile.name}.xlsx`);
+    } else if (emailData.previewFile && emailData.previewFile.file) {
+      alert("미리보기 파일은 엑셀(.xlsx) 형식만 가능합니다.");
+      setIsLoading(false);
+      return;
+    }
+  
+    emailData.files.forEach(({ file, name }) => {
+      formData.append('files', file, name);
+    });
+  
+    try {
+      await axios.post(`/api/bsc/order`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+    
       const updatedApplications = applications.filter(app => !selectedApplications.includes(app.id));
       setApplications(updatedApplications);
-      setSelectedApplications([]); 
-  
+      setSelectedApplications([]);
+    
       setShowEmailModal(false);
       alert('발주 요청이 성공적으로 완료되었습니다.');
       refreshSidebar();
       navigate('/std', { replace: true });
-      
+    
     } catch (error) {
       console.error('Error sending order request: ', error);
       alert('발주 요청 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
     }
-  };
-  
+  };  
+          
   // 테이블 컬럼 정의
   const columns = [
     {
@@ -279,7 +278,6 @@ function BcdOrder() {
           onRowMouseOver={(rowIndex) => handleMouseOver(rowIndex)}  
           onRowMouseUp={handleMouseUp}    
         />
-        <Pagination totalPages={totalPages} onPageChange={handlePageClick} />
         </>
 
 )}
@@ -297,7 +295,7 @@ function BcdOrder() {
           />
         </div>
       )}
-      <EmailModal show={showEmailModal} onClose={() => setShowEmailModal(false)} onSend={handleSendEmail} />
+      <EmailModal show={showEmailModal} onClose={() => setShowEmailModal(false)} onSend={handleSendEmail} orderType='명함' selectedApplications={selectedApplications}/>
     </div>
   );
 }

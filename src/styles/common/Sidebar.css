@@ -1,9 +1,9 @@
 /* Sidebar.css */
 .sidebar {
-  width: 210px;
-  background-color: #EDF1F5;
-  color: black;
-  padding: 20px 20px 20px 25px;
+  width: 12%;
+  background-color: #363a3f;
+  color: #e6e7e7;
+  padding: 20px;
   height: 100vh; 
   display: flex;
   flex-direction: column;
@@ -11,12 +11,18 @@
   overflow-y: auto; 
   user-select: none;
   transition: width 0.3s ease, padding 0.3s ease;
+  border-right: 0.1px solid #f1f1f3;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.7px;
+  position: relative;
+  border-top-right-radius: 15px;
 }
 
 .toggle-icon {
   width: 9%;
   margin-top: 5px;
   transition: opacity 0.3s ease;
+  filter: invert(100%) grayscale(100%);
 }
 
 .sidebar::-webkit-scrollbar {
@@ -26,32 +32,46 @@
 
 .logo {
   width: 155px;
-  height: 60px;
+  height: 55px;
   margin-top: 32px;
-  margin-bottom: 32px;
-  margin-right: 8px;
+  margin-bottom: 44px;
+  margin-right: 22px;
 }
 
 .sidebar-section {
-  width: 100%;
-  margin-left: 45px;
-  user-select: none;
+  width: 80%;
+  margin-bottom: 10px;
+  margin-right: 24px;
+}
+
+.sidebar-section .sidebar-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #e6e7e7;
+  margin: 3px 0px 10px;
+}
+
+.right-content {
+  margin: 0; 
+  font-size: 17px;
 }
 
 .sidebar-section h2 {
   font-size: 17px;
-  margin: 5px 0px 15px 28px;
+  margin: 5px 0px 15px 0px;
   cursor: pointer;
   user-select: none;
 }
 
 .sidebar-section h2 a {
-  color: black; 
+  color: #e6e7e7; 
   text-decoration: none; 
+  font-weight: 400;
 }
 
 .sidebar-section h2 :hover {
-  color: #2789FE;
+  color: #88aeec;
 }
 
 .sidebar-section ul {
@@ -64,8 +84,8 @@
 
 .sidebar-section li {
   font-size: 14.5px;
-  margin-bottom: 7px;
-  margin-left: 28px;
+  margin-bottom: 10px;
+  margin-left: 32px; 
   cursor: pointer;
   user-select: none;
 }
@@ -75,27 +95,24 @@
 }
 
 .sidebar-section li:hover {
-  color: #2789FE;
-}
-
-.sidebar-section {
-  width: 100%;
-  margin-bottom: 0px;
+  color: #88aeec;
 }
 
 .sidebar-section h3 {
   font-size: 17px;
+  font-weight: 400;
   letter-spacing: 0.5px;
   margin-top: 5px;
   margin-bottom: 15px;
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   user-select: none;
 }
 
 .sidebar-section h3:hover {
-  color: #2789FE;
+  color: #88aeec;
 }
 
 .toggle-icon {
@@ -103,9 +120,41 @@
   margin-bottom: 5px;
 }
 
+.icon-text {
+  display: flex;
+  align-items: center;
+}
+
+.toggle-icon-left {
+  margin-right: 8px;
+  width: 24px;
+  height: 24px;
+  filter: invert(100%) grayscale(100%);
+}
+
+.toggle-small-icon {
+  margin-right: 12px;
+  width: 20px;
+  height: 20px;
+  filter: invert(100%) grayscale(100%);
+}
+
+.toggle-icon-right {
+  margin-left: auto;
+  width: 20px;
+  height: 20px;
+  transition: opacity 0.3s ease;
+  filter: invert(100%) grayscale(100%);
+}
+
 .sidebar-section .active a,
 .sidebar-section .active-toggle {
-  color: #2789FE;
+  color: #88aeec;
+  font-weight: bold;
+}
+
+.sidebar-section .sidebar-link :hover{
+  color: #88aeec;
   font-weight: bold;
 }
 
@@ -120,25 +169,26 @@
 }
 
 .pending-count {
-  background-color: #D1D5DB; 
+  background-color: #b5cdf4; 
   color: #4B5563; 
   border-radius: 50%;
-  padding: 2px 7px 4px 7px;
+  padding: 1px 5px 1px 5px;
   font-size: 11px; 
-  margin-left: 7px;
+  margin-left: 8px;
   width: 10px; 
   height: 18px; 
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold; 
+  font-weight: bold;
+
 }
 
 /* 사이드바가 닫힌 상태일 때 */
 .sidebar.closed {
-  width: 45px;
+  width: 40px;
   padding: 20px 10px;
-  background-color: white;
+  background-color: #363a3f;
 }
 
 .sidebar.closed .logo,
@@ -147,23 +197,16 @@
 }
 
 .sidebar-toggle-button {
-  color: #8f969e;
+  color: #E6E7E7;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 30px;
   position: absolute;
   top: 15px;
+  right: 20px;
   z-index: 10;
   transition: color 0.3s ease;
 }
 
 .sidebar-toggle-button:hover {
-  color: #2789FE;
-}
-
-.sidebar.open .sidebar-toggle-button {
-  left: 20px;
-}
-
-.sidebar.closed .sidebar-toggle-button {
-  left: 20px;
+  color: #88aeec;
 }

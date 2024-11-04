@@ -5,8 +5,7 @@ import DocstorageAddModal from '../../views/docstorage/DocstorageAddModal';
 import DocstorageUpdateModal from '../../views/docstorage/DocstorageUpdateModal';
 import DocstorageApplyModal from '../../views/docstorage/DocstorageApplyModal';
 import DocstorageBulkUpdateModal from '../../views/docstorage/DocstorageBulkUpdateModal';
-import TypeSelect from '../../components/TypeSelect'; 
-import StatusSelect from '../../components/StatusSelect';
+import CustomSelect from '../../components/CustomSelect';
 import axios from 'axios';
 import '../../styles/common/Page.css';
 import '../../styles/docstorage/Docstorage.css';
@@ -325,10 +324,11 @@ function Docstorage() {
     { header: 'NO', accessor: 'no' },
     {
       header: (
-        <TypeSelect
-          types={types}
-          selectedType={selectedType}
-          onTypeChange={handleTypeChange}
+        <CustomSelect
+          label="분류"
+          options={types}
+          selectedValue={selectedType}
+          onChangeHandler={handleTypeChange}
         />
       ),
       accessor: 'typeDisplay',
@@ -336,10 +336,11 @@ function Docstorage() {
     },
     {
       header: (
-        <StatusSelect
-          statusOptions={statusOptions}
-          selectedStatus={selectedStatus}  
-          onStatusChange={handleStatusChange} 
+        <CustomSelect
+          label="상태"
+          options={statusOptions}
+          selectedValue={selectedStatus}  
+          onChangeHandler={handleStatusChange} 
         />
       ),
       accessor: 'statusDisplay',

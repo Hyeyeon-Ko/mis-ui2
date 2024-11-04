@@ -39,13 +39,13 @@
 }
 
 .confirm-modal-button.confirm {
-  background-color: #2789FE;
+  background-color: #5B89F5;
   color: white;
   border: none;
 }
 
 .confirm-modal-button.confirm:hover {
-  background-color: #1e6fc1;
+  background-color: #426dd1;
 }
 
 .confirm-modal-button.cancel {

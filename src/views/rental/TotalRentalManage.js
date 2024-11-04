@@ -215,7 +215,7 @@ function TotalRentalManage() {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', '렌탈현황 관리표.xlsx');
+        link.setAttribute('download', '렌탈 관리표.xlsx');
         document.body.appendChild(link);
         link.click();
         link.remove();
@@ -228,8 +228,8 @@ function TotalRentalManage() {
         <div className='content'>
             <div className="totalRentalManage-content">
                 <div className='totalRentalManage-content-inner'>
-                    <h2>전국 렌탈현황 관리표</h2>
-                    <Breadcrumb items={['자산 관리', '전국 렌탈현황 관리표']} />
+                    <h2>전국 렌탈 관리표</h2>
+                    <Breadcrumb items={['자산 관리', '전국 렌탈 관리표']} />
                     <div className="totalRentalManage-category-section">
                         <div className="totalRentalManage-category">
                             <label htmlFor="center" className="totalRentalManage-category-label">센 터&gt;&gt;</label>

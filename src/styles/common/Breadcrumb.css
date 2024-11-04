@@ -1,16 +1,16 @@
 .breadcrumb {
     display: flex;
     align-items: center;
-    font-size: 11px;
-    margin-top: 24px;
+    font-size: 6px;
+    margin-top: 16px;
     margin-left: 4px;
     margin-bottom: 10px;
     color: #888;
   }
 
   .breadcrumb .nav-icon {
-    height: 16px;
-    width: 16px;
+    height: 14px;
+    width: 14px;
   }
   
   .breadcrumb .before {
@@ -22,13 +22,13 @@
   .breadcrumb .current {
     margin-top: 2px;
     font-weight: bold;
-    color: #2789FE;
+    color: #5B89F5;
   }
   
   .breadcrumb .nav-item {
     margin-left: 0px;
     margin-right: 4px;
-    font-size: 13px;
+    font-size: 12px;
   }
   
   .breadcrumb .nav-separator {

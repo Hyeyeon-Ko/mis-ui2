@@ -95,14 +95,14 @@
 }
 
 .doc-confirm-button.confirm {
-  background-color: #2789FE;
+  background-color: #5B89F5;
   color: white;
   font-size: 15px;
   border: none;
 }
 
 .doc-confirm-button.confirm:hover {
-  background-color: #1e6fc1;
+  background-color: #426dd1;
 }
 
 .doc-confirm-file-download {

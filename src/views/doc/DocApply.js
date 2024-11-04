@@ -54,7 +54,7 @@ function DocApply() {
    *    2) 발신 신청
    *      - handleSendLeaderRequest
    *      - autoSelectApproversAndSubmit
-   *      - fetchOrgChart
+   *      - openOrgChartModal
    *  */  
   //  
   
@@ -89,7 +89,7 @@ function DocApply() {
         if (auth.roleNm !== '팀원') {
           autoSelectApproversAndSubmit(); 
         } else {
-          fetchOrgChart(); 
+          openOrgChartModal(); 
         }
       }
     }
@@ -306,24 +306,29 @@ function DocApply() {
   };  
 
   // 2-2-3. 문서 발신신청 3
-  const fetchOrgChart = () => {
-    const { instCd } = auth;
-    axios.get(`/api/std/orgChart`, { params: { instCd } })
+  const openOrgChartModal = () => {
+    const { deptCode, instCd } = auth;
+  
+    axios.get(`/api/std/orgChart`, {
+      params: { instCd, deptCode },
+    })
       .then(response => {
         setOrgData(response.data.data);
-        setExpandedNodes({});
-        setShowOrgChart(true);
+        const expanded = {};
+        response.data.data.forEach(dept => expanded[dept.detailCd] = true); 
+        setExpandedNodes(expanded); 
+        setShowOrgChart(true); 
       })
       .catch(error => console.error('Error fetching organization data:', error));
-    
-  };
-
+  };  
+  
   const handleToggle = (detailCd) => {
     setExpandedNodes((prevState) => ({
       ...prevState,
       [detailCd]: !prevState[detailCd],
     }));
   };
+
 
   const hasChildren = (detailCd) => {
     return orgData.some(dept => dept.parentCd === detailCd);
@@ -342,7 +347,7 @@ function DocApply() {
   const renderOrgTree = (parentId, level = 0) => {
     const children = orgData.filter(dept => dept.parentCd === parentId);
     if (children.length === 0) return null;
-
+  
     return (
       <ul className="org-list">
         {children.map(dept => (
@@ -350,7 +355,7 @@ function DocApply() {
             <div className="org-item-header" onClick={() => hasChildren(dept.detailCd) && handleToggle(dept.detailCd)}>
               {hasChildren(dept.detailCd) ? (
                 <span className="toggle-button">
-                  {expandedNodes[dept.detailCd] ? '∧' : '∨'}
+                  {expandedNodes[dept.detailCd] ? '∧' : '∨'} 
                 </span>
               ) : (
                 <span className="no-toggle"></span>
@@ -442,7 +447,7 @@ function DocApply() {
               </div>
               <div className='doc-form-group'>
                 <label>첨부파일 <span>*</span></label>
-                <text> 접수문서 첫 페이지를 스캔해 첨부해주세요.</text>
+                <p> 접수문서 첫 페이지를 스캔해 첨부해주세요.</p>
                 <input
                   type="file"
                   name="attachment"

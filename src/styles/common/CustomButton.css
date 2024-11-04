@@ -17,6 +17,15 @@
   background-color: #068c4e;
 }
 
+.toner-button {
+  color: rgb(70, 70, 70);
+  background-color: #bdc6cf;
+}
+
+.toner-button:hover {
+  background-color: #a1a9b2;
+}
+
 .finish-excel-button {
   background-color: #d7dde4;
   color: rgb(85, 84, 84)
@@ -27,38 +36,48 @@
   color: white
 }
 
+.finish-noti-button {
+  background-color: #d7dde4;
+  color: rgb(85, 84, 84)
+}
+
+.finish-noti-button:hover {
+  background-color: #5B89F5;
+  color: white
+}
+
 .order-request-button {
-  background-color: #2789FE;
+  background-color: #5B89F5;
 }
 
 .order-request-button:hover {
-  background-color: #1e6fc1;
+  background-color: #426dd1;
 }
 
 .authority-add-button {
-  background-color: #2789FE;
+  background-color: #5B89F5;
   margin-top: 5px;
 }
 
 .docstorage-approve-button {
-  background-color: #2789FE;
+  background-color: #5B89F5;
   margin-top: 50px;
   letter-spacing: 5px;
   padding: 10px 10px 10px 15px;
 }
 
 .authority-add-button:hover {
-  background-color: #1e6fc1;
+  background-color: #426dd1;
   transition-duration: 200ms;
 
 }
 
 .apply-request-button {
-  background-color: #2789FE;
+  background-color: #5B89F5;
 }
 
 .apply-request-button:hover {
-  background-color: #1e6fc1;
+  background-color: #426dd1;
   transition-duration: 200ms;
 }
 
@@ -85,7 +104,6 @@
 .apply-preview-button:hover {
   background-color: #d1d4d8;
   transition-duration: 200ms;
-
 }
 
 .preview-button {
@@ -105,7 +123,7 @@
 }
 
 .approve-button {
-  background-color: #2789FE;
+  background-color: #5B89F5;
   color: white;
   border: none;
   border-radius: 5px;
@@ -118,7 +136,7 @@
 }
 
 .approve-button:hover {
-  background-color: #1e6fc1;
+  background-color: #426dd1;
   transition-duration: 200ms;
 
 }
@@ -170,7 +188,7 @@
 }
 
 .save-button, .add-button, .data-reset-button {
-  background-color: #2789FE;
+  background-color: #5B89F5;
   margin-top: 20px;
   letter-spacing: 5px;
   padding: 11px 19px 11px 22px; 

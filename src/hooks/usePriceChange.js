@@ -17,5 +17,5 @@ export function usePriceChange() {
         setFormattedPrice(result);
     };
 
-    return [formattedPrice, handleUsePriceChange];
+    return [formattedPrice, setFormattedPrice, handleUsePriceChange];
 }

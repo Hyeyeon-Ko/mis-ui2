@@ -29,7 +29,7 @@
 }
 
 .pagination .active a {
-  background-color: #2789FE;
+  background-color: #5B89F5;
   color: white;
   font-weight: bold;
 }
@@ -71,7 +71,7 @@
   }
   
   .pagination .active a {
-    background-color: #2789FE;
+    background-color: #5B89F5;
     color: white;
     font-weight: bold;
   }

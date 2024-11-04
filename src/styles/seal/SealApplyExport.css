@@ -79,7 +79,7 @@
 .seal-export-form-group input:focus,
 .seal-export-form-group select:focus,
 .seal-export-form-group textarea:focus {
-  border-color: #007bff;
+  border-color: #5B89F5;
   box-shadow: 0 0 2px rgba(0, 123, 255, 0.5);
   outline: none;
 }
@@ -135,7 +135,7 @@
 }
 
 .seal-export-options input[type="radio"]:checked + img {
-  border-color: #007bff;
+  border-color: #5B89F5;
 }
 
 .seal-export-approval-buttons {

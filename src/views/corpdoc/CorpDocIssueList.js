@@ -6,7 +6,7 @@ import ConditionFilter from "../../components/common/ConditionFilter";
 import CorpDocApprovalModal from "../../views/corpdoc/CorpDocApprovalModal";
 import CorpDocStoreModal from "./CorpDocStoreModal";
 import IssueModal from "../../components/common/ConfirmModal";
-import CenterSelect from "../../components/CenterSelect";
+import CustomSelect from "../../components/CustomSelect";
 import SignitureImage from "../../assets/images/signiture.png";
 import axios from "axios";
 import { AuthContext } from "../../components/AuthContext";
@@ -397,10 +397,11 @@ function CorpDocIssueList() {
             </tr>
             <tr>
               <th>
-                <CenterSelect
-                  centers={centers}
-                  selectedCenter={selectedCenter}
-                  onCenterChange={handleCenterChange}
+                <CustomSelect
+                  label="센터"
+                  options={centers}
+                  selectedValue={selectedCenter}
+                  onChangeHandler={handleCenterChange}
                 />
               </th>
               <th>이름</th>

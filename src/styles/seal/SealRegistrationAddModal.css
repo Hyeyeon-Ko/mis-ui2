@@ -98,7 +98,7 @@ input:disabled {
 }
 
 .seal-regist-button.confirm {
-    background-color: #2789FE;
+    background-color: #5B89F5;
     color: #ffffff;
     padding: 10px 20px;
     border: none;
@@ -109,7 +109,7 @@ input:disabled {
 }
 
 .seal-regist-button.confirm:hover {
-    background-color: #1e6fc1;
+    background-color: #426dd1;
 }
 
 .seal-regist-button.cancel {

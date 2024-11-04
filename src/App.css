@@ -60,7 +60,7 @@
 
 .sidebar-section {
   width: 100%;
-  margin-left: 90px;
+  margin-left: 20px;
 }
 
 .sidebar-section h2 {
@@ -75,7 +75,7 @@
 }
 
 .sidebar-section h2 a:hover {
-  color: #2789FE;
+  color: #5B89F5;
   font-weight: bold;
 }
 
@@ -97,7 +97,7 @@
 }
 
 .sidebar-section li:hover {
-  color: #2789FE;
+  color: #5B89F5;
   font-weight: bold;
 }
 
@@ -115,7 +115,7 @@
 }
 
 .sidebar-section h3:hover {
-  color: #2789FE;
+  color: #88aeec;
   font-weight: bold;
 }
 
@@ -125,7 +125,7 @@
 }
 
 .sidebar-section .active {
-  color: #2789FE;
+  color: #88aeec;
   font-weight: bold;
 }
 

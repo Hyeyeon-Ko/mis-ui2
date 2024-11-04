@@ -102,11 +102,11 @@
 
   .seal-add-button {
       color: white;
-      background-color: #2789fe;
+      background-color: #5B89F5;
   }
 
   .seal-add-button:hover {
-      background-color: #1e6fc1;
+      background-color: #426dd1;
   }
 
   .seal-modify-button, .seal-delete-button {

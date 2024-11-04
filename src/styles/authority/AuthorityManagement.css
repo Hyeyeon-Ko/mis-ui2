@@ -12,6 +12,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 6px;
 }
 
 .buttons-container {
@@ -20,12 +21,12 @@
 }
 
 .authority-add-button {
-  background-color: #2789FE;
+  background-color: #5B89F5;
   color: white;
 }
 
 .authority-add-button:hover {
-  background-color: #1e6fc1;
+  background-color: #426dd1;
 }
 
 .email-cell {

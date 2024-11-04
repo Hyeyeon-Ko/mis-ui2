@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { addFormData, formFields } from '../../datas/rentalDatas';
 import useRentalChange from '../../hooks/useRentalChange';
 import { useDateChange } from '../../hooks/apply/useDateChange';
-import { usePriceChange } from '../../hooks/apply/usePriceChange';
+import { usePriceChange } from '../../hooks/usePriceChange';
 
 const RentalBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds }) => {
   const { handleChange, formData, setFormData } = useRentalChange();
@@ -68,7 +68,9 @@ const RentalBulkUpdateModal = ({ show, onClose, onSave, selectedDetailIds }) => 
         <p className="rental-instructions">일괄 수정할 항목에 내용을 입력하세요.</p>
         <div className="rental-modal-content">
           <div className="rental-add-section">
-            {formFields.map((field, index) => (
+            {formFields
+            .filter(field => field.name !== 'contractNum')
+            .map((field, index) => (
               <div className="rental-add-detail-row" key={index}>
                 <label>{field.label}</label>
                 {field.name === 'category' ? (

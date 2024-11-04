@@ -72,7 +72,7 @@ function MyApplyList() {
   
       const data = response.data.data.pagedResult || response.data.data;
   
-      const { myBcdResponses, myDocResponses, myCorpDocResponses, mySealResponses, pagedResult } = response.data.data;
+      const { myBcdResponses, myDocResponses, myCorpDocResponses, mySealResponses, myTonerResponses, pagedResult } = response.data.data;
 
       
   
@@ -99,6 +99,11 @@ function MyApplyList() {
           combinedData = combinedData.concat(mySealResponses.content);
           totalPages = Math.max(data.mySealResponses.totalPages || 1, 1);
           currentPage = data.mySealResponses.number + 1;
+        }
+        if(myTonerResponses != null) { 
+          combinedData = combinedData.concat(myTonerResponses.content);
+          totalPages = Math.max(data.myTonerResponses.totalPages || 1, 1);
+          currentPage = data.myTonerResponses.number + 1;
         }
         
       } else {
@@ -133,7 +138,7 @@ function MyApplyList() {
   
       setApplications(transformedData);
       setFilteredApplications(transformedData); 
-      setTotalPages(totalPages);  // 여기에 페이지 설정
+      setTotalPages(totalPages);  
       setCurrentPage(currentPage);
     } catch (error) {
       console.error('Error fetching applications:', error.response?.data || error.message);
@@ -302,7 +307,7 @@ function MyApplyList() {
   };
       
   const applicationColumns = [
-    { header: '문서분류', accessor: 'docType', width: '11%' },
+    { header: '신청분류', accessor: 'docType', width: '11%' },
     { header: '제목', accessor: 'title', width: '30%' },
     { header: '신청일시', accessor: 'draftDate', width: '14%' },
     { header: '신청자', accessor: 'drafter', width: '9%' },
@@ -325,7 +330,7 @@ function MyApplyList() {
           !isSpecialRoleAndTeam ? (
           <button
             className="status-button"
-            style={{ color: '#2789FE', textDecoration: 'underline' }}
+            style={{ color: '#5B89F5', textDecoration: 'underline' }}
             onClick={() => handleApprovalClick(row)}
           >
             {row.applyStatus}
@@ -340,7 +345,7 @@ function MyApplyList() {
             style={
               viewedRejections.has(row.draftId)
                 ? { color: 'black', textDecoration: 'underline' }
-                : { color: '#2789FE', textDecoration: 'underline' }
+                : { color: '#5B89F5', textDecoration: 'underline' }
             }
             onClick={() => handleButtonClick(row)}
           >
@@ -395,7 +400,7 @@ function MyApplyList() {
           // setKeyword={(keyword) =>
           //   setFilterInputs((prev) => ({ ...prev, keyword }))
           // }
-          // showDocumentType={false}   // 문서분류 표시여부
+          // showDocumentType={false}   // 신청분류 표시여부
           // documentType={documentType}
           // setDocumentType={setDocumentType} 
         />
@@ -411,7 +416,7 @@ function MyApplyList() {
       </div>
       {showModal && (
         <ConfirmModal
-          message={selectedApplication.applyStatus === '발급완료' ? "법인서류를 수령하셨습니까?" : "명함을 수령하셨습니까?"}
+          message={selectedApplication.docType === '토너신청' ? "토너를 수령하셨습니까?" : "명함을 수령하셨습니까?"}
           onConfirm={handleConfirmModal}
           onCancel={handleCloseModal}
         />

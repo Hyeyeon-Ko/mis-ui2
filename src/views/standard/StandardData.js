@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useRef } from 'react';
+import React, { useEffect, useState, useContext, useRef, useCallback } from 'react';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
 import StandardAddModal from '../standard/StandardAddModal';
@@ -13,6 +13,7 @@ import PaginationSub from '../../components/common/PaginationSub';
 
 function StandardData() {
   const {selectedDetails, details, setSelectedDetails,setDetails, handleDetailSelect, handleSelectAll} = useStandardChange();
+  const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [headerData, setHeaderData] = useState({});
   const [selectedCategory, setSelectedCategory] = useState('A');
@@ -29,19 +30,22 @@ function StandardData() {
   const dragEndIndex = useRef(null);
   const dragMode = useRef('select');
 
-  const categories = [
-    { categoryCode: 'A', categoryName: 'A 공통' },
-    { categoryCode: 'B', categoryName: 'B 권한' },
-    { categoryCode: 'C', categoryName: 'C 인사정보' },
-  ];
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(`/api/std/classInfo`);
+      const data = response.data.data || [];
+      setCategories(data);
+    } catch (error) {
+      console.error('대분류를 가져오는 중 에러 발생:', error.response ? error.response.data : error.message);
+      setCategories([]);
+    }
+  };
 
   useEffect(() => {
-    fetchSubCategories(selectedCategory);
-    setSelectedDetails([]);
-     // eslint-disable-next-line
-  }, [selectedCategory]);
+    fetchCategories();
+  }, []);
 
-  const fetchSubCategories = async (classCd) => {
+  const fetchSubCategories = useCallback(async (classCd) => {
     try {
       const response = await axios.get(`/api/std/groupInfo`, { params: { classCd } });
       const data = response.data.data || [];
@@ -59,7 +63,12 @@ function StandardData() {
       setDetails([]);
       setSelectedDetails([]);
     }
-  };
+  }, [setDetails, setSelectedDetails]);
+
+  useEffect(() => {
+    fetchSubCategories(selectedCategory);
+    setSelectedDetails([]);
+  }, [selectedCategory, fetchSubCategories, setSelectedDetails]);
 
   const fetchDetails = async (groupCd, pageIndex = 1, pageSize = 10) => {
     try {
@@ -211,7 +220,30 @@ function StandardData() {
         console.error('중분류 정보를 저장하는 중 에러 발생:', error);
         alert('중분류 코드 추가에 실패했습니다.');
       }
+    } else if (modalMode === 'class') {
+      try {
+        await axios.post(`/api/std/classInfo`, {
+          classCd: newRow.classCd,
+          classNm: newRow.classNm,
+          userId: auth.userId,
+        });
+        alert('대분류 코드가 추가되었습니다.');
+        fetchCategories();
+        setShowModal(false);
+      } catch (error) {
+        console.error('대분류 정보를 저장하는 중 에러 발생:', error);
+        if(error.response.data.code === 404) {
+          alert('이미 존재하는 대분류코드입니다.')
+        } else {
+          alert('대분류 코드 추가에 실패했습니다.');
+        }
+      }
     }
+  };
+
+  const handleAddCategoryRow = () => {
+    setModalMode('class');
+    setShowModal(true);
   };
 
   const handleAddSubCategoryRow = () => {
@@ -366,6 +398,8 @@ function StandardData() {
   const getModalTitle = () => {
     if (modalMode === 'detail') {
       return `${subCategoryName} 추가`;
+    } else if (modalMode === 'class') {
+      return `대분류 추가`;
     } else if (modalMode === 'group') {
       return `중분류 추가`;
     } else {
@@ -388,11 +422,12 @@ function StandardData() {
               className="category-dropdown"
             >
               {categories.map(category => (
-                <option key={category.categoryCode} value={category.categoryCode}>
-                  {category.categoryName}
+                <option key={category.classCd} value={category.classCd}>
+                  {category.classCd} {category.classNm}
                 </option>
               ))}
             </select>
+            <button className="data-add-button" onClick={handleAddCategoryRow} disabled={!auth.hasStandardDataAuthority}>추 가</button>
           </div>
         </div>
         <div className="tables-section">

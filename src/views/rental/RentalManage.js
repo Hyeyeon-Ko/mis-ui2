@@ -5,8 +5,7 @@ import Table from '../../components/common/Table';
 import RentalAddModal from './RentalAddModal'; 
 import RentalUpdateModal from './RentalUpdateModal'; 
 import RentalBulkUpdateModal from './RentalBulkUpdateModal';
-import StatusSelect from '../../components/StatusSelect';
-import ProduceSelect from '../../components/ProductSelect';
+import CustomSelect from '../../components/CustomSelect';
 import { AuthContext } from '../../components/AuthContext';
 import '../../styles/common/Page.css';
 import '../../styles/rental/RentalManage.css';
@@ -31,6 +30,7 @@ function RentalManage() {
   const statusOptions = [
     { label: '전체', value: '전체' },
     { label: '완료', value: '완료' },
+    { label: '대기', value: '' },
   ];
 
   const categoryOptions = [
@@ -116,6 +116,11 @@ function RentalManage() {
       filteredData = filteredData.filter(item => item.category === selectedCategory);
     }
   
+    filteredData = filteredData.map((item, index) => ({
+      ...item,
+      no: index + 1,  
+    }));
+  
     setFilteredRentalDetails(filteredData);
   
     calculateTotalRentalFee(filteredData);
@@ -192,16 +197,6 @@ function RentalManage() {
         return;
     }
 
-    const completedItems = selectedRows.filter(rowId => {
-        const selectedItem = rentalDetails.find(item => item.detailId === rowId);
-        return selectedItem && selectedItem.status === '완료';
-    });
-
-    if (completedItems.length > 0) {
-        alert("완료된 내역은 삭제할 수 없습니다.");
-        return;
-    }
-
     try {
         for (const detailId of selectedRows) {
             await axios.delete(`/api/rental/`, { params: { detailId } });
@@ -224,7 +219,7 @@ function RentalManage() {
         console.error('렌탈현황 정보를 삭제하는 중 에러 발생:', error);
         alert('삭제에 실패했습니다.');
     }
-};
+  };
 
   const handleFinishButtonClick = async () => {
     if (selectedRows.length === 0) {
@@ -342,18 +337,20 @@ function RentalManage() {
     },
     { header: 'NO', accessor: 'no' },
     { header: (
-      <StatusSelect
-        statusOptions={statusOptions}  
-        selectedStatus={selectedStatus}  
-        onStatusChange={(e) => setSelectedStatus(e.target.value)} 
+      <CustomSelect
+        label="상태"
+        options={statusOptions}  
+        selectedValue={selectedStatus}  
+        onChangeHandler={(e) => setSelectedStatus(e.target.value)} 
       />
      ), accessor: 'status' },
     { header: '업체명', accessor: 'companyNm' },
     { header: (
-      <ProduceSelect
-        categoryOptions={categoryOptions}  
-        selectedCategory={selectedCategory}  
-        onCategoryChange={(e) => setSelectedCategory(e.target.value)} 
+      <CustomSelect
+        label="제품군"
+        options={categoryOptions}  
+        selectedValue={selectedCategory}  
+        onChangeHandler={(e) => setSelectedCategory(e.target.value)} 
       />
     ), accessor: 'category' },    
     { header: '계약번호', accessor: 'contractNum' },
@@ -370,8 +367,8 @@ function RentalManage() {
     <div className='content'>
       <div className='rental-content'>
         <div className="rental-content-inner">
-          <h2>렌탈현황 관리표</h2>
-          <Breadcrumb items={['자산 관리', '렌탈현황 관리표']} />
+          <h2>렌탈 관리표</h2>
+          <Breadcrumb items={['자산 관리', '렌탈 관리표']} />
           {loading ? (
             <Loading />
           ) : (

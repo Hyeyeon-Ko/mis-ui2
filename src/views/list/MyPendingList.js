@@ -102,6 +102,9 @@ function MyPendingList() {
         case '인장신청(반출)':
           endpoint = '/api/seal/export/';
           break;
+        case '토너신청':
+          endpoint = '/api/toner/'
+          break;
         default:
           console.error('Unknown document type:', selectedApplication.docType);
           return;
@@ -159,6 +162,9 @@ function MyPendingList() {
                 break;
               case '인장신청(반출)':
                 path = `/seal/export/${row.draftId}`;
+                break;
+              case '토너신청':
+                path = `/toner/${row.draftId}?type=modify`; 
                 break;
               default:
                 path = `/doc/${row.draftId}`; 

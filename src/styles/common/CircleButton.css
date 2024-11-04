@@ -21,7 +21,7 @@
 }
 
 .circle-button:hover {
-  background-color: #2789FE;
+  background-color: #5B89F5;
   color: white;
   transform: scale(1.05); /* 호버 시 살짝 확대되는 효과 */
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2); /* 호버 시 그림자 강화 */

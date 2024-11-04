@@ -41,7 +41,7 @@
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
-/* 문서분류 박스 스타일 수정 */
+/* 신청분류 박스 스타일 수정 */
 .all-application-filter select {
   width: 120px;
   padding: 4px;
@@ -82,12 +82,12 @@
 }
 
 .reset-text:hover {
-  color: #2789FE;
+  color: #5B89F5;
 }
 
 .search-button {
   border-radius: 8px;
-  background-color: #2789FE;
+  background-color: #5B89F5;
   color: white;
   border: none;
   padding: 5.5px 10px;
@@ -97,9 +97,7 @@
 }
 
 .search-button:hover {
-  -webkit-transition: .5s ease-in-out;
-	transition: .5s ease-in-out;
-  background-color: #1e6fc1;
+  background-color: #426dd1;
 }
 
 .all-application-filter input[type="text"] {

@@ -179,35 +179,6 @@ function SealManagementList() {
     fetchSealManagementList(1, itemsPerPage, params);
   };
 
-  // const applyFilters = useCallback(() => {
-  //   let filteredData = applications;
-
-  //   const keyword = filterInputs.keyword.toLowerCase().trim();
-  //   if (keyword) {
-  //     if (filterInputs.searchType === '전체') {
-  //       filteredData = filteredData.filter(application =>
-  //         application.date.toLowerCase().includes(keyword) ||
-  //         application.submitter.toLowerCase().includes(keyword) ||
-  //         application.purpose.toLowerCase().includes(keyword)
-  //       );
-  //     } else if (filterInputs.searchType === '일자') {
-  //       filteredData = filteredData.filter(application =>
-  //         application.date.toLowerCase().includes(keyword)
-  //       );
-  //     } else if (filterInputs.searchType === '제출처') {
-  //       filteredData = filteredData.filter(application =>
-  //         application.submitter.toLowerCase().includes(keyword)
-  //       );
-  //     } else if (filterInputs.searchType === '사용목적') {
-  //       filteredData = filteredData.filter(application =>
-  //         application.purpose.toLowerCase().includes(keyword)
-  //       );
-  //     }
-  //   }
-
-  //   setFilteredApplications(filteredData);
-  // }, [applications, filterInputs, setFilteredApplications]);
-
   const handleRowClick = (status, document) => {
     if (status === "결재진행중" || status === "결재완료") {
       if (status === "결재완료") {

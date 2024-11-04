@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import '../../styles/standard/StandardAddModal.css';
 import useStandardChange from '../../hooks/useStandardChange';
@@ -6,7 +6,8 @@ import useStandardChange from '../../hooks/useStandardChange';
 const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory, detailData }) => {
   const [detailCode, setDetailCode] = useState('');
   const [detailName, setDetailName] = useState('');
-  const [classCd, setClassCode] = useState(selectedCategory);
+  const [classCd, setClassCode] = useState('');
+  const [classNm, setClassName] = useState('');
   const [groupCd, setGroupCode] = useState('');
   const [groupNm, setGroupName] = useState('');
   const [isDragging, setIsDragging] = useState(false);
@@ -55,6 +56,12 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
       const normalizedItems = Array.from({ length: 11 }, (_, index) => items[index]?.value || '');
   
       onSave({ detailCode, detailName, items: normalizedItems });
+    } else if (mode === 'class') {
+      if (!classCd || !classNm) {
+        alert('추가할 정보를 모두 입력해주세요.');
+        return;
+      }
+      onSave({ classCd, classNm });
     } else {
       if (!classCd || !groupCd || !groupNm) {
         alert('추가할 정보를 모두 입력해주세요.');
@@ -64,13 +71,15 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
     }
   };
     
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setDetailCode('');
     setDetailName('');
     setItems([]);
     setGroupCode('');
     setGroupName('');
-  };
+    setClassCode('');
+    setClassName('');
+  }, [setItems]);  
 
   useEffect(() => {
     if (!show) {
@@ -79,8 +88,7 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
         setClassCode(selectedCategory);
       }
     }
-     // eslint-disable-next-line
-  }, [show, mode, selectedCategory]);
+  }, [show, mode, selectedCategory, resetForm]);
 
   const handleMouseDown = (e) => {
     setIsDragging(true);
@@ -147,6 +155,19 @@ const StandardAddModal = ({ show, onClose, onSave, mode, title, selectedCategory
                 <button className="add-item-button" onClick={handleAddItem}>+</button>
               </div>
             )}
+          </div>
+        ) : mode === 'class' ? (
+          <div className="add-standard-details">
+            <div className="add-standard-detail-row">
+              <label>대분류코드</label>
+              <input type="text" value={classCd} onChange={e => setClassCode(e.target.value)} />
+              <hr className="detail-separator" />
+            </div>
+            <div className="add-standard-detail-row">
+              <label>대분류명</label>
+              <input type="text" value={classNm} onChange={e => setClassName(e.target.value)} />
+              <hr className="detail-separator" />
+            </div>
           </div>
         ) : (
           <div className="add-standard-details">

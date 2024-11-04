@@ -19,6 +19,7 @@ import DetailDocApplication from './views/doc/DetailDocApplication';
 import DetailCorpDocApplication from './views/corpdoc/DetailCorpDocApplication';
 import DetailSealImprintApplication from './views/seal/DetailSealImprintApplication';
 import DetailSealExportApplication from './views/seal/DetailSealExportApplication';
+import DetailTonerApplication from './views/toner/DetailTonerApplication';
 import DocInList from './views/doc/DocInList';
 import DocOutList from './views/doc/DocOutList';
 import SealManagementList from './views/seal/SealManagementList';
@@ -38,10 +39,12 @@ import DocstorageList from './views/docstorage/DocstorageList';
 import TotalDocstorageList from './views/docstorage/TotalDocstorageList';
 import RentalManage from './views/rental/RentalManage';
 import TotalRentalManage from './views/rental/TotalRentalManage';
-// import TonerApplyFirst from './views/toner/TonerApply';
+import TonerApply from './views/toner/TonerApply';
 import TonerList from './views/toner/TonerList';
 import TonerPriceList from './views/toner/TonerPriceList';
 import TotalTonerList from './views/toner/TotalTonerList';
+import TonerPendingList from './views/toner/TonerPendingList';
+import TonerOrderList from './views/toner/TonerOrderList';
 import { AuthProvider, AuthContext } from './components/AuthContext';
 
 function MainLayout({ children }) {
@@ -139,16 +142,21 @@ function App() {
                 <Route path="/totalRentalList" element={<RequireAuth><TotalRentalManage /></RequireAuth>} />
                 <Route path="/bcd/orderList" element={<RequireAuth><BcdOrder /></RequireAuth>} />
                 <Route path="/tonerList" element={<RequireAuth><TonerList /></RequireAuth>} />
+                <Route path="/tonerApply" element={<RequireAuth><TonerApply /></RequireAuth>} />
                 <Route path="/totalTonerList" element={<RequireAuth><TotalTonerList /></RequireAuth>} />
                 <Route path="/toner/priceList" element={<RequireAuth><TonerPriceList /></RequireAuth>} />
+                <Route path="/toner/pendingList" element={<RequireAuth><TonerPendingList /></RequireAuth>} />
+                <Route path="/toner/orderList" element={<RequireAuth><TonerOrderList /></RequireAuth>} />
                 <Route path="/std" element={<RequireAuth><StandardData /></RequireAuth>} />
                 <Route path="/bcd/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
                 <Route path="/doc/:draftId" element={<RequireAuth><DetailDocApplication /></RequireAuth>} />
+                <Route path="/toner/:draftId" element={<RequireAuth><TonerApply /></RequireAuth>} />
                 <Route path="/corpDoc/:draftId" element={<RequireAuth><DetailCorpDocApplication/></RequireAuth>}/>
                 <Route path="/seal/imprint/:draftId" element={<RequireAuth><DetailSealImprintApplication /></RequireAuth>} />
                 <Route path="/seal/export/:draftId" element={<RequireAuth><DetailSealExportApplication /></RequireAuth>} />
                 <Route path="/bcd/applyList/:draftId" element={<RequireAuth><DetailApplication /></RequireAuth>} />
                 <Route path="/corpDoc/applyList/:draftId" element={<RequireAuth><DetailCorpDocApplication /></RequireAuth>} />
+                <Route path="/toner/applyList/:draftId" element={<RequireAuth><DetailTonerApplication /></RequireAuth>} />
               </Routes>
             </MainLayout>
           } />

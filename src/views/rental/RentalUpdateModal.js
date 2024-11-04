@@ -7,7 +7,7 @@ import { AuthContext } from '../../components/AuthContext';
 import { formFields } from '../../datas/rentalDatas';
 import useRentalChange from '../../hooks/useRentalChange';
 import { useDateChange } from '../../hooks/apply/useDateChange';
-import { usePriceChange } from '../../hooks/apply/usePriceChange';
+import { usePriceChange } from '../../hooks/usePriceChange';
 
 
 const RentalUpdateModal = ({ show, onClose, onSave, rentalData }) => {

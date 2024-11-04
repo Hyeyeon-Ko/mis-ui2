@@ -7,7 +7,7 @@ import '../../styles/rental/RentalAddModal.css';
 import { addFormData, formFields } from '../../datas/rentalDatas';
 import useRentalChange from '../../hooks/useRentalChange';
 import { useDateChange } from '../../hooks/apply/useDateChange';
-import { usePriceChange } from '../../hooks/apply/usePriceChange';
+import { usePriceChange } from '../../hooks/usePriceChange';
 
 const RentalAddModal = ({ show, onClose, onSave }) => {
   const { auth } = useContext(AuthContext); 
