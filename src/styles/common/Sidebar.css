@@ -1,6 +1,6 @@
 /* Sidebar.css */
 .sidebar {
-  width: 10.5%;
+  width: 12%;
   background-color: #363a3f;
   color: #e6e7e7;
   padding: 20px 20px 20px 25px;
@@ -34,7 +34,6 @@
   margin-top: 32px;
   margin-bottom: 40px;
   margin-right: 8px;
-  filter: invert(100%) grayscale(50%);
 }
 
 .sidebar-section {

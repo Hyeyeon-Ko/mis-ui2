@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import '../../styles/common/Sidebar.css';
-import logo from '../../assets/images/logo.png';
+import logo from '../../assets/images/logo2.png';
 import { AuthContext } from '../AuthContext';
 import dropdownDefaultIcon from '../../assets/images/dropdownDefault.png';
 import dropdownActiveIcon from '../../assets/images/dropdownActive.png';
