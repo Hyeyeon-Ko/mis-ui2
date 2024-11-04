@@ -169,12 +169,18 @@ function Sidebar() {
 
   return (
     <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
-      <div className="sidebar-toggle-button" onClick={toggleSidebar}> {/* 사이드바 토글 버튼 */}
-        {isSidebarOpen ? '≡' : '≡'}
+      <div className="sidebar-header">
+        <Link to="/">
+          <img src={logo} alt="KMI Logo" className="logo" />
+        </Link>
+        <div className="sidebar-toggle-button" onClick={toggleSidebar}>
+          {/* 사이드바 토글 버튼 */}
+          {isSidebarOpen ? '≡' : '≡'}
+        </div>
       </div>
-      <Link to="/">
-        <img src={logo} alt="KMI Logo" className="logo" />
-      </Link>
+      <div className='sidebar-menu'>
+        MENU
+      </div>
       {auth.isUserMode || auth.role === 'USER' ? (
         <>
           <SidebarSection
