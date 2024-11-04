@@ -31,11 +31,9 @@
 }
 
 .logo {
-  width: 155px;
-  height: 55px;
-  margin-top: 32px;
-  margin-bottom: 44px;
-  margin-right: 22px;
+  width: 200px;
+  height: 80px;
+  margin: 30px 18px 10px 14px;
 }
 
 .sidebar-section {
