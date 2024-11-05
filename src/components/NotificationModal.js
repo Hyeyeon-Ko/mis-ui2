@@ -68,16 +68,16 @@ const NotificationModal = ({ onClose, decrementUnreadCount, decrementAllUnreadCo
     }
   };
 
-  const handleClickOutside = (event) => {
+  const handleClickOutside = useCallback((event) => {
     if (modalRef.current && !modalRef.current.contains(event.target)) {
       onClose();
     }
-  };
+  }, [onClose]);
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [handleClickOutside]);
 
   return (
     <div className="modal-backdrop">

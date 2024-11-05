@@ -18,6 +18,31 @@
   border-top-right-radius: 15px;
 }
 
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+  border-bottom: 1px solid  rgba(241, 241, 243, 0.1);
+  padding-bottom: 10px;
+}
+
+.sidebar.open .sidebar-menu {
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  margin-left: 18px;
+  padding: 0 20px;
+  width: 100%;
+}
+
+.sidebar.sidebar.closed .sidebar-menu {
+  display: none;
+}
+
 .toggle-icon {
   width: 9%;
   margin-top: 5px;
@@ -31,17 +56,16 @@
 }
 
 .logo {
-  width: 155px;
-  height: 55px;
-  margin-top: 32px;
-  margin-bottom: 44px;
-  margin-right: 22px;
+  width: 85%;
+  height: 40px;
+  margin: 0;
 }
 
 .sidebar-section {
-  width: 80%;
+  width: 100%;
   margin-bottom: 10px;
-  margin-right: 24px;
+  margin-left: 12px;
+  padding: 0 20px;
 }
 
 .sidebar-section .sidebar-link {
@@ -102,8 +126,7 @@
   font-size: 17px;
   font-weight: 400;
   letter-spacing: 0.5px;
-  margin-top: 5px;
-  margin-bottom: 15px;
+  margin: 5px 8px 15px 0px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -201,7 +224,7 @@
   cursor: pointer;
   font-size: 30px;
   position: absolute;
-  top: 15px;
+  top: 16px;
   right: 20px;
   z-index: 10;
   transition: color 0.3s ease;
