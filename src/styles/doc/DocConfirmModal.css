@@ -134,3 +134,24 @@
 .doc-confirm-form-group.hidden {
   display: none;
 }
+
+.doc-download-button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  text-decoration: none;
+  margin-top: 6px;
+}
+
+.doc-download-button span {
+  margin-top: 6px;
+}
+
+.doc-download-button:hover {
+  color: #5B89F5;
+}

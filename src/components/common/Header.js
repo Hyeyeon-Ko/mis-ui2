@@ -52,21 +52,23 @@ function Header() {
         <div className="user-info">
           {auth.isAuthenticated ? (
             <>
-              <div className="notification-wrapper">
-                <img
-                  ref={notiButtonRef}
-                  src={notiImg}
-                  alt="Notifications"
-                  className="notification-icon"
-                  onClick={handleNotiClick}
-                  style={{ cursor: 'pointer', marginRight: '10px' }}
-                />
-                {unreadCount > 0 && (
-                  <span className="unread-badge" onClick={handleNotiClick}>
-                    {unreadCount}
-                  </span>
-                )}
-              </div>
+              {auth.isUserMode && (
+                <div className="notification-wrapper">
+                  <img
+                    ref={notiButtonRef}
+                    src={notiImg}
+                    alt="Notifications"
+                    className="notification-icon"
+                    onClick={handleNotiClick}
+                    style={{ cursor: 'pointer', marginRight: '10px' }}
+                  />
+                  {unreadCount > 0 && (
+                    <span className="unread-badge" onClick={handleNotiClick}>
+                      {unreadCount}
+                    </span>
+                  )}
+                </div>
+              )}
               <span>{auth.userNm}({auth.userId})</span>
               <span> | </span>
               <span> {auth.isUserMode ? 'USER' : auth.role} </span>

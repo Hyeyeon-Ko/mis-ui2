@@ -78,10 +78,8 @@ function Sidebar() {
     { label: '문서수발신', url: '/doc' },
     // { label: '토너신청', url: '/tonerApply' },
     { label: '', url: '/' },
-    { label: '', url: '/' },
     // { label: '토너신청', url: '/toner' },
     // { label: '문서이관/파쇄', url: '/docstorage' },
-    // { label: '', url: '/' },
     // { label: '', url: '/' },
   ];
 

@@ -144,10 +144,10 @@ const handleFileDownloadConfirm = async ({ downloadNotes, downloadType }) => {
           <div className="doc-confirm-form-group">
             <label>첨부 파일</label>
             <div className="doc-confirm-file-download">
-              <button onClick={handleFileDownloadClick} style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}>
-                <span>{formData.fileName}</span>
-                <img src={downloadIcon} alt="다운로드" />
-              </button>
+            <button onClick={handleFileDownloadClick} className="doc-download-button">
+              <span>{formData.fileName}</span>
+              <img src={downloadIcon} alt="다운로드" />
+            </button>
             </div>
           </div>
         )}
