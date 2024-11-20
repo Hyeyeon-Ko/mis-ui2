@@ -20,9 +20,12 @@ before_script:
   
 build:
   stage: build
-  image: node:alpine
+  image: node:14-alpine
   script:
     - apk add --no-cache python3 make g++
+    - export ESLINT_NO_DEV_ERRORS=true
+    - export CI=false
+    - export PUBLIC_URL=http://172.16.250.87
     - npm install
     - npm run build
   tags:

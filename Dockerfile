@@ -4,11 +4,11 @@ FROM node:14-alpine as build
 # 작업 디렉토리 설정
 WORKDIR /app
 
-# 의존성 설치를 위한 패키지 파일 복사
-COPY package.json ./
-
 # package-lock.json 파일이 있는 경우 삭제
 RUN rm -f package-lock.json
+
+# 의존성 설치를 위한 패키지 파일 복사
+COPY package.json ./
 
 # 환경 변수 설정: ESLint 경고/오류 무시
 ENV ESLINT_NO_DEV_ERRORS=true
