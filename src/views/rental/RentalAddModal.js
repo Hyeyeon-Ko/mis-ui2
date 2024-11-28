@@ -235,6 +235,7 @@ const RentalAddModal = ({ show, onClose, onSave }) => {
                             handleExpiryDateChange(e);
                         } else if (field.name === 'rentalFee') {
                           handleRentalFeeChange(e); 
+                          handleChange(e); 
                         }
                         handleChange(e);
                       }}

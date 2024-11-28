@@ -14,6 +14,7 @@ import backImageEng from '../../assets/images/backimage_eng.png';
 import backImageCompany from '../../assets/images/backimage_company.png';
 import Form from '../../components/common/Form';
 import useBdcChange from '../../hooks/bdc/useBdcChange';
+import Loading from '../../components/common/Loading';
 
 
 function BcdApplySecond() {
@@ -49,6 +50,7 @@ function BcdApplySecond() {
   const [orgData, setOrgData] = useState([]); 
   const [expandedNodes, setExpandedNodes] = useState({});
   const [teamMembers, setTeamMembers] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const gradeOrder = [
     "(직접입력)",
@@ -252,6 +254,7 @@ function BcdApplySecond() {
 
   const handleConfirmRequest = async () => {
     setShowFinalConfirmationModal(false);
+    setIsLoading(true);
 
     const isCustomTeam = formData.team === '000';
 
@@ -302,12 +305,15 @@ function BcdApplySecond() {
       const response = await axios.post(endpoint, requestData);
       if (response.data.code === 200) {
         alert('명함 신청이 완료되었습니다.');
+        setIsLoading(false);
         navigate('/myPendingList');
       } else {
         alert('명함 신청 중 오류가 발생했습니다.');
+        setIsLoading(false);
       }
     } catch (error) {
       alert('명함 신청 중 오류가 발생했습니다.');
+      setIsLoading(false);
     }
   };
 
@@ -406,7 +412,7 @@ function BcdApplySecond() {
       <div className="apply-content">
         <h2>명함신청</h2>
         <Breadcrumb items={['신청하기', '명함신청']} />
-
+        {isLoading && <Loading />}
           <Form>
             {() => {
               return (
@@ -418,7 +424,7 @@ function BcdApplySecond() {
                         <input className='form-name-input' type="text" value={`${formData.name} (${formData.userId})`} readOnly />
                       ) : (
                         <div className="form-horizontal">
-                          <input type="text" placeholder="사번을 입력하세요." value={userIdInput} onChange={handleUserIdChange} />
+                          <input type="number" placeholder="사번을 입력하세요." value={userIdInput} onChange={handleUserIdChange} />
                           <button type="button" className="lookup-button" onClick={handleLookupUser}>조회</button>
                         </div>
                       )}
@@ -647,20 +653,22 @@ function BcdApplySecond() {
           </Form>
 
         <div className="apply-buttons-container">
-          <CustomButton 
-            type="button" 
-            className="apply-preview-button" 
-            onClick={handlePreview} 
-            disabled={!validateForm()}
-          >
-            명함시안 미리보기
-          </CustomButton>
-          <CustomButton 
-            className="apply-request-button" 
-            onClick={handleApplyRequest}
-          >
-            명함 신청하기
-          </CustomButton>
+        <CustomButton
+          type="button"
+          className="apply-preview-button"
+          onClick={handlePreview}
+          disabled={!validateForm()}
+        >
+          명함시안 미리보기
+        </CustomButton>
+
+        <CustomButton
+          className="apply-request-button"
+          onClick={handleApplyRequest}
+          disabled={!isPreviewChecked} 
+        >
+          명함 신청하기
+        </CustomButton>
         </div>
       </div>
       <OrgChartModal
