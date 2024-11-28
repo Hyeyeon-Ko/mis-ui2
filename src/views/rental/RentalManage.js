@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, useRef, useCallback } from 'rea
 import axios from 'axios';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import Table from '../../components/common/Table';
+import ConfirmModal from '../../components/common/ConfirmModal';
 import RentalAddModal from './RentalAddModal'; 
 import RentalUpdateModal from './RentalUpdateModal'; 
 import RentalBulkUpdateModal from './RentalBulkUpdateModal';
@@ -26,6 +27,7 @@ function RentalManage() {
   const [loading, setLoading] = useState(false);
   const [lastUpdtDate, setLastUpdtDate] = useState(null);
   const [totalRentalFee, setTotalRentalFee] = useState(0);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const statusOptions = [
     { label: '전체', value: '전체' },
@@ -193,10 +195,13 @@ function RentalManage() {
 
   const handleDeleteButtonClick = async () => {
     if (selectedRows.length === 0) {
-        alert("삭제할 항목을 선택하세요.");
-        return;
+      alert("삭제할 항목을 선택하세요.");
+      return;
     }
+    setShowDeleteModal(true);
+  }
 
+  const handleConfirmDelete = async () => {
     try {
         for (const detailId of selectedRows) {
             await axios.delete(`/api/rental/`, { params: { detailId } });
@@ -215,6 +220,7 @@ function RentalManage() {
         });
 
         setSelectedRows([]); 
+        setShowDeleteModal(false);
     } catch (error) {
         console.error('렌탈현황 정보를 삭제하는 중 에러 발생:', error);
         alert('삭제에 실패했습니다.');
@@ -409,6 +415,13 @@ function RentalManage() {
           )}
         </div>
       </div>
+      {showDeleteModal && (
+          <ConfirmModal
+            message="정말 삭제하시겠습니까?"
+            onConfirm={handleConfirmDelete}
+            onCancel={() => setShowDeleteModal(false)}
+          />
+        )}
       <RentalAddModal 
         show={isAddModalVisible} 
         onClose={handleModalClose} 

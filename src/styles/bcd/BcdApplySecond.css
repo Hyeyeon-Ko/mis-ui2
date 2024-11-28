@@ -70,6 +70,7 @@
 }
 
 .apply-content input[type="text"], 
+.apply-content input[type="number"],
 input[type="text2"] {
     width: 240px;
     height: 24px;
@@ -78,6 +79,16 @@ input[type="text2"] {
     border-radius: 5px;
     font-size: 12.5px;
     background-color: #fff;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
 }
 
 .address-floor-input input[name="address"] {
@@ -358,4 +369,24 @@ input[type="text2"] {
     font-size: 16px;
     font-weight: bold;
     gap: 6px;
+}
+
+input::placeholder {
+    color: #818181 !important;
+  }
+
+.apply-preview-button {
+  animation: glow 1.5s infinite;
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 12px rgba(0, 123, 255, 0.8);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(0, 123, 255, 1);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.8);
+  }
 }
