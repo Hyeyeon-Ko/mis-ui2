@@ -32,16 +32,6 @@ const ApprovalModal = ({ show, onClose, documentDetails = { signitureImage: Chec
 
   const getColumnsByDocType = () => {
     switch (documentDetails.docType) {
-      case '명함신청':
-        if (auth.roleNm === '팀원' && (auth.teamCd === 'FDT12' || auth.teamCd === 'CNT2')) {
-          return ['총무팀 팀장'];
-        } else if (auth.roleNm !== '팀원' && (auth.teamCd !== 'FDT12' && auth.teamCd !== 'CNT2')) {
-          return ['총무팀 담당자', '총무팀 팀장'];
-        } else if (auth.roleNm === '팀원' && (auth.teamCd !== 'FDT12' && auth.teamCd !== 'CNT2')) {
-          return ['신청자 팀장', '총무팀 담당자', '총무팀 팀장'];
-        } else {
-          return [];
-        }
       case '문서수신':
         return ['총무팀 담당자'];
       case '문서발신':

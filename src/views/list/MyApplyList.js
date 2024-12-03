@@ -289,7 +289,7 @@ function MyApplyList() {
   };
 
   const handleApprovalClick = (application) => {
-    const allowedDocumentTypes = ['명함신청', '문서수신', '문서발신'];
+    const allowedDocumentTypes = ['문서수신', '문서발신'];
     if (allowedDocumentTypes.includes(application.docType)) {
       setDocumentDetails({
         docType: application.docType,
@@ -318,7 +318,7 @@ function MyApplyList() {
       accessor: 'applyStatus',
       width: '12%',
       Cell: ({ row }) => {
-        const allowedDocumentTypes = ['명함신청', '문서수신', '문서발신'];
+        const allowedDocumentTypes = ['문서수신', '문서발신'];
         const isAllowedDocType = allowedDocumentTypes.includes(row.docType);
     
         const isSpecialRoleAndTeam =

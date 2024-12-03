@@ -5,6 +5,7 @@
   padding: 0 20px;
   text-align: center;
   margin-top: 12vh; 
+  user-select: none;
 }
 
 .kmi-intro {
