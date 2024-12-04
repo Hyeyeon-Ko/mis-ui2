@@ -4,6 +4,7 @@
     align-items: center;
     flex: 1;
     padding: 20px;
+    user-select: none;
 }
  
 .home-section-link {

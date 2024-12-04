@@ -289,7 +289,7 @@ function MyApplyList() {
   };
 
   const handleApprovalClick = (application) => {
-    const allowedDocumentTypes = ['명함신청', '문서수신', '문서발신'];
+    const allowedDocumentTypes = ['문서수신', '문서발신'];
     if (allowedDocumentTypes.includes(application.docType)) {
       setDocumentDetails({
         docType: application.docType,
@@ -318,7 +318,7 @@ function MyApplyList() {
       accessor: 'applyStatus',
       width: '12%',
       Cell: ({ row }) => {
-        const allowedDocumentTypes = ['명함신청', '문서수신', '문서발신'];
+        const allowedDocumentTypes = ['문서수신', '문서발신'];
         const isAllowedDocType = allowedDocumentTypes.includes(row.docType);
     
         const isSpecialRoleAndTeam =
@@ -335,7 +335,7 @@ function MyApplyList() {
           >
             {row.applyStatus}
           </button>
-        ) : row.applyStatus === '발주완료' || row.applyStatus === '발급완료' ? (
+        ) : row.applyStatus === '발급완료' ? (
           <button className="status-button" onClick={() => handleButtonClick(row)}>
             수령확인
           </button>

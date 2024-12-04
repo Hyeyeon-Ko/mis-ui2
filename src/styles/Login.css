@@ -6,6 +6,7 @@
     align-items: center;
     height: 100vh;
     background-color: #363a3f;
+    user-select: none
   }
   
   .login-box {
