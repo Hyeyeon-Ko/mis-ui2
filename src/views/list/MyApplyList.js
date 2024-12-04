@@ -335,7 +335,7 @@ function MyApplyList() {
           >
             {row.applyStatus}
           </button>
-        ) : row.applyStatus === '발주완료' || row.applyStatus === '발급완료' ? (
+        ) : row.applyStatus === '발급완료' ? (
           <button className="status-button" onClick={() => handleButtonClick(row)}>
             수령확인
           </button>

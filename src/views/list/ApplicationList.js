@@ -65,6 +65,7 @@ function ApplicationsList() {
   const { formattedStartDate, formattedEndDate } = useDateSet();
   const [totalPages, setTotalPages] = useState("1");
   const [currentPage, setCurrentPage] = useState("1");
+  const [isPaginationRequired, setIsPaginationRequired] = useState(true); 
 
   const itemsPerPage = 10;
 
@@ -235,6 +236,7 @@ function ApplicationsList() {
           filters.endDate !== undefined;
 
         if (isDocTypeAB && isFiltersChanged && isNotNull) {
+          setIsPaginationRequired(false);
           const response = await axios.get("/api/applyList", {
             params: {
               userId: auth.userId || "",
@@ -287,6 +289,7 @@ function ApplicationsList() {
           setTotalPages(1);  
           setCurrentPage(1);
         } else {
+          setIsPaginationRequired(true);
           const response = await axios.get("/api/applyList2", {
             params: {
               userId: auth.userId || "",
@@ -567,6 +570,7 @@ function ApplicationsList() {
       if (response.status === 200) {
         alert("알림이 성공적으로 전송되었습니다.");
         setSelectedApplications([]);
+        fetchApplications();
       }
     } catch (error) {
       console.error("Error sending notification: ", error);
@@ -850,12 +854,12 @@ function ApplicationsList() {
               onSelect={handleSelect}
               selectedItems={selectedApplications}
             />
-            {totalPages > 1 && ( 
-              <PaginationSub
-                totalPages={totalPages}
-                onPageChange={handlePageClick}
-                currentPage={currentPage}
-              />
+            {!loading && isPaginationRequired && (
+                <PaginationSub
+                    totalPages={totalPages}
+                    onPageChange={handlePageClick}
+                    currentPage={currentPage}
+                />
             )}
           </>
         )}
